@@ -468,8 +468,12 @@ function renderResults(name, year, month, day, hour) {
   // Fortune
   renderFortune(fortune);
 
-  // 2026 Forecast
-  render2026Fortune(animal, elements);
+  // 2026 Forecast (pre-calc once so love section shares same overall score)
+  const forecast2026 = calc2026Fortune(animal, elements);
+  render2026Fortune(animal, elements, forecast2026);
+
+  // Love & Relationships
+  renderLoveSection(animal, elements, forecast2026.overall);
 
   // Career + season + yin/yang
   renderCareerArchetype(dominantEl);
@@ -980,6 +984,168 @@ function initDateInputs() {
 }
 
 /* ═══════════════════════════════════════
+   LOVE — Archetype Data
+═══════════════════════════════════════ */
+const HEART_PATH = 'M 50 78 C 20 62 2 48 2 32 C 2 16 15 10 26 10 C 36 10 45 15 50 22 C 55 15 64 10 74 10 C 85 10 98 16 98 32 C 98 48 80 62 50 78 Z';
+
+const LOVE_ARCHETYPE = {
+  Wood:  {
+    title: 'The Nurturer', emoji: '🌿',
+    tagline: 'Patient · Devoted · Slow-burning',
+    desc_en: 'You love through acts of care and quiet consistency. You build slowly, but what you build lasts a lifetime. Partners feel deeply safe with you.',
+    desc_zh: '你以关怀与持久表达爱意，缓慢建立却经久不衰，伴侣在你身边感到深深的安全感。',
+    traits: ['Devoted', 'Patient', 'Nurturing'], language: 'Acts of Service',
+  },
+  Fire:  {
+    title: 'The Flame', emoji: '❤️‍🔥',
+    tagline: 'Intense · Magnetic · All-or-nothing',
+    desc_en: 'You love like wildfire — consuming, electric, impossible to ignore. You draw people in effortlessly. The challenge is sustaining that heat over time.',
+    desc_zh: '你的爱如烈火——炽烈、充满电力、势不可挡。魅力自然流露，挑战在于持久燃烧。',
+    traits: ['Magnetic', 'Passionate', 'Bold'], language: 'Words of Affirmation',
+  },
+  Earth: {
+    title: 'The Anchor', emoji: '🤎',
+    tagline: 'Loyal · Steady · The one who stays',
+    desc_en: 'You love with unshakeable loyalty. You\'re the person who shows up — in storms and in stillness. You give quietly and endlessly. You need to feel truly needed.',
+    desc_zh: '你以不可动摇的忠诚去爱，风雨晴朗都始终出现，默默付出。你需要被人真正需要。',
+    traits: ['Loyal', 'Reliable', 'Grounding'], language: 'Quality Time',
+  },
+  Metal: {
+    title: 'The Enigma', emoji: '🩶',
+    tagline: 'Selective · Precise · Fiercely devoted',
+    desc_en: 'You don\'t fall easily — but when you do, it\'s absolute. Your love is a fortress: rare entry, total protection. Vulnerability is your greatest frontier.',
+    desc_zh: '你不轻易动情，但一旦爱上便是全然投入。你的爱是堡垒，难以进入，却给予全面守护。',
+    traits: ['Selective', 'Devoted', 'Protective'], language: 'Acts of Service',
+  },
+  Water: {
+    title: 'The Dreamer', emoji: '💙',
+    tagline: 'Romantic · Intuitive · Soul-deep',
+    desc_en: 'You love with your whole soul — poetic, intuitive, and boundlessly empathetic. You feel what others feel before they say it. Guard your heart wisely.',
+    desc_zh: '你以整个灵魂去爱——浪漫、直觉敏锐、共情力无边。能在对方开口前感知其情绪，守护好自己的心。',
+    traits: ['Romantic', 'Empathetic', 'Intuitive'], language: 'Physical Touch',
+  },
+};
+
+/* ── Love 2026 Score ── */
+function calcLove2026(animal, elements, overall2026) {
+  const dominant = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
+  const zodiacLove = ZODIAC[animal].fortune.love;
+  // Fire Horse year is charged with passion — some signs benefit more
+  const ROMANTIC_BOOST = { Tiger:+10, Dog:+8, Goat:+8, Rabbit:+6, Horse:+5 };
+  const ROMANCE_DRAG   = { Rat:-8, Ox:-6 };
+  const animalMod = ROMANTIC_BOOST[animal] || ROMANCE_DRAG[animal] || 0;
+  const elLoveMod = { Wood:+7, Fire:+10, Earth:+2, Metal:-3, Water:+5 };
+  return Math.min(96, Math.max(35, Math.round(
+    zodiacLove * 0.45 + overall2026 * 0.25 + 25 + animalMod + (elLoveMod[dominant] || 0)
+  )));
+}
+
+/* ── Render Love Section ── */
+function renderLoveSection(animal, elements, overall2026) {
+  const dominant = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
+  const la = LOVE_ARCHETYPE[dominant];
+  const elColor = EL_COLOR[dominant];
+  const loveScore = calcLove2026(animal, elements, overall2026);
+  const zData = ZODIAC[animal];
+
+  const tier = loveScore >= 80
+    ? { label: 'High Potential 💘', color: '#f43f5e', zh: '桃花运旺' }
+    : loveScore >= 60
+    ? { label: 'Promising 💛', color: '#fb923c', zh: '情缘可期' }
+    : { label: 'Patience Required 🤍', color: '#94a3b8', zh: '修心静待' };
+
+  const soulHTML = zData.compat.map(a => {
+    const br = BRANCHES.find(b => b.animal === a);
+    const col = EL_COLOR[br?.element || 'Fire'];
+    return `<div class="love-soul-chip" style="border-color:${col}44;background:${col}12;color:${col}">
+      <svg viewBox="0 0 100 100" width="16" height="16" style="color:${col}">${ANIMAL_SVGS[a]||''}</svg>${a}
+    </div>`;
+  }).join('');
+
+  const clashHTML = zData.clash.map(a => {
+    return `<div class="love-clash-chip">
+      <svg viewBox="0 0 100 100" width="14" height="14" style="color:rgba(255,255,255,0.35)">${ANIMAL_SVGS[a]||''}</svg>${a}
+    </div>`;
+  }).join('');
+
+  document.getElementById('love-card').innerHTML = `
+    <div class="love-card">
+      <div class="love-top">
+        <div class="love-heart-wrap">
+          <svg viewBox="0 0 100 88" class="love-heart-svg">
+            <defs>
+              <clipPath id="loveClip">
+                <rect id="love-clip-rect" x="-5" y="78" width="110" height="90"/>
+              </clipPath>
+              <linearGradient id="loveGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#f43f5e"/>
+                <stop offset="100%" stop-color="#fb7185"/>
+              </linearGradient>
+            </defs>
+            <path d="${HEART_PATH}" fill="rgba(244,63,94,0.1)" stroke="rgba(244,63,94,0.22)" stroke-width="1.5"/>
+            <path d="${HEART_PATH}" fill="url(#loveGrad)" clip-path="url(#loveClip)" opacity="0.9"/>
+          </svg>
+          <div class="love-score-over">
+            <span class="love-score-num" id="love-score-num">0</span>
+            <span class="love-score-pct">%</span>
+          </div>
+        </div>
+        <div class="love-tier-label" style="color:${tier.color}">${tier.label}</div>
+        <div class="love-sublabel en">Chance of a meaningful connection in 2026</div>
+        <div class="love-sublabel zh hide">${tier.zh} · 2026年情感运势</div>
+      </div>
+
+      <div class="love-archetype" style="border-color:${elColor}25">
+        <div class="love-archetype-emoji">${la.emoji}</div>
+        <div class="love-archetype-info">
+          <div class="love-archetype-title" style="color:${elColor}">${la.title}</div>
+          <div class="love-archetype-tagline">${la.tagline}</div>
+          <div class="love-traits">${la.traits.map(t=>`<span class="love-trait">${t}</span>`).join('')}</div>
+        </div>
+        <div class="love-lang-badge">
+          <div class="love-lang-icon">🗣</div>
+          <div class="love-lang-text">${la.language}</div>
+        </div>
+      </div>
+
+      <div class="love-desc">
+        <p class="en">${la.desc_en}</p>
+        <p class="zh hide">${la.desc_zh}</p>
+      </div>
+
+      <div class="love-matches">
+        <div class="love-match-label">♥ Soul Animals</div>
+        <div class="love-soul-row">${soulHTML}</div>
+        <div class="love-match-label" style="margin-top:12px;color:rgba(255,255,255,0.3)">⚡ Handle With Care</div>
+        <div class="love-clash-row">${clashHTML}</div>
+      </div>
+    </div>`;
+
+  // Animate heart fill from bottom up
+  setTimeout(() => {
+    const rect = document.getElementById('love-clip-rect');
+    if (!rect) return;
+    const targetY = 78 - (loveScore / 100) * 68;
+    const startTime = performance.now();
+    function step(now) {
+      const t = Math.min((now - startTime) / 1600, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      rect.setAttribute('y', (78 + (targetY - 78) * ease).toFixed(2));
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    // Count up
+    let n = 0;
+    const iv = setInterval(() => {
+      n = Math.min(n + 2, loveScore);
+      const el = document.getElementById('love-score-num');
+      if (el) el.textContent = n;
+      if (n >= loveScore) clearInterval(iv);
+    }, 22);
+  }, 700);
+}
+
+/* ═══════════════════════════════════════
    TIPS — Tooltip Content Dictionary
 ═══════════════════════════════════════ */
 const TIPS = {
@@ -1060,6 +1226,13 @@ const TIPS = {
     body_en: '2026 is 丙午 (Bǐng Wǔ) — the Year of the Fire Horse. This score shows how your birth chart interacts with the Horse\'s blazing, free-spirited energy. Fire Horse years reward boldness and punish hesitation.',
     body_zh: '2026年为丙午年——火马之年。分数反映命盘与火马奔放能量的互动。火马年奖励大胆者，惩罚犹豫者。'
   },
+  'love-section': {
+    icon: '❤️',
+    title_en: 'Love & Relationships',
+    title_zh: '爱情与关系',
+    body_en: 'Your love forecast blends your zodiac\'s natural romantic energy with how the 2026 Fire Horse year activates the heart. The archetype reveals how you give and receive love — shaped by your dominant element.',
+    body_zh: '爱情运融合了生肖天然的感情能量与2026年火马年对情感的激活。爱情原型揭示了你基于主导五行的给予与接受爱的方式。'
+  },
 };
 
 /* ── Tooltip Functions ── */
@@ -1126,8 +1299,8 @@ function gen2026Monthly(base) {
   )));
 }
 
-function render2026Fortune(animal, elements) {
-  const { overall, aspects } = calc2026Fortune(animal, elements);
+function render2026Fortune(animal, elements, preCalc = null) {
+  const { overall, aspects } = preCalc || calc2026Fortune(animal, elements);
   const months = gen2026Monthly(overall);
   const dominant = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
 
