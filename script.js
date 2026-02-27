@@ -3,6 +3,204 @@
    script.js
 ═══════════════════════════════════════ */
 
+/* ── Haptic Feedback ── */
+function haptic(pattern = 10) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
+/* ── Custom Animal SVG Illustrations ── */
+const ANIMAL_SVGS = {
+  Rat: `
+    <ellipse cx="34" cy="25" rx="10" ry="13" fill="currentColor" opacity="0.85"/>
+    <ellipse cx="66" cy="25" rx="10" ry="13" fill="currentColor" opacity="0.85"/>
+    <ellipse cx="34" cy="25" rx="6.5" ry="9" fill="currentColor" opacity="0.3"/>
+    <ellipse cx="66" cy="25" rx="6.5" ry="9" fill="currentColor" opacity="0.3"/>
+    <ellipse cx="50" cy="67" rx="24" ry="20" fill="currentColor"/>
+    <circle cx="50" cy="44" r="17" fill="currentColor"/>
+    <ellipse cx="50" cy="52" rx="8" ry="6" fill="currentColor" opacity="0.65"/>
+    <circle cx="43" cy="40" r="3" fill="white"/><circle cx="57" cy="40" r="3" fill="white"/>
+    <circle cx="44" cy="41" r="1.5" fill="#0a0a1a"/><circle cx="58" cy="41" r="1.5" fill="#0a0a1a"/>
+    <circle cx="44.5" cy="40" r="0.7" fill="white"/><circle cx="58.5" cy="40" r="0.7" fill="white"/>
+    <ellipse cx="50" cy="53" rx="2.5" ry="2" fill="#ff8aaa"/>
+    <line x1="58" y1="50" x2="74" y2="47" stroke="currentColor" stroke-width="1" opacity="0.45"/>
+    <line x1="58" y1="53" x2="74" y2="53" stroke="currentColor" stroke-width="1" opacity="0.45"/>
+    <line x1="42" y1="50" x2="26" y2="47" stroke="currentColor" stroke-width="1" opacity="0.45"/>
+    <line x1="42" y1="53" x2="26" y2="53" stroke="currentColor" stroke-width="1" opacity="0.45"/>
+    <path d="M74,64 Q90,54 86,40 Q83,28 91,22" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.75"/>`,
+
+  Ox: `
+    <path d="M32,30 Q20,14 28,7" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M68,30 Q80,14 72,7" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="50" cy="70" rx="26" ry="19" fill="currentColor"/>
+    <rect x="38" y="50" width="24" height="20" rx="8" fill="currentColor"/>
+    <ellipse cx="50" cy="42" rx="18" ry="16" fill="currentColor"/>
+    <ellipse cx="50" cy="52" rx="12" ry="8" fill="currentColor" opacity="0.65"/>
+    <circle cx="45" cy="53" r="2.5" fill="currentColor" opacity="0.4"/>
+    <circle cx="55" cy="53" r="2.5" fill="currentColor" opacity="0.4"/>
+    <circle cx="41" cy="38" r="3.5" fill="white"/><circle cx="59" cy="38" r="3.5" fill="white"/>
+    <circle cx="42" cy="39" r="1.8" fill="#0a0a1a"/><circle cx="60" cy="39" r="1.8" fill="#0a0a1a"/>
+    <circle cx="42.5" cy="38.5" r="0.7" fill="white"/><circle cx="60.5" cy="38.5" r="0.7" fill="white"/>`,
+
+  Tiger: `
+    <path d="M30,30 L24,13 L41,24" fill="currentColor" opacity="0.9"/>
+    <path d="M70,30 L76,13 L59,24" fill="currentColor" opacity="0.9"/>
+    <path d="M32,29 L27,16 L40,25" fill="currentColor" opacity="0.35"/>
+    <path d="M68,29 L73,16 L60,25" fill="currentColor" opacity="0.35"/>
+    <ellipse cx="50" cy="70" rx="25" ry="18" fill="currentColor"/>
+    <circle cx="50" cy="46" r="22" fill="currentColor"/>
+    <ellipse cx="50" cy="55" rx="11" ry="8" fill="currentColor" opacity="0.6"/>
+    <path d="M46,50 L50,55 L54,50" stroke="currentColor" stroke-width="1.5" fill="currentColor" opacity="0.75"/>
+    <ellipse cx="41" cy="43" rx="5" ry="3.5" fill="white"/>
+    <ellipse cx="59" cy="43" rx="5" ry="3.5" fill="white"/>
+    <circle cx="41.5" cy="43.5" r="2.5" fill="#111"/>
+    <circle cx="59.5" cy="43.5" r="2.5" fill="#111"/>
+    <circle cx="42" cy="43" r="0.9" fill="white"/>
+    <circle cx="60" cy="43" r="0.9" fill="white"/>
+    <path d="M47,29 Q50,25 53,29" stroke="currentColor" stroke-width="2.5" fill="none" opacity="0.45" stroke-linecap="round"/>
+    <path d="M43,34 Q50,30 57,34" stroke="currentColor" stroke-width="2" fill="none" opacity="0.35" stroke-linecap="round"/>
+    <line x1="61" y1="53" x2="77" y2="49" stroke="currentColor" stroke-width="1.2" opacity="0.45"/>
+    <line x1="61" y1="56" x2="77" y2="56" stroke="currentColor" stroke-width="1.2" opacity="0.45"/>
+    <line x1="39" y1="53" x2="23" y2="49" stroke="currentColor" stroke-width="1.2" opacity="0.45"/>
+    <line x1="39" y1="56" x2="23" y2="56" stroke="currentColor" stroke-width="1.2" opacity="0.45"/>`,
+
+  Rabbit: `
+    <ellipse cx="37" cy="22" rx="9" ry="19" fill="currentColor" opacity="0.9"/>
+    <ellipse cx="63" cy="22" rx="9" ry="19" fill="currentColor" opacity="0.9"/>
+    <ellipse cx="37" cy="22" rx="5.5" ry="14" fill="currentColor" opacity="0.3"/>
+    <ellipse cx="63" cy="22" rx="5.5" ry="14" fill="currentColor" opacity="0.3"/>
+    <ellipse cx="50" cy="70" rx="22" ry="19" fill="currentColor"/>
+    <circle cx="50" cy="49" r="17" fill="currentColor"/>
+    <circle cx="37" cy="54" r="8" fill="currentColor" opacity="0.45"/>
+    <circle cx="63" cy="54" r="8" fill="currentColor" opacity="0.45"/>
+    <ellipse cx="50" cy="52" rx="2.5" ry="2" fill="#ff8aaa"/>
+    <circle cx="43" cy="45" r="3.5" fill="white"/><circle cx="57" cy="45" r="3.5" fill="white"/>
+    <circle cx="44" cy="46" r="2" fill="#111"/><circle cx="58" cy="46" r="2" fill="#111"/>
+    <circle cx="44.5" cy="45.5" r="0.7" fill="white"/><circle cx="58.5" cy="45.5" r="0.7" fill="white"/>
+    <circle cx="50" cy="86" r="6" fill="currentColor" opacity="0.55"/>`,
+
+  Dragon: `
+    <path d="M50,82 Q72,70 70,54 Q68,40 50,36 Q32,32 30,20 Q28,10 38,6" stroke="currentColor" stroke-width="11" fill="none" stroke-linecap="round" opacity="0.8"/>
+    <path d="M50,82 Q72,70 70,54 Q68,40 50,36 Q32,32 30,20 Q28,10 38,6" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.25"/>
+    <ellipse cx="42" cy="15" rx="13" ry="9" fill="currentColor" transform="rotate(-22,42,15)"/>
+    <path d="M34,8 Q27,1 32,-3" stroke="currentColor" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M46,7 Q44,-1 50,-4" stroke="currentColor" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <circle cx="37" cy="12" r="3" fill="white"/>
+    <circle cx="37.5" cy="12.5" r="1.8" fill="#111"/>
+    <circle cx="38" cy="12" r="0.7" fill="white"/>
+    <path d="M55,18 Q64,13 60,22 Q68,17 62,27" fill="currentColor" opacity="0.55"/>
+    <path d="M64,58 L68,64 M64,58 L70,61 M64,58 L66,54" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.65"/>`,
+
+  Snake: `
+    <circle cx="50" cy="58" r="28" fill="none" stroke="currentColor" stroke-width="9" opacity="0.7"/>
+    <circle cx="50" cy="58" r="17" fill="none" stroke="currentColor" stroke-width="9" opacity="0.8"/>
+    <circle cx="50" cy="58" r="7" fill="currentColor" opacity="0.65"/>
+    <path d="M50,30 Q50,18 62,13" stroke="currentColor" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.85"/>
+    <ellipse cx="66" cy="10" rx="10" ry="7" fill="currentColor" transform="rotate(28,66,10)"/>
+    <circle cx="69" cy="7" r="2.5" fill="white"/>
+    <circle cx="69.5" cy="7.5" r="1.4" fill="#111"/>
+    <path d="M74,14 L80,11 M74,14 L80,17" stroke="#ff4466" stroke-width="1.8" fill="none" stroke-linecap="round"/>`,
+
+  Horse: `
+    <ellipse cx="52" cy="70" rx="28" ry="18" fill="currentColor" transform="rotate(-8,52,70)"/>
+    <path d="M38,56 Q31,42 40,29" stroke="currentColor" stroke-width="15" fill="none" stroke-linecap="round"/>
+    <ellipse cx="40" cy="24" rx="10" ry="14" fill="currentColor" transform="rotate(18,40,24)"/>
+    <path d="M38,31 Q27,27 29,18 Q21,20 23,11 Q15,13 20,5" stroke="currentColor" stroke-width="5.5" fill="none" stroke-linecap="round" opacity="0.65"/>
+    <ellipse cx="46" cy="28" rx="3" ry="2.5" fill="currentColor" opacity="0.45"/>
+    <circle cx="35" cy="20" r="3" fill="white"/>
+    <circle cx="35.5" cy="20.5" r="1.8" fill="#111"/>
+    <circle cx="36" cy="20" r="0.7" fill="white"/>
+    <line x1="36" y1="83" x2="34" y2="96" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" opacity="0.75"/>
+    <line x1="50" y1="85" x2="50" y2="96" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" opacity="0.75"/>
+    <line x1="64" y1="83" x2="66" y2="96" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" opacity="0.75"/>`,
+
+  Goat: `
+    <ellipse cx="50" cy="70" rx="26" ry="20" fill="currentColor"/>
+    <circle cx="36" cy="68" r="10" fill="currentColor" opacity="0.65"/>
+    <circle cx="64" cy="68" r="10" fill="currentColor" opacity="0.65"/>
+    <circle cx="50" cy="64" r="10" fill="currentColor" opacity="0.65"/>
+    <rect x="42" y="51" width="16" height="17" rx="6" fill="currentColor"/>
+    <circle cx="50" cy="44" r="14" fill="currentColor"/>
+    <path d="M40,34 Q33,21 39,14" stroke="currentColor" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    <path d="M60,34 Q67,21 61,14" stroke="currentColor" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="50" cy="57" rx="5" ry="9" fill="currentColor" opacity="0.6"/>
+    <ellipse cx="43" cy="41" rx="3.5" ry="2.5" fill="white"/>
+    <ellipse cx="57" cy="41" rx="3.5" ry="2.5" fill="white"/>
+    <ellipse cx="43.5" cy="41.5" rx="2" ry="1.5" fill="#111"/>
+    <ellipse cx="57.5" cy="41.5" rx="2" ry="1.5" fill="#111"/>
+    <ellipse cx="50" cy="49" rx="7" ry="5" fill="currentColor" opacity="0.6"/>`,
+
+  Monkey: `
+    <ellipse cx="50" cy="70" rx="22" ry="18" fill="currentColor"/>
+    <circle cx="50" cy="44" r="18" fill="currentColor"/>
+    <circle cx="27" cy="44" r="11" fill="currentColor" opacity="0.85"/>
+    <circle cx="27" cy="44" r="7" fill="currentColor" opacity="0.35"/>
+    <circle cx="73" cy="44" r="11" fill="currentColor" opacity="0.85"/>
+    <circle cx="73" cy="44" r="7" fill="currentColor" opacity="0.35"/>
+    <ellipse cx="50" cy="47" rx="12" ry="13" fill="currentColor" opacity="0.5"/>
+    <circle cx="43" cy="40" r="3.5" fill="white"/>
+    <circle cx="57" cy="40" r="3.5" fill="white"/>
+    <circle cx="44" cy="41" r="2" fill="#111"/>
+    <circle cx="58" cy="41" r="2" fill="#111"/>
+    <circle cx="44.5" cy="40.5" r="0.7" fill="white"/>
+    <circle cx="58.5" cy="40.5" r="0.7" fill="white"/>
+    <circle cx="47" cy="47" r="2" fill="currentColor" opacity="0.55"/>
+    <circle cx="53" cy="47" r="2" fill="currentColor" opacity="0.55"/>
+    <path d="M43,52 Q50,57 57,52" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.55"/>
+    <path d="M72,62 Q86,52 84,40 Q82,29 76,27" stroke="currentColor" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.65"/>`,
+
+  Rooster: `
+    <ellipse cx="48" cy="68" rx="22" ry="18" fill="currentColor"/>
+    <path d="M68,62 Q82,49 86,38" stroke="currentColor" stroke-width="5.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+    <path d="M68,66 Q84,57 90,50" stroke="currentColor" stroke-width="5.5" fill="none" stroke-linecap="round" opacity="0.65"/>
+    <path d="M68,71 Q84,69 90,64" stroke="currentColor" stroke-width="5.5" fill="none" stroke-linecap="round" opacity="0.55"/>
+    <ellipse cx="44" cy="53" rx="11" ry="15" fill="currentColor" transform="rotate(-5,44,53)"/>
+    <circle cx="40" cy="36" r="14" fill="currentColor"/>
+    <path d="M35,23 Q40,12 45,21 Q47,11 52,20 Q54,9 57,17" stroke="currentColor" stroke-width="2.5" fill="currentColor" opacity="0.75"/>
+    <ellipse cx="31" cy="43" rx="5.5" ry="9" fill="currentColor" opacity="0.65"/>
+    <path d="M25,36 L18,34 L25,31" fill="currentColor" opacity="0.85"/>
+    <circle cx="38" cy="32" r="3.5" fill="white"/>
+    <circle cx="38.5" cy="32.5" r="2" fill="#111"/>
+    <circle cx="39" cy="32" r="0.7" fill="white"/>`,
+
+  Dog: `
+    <ellipse cx="50" cy="70" rx="24" ry="19" fill="currentColor"/>
+    <path d="M75,62 Q88,51 84,40" stroke="currentColor" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.65"/>
+    <circle cx="50" cy="44" r="18" fill="currentColor"/>
+    <ellipse cx="27" cy="49" rx="10" ry="17" fill="currentColor" opacity="0.85" transform="rotate(14,27,49)"/>
+    <ellipse cx="73" cy="49" rx="10" ry="17" fill="currentColor" opacity="0.85" transform="rotate(-14,73,49)"/>
+    <ellipse cx="50" cy="51" rx="11" ry="9" fill="currentColor" opacity="0.6"/>
+    <ellipse cx="50" cy="46" rx="6" ry="4.5" fill="currentColor" opacity="0.8"/>
+    <circle cx="47" cy="46" r="1.8" fill="white" opacity="0.35"/>
+    <circle cx="41" cy="40" r="3.5" fill="white"/>
+    <circle cx="59" cy="40" r="3.5" fill="white"/>
+    <circle cx="41.5" cy="40.5" r="2.2" fill="#111"/>
+    <circle cx="59.5" cy="40.5" r="2.2" fill="#111"/>
+    <circle cx="42" cy="40" r="0.8" fill="white"/>
+    <circle cx="60" cy="40" r="0.8" fill="white"/>
+    <path d="M37,36 Q41,34 45,36" stroke="currentColor" stroke-width="2" fill="none" opacity="0.5"/>
+    <path d="M55,36 Q59,34 63,36" stroke="currentColor" stroke-width="2" fill="none" opacity="0.5"/>
+    <path d="M44,55 Q50,62 56,55" fill="currentColor" opacity="0.45"/>`,
+
+  Pig: `
+    <circle cx="50" cy="68" r="24" fill="currentColor"/>
+    <circle cx="50" cy="44" r="20" fill="currentColor"/>
+    <ellipse cx="32" cy="28" rx="9" ry="8.5" fill="currentColor" opacity="0.85"/>
+    <ellipse cx="68" cy="28" rx="9" ry="8.5" fill="currentColor" opacity="0.85"/>
+    <ellipse cx="32" cy="28" rx="5.5" ry="5" fill="currentColor" opacity="0.3"/>
+    <ellipse cx="68" cy="28" rx="5.5" ry="5" fill="currentColor" opacity="0.3"/>
+    <circle cx="50" cy="51" r="13" fill="currentColor" opacity="0.6"/>
+    <circle cx="45" cy="52" r="3.5" fill="currentColor" opacity="0.5"/>
+    <circle cx="55" cy="52" r="3.5" fill="currentColor" opacity="0.5"/>
+    <circle cx="40" cy="38" r="4" fill="white"/>
+    <circle cx="60" cy="38" r="4" fill="white"/>
+    <circle cx="40.5" cy="38.5" r="2.3" fill="#111"/>
+    <circle cx="60.5" cy="38.5" r="2.3" fill="#111"/>
+    <circle cx="41" cy="38" r="0.8" fill="white"/>
+    <circle cx="61" cy="38" r="0.8" fill="white"/>
+    <path d="M40,57 Q50,64 60,57" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.45"/>
+    <path d="M74,66 Q83,58 80,52 Q78,47 83,45" stroke="currentColor" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.65"/>`,
+};
+
 /* ── Heavenly Stems ── */
 const STEMS = [
   { char:'甲', pinyin:'Jiǎ',  element:'Wood',  polarity:'Yang' },
@@ -204,16 +402,16 @@ function runLoader(callback) {
 ═══════════════════════════════════════ */
 function handleSubmit(e) {
   e.preventDefault();
-  const name      = document.getElementById('name').value.trim();
-  const dateVal   = document.getElementById('birthdate').value;
-  const timeVal   = document.getElementById('birthtime').value;
-  if (!dateVal) return;
+  haptic([15, 50, 15]);
+  const name  = document.getElementById('name').value.trim();
+  const d     = parseInt(document.getElementById('birth-day').value,   10);
+  const m     = parseInt(document.getElementById('birth-month').value, 10);
+  const y     = parseInt(document.getElementById('birth-year').value,  10);
+  if (!d || !m || !y || y < 1900 || y > 2025) return;
 
-  const [y, m, d] = dateVal.split('-').map(Number);
+  const timeVal = document.getElementById('birthtime').value;
   let hour = null;
-  if (timeVal) {
-    hour = parseInt(timeVal.split(':')[0], 10);
-  }
+  if (timeVal) hour = parseInt(timeVal.split(':')[0], 10);
 
   runLoader(() => renderResults(name, y, m - 1, d, hour));
 }
@@ -233,11 +431,17 @@ function renderResults(name, year, month, day, hour) {
   const greet = name ? `Hey, ${name} ✦` : 'Your Destiny ✦';
   document.getElementById('greeting').textContent = greet;
 
-  // Hero card
   const elColor = EL_COLOR[yearPillar.stem.element];
+  const dominantEl = Object.entries(elements).sort((a,b)=>b[1]-a[1])[0][0];
+
+  // Store share data
+  _shareData = { animal, element: yearPillar.stem.element, polarity: yearPillar.stem.polarity, year, fortune };
+
+  // Hero card
   document.getElementById('hero-bg').style.background =
-    `linear-gradient(135deg, ${elColor}22, ${elColor}55, #0f0f1c)`;
-  document.getElementById('hero-emoji').textContent = yearPillar.branch.emoji;
+    `linear-gradient(135deg, ${elColor}28, ${elColor}55, #0f0f1c)`;
+  document.getElementById('hero-medallion').innerHTML =
+    makeMedallion(animal, elColor, 'hero-med');
   document.getElementById('hero-year-tag').textContent =
     `Year of the ${animal} · ${year}`;
   document.getElementById('hero-name').textContent = animal;
@@ -252,6 +456,9 @@ function renderResults(name, year, month, day, hour) {
   document.getElementById('trait-pills').innerHTML =
     zData.traits.map(t => `<span class="trait-pill">${t}</span>`).join('');
 
+  // Daily fortune
+  renderDailyFortune(animal);
+
   // Pillars
   renderPillars(pillars);
 
@@ -260,6 +467,11 @@ function renderResults(name, year, month, day, hour) {
 
   // Fortune
   renderFortune(fortune);
+
+  // Career + season + yin/yang
+  renderCareerArchetype(dominantEl);
+  renderPowerSeason(dominantEl);
+  renderYinYang(pillars);
 
   // Reading
   document.getElementById('reading-en').textContent = zData.desc_en;
@@ -272,6 +484,7 @@ function renderResults(name, year, month, day, hour) {
   renderLucky(zData.lucky);
 
   showScreen('results');
+  haptic([20, 60, 20]);
 
   // Animate progress rings after screen shows
   setTimeout(() => animateFortune(fortune), 300);
@@ -295,7 +508,7 @@ function renderPillars(pillars) {
       <div class="pillar-stem-name">${p.stem.pinyin}</div>
       <div class="pillar-sep"></div>
       <div class="pillar-branch-char">${p.branch.char}</div>
-      <div class="pillar-animal-emoji">${p.branch.emoji}</div>
+      ${makeMedallion(p.branch.animal, EL_COLOR[p.branch.element], 'pillar-med')}
       <div class="pillar-animal-name">${p.branch.animal}</div>
       <div class="pillar-el-dot" style="background:${EL_COLOR[p.branch.element]}"></div>
     </div>`;
@@ -490,6 +703,280 @@ function toggleLang() {
   btn.classList.toggle('zh-active', isZh);
 }
 
+/* ═══════════════════════════════════════
+   Extra Zodiac Data — Career + Season
+═══════════════════════════════════════ */
+const CAREER_ARCHETYPE = {
+  Wood:  { icon:'🌿', name:'The Cultivator',  tagline:'Builder · Educator · Healer', roles:['Medicine','Education','Architecture','Environmental Science','Coaching'] },
+  Fire:  { icon:'🔥', name:'The Visionary',   tagline:'Leader · Artist · Performer',  roles:['Entrepreneurship','Entertainment','Marketing','Politics','Design'] },
+  Earth: { icon:'🌍', name:'The Anchor',      tagline:'Manager · Mediator · Founder', roles:['Business','Real Estate','Finance','HR','Consulting'] },
+  Metal: { icon:'⚡', name:'The Executor',    tagline:'Engineer · Analyst · Strategist', roles:['Engineering','Law','Finance','Science','Military'] },
+  Water: { icon:'💧', name:'The Strategist',  tagline:'Thinker · Writer · Philosopher', roles:['Writing','Research','Philosophy','Tech','Intelligence'] },
+};
+
+const POWER_SEASON = {
+  Wood:  { season:'Spring', emoji:'🌸', vibe:'Growth & new beginnings' },
+  Fire:  { season:'Summer', emoji:'☀️', vibe:'Peak energy & visibility' },
+  Earth: { season:'Harvest',emoji:'🍂', vibe:'Stability & abundance' },
+  Metal: { season:'Autumn', emoji:'🍁', vibe:'Precision & clarity' },
+  Water: { season:'Winter', emoji:'❄️', vibe:'Reflection & strategy' },
+};
+
+const ALL_SEASONS = [
+  { key:'Wood',  label:'Spring', emoji:'🌸', vibe:'Growth' },
+  { key:'Fire',  label:'Summer', emoji:'☀️', vibe:'Visibility' },
+  { key:'Earth', label:'Harvest',emoji:'🍂', vibe:'Abundance' },
+  { key:'Metal', label:'Autumn', emoji:'🍁', vibe:'Clarity' },
+];
+// Water = Winter wraps around; displayed separately in the card footer
+
+/* ── Medallion helper ── */
+function makeMedallion(animal, elColor, cls = 'hero-med') {
+  const svg = ANIMAL_SVGS[animal] || '';
+  return `<div class="animal-medallion ${cls}" style="background:radial-gradient(circle at 40% 35%, ${elColor}55, ${elColor}18);">
+    <div class="med-ring"></div>
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="color:white">${svg}</svg>
+  </div>`;
+}
+
+/* ── Daily Fortune ── */
+function calcDayBranch(year, month, day) {
+  const ref = new Date(2000, 0, 7);
+  const d   = new Date(year, month, day);
+  const diff = Math.round((d - ref) / 86400000);
+  return ((diff % 12) + 12) % 12;
+}
+
+function renderDailyFortune(userAnimal) {
+  const now = new Date();
+  const todayBranchIdx = calcDayBranch(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayAnimal    = BRANCHES[todayBranchIdx].animal;
+  const userZodiac     = ZODIAC[userAnimal];
+
+  let score, color, levelLabel, msg_en, msg_zh;
+  if (userZodiac.compat.includes(todayAnimal)) {
+    score = 85 + Math.floor(Math.random() * 12);
+    color = '#22c55e'; levelLabel = 'Auspicious';
+    msg_en = `Today's energy flows with you. The ${todayAnimal} day amplifies your natural power — make your boldest moves now.`;
+    msg_zh = `今日能量与你同频。${todayAnimal}日增强你的天赋能量，大胆出击，正当时。`;
+  } else if (userZodiac.clash.includes(todayAnimal)) {
+    score = 38 + Math.floor(Math.random() * 18);
+    color = '#ef4444'; levelLabel = 'Challenging';
+    msg_en = `The ${todayAnimal} day creates friction with your chart. Navigate slowly, hold decisions until tomorrow, and protect your energy.`;
+    msg_zh = `今日${todayAnimal}日与你的命盘有冲突。放缓节奏，重要决定推迟到明天，注意保护自己的能量。`;
+  } else {
+    score = 60 + Math.floor(Math.random() * 22);
+    color = '#f0c040'; levelLabel = 'Balanced';
+    msg_en = `A steady ${todayAnimal} day — neither tailwind nor headwind. Focus on consistency, refine the details, and trust the process.`;
+    msg_zh = `今日${todayAnimal}日平稳，无明显顺逆之风。专注于一致性，打磨细节，相信过程。`;
+  }
+
+  const dateLabel = now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  document.getElementById('today-date-label').textContent = dateLabel;
+
+  const card = document.getElementById('daily-card');
+  card.innerHTML = `<div class="daily-fortune-card">
+    <div class="daily-top">
+      <div>
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Today's Day Animal</div>
+        <div class="daily-animal-chip">
+          <svg viewBox="0 0 100 100" width="22" height="22" style="color:${color}">${ANIMAL_SVGS[todayAnimal]||''}</svg>
+          ${todayAnimal}
+        </div>
+      </div>
+      <div class="daily-score-wrap">
+        <div class="daily-score-num" id="daily-score-num" style="color:${color}">0</div>
+        <div class="daily-score-label">${levelLabel}</div>
+      </div>
+    </div>
+    <div class="daily-bar-track">
+      <div class="daily-bar-fill" id="daily-bar" style="background:${color}" data-pct="${score}"></div>
+    </div>
+    <div class="daily-msg">
+      <span class="daily-level-dot" style="background:${color}"></span>
+      <span class="en">${msg_en}</span>
+      <span class="zh hide">${msg_zh}</span>
+    </div>
+  </div>`;
+
+  setTimeout(() => {
+    document.getElementById('daily-bar').style.width = score + '%';
+    let n = 0;
+    const iv = setInterval(() => {
+      n = Math.min(n + 3, score);
+      const el = document.getElementById('daily-score-num');
+      if (el) el.textContent = n;
+      if (n >= score) clearInterval(iv);
+    }, 18);
+  }, 400);
+}
+
+/* ── Career Archetype ── */
+function renderCareerArchetype(dominantEl) {
+  const ca = CAREER_ARCHETYPE[dominantEl];
+  const col = EL_COLOR[dominantEl];
+  document.getElementById('career-card').innerHTML = `
+    <div class="career-card" style="border-color:${col}22">
+      <div class="career-icon-wrap">${ca.icon}</div>
+      <div class="career-info">
+        <div class="career-archetype-name" style="color:${col}">${ca.name}</div>
+        <div class="career-tagline en">${ca.tagline}</div>
+        <div class="career-roles">
+          ${ca.roles.map(r=>`<span class="career-role-chip">${r}</span>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ── Power Season ── */
+function renderPowerSeason(dominantEl) {
+  const ps = POWER_SEASON[dominantEl];
+  const seasons = [
+    { key:'Wood',  label:'Spring', emoji:'🌸', vibe:'Growth & new beginnings' },
+    { key:'Fire',  label:'Summer', emoji:'☀️',  vibe:'Peak energy & visibility' },
+    { key:'Earth', label:'Harvest',emoji:'🍂', vibe:'Stability & abundance' },
+    { key:'Metal', label:'Autumn', emoji:'🍁', vibe:'Precision & clarity' },
+    { key:'Water', label:'Winter', emoji:'❄️',  vibe:'Reflection & strategy' },
+  ];
+  const segmentColors = { Wood:'#22c55e', Fire:'#ef4444', Earth:'#f59e0b', Metal:'#94a3b8', Water:'#3b82f6' };
+
+  const barHTML = seasons.map(s =>
+    `<div class="season-segment" style="background:${segmentColors[s.key]};opacity:${s.key===dominantEl?1:0.25}"></div>`
+  ).join('');
+
+  const bodyHTML = seasons.map(s => `
+    <div class="season-item ${s.key===dominantEl?'active':''}">
+      <div class="season-emoji">${s.emoji}</div>
+      <div class="season-name" style="${s.key===dominantEl?`color:${segmentColors[s.key]}`:''}">
+        ${s.label}${s.key===dominantEl?'':''}
+      </div>
+      ${s.key===dominantEl?`<span class="power-badge">YOUR PEAK</span>`:`<div class="season-vibe">${s.vibe}</div>`}
+    </div>`).join('');
+
+  document.getElementById('season-card').innerHTML = `
+    <div class="season-card">
+      <div class="season-bar">${barHTML}</div>
+      <div class="season-body">${bodyHTML}</div>
+    </div>`;
+}
+
+/* ── Yin Yang Balance ── */
+function renderYinYang(pillars) {
+  let yin = 0, yang = 0;
+  pillars.forEach(p => {
+    if (!p.known) return;
+    if (p.stem)   p.stem.polarity   === 'Yin' ? yin++ : yang++;
+    if (p.branch) {
+      const branchPolarity = BRANCHES.indexOf(p.branch) % 2 === 0 ? 'Yang' : 'Yin';
+      branchPolarity === 'Yin' ? yin++ : yang++;
+    }
+  });
+  const total = yin + yang || 1;
+  const yinPct  = Math.round(yin  / total * 100);
+  const yangPct = Math.round(yang / total * 100);
+
+  const summary = yinPct > 65 ? 'Deeply Yin — intuitive, receptive, and internally focused.'
+    : yangPct > 65 ? 'Strongly Yang — action-driven, expressive, and outward-facing.'
+    : 'Well Balanced — a rare and powerful equilibrium between Yin and Yang.';
+
+  const sumZh = yinPct > 65 ? '阴气较重，直觉敏锐，内敛而深邃。'
+    : yangPct > 65 ? '阳气充足，行动力强，外向而积极。'
+    : '阴阳均衡，难得的平衡之气，内外兼修。';
+
+  document.getElementById('yinyang-card').innerHTML = `
+    <div class="yinyang-card">
+      <div class="yy-row">
+        <div class="yy-label" style="color:#a78bfa">阴</div>
+        <div class="yy-track">
+          <div class="yy-fill-yin" id="yy-yin" data-pct="${yinPct}"></div>
+        </div>
+        <div class="yy-count" style="color:#a78bfa">${yin}</div>
+      </div>
+      <div class="yy-row">
+        <div class="yy-label" style="color:#f59e0b">阳</div>
+        <div class="yy-track">
+          <div class="yy-fill-yang" id="yy-yang" data-pct="${yangPct}"></div>
+        </div>
+        <div class="yy-count" style="color:#f59e0b">${yang}</div>
+      </div>
+      <div class="yy-symbols">
+        ${Array(yin).fill('<div class="yy-dot yin"></div>').join('')}
+        ${Array(yang).fill('<div class="yy-dot yang"></div>').join('')}
+      </div>
+      <div class="yy-summary en">${summary}</div>
+      <div class="yy-summary zh hide">${sumZh}</div>
+    </div>`;
+
+  setTimeout(() => {
+    const yinEl  = document.getElementById('yy-yin');
+    const yangEl = document.getElementById('yy-yang');
+    if (yinEl)  yinEl.style.width  = yinPct  + '%';
+    if (yangEl) yangEl.style.width = yangPct + '%';
+  }, 400);
+}
+
+/* ── Share Card ── */
+let _shareData = {};
+
+function showShareCard() {
+  const o = _shareData;
+  if (!o.animal) return;
+  const elColor = EL_COLOR[o.element];
+  document.getElementById('share-card-preview').innerHTML = `
+    <div class="share-wobazi-logo">✦ WOBAZI ✦</div>
+    <div class="share-animal-big">
+      <svg viewBox="0 0 100 100" width="80" height="80" style="color:${elColor}">${ANIMAL_SVGS[o.animal]||''}</svg>
+    </div>
+    <div class="share-animal-name">${o.animal}</div>
+    <div class="share-sub">${o.element} ${o.polarity} · Year ${o.year}</div>
+    <div class="share-fortune-row">
+      ${[['❤️','Love',o.fortune.love,'#f43f5e'],['💼','Career',o.fortune.career,'#8b5cf6'],
+         ['🌿','Health',o.fortune.health,'#22c55e'],['💰','Wealth',o.fortune.wealth,'#f59e0b']]
+        .map(([ic,lb,sc,cl])=>`<div class="share-fortune-item">
+          <div class="share-fortune-icon">${ic}</div>
+          <div class="share-fortune-score" style="color:${cl}">${sc}</div>
+          <div class="share-fortune-lbl">${lb}</div>
+        </div>`).join('')}
+    </div>
+    <div class="share-url">wobazi.com</div>`;
+
+  document.getElementById('share-overlay').classList.remove('hide');
+}
+
+function closeShare() {
+  document.getElementById('share-overlay').classList.add('hide');
+}
+
+async function doShare() {
+  haptic(15);
+  const o = _shareData;
+  const text = `I'm a ${o.element} ${o.animal} (${o.polarity}) 🐉\nLove ${o.fortune.love} · Career ${o.fortune.career} · Health ${o.fortune.health} · Wealth ${o.fortune.wealth}\nDiscover your Chinese destiny →`;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'My Wobazi Reading', text, url: 'https://wobazi.com' });
+    } catch (_) {}
+  } else if (navigator.clipboard) {
+    await navigator.clipboard.writeText(text + '\nhttps://wobazi.com');
+    alert('Copied to clipboard!');
+  }
+}
+
+/* ── Date input auto-advance ── */
+function initDateInputs() {
+  const dayEl   = document.getElementById('birth-day');
+  const monEl   = document.getElementById('birth-month');
+  const yearEl  = document.getElementById('birth-year');
+  if (!dayEl) return;
+
+  dayEl.addEventListener('input', () => {
+    if (dayEl.value.length >= 2) monEl.focus();
+  });
+  monEl.addEventListener('input', () => {
+    if (monEl.value.length >= 2) yearEl.focus();
+  });
+}
+
 /* ── Init ── */
 buildStars();
+initDateInputs();
 

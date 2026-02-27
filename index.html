@@ -22,7 +22,7 @@
         <p class="logo-sub">Chinese Destiny Engine</p>
       </div>
       <p class="splash-tagline">Decode your fate through the ancient<br>art of the Four Pillars</p>
-      <button class="btn-primary" onclick="showScreen('input')">
+      <button class="btn-primary" onclick="haptic(10); showScreen('input')">
         Begin Your Reading
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
@@ -32,7 +32,7 @@
   <!-- INPUT -->
   <div id="input" class="screen">
     <div class="nav-bar">
-      <button class="btn-back" onclick="showScreen('splash')">
+      <button class="btn-back" onclick="haptic(8); showScreen('splash')">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="nav-title">Birth Chart</span>
@@ -48,14 +48,23 @@
           <label>Name <span class="label-opt">optional</span></label>
           <input type="text" id="name" placeholder="What do we call you?" autocomplete="off" spellcheck="false">
         </div>
+
         <div class="field">
           <label>Date of Birth <span class="label-req">*</span></label>
-          <input type="date" id="birthdate" required>
+          <div class="date-trio">
+            <input type="number" id="birth-day"   class="date-part" placeholder="DD"   min="1"    max="31"   inputmode="numeric">
+            <span class="date-sep">/</span>
+            <input type="number" id="birth-month" class="date-part" placeholder="MM"   min="1"    max="12"   inputmode="numeric">
+            <span class="date-sep">/</span>
+            <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1920" max="2025" inputmode="numeric">
+          </div>
         </div>
+
         <div class="field">
           <label>Time of Birth <span class="label-opt">optional — unlocks Hour Pillar</span></label>
           <input type="time" id="birthtime">
         </div>
+
         <button type="submit" class="btn-primary btn-full">
           <span>Reveal My Destiny</span>
           <span class="btn-char">龙</span>
@@ -84,15 +93,21 @@
   <div id="results" class="screen">
     <div class="results-header">
       <div id="greeting" class="greeting"></div>
-      <button class="btn-lang" id="lang-btn" onclick="toggleLang()">中文</button>
+      <div class="header-actions">
+        <button class="btn-share-icon" id="share-btn" onclick="haptic(8); showShareCard()" title="Share">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+        <button class="btn-lang" id="lang-btn" onclick="toggleLang()">中文</button>
+      </div>
     </div>
+
     <div class="scroll-body">
 
       <!-- Hero -->
       <section class="hero-card" id="hero-card">
         <div class="hero-bg" id="hero-bg"></div>
         <div class="hero-content">
-          <div class="hero-emoji" id="hero-emoji">🐉</div>
+          <div class="hero-medallion" id="hero-medallion"></div>
           <div class="hero-text">
             <div class="hero-year-tag" id="hero-year-tag"></div>
             <h1 class="hero-name" id="hero-name"></h1>
@@ -100,6 +115,16 @@
           </div>
         </div>
         <div class="trait-pills" id="trait-pills"></div>
+      </section>
+
+      <!-- Daily Fortune -->
+      <section class="section">
+        <div class="section-head">
+          <h3 class="en">Today's Fortune</h3>
+          <h3 class="zh hide">今日运势</h3>
+          <span class="section-sub" id="today-date-label"></span>
+        </div>
+        <div id="daily-card"></div>
       </section>
 
       <!-- Four Pillars -->
@@ -135,6 +160,34 @@
         <div class="fortune-grid" id="fortune-grid"></div>
       </section>
 
+      <!-- Career Archetype -->
+      <section class="section">
+        <div class="section-head">
+          <h3 class="en">Career Archetype</h3>
+          <h3 class="zh hide">职业原型</h3>
+        </div>
+        <div id="career-card"></div>
+      </section>
+
+      <!-- Power Season -->
+      <section class="section">
+        <div class="section-head">
+          <h3 class="en">Power Season</h3>
+          <h3 class="zh hide">旺季</h3>
+        </div>
+        <div id="season-card"></div>
+      </section>
+
+      <!-- Yin Yang -->
+      <section class="section">
+        <div class="section-head">
+          <h3 class="en">Yin · Yang Balance</h3>
+          <h3 class="zh hide">阴阳平衡</h3>
+          <span class="section-sub">阴阳 Yīn Yáng</span>
+        </div>
+        <div id="yinyang-card"></div>
+      </section>
+
       <!-- Reading -->
       <section class="section">
         <div class="section-head">
@@ -166,10 +219,25 @@
       </section>
 
       <div class="results-footer">
-        <button class="btn-secondary" onclick="showScreen('input')">
+        <button class="btn-secondary" onclick="haptic(8); showScreen('input')">
           <span class="en">New Reading</span>
           <span class="zh hide">重新算命</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHARE OVERLAY -->
+  <div id="share-overlay" class="share-overlay hide">
+    <div class="share-backdrop" onclick="closeShare()"></div>
+    <div class="share-panel">
+      <div class="share-card-preview" id="share-card-preview"></div>
+      <div class="share-buttons">
+        <button class="btn-share-action primary-share" onclick="doShare()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share My Reading
+        </button>
+        <button class="btn-share-action secondary-share" onclick="closeShare()">Close</button>
       </div>
     </div>
   </div>
