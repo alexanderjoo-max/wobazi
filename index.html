@@ -1,1 +1,179 @@
-echo "<h1>Welcome to wobazi.com</h1>" > index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Wobazi ✦ Your Chinese Destiny</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- SPLASH -->
+  <div id="splash" class="screen active">
+    <div class="stars" id="stars"></div>
+    <div class="splash-content">
+      <div class="logo-wrap">
+        <div class="logo-chinese">八字</div>
+        <h1 class="logo-text">wobazi</h1>
+        <p class="logo-sub">Chinese Destiny Engine</p>
+      </div>
+      <p class="splash-tagline">Decode your fate through the ancient<br>art of the Four Pillars</p>
+      <button class="btn-primary" onclick="showScreen('input')">
+        Begin Your Reading
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div id="input" class="screen">
+    <div class="nav-bar">
+      <button class="btn-back" onclick="showScreen('splash')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="nav-title">Birth Chart</span>
+      <div style="width:40px"></div>
+    </div>
+    <div class="input-body">
+      <div class="input-intro">
+        <div class="intro-icon">✦</div>
+        <p>Enter your details to unlock your<br><strong>Four Pillars of Destiny</strong></p>
+      </div>
+      <form id="bazi-form" onsubmit="handleSubmit(event)">
+        <div class="field">
+          <label>Name <span class="label-opt">optional</span></label>
+          <input type="text" id="name" placeholder="What do we call you?" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label>Date of Birth <span class="label-req">*</span></label>
+          <input type="date" id="birthdate" required>
+        </div>
+        <div class="field">
+          <label>Time of Birth <span class="label-opt">optional — unlocks Hour Pillar</span></label>
+          <input type="time" id="birthtime">
+        </div>
+        <button type="submit" class="btn-primary btn-full">
+          <span>Reveal My Destiny</span>
+          <span class="btn-char">龙</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading" class="screen">
+    <div class="loading-wrap">
+      <div class="taiji-wrap">
+        <div class="taiji">☯</div>
+        <div class="taiji-ring r1"></div>
+        <div class="taiji-ring r2"></div>
+        <div class="taiji-ring r3"></div>
+      </div>
+      <p class="loading-msg" id="loading-msg">Aligning the heavenly stems…</p>
+      <div class="loading-track">
+        <div class="loading-fill" id="loading-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results" class="screen">
+    <div class="results-header">
+      <div id="greeting" class="greeting"></div>
+      <button class="btn-lang" id="lang-btn" onclick="toggleLang()">中文</button>
+    </div>
+    <div class="scroll-body">
+
+      <!-- Hero -->
+      <section class="hero-card" id="hero-card">
+        <div class="hero-bg" id="hero-bg"></div>
+        <div class="hero-content">
+          <div class="hero-emoji" id="hero-emoji">🐉</div>
+          <div class="hero-text">
+            <div class="hero-year-tag" id="hero-year-tag"></div>
+            <h1 class="hero-name" id="hero-name"></h1>
+            <div class="hero-badges" id="hero-badges"></div>
+          </div>
+        </div>
+        <div class="trait-pills" id="trait-pills"></div>
+      </section>
+
+      <!-- Four Pillars -->
+      <section class="section">
+        <div class="section-head">
+          <h3 class="en">Four Pillars</h3>
+          <h3 class="zh hide">四柱</h3>
+          <span class="section-sub">八字 Bāzì</span>
+        </div>
+        <div class="pillars-row" id="pillars-row"></div>
+      </section>
+
+      <!-- Element Balance -->
+      <section class="section">
+        <div class="section-head">
+          <h3 class="en">Element Balance</h3>
+          <h3 class="zh hide">五行平衡</h3>
+          <span class="section-sub">五行 Wǔxíng</span>
+        </div>
+        <div class="element-chart-wrap">
+          <svg id="radar-svg" viewBox="0 0 200 190" class="radar-svg"></svg>
+          <div class="element-legend" id="element-legend"></div>
+        </div>
+      </section>
+
+      <!-- Fortune -->
+      <section class="section">
+        <div class="section-head">
+          <h3 class="en">Life Fortune</h3>
+          <h3 class="zh hide">命运</h3>
+          <span class="section-sub">命运 Mìngyùn</span>
+        </div>
+        <div class="fortune-grid" id="fortune-grid"></div>
+      </section>
+
+      <!-- Reading -->
+      <section class="section">
+        <div class="section-head">
+          <h3 class="en">Your Reading</h3>
+          <h3 class="zh hide">您的命理</h3>
+        </div>
+        <div class="reading-card">
+          <p class="en" id="reading-en"></p>
+          <p class="zh hide" id="reading-zh"></p>
+        </div>
+      </section>
+
+      <!-- Compatibility -->
+      <section class="section">
+        <div class="section-head">
+          <h3 class="en">Compatibility</h3>
+          <h3 class="zh hide">生肖相合</h3>
+        </div>
+        <div id="compat-wrap"></div>
+      </section>
+
+      <!-- Lucky -->
+      <section class="section">
+        <div class="section-head">
+          <h3 class="en">Lucky Vibes</h3>
+          <h3 class="zh hide">吉祥元素</h3>
+        </div>
+        <div class="lucky-grid" id="lucky-grid"></div>
+      </section>
+
+      <div class="results-footer">
+        <button class="btn-secondary" onclick="showScreen('input')">
+          <span class="en">New Reading</span>
+          <span class="zh hide">重新算命</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
