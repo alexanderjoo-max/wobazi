@@ -117,9 +117,19 @@
         <div class="trait-pills" id="trait-pills"></div>
       </section>
 
+      <!-- 2026 Annual Forecast -->
+      <section class="section">
+        <div class="section-head" data-tip="forecast-2026">
+          <h3 class="en">2026 Forecast</h3>
+          <h3 class="zh hide">2026年运势</h3>
+          <span class="section-sub">丙午 · Fire Horse</span>
+        </div>
+        <div id="forecast-card"></div>
+      </section>
+
       <!-- Daily Fortune -->
       <section class="section">
-        <div class="section-head">
+        <div class="section-head" data-tip="daily-fortune">
           <h3 class="en">Today's Fortune</h3>
           <h3 class="zh hide">今日运势</h3>
           <span class="section-sub" id="today-date-label"></span>
@@ -129,7 +139,7 @@
 
       <!-- Four Pillars -->
       <section class="section">
-        <div class="section-head">
+        <div class="section-head" data-tip="four-pillars">
           <h3 class="en">Four Pillars</h3>
           <h3 class="zh hide">四柱</h3>
           <span class="section-sub">八字 Bāzì</span>
@@ -139,7 +149,7 @@
 
       <!-- Element Balance -->
       <section class="section">
-        <div class="section-head">
+        <div class="section-head" data-tip="element-balance">
           <h3 class="en">Element Balance</h3>
           <h3 class="zh hide">五行平衡</h3>
           <span class="section-sub">五行 Wǔxíng</span>
@@ -152,7 +162,7 @@
 
       <!-- Fortune -->
       <section class="section">
-        <div class="section-head">
+        <div class="section-head" data-tip="fortune-cards">
           <h3 class="en">Life Fortune</h3>
           <h3 class="zh hide">命运</h3>
           <span class="section-sub">命运 Mìngyùn</span>
@@ -162,7 +172,7 @@
 
       <!-- Career Archetype -->
       <section class="section">
-        <div class="section-head">
+        <div class="section-head" data-tip="career-archetype">
           <h3 class="en">Career Archetype</h3>
           <h3 class="zh hide">职业原型</h3>
         </div>
@@ -171,7 +181,7 @@
 
       <!-- Power Season -->
       <section class="section">
-        <div class="section-head">
+        <div class="section-head" data-tip="power-season">
           <h3 class="en">Power Season</h3>
           <h3 class="zh hide">旺季</h3>
         </div>
@@ -180,7 +190,7 @@
 
       <!-- Yin Yang -->
       <section class="section">
-        <div class="section-head">
+        <div class="section-head" data-tip="yin-yang">
           <h3 class="en">Yin · Yang Balance</h3>
           <h3 class="zh hide">阴阳平衡</h3>
           <span class="section-sub">阴阳 Yīn Yáng</span>
@@ -190,7 +200,7 @@
 
       <!-- Reading -->
       <section class="section">
-        <div class="section-head">
+        <div class="section-head" data-tip="zodiac">
           <h3 class="en">Your Reading</h3>
           <h3 class="zh hide">您的命理</h3>
         </div>
@@ -202,7 +212,7 @@
 
       <!-- Compatibility -->
       <section class="section">
-        <div class="section-head">
+        <div class="section-head" data-tip="compatibility">
           <h3 class="en">Compatibility</h3>
           <h3 class="zh hide">生肖相合</h3>
         </div>
@@ -211,7 +221,7 @@
 
       <!-- Lucky -->
       <section class="section">
-        <div class="section-head">
+        <div class="section-head" data-tip="lucky-vibes">
           <h3 class="en">Lucky Vibes</h3>
           <h3 class="zh hide">吉祥元素</h3>
         </div>
@@ -239,6 +249,20 @@
         </button>
         <button class="btn-share-action secondary-share" onclick="closeShare()">Close</button>
       </div>
+    </div>
+  </div>
+
+  <!-- TIP OVERLAY -->
+  <div id="tip-overlay" class="tip-overlay">
+    <div class="tip-backdrop" onclick="closeTip()"></div>
+    <div class="tip-sheet">
+      <div class="tip-handle"></div>
+      <div class="tip-icon" id="tip-icon"></div>
+      <div class="tip-title-en" id="tip-title-en"></div>
+      <div class="tip-title-zh" id="tip-title-zh"></div>
+      <div class="tip-body-en" id="tip-body-en"></div>
+      <div class="tip-body-zh" id="tip-body-zh"></div>
+      <button class="tip-close" onclick="closeTip()">Got it ✓</button>
     </div>
   </div>
 

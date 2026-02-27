@@ -468,6 +468,9 @@ function renderResults(name, year, month, day, hour) {
   // Fortune
   renderFortune(fortune);
 
+  // 2026 Forecast
+  render2026Fortune(animal, elements);
+
   // Career + season + yin/yang
   renderCareerArchetype(dominantEl);
   renderPowerSeason(dominantEl);
@@ -976,7 +979,278 @@ function initDateInputs() {
   });
 }
 
+/* ═══════════════════════════════════════
+   TIPS — Tooltip Content Dictionary
+═══════════════════════════════════════ */
+const TIPS = {
+  'zodiac': {
+    icon: '🐉',
+    title_en: 'Your Zodiac Animal',
+    title_zh: '生肖',
+    body_en: 'Your zodiac animal is set by your birth year. In Chinese astrology it forms the Year Pillar — your outer persona, how the world sees you, and the core energy you were born with.',
+    body_zh: '生肖由出生年份决定，构成年柱，代表你的外在个性与生俱来的核心能量。'
+  },
+  'four-pillars': {
+    icon: '柱',
+    title_en: 'Four Pillars of Destiny',
+    title_zh: '四柱八字',
+    body_en: 'The Four Pillars (八字 Bāzì — "Eight Characters") are Year, Month, Day, and Hour. Each pillar has a Heavenly Stem on top and an Earthly Branch below. These 8 characters form the complete map of your destiny.',
+    body_zh: '四柱即年、月、日、时，每柱含天干与地支各一字，合为八字，是命运的完整蓝图。'
+  },
+  'daily-fortune': {
+    icon: '📅',
+    title_en: 'Daily Fortune',
+    title_zh: '日运势',
+    body_en: 'Every day is governed by one of the 12 Earthly Branches. When today\'s ruling animal is compatible with yours, energy flows your way. When they clash, tread carefully and conserve your power.',
+    body_zh: '每天由十二地支之一掌管。当日生肖与你相合则万事顺遂；相冲时宜谨慎行事，保存能量。'
+  },
+  'element-balance': {
+    icon: '⬠',
+    title_en: 'Element Balance',
+    title_zh: '五行平衡',
+    body_en: 'The Five Elements — Wood, Fire, Earth, Metal, Water — are Chinese cosmology\'s foundation. Your eight birth characters each carry an element. The balance (or imbalance) shapes your strengths and blind spots.',
+    body_zh: '五行（木火土金水）是宇宙的基础。八字中每个字都带有五行属性，其平衡或偏颇决定你的优势与盲点。'
+  },
+  'fortune-cards': {
+    icon: '🔮',
+    title_en: 'Life Fortune',
+    title_zh: '命运分值',
+    body_en: 'These four scores reflect the intrinsic energy patterns in your birth chart across Love, Career, Health, and Wealth. They represent your lifetime baseline — not a single year — shaped by your elements and animal.',
+    body_zh: '四项分值反映命盘中爱情、事业、健康与财富的内在能量格局，代表终身基础运势，由五行与生肖共同塑造。'
+  },
+  'career-archetype': {
+    icon: '🎭',
+    title_en: 'Career Archetype',
+    title_zh: '职业原型',
+    body_en: 'Your dominant element determines your natural professional archetype — the type of work where your energy flows most freely and you\'re most likely to achieve mastery and fulfilment.',
+    body_zh: '主导五行决定你的职业原型——最能发挥天赋、最易达到卓越与满足感的工作方向。'
+  },
+  'power-season': {
+    icon: '🌸',
+    title_en: 'Power Season',
+    title_zh: '旺季',
+    body_en: 'Each element rules a season. Your power season is when your dominant element peaks in nature, amplifying your natural qi. Use this window for your biggest decisions and boldest moves.',
+    body_zh: '五行各主一季。你的旺季是主导五行在自然界能量最强的时节，此时气场加持，是做出重大决策的最佳时机。'
+  },
+  'yin-yang': {
+    icon: '☯',
+    title_en: 'Yin · Yang Balance',
+    title_zh: '阴阳平衡',
+    body_en: 'Yin (阴) is receptive, inward, reflective energy. Yang (阳) is active, outward, expressive. The balance in your chart reveals whether you naturally move through life more inwardly or outwardly.',
+    body_zh: '阴为内敛接纳之能，阳为主动外放之能。命盘中阴阳的比例，揭示你天生的处世方式。'
+  },
+  'compatibility': {
+    icon: '💫',
+    title_en: 'Compatibility',
+    title_zh: '生肖相合',
+    body_en: 'Based on the ancient San He (三合) and Liu He (六合) harmony systems. Compatible animals create flowing, supportive energy. Challenging pairings create friction — but also the heat that drives growth.',
+    body_zh: '依据三合、六合古法。相合生肖带来流畅相助的能量，相冲生肖虽摩擦，却也是激发成长的动力。'
+  },
+  'lucky-vibes': {
+    icon: '✨',
+    title_en: 'Lucky Vibes',
+    title_zh: '吉祥元素',
+    body_en: 'Your lucky colors, numbers, and compass direction are derived from your animal\'s elemental essence. Surrounding yourself with these creates resonance between your environment and your innate energy.',
+    body_zh: '吉祥色彩、数字与方位由生肖五行属性决定，以此布置环境，有助于与天生能量共鸣。'
+  },
+  'forecast-2026': {
+    icon: '🔮',
+    title_en: '2026 Annual Forecast',
+    title_zh: '2026年运势',
+    body_en: '2026 is 丙午 (Bǐng Wǔ) — the Year of the Fire Horse. This score shows how your birth chart interacts with the Horse\'s blazing, free-spirited energy. Fire Horse years reward boldness and punish hesitation.',
+    body_zh: '2026年为丙午年——火马之年。分数反映命盘与火马奔放能量的互动。火马年奖励大胆者，惩罚犹豫者。'
+  },
+};
+
+/* ── Tooltip Functions ── */
+function showTip(key) {
+  const tip = TIPS[key];
+  if (!tip) return;
+  haptic(8);
+  document.getElementById('tip-icon').textContent     = tip.icon;
+  document.getElementById('tip-title-en').textContent = tip.title_en;
+  document.getElementById('tip-title-zh').textContent = tip.title_zh;
+  document.getElementById('tip-body-en').textContent  = tip.body_en;
+  document.getElementById('tip-body-zh').textContent  = tip.body_zh;
+  document.getElementById('tip-overlay').classList.add('active');
+}
+
+function closeTip() {
+  document.getElementById('tip-overlay').classList.remove('active');
+}
+
+function initTooltips() {
+  document.getElementById('results').addEventListener('click', function(e) {
+    const tipEl = e.target.closest('[data-tip]');
+    if (tipEl) {
+      e.stopPropagation();
+      showTip(tipEl.dataset.tip);
+    }
+  });
+}
+
+/* ═══════════════════════════════════════
+   2026 ANNUAL FORECAST
+═══════════════════════════════════════ */
+function calc2026Fortune(animal, elements) {
+  // 2026 = 丙午 Fire Horse
+  const HORSE_COMPAT = ['Tiger', 'Dog', 'Goat'];
+  const HORSE_CLASH  = ['Rat', 'Ox'];
+  let base;
+  if (HORSE_COMPAT.includes(animal))      base = 80;
+  else if (HORSE_CLASH.includes(animal))  base = 42;
+  else if (animal === 'Horse')            base = 74;
+  else                                    base = 62;
+
+  // Dominant element vs Fire year
+  const dominant = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
+  const elMod = { Wood:+9, Fire:+5, Earth:+3, Metal:-4, Water:-8 };
+  base = Math.min(95, Math.max(28, base + (elMod[dominant] || 0)));
+
+  // Aspect scores with small variance
+  const v = () => Math.floor(Math.random() * 10) - 5;
+  const aspects = {
+    career: Math.min(95, Math.max(25, base + v() + (dominant === 'Fire'  ? 5 : 0))),
+    love:   Math.min(95, Math.max(25, base + v() + (dominant === 'Wood'  ? 4 : 0))),
+    wealth: Math.min(95, Math.max(25, base + v() + (dominant === 'Earth' ? 5 : 0))),
+    health: Math.min(95, Math.max(25, base + v() + (dominant === 'Metal' ? 4 : 0))),
+  };
+  return { overall: base, aspects };
+}
+
+function gen2026Monthly(base) {
+  // Fire Horse peaks in summer; dips in winter
+  const boost = [-6, -8, -2, 4, 8, 14, 12, 9, 4, 0, -4, -5];
+  return boost.map(b => Math.min(98, Math.max(22,
+    Math.round(base + b + (Math.random() * 8 - 4))
+  )));
+}
+
+function render2026Fortune(animal, elements) {
+  const { overall, aspects } = calc2026Fortune(animal, elements);
+  const months = gen2026Monthly(overall);
+  const dominant = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
+
+  const arcLen  = 306.3; // Full arc for 270° at r=65
+  const fillLen = (overall / 100) * arcLen;
+
+  const levelEn = overall >= 75 ? 'Auspicious Year ✦' : overall >= 55 ? 'Steady Year' : 'Challenging Year';
+  const levelZh = overall >= 75 ? '大吉之年 ✦'        : overall >= 55 ? '平稳之年'    : '多磨之年';
+
+  const insightEn = overall >= 75
+    ? `The Fire Horse's blazing momentum aligns strongly with your chart. 2026 rewards your boldest moves — especially mid-year when Fire peaks. Lean in hard.`
+    : overall >= 55
+    ? `A mixed year: Fire Horse energy creates push-and-pull. Focus efforts in summer when Fire peaks, pace carefully through winter, and stay consistent.`
+    : `2026's wild energy may feel turbulent against your chart. Prioritise patience, strategy, and long-game thinking over impulsive risks. Build — don't sprint.`;
+  const insightZh = overall >= 75
+    ? `火马年的强劲势头与你的命盘高度契合。2026年大胆行动，尤以年中火能量最旺时为佳。`
+    : overall >= 55
+    ? `2026年喜忧参半，夏季发力，冬季蓄势，以稳健一致贯穿全年。`
+    : `火马年能量对你的命盘有压力，以耐心、谋略为主，避免冒进，以长远视角稳步前行。`;
+
+  const ASPECT_META = [
+    { key:'career', label:'Career', icon:'💼', color:'#8b5cf6' },
+    { key:'love',   label:'Love',   icon:'❤️',  color:'#f43f5e' },
+    { key:'wealth', label:'Wealth', icon:'💰',  color:'#f59e0b' },
+    { key:'health', label:'Health', icon:'🌿',  color:'#22c55e' },
+  ];
+
+  const maxM = Math.max(...months);
+  const MLABELS = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+  const barsHTML = months.map((v, i) => {
+    const isHigh = v === maxM;
+    const h = Math.round(8 + (v / maxM) * 48);
+    return `<div class="month-bar-col">
+      <div class="month-bar" id="mbar-${i}"
+        style="height:4px;background:${isHigh ? '#f0c040' : EL_COLOR['Fire']+'88'}"
+        data-h="${h}"></div>
+      <div class="month-bar-label">${MLABELS[i]}</div>
+    </div>`;
+  }).join('');
+
+  const aspectsHTML = ASPECT_META.map(m => `
+    <div class="aspect-item">
+      <div class="aspect-header">
+        <div class="aspect-name">${m.icon} ${m.label}</div>
+        <div class="aspect-score" style="color:${m.color}">${aspects[m.key]}</div>
+      </div>
+      <div class="aspect-bar-track">
+        <div class="aspect-bar-fill" id="asp-bar-${m.key}" style="background:${m.color}" data-pct="${aspects[m.key]}"></div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('forecast-card').innerHTML = `
+    <div class="forecast-card">
+      <div class="forecast-year-badge">丙午 2026</div>
+      <div class="forecast-top">
+        <div class="forecast-arc-wrap">
+          <svg class="forecast-arc-svg" viewBox="0 0 200 130">
+            <defs>
+              <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="#3b82f6"/>
+                <stop offset="50%"  stop-color="#f0c040"/>
+                <stop offset="100%" stop-color="#ef4444"/>
+              </linearGradient>
+            </defs>
+            <path d="M 54 126 A 65 65 0 1 1 146 126"
+              fill="none" stroke="rgba(255,255,255,0.07)"
+              stroke-width="10" stroke-linecap="round"/>
+            <path id="forecast-arc-fill" d="M 54 126 A 65 65 0 1 1 146 126"
+              fill="none" stroke="url(#arcGrad)"
+              stroke-width="10" stroke-linecap="round"
+              stroke-dasharray="0 306.3"/>
+          </svg>
+          <div class="forecast-score-over">
+            <div class="forecast-score-num" id="forecast-score-num">0</div>
+            <div class="forecast-score-pct">/ 100</div>
+          </div>
+        </div>
+        <div class="forecast-label en">${levelEn}</div>
+        <div class="forecast-label zh hide">${levelZh}</div>
+        <div class="forecast-sublabel en">Your 2026 Fortune Score</div>
+        <div class="forecast-sublabel zh hide">2026年运势综合评分</div>
+      </div>
+      <div class="forecast-aspects">${aspectsHTML}</div>
+      <div class="forecast-monthly">
+        <div class="forecast-monthly-title">Monthly Energy · 月份运势</div>
+        <div class="month-bars">${barsHTML}</div>
+      </div>
+      <div class="forecast-insight">
+        <span class="en">${insightEn}</span>
+        <div class="forecast-insight-zh zh hide">${insightZh}</div>
+      </div>
+    </div>`;
+
+  setTimeout(() => {
+    // Animate arc
+    const arcEl = document.getElementById('forecast-arc-fill');
+    if (arcEl) {
+      arcEl.style.transition = 'stroke-dasharray 1.6s ease';
+      arcEl.setAttribute('stroke-dasharray', `${fillLen} 306.3`);
+    }
+    // Count up score
+    let n = 0;
+    const iv = setInterval(() => {
+      n = Math.min(n + 2, overall);
+      const el = document.getElementById('forecast-score-num');
+      if (el) el.textContent = n;
+      if (n >= overall) clearInterval(iv);
+    }, 20);
+    // Aspect bars
+    ASPECT_META.forEach(m => {
+      const bar = document.getElementById(`asp-bar-${m.key}`);
+      if (bar) bar.style.width = aspects[m.key] + '%';
+    });
+    // Month bars
+    months.forEach((_, i) => {
+      const bar = document.getElementById(`mbar-${i}`);
+      if (bar) bar.style.height = bar.dataset.h + 'px';
+    });
+  }, 500);
+}
+
 /* ── Init ── */
 buildStars();
 initDateInputs();
+initTooltips();
 
