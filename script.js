@@ -1288,10 +1288,13 @@ function renderWorkSection(animal, elements, forecast2026) {
       if (el) el.textContent = n;
       if (n >= workScore) clearInterval(iv);
     }, 22);
-    // Scroll to current month
+    // Scroll strip horizontally to current month (no vertical page jump)
     const strip = document.getElementById('work-months-strip');
-    const now   = strip?.querySelector('.now-month');
-    if (now) now.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    if (strip) {
+      const tileW = 92;
+      const nowMonth = new Date().getMonth();
+      strip.scrollLeft = Math.max(0, nowMonth * tileW - strip.clientWidth / 2 + tileW / 2);
+    }
   }, 400);
 }
 
