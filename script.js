@@ -463,6 +463,8 @@ function renderResults(name, year, month, day, hour) {
   document.getElementById('hero-year-tag').textContent =
     `Year of the ${animal} · ${year}`;
   document.getElementById('hero-name').textContent = animal;
+  document.getElementById('hero-chinese').textContent =
+    yearPillar.stem.char + yearPillar.branch.char;
 
   const badgeEl = document.getElementById('hero-badges');
   badgeEl.innerHTML = [
@@ -492,6 +494,9 @@ function renderResults(name, year, month, day, hour) {
 
   // Love & Relationships
   renderLoveSection(animal, elements, forecast2026.overall);
+
+  // Work & Career monthly
+  renderWorkSection(animal, elements, forecast2026);
 
   // Career + season + yin/yang
   renderCareerArchetype(dominantEl);
@@ -1005,6 +1010,120 @@ function initDateInputs() {
 }
 
 /* ═══════════════════════════════════════
+   WORK — Monthly Career Section
+═══════════════════════════════════════ */
+const WORK_ACTIONS = {
+  high: [
+    { emoji:'🚀', action:'Push hard this month',  sub:'Energy and output are at their peak'      },
+    { emoji:'💡', action:'Pitch the big idea',     sub:'Momentum is firmly on your side'          },
+    { emoji:'📈', action:'Take on more',           sub:'Your capacity is higher than usual'        },
+    { emoji:'🏆', action:'Go for the promotion',  sub:'Visibility and recognition are strong'     },
+  ],
+  mid: [
+    { emoji:'📋', action:'Focus on the plan',      sub:'Steady execution beats inspiration now'   },
+    { emoji:'🤝', action:'Strengthen alliances',   sub:'Collaboration will move things forward'   },
+    { emoji:'📚', action:'Invest in skills',       sub:'A quieter month is good for learning'     },
+    { emoji:'⚙️', action:'Handle the details',     sub:'Systems and processes need attention now' },
+  ],
+  low: [
+    { emoji:'🔇', action:'Keep a low profile',    sub:'Not the time to draw attention'            },
+    { emoji:'⏸',  action:'Pause major moves',     sub:'Obstacles will resolve on their own'       },
+    { emoji:'🛠',  action:'Fix what is broken',    sub:'Maintenance over ambition this month'      },
+    { emoji:'🧘', action:'Conserve your energy',  sub:"Pushing hard won't pay off right now"      },
+  ],
+};
+
+function calcWork2026(animal, elements, overall2026) {
+  const dominant = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
+  const zodiacCareer = ZODIAC[animal].fortune.career;
+  const WORK_BOOST = { Dragon:+12, Ox:+9, Rooster:+8, Monkey:+7, Tiger:+5 };
+  const WORK_DRAG  = { Goat:-6, Pig:-4 };
+  const animalMod  = WORK_BOOST[animal] || WORK_DRAG[animal] || 0;
+  const elWorkMod  = { Metal:+8, Earth:+6, Wood:+3, Water:+2, Fire:-2 };
+  return Math.min(95, Math.max(30, Math.round(
+    zodiacCareer * 0.4 + overall2026 * 0.3 + 20 + animalMod + (elWorkMod[dominant] || 0)
+  )));
+}
+
+function genWorkMonthly(workScore) {
+  // Q1 slow start, Q2 ramps, summer strong push, Q4 winds down
+  const boost = [-5, -2, +4, +7, +5, +8, +9, +6, +3, -1, -4, -6];
+  return boost.map((b, i) => {
+    const score = Math.min(95, Math.max(20, Math.round(workScore + b)));
+    const level = score >= 65 ? 'high' : score >= 45 ? 'mid' : 'low';
+    const pool  = WORK_ACTIONS[level];
+    const pick  = pool[(i * 5 + Math.round(workScore)) % pool.length];
+    return { ...pick, score, level };
+  });
+}
+
+function renderWorkSection(animal, elements, forecast2026) {
+  const dominant  = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
+  const ca        = CAREER_ARCHETYPE[dominant];
+  const elColor   = EL_COLOR[dominant];
+  const workScore = calcWork2026(animal, elements, forecast2026.overall);
+  const nowMonth  = new Date().getMonth();
+
+  const tier = workScore >= 75
+    ? { label:'High Momentum 🚀', color:'#8b5cf6', zh:'事业腾飞' }
+    : workScore >= 55
+    ? { label:'Steady Progress 📈', color:'#3b82f6', zh:'稳步前行' }
+    : { label:'Consolidation Phase 🛠', color:'#64748b', zh:'蓄势待发' };
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthly = genWorkMonthly(workScore);
+  const monthlyHTML = monthly.map((d, i) => `
+    <div class="love-month-tile level-${d.level}${i === nowMonth ? ' now-month work-now' : ''}">
+      <div class="love-month-name">${MONTHS[i]}</div>
+      <div class="love-month-emoji">${d.emoji}</div>
+      <div class="love-month-action">${d.action}</div>
+      <div class="love-month-sub">${d.sub}</div>
+    </div>`).join('');
+
+  document.getElementById('work-card').innerHTML = `
+    <div class="love-card work-card-inner">
+      <div class="love-top">
+        <div class="work-score-wrap">
+          <div class="work-score-num" id="work-score-num">0</div>
+          <div class="work-score-label">/ 100</div>
+        </div>
+        <div class="love-tier-label" style="color:${tier.color}">${tier.label}</div>
+        <div class="love-sublabel en">Your 2026 career momentum</div>
+        <div class="love-sublabel zh hide">${tier.zh} · 2026年事业运</div>
+      </div>
+      <div class="love-archetype" style="border-color:${elColor}25">
+        <div class="love-archetype-emoji">${ca.icon}</div>
+        <div class="love-archetype-info">
+          <div class="love-archetype-title" style="color:${elColor}">${ca.name}</div>
+          <div class="love-archetype-tagline">${ca.tagline}</div>
+          <div class="love-traits">${ca.roles.slice(0,3).map(r=>`<span class="love-trait">${r}</span>`).join('')}</div>
+        </div>
+      </div>
+      <div class="love-months-wrap">
+        <div class="love-months-label">Monthly Career Forecast · 月份事业运</div>
+        <div class="love-months-strip" id="work-months-strip">
+          <div class="love-months-row">${monthlyHTML}</div>
+        </div>
+      </div>
+    </div>`;
+
+  setTimeout(() => {
+    // Count up score
+    let n = 0;
+    const iv = setInterval(() => {
+      n = Math.min(n + 2, workScore);
+      const el = document.getElementById('work-score-num');
+      if (el) el.textContent = n;
+      if (n >= workScore) clearInterval(iv);
+    }, 22);
+    // Scroll to current month
+    const strip = document.getElementById('work-months-strip');
+    const now   = strip?.querySelector('.now-month');
+    if (now) now.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+  }, 400);
+}
+
+/* ═══════════════════════════════════════
    LOVE — Archetype Data
 ═══════════════════════════════════════ */
 const HEART_PATH = 'M 50 78 C 20 62 2 48 2 32 C 2 16 15 10 26 10 C 36 10 45 15 50 22 C 55 15 64 10 74 10 C 85 10 98 16 98 32 C 98 48 80 62 50 78 Z';
@@ -1349,6 +1468,13 @@ const TIPS = {
     title_zh: '月份运势',
     body_en: 'Each bar shows the relative strength of qi flowing through that month in 2026. Peak bars are when Fire Horse energy aligns best with your chart — ideal for bold moves, launches, and key decisions.',
     body_zh: '每根柱子代表2026年该月气场强弱。最高峰处为火马能量与你命盘最契合之时，宜大胆行动、启动计划与做出关键决策。'
+  },
+  'work-section': {
+    icon: '💼',
+    title_en: 'Work & Career',
+    title_zh: '事业运势',
+    body_en: 'Your career momentum score blends your zodiac\'s natural professional energy with the 2026 Fire Horse year. Fire Horse years reward those who move decisively — the monthly strip shows when to push and when to pace.',
+    body_zh: '事业运势综合了你生肖天然的职业能量与2026火马年的影响。火马年奖励果断行动者，月份运势指引你何时发力、何时蓄势。'
   },
   'love-section': {
     icon: '❤️',
