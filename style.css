@@ -1704,6 +1704,57 @@ input  { font-family: inherit; }
    NEW FEATURES — ALL 10
 ════════════════════════════════════════ */
 
+/* ── Tip hint badge (section-head ⓘ indicator) ── */
+.tip-hint {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gold);
+  opacity: 0.55;
+  margin-left: auto;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.section-head:hover .tip-hint,
+.section-head:active .tip-hint { opacity: 1; }
+
+/* ── Today's Action Plan (compact Fortune card) ── */
+.today-actions-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-left: 3px solid;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.tap-action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.tap-action-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.tap-action-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tap-action-label { font-size: 13px; font-weight: 600; line-height: 1.4; }
+.tap-action-sub   { font-size: 11px; color: var(--muted); line-height: 1.55; }
+.tap-actions-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold);
+  background: var(--gold-dim);
+  border: 1px solid rgba(240,192,64,0.25);
+  border-radius: 100px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 2px;
+  transition: background 0.2s;
+}
+.tap-actions-link:active { background: rgba(240,192,64,0.2); transform: scale(0.98); }
+
 /* ── Gender Radio Field ── */
 .gender-row {
   display: flex;

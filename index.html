@@ -218,7 +218,7 @@
       <div class="tab-bar-inner">
         <button class="tab-btn active" id="tab-btn-fortune" onclick="haptic(6); switchTab('fortune')">Fortune</button>
         <button class="tab-btn" id="tab-btn-personality" onclick="haptic(6); switchTab('personality')">Personality</button>
-        <button class="tab-btn" id="tab-btn-oracle" onclick="haptic(6); switchTab('oracle')">Oracle</button>
+        <button class="tab-btn" id="tab-btn-actions" onclick="haptic(6); switchTab('actions')">Actions</button>
       </div>
     </div>
 
@@ -259,6 +259,15 @@
         <div id="daily-card"></div>
       </section>
 
+      <!-- Today's Action Plan (compact summary) -->
+      <section class="section" data-tab="fortune" id="today-actions-section">
+        <div class="section-head">
+          <h3 class="en">Today's Action Plan</h3>
+          <span class="section-sub">3 things to do now</span>
+        </div>
+        <div id="today-actions-card"></div>
+      </section>
+
       <!-- Love & Relationships -->
       <section class="section" data-tab="fortune">
         <div class="section-head" data-tip="love-section">
@@ -279,8 +288,8 @@
         <div id="work-card"></div>
       </section>
 
-      <!-- Oracle Deep Read -->
-      <section class="section orc-section" data-tab="oracle" id="oracle-section">
+      <!-- Oracle Deep Read (Actions tab) -->
+      <section class="section orc-section" data-tab="actions" id="oracle-section">
         <div id="oracle-card"></div>
       </section>
 
@@ -300,6 +309,7 @@
           <h3 class="en">Element Balance</h3>
           <h3 class="zh hide">五行平衡</h3>
           <span class="section-sub">五行 Wǔxíng</span>
+          <span class="tip-hint">ⓘ What is this?</span>
         </div>
         <div class="element-chart-wrap">
           <svg id="radar-svg" viewBox="0 0 200 190" class="radar-svg"></svg>
@@ -318,7 +328,7 @@
       </section>
 
       <!-- Feng Shui Outfit Guide -->
-      <section class="section" data-tab="fortune" data-tip="outfit">
+      <section class="section" data-tab="actions" data-tip="outfit">
         <div class="section-head">
           <h3 class="en">Feng Shui Outfit Guide</h3>
           <span class="section-sub">2026 · Monthly Colors</span>
@@ -327,7 +337,7 @@
       </section>
 
       <!-- Lucky Numbers -->
-      <section class="section" data-tab="fortune" data-tip="lucky-nums">
+      <section class="section" data-tab="actions" data-tip="lucky-nums">
         <div class="section-head">
           <h3 class="en">Lucky Numbers</h3>
           <span class="section-sub">数字运势</span>
@@ -391,7 +401,7 @@
       </section>
 
       <!-- Lucky Foods -->
-      <section class="section" data-tab="personality" data-tip="foods">
+      <section class="section" data-tab="actions" data-tip="foods">
         <div class="section-head">
           <h3 class="en">Lucky Foods</h3>
           <span class="section-sub">Element Nutrition</span>
@@ -400,7 +410,7 @@
       </section>
 
       <!-- Crystals & Gems -->
-      <section class="section" data-tab="personality" data-tip="crystals">
+      <section class="section" data-tab="actions" data-tip="crystals">
         <div class="section-head">
           <h3 class="en">Crystals &amp; Gems</h3>
           <span class="section-sub">Energy Stones</span>
@@ -409,7 +419,7 @@
       </section>
 
       <!-- Morning Ritual -->
-      <section class="section" data-tab="personality" data-tip="ritual">
+      <section class="section" data-tab="actions" data-tip="ritual">
         <div class="section-head">
           <h3 class="en">Morning Ritual</h3>
           <span class="section-sub">元素晨练</span>
@@ -418,7 +428,7 @@
       </section>
 
       <!-- Feng Shui Direction (Kua) — hidden if no gender -->
-      <section class="section data-hidden" id="kua-section" data-tab="personality" data-tip="kua">
+      <section class="section data-hidden" id="kua-section" data-tab="actions" data-tip="kua">
         <div class="section-head">
           <h3 class="en">Sleep Direction</h3>
           <span class="section-sub">卦数 · Feng Shui Kua</span>

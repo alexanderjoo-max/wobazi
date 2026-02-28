@@ -360,7 +360,7 @@ function showScreen(id) {
 function switchTab(tab) {
   document.getElementById('tab-btn-fortune').classList.toggle('active', tab === 'fortune');
   document.getElementById('tab-btn-personality').classList.toggle('active', tab === 'personality');
-  document.getElementById('tab-btn-oracle').classList.toggle('active', tab === 'oracle');
+  document.getElementById('tab-btn-actions').classList.toggle('active', tab === 'actions');
   document.querySelectorAll('#results .section[data-tab]').forEach(el => {
     el.classList.toggle('hide', el.dataset.tab !== tab || el.classList.contains('data-hidden'));
   });
@@ -537,6 +537,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
 
   // New feature renders
   const nowMonth = new Date().getMonth(); // 0-indexed
+  renderTodayActionsCard(dominantEl, nowMonth);
   renderOutfitSection(dominantEl, nowMonth);
   renderLuckyNumbers(year, month, day, animal, dominantEl);
   renderAuspiciousDates(animal, dominantEl);
@@ -558,7 +559,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
 
   // Init tab from URL hash (default: fortune)
   const initTab = location.hash === '#personality' ? 'personality'
-                : location.hash === '#oracle'       ? 'oracle'
+                : location.hash === '#actions'      ? 'actions'
                 : 'fortune';
   switchTab(initTab);
 
@@ -2324,6 +2325,40 @@ function getAuspiciousDays(animal, dominantEl) {
 /* ═══════════════════════════════════════
    NEW FEATURE RENDER FUNCTIONS
 ═══════════════════════════════════════ */
+
+/* ── Render Today's Action Plan (compact card on Fortune tab) ── */
+function renderTodayActionsCard(dominantEl, nowMonth) {
+  const elColor   = EL_COLOR[dominantEl];
+  const outfit    = OUTFIT_COLORS[nowMonth];
+  const ritual    = MORNING_RITUAL[dominantEl];
+  const crystal   = CRYSTALS[dominantEl]?.[0];
+
+  // Derive 3 concise actions
+  const actions = [
+    { icon: '👗', label: `Wear <strong>${outfit.name}</strong>`,   sub: outfit.why.split('—')[1]?.trim() || outfit.why },
+    { icon: ritual[0].icon, label: `<strong>${ritual[0].title}</strong>`, sub: ritual[0].body.split('.')[0] + '.' },
+    { icon: ritual[1].icon, label: `<strong>${ritual[1].title}</strong>`, sub: ritual[1].body.split('.')[0] + '.' },
+  ];
+
+  const itemsHTML = actions.map(a => `
+    <div class="tap-action-item">
+      <span class="tap-action-icon">${a.icon}</span>
+      <div class="tap-action-body">
+        <div class="tap-action-label">${a.label}</div>
+        <div class="tap-action-sub">${a.sub}</div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('today-actions-card').innerHTML = `
+    <div class="today-actions-card" style="border-left-color:${elColor}">
+      ${itemsHTML}
+      <button class="tap-actions-link" onclick="haptic(6); switchTab('actions')">
+        See full Action Plan — outfit, foods, rituals, lucky numbers →
+      </button>
+    </div>
+  `;
+}
 
 /* ── Render Outfit Section ── */
 function renderOutfitSection(dominantEl, nowMonth) {
