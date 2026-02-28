@@ -1030,7 +1030,6 @@ const LOVE_ARCHETYPE = {
 function calcLove2026(animal, elements, overall2026) {
   const dominant = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
   const zodiacLove = ZODIAC[animal].fortune.love;
-  // Fire Horse year is charged with passion — some signs benefit more
   const ROMANTIC_BOOST = { Tiger:+10, Dog:+8, Goat:+8, Rabbit:+6, Horse:+5 };
   const ROMANCE_DRAG   = { Rat:-8, Ox:-6 };
   const animalMod = ROMANTIC_BOOST[animal] || ROMANCE_DRAG[animal] || 0;
@@ -1040,36 +1039,119 @@ function calcLove2026(animal, elements, overall2026) {
   )));
 }
 
+/* ── Animal birth years ── */
+const ANIMAL_BASE_YEAR = {
+  Rat:1960, Ox:1961, Tiger:1962, Rabbit:1963, Dragon:1964, Snake:1965,
+  Horse:1966, Goat:1967, Monkey:1968, Rooster:1969, Dog:1970, Pig:1971,
+};
+function getAnimalYears(animal) {
+  const base = ANIMAL_BASE_YEAR[animal];
+  const years = [];
+  for (let y = base; y <= 2024; y += 12) years.push(y);
+  return years;
+}
+
+/* ── Compatibility love notes (by match animal's element) ── */
+const LOVE_NOTES = {
+  Wood:  ['Nurtures your growth',        'Grows alongside you',          'Steady and patient with you'  ],
+  Fire:  ['Pure electric chemistry',     'Ignites your passion',         'Matches your fire'            ],
+  Earth: ['Your rock — always shows up', 'Deep unshakeable devotion',    'Makes you feel at home'       ],
+  Metal: ['A sharpening connection',     'Loyal beyond measure',         'Brings out your precision'    ],
+  Water: ['Flows into your soul',        'Understands your silences',    'Deep emotional resonance'     ],
+};
+function getLoveNote(userAnimal, matchAnimal) {
+  const el   = BRANCHES.find(b => b.animal === matchAnimal)?.element || 'Fire';
+  const pool = LOVE_NOTES[el];
+  const idx  = (userAnimal.charCodeAt(0) + matchAnimal.charCodeAt(0)) % pool.length;
+  return pool[idx];
+}
+
+/* ── Monthly love advice ── */
+const LOVE_ACTIONS = {
+  high: [
+    { emoji:'✨', action:'Say yes to everything', sub:'High chance of getting what you want'  },
+    { emoji:'❤️', action:'Make the first move',   sub:'Stars are aligned in your favour'      },
+    { emoji:'🔥', action:'Be bold — act now',     sub:'Your energy is magnetic right now'     },
+    { emoji:'🌟', action:'Put yourself out there',sub:'A meaningful connection is very close'  },
+  ],
+  mid: [
+    { emoji:'🌿', action:'Deepen what you have',  sub:'Quality over new connections'           },
+    { emoji:'💬', action:'Have the conversation', sub:'Clarity will bring you much closer'     },
+    { emoji:'🕊', action:'Keep showing up',       sub:'Consistency is your love language now'  },
+    { emoji:'💛', action:'Love gently',           sub:'Small moments carry the most weight'    },
+  ],
+  low: [
+    { emoji:'🛡', action:'Protect your energy',  sub:'Lots of disappointment if you chase'    },
+    { emoji:'🔮', action:'Focus on yourself',    sub:'The right timing is coming — not now'   },
+    { emoji:'🌙', action:'Rest and reflect',     sub:"Recharge so you're ready when it comes" },
+    { emoji:'🧘', action:'Set your standards',   sub:'Love yourself first this month'         },
+  ],
+};
+
+function genLoveMonthly(loveScore) {
+  // Valentine's Feb peaks, summer high, winter quieter
+  const boost = [-4, +9, +5, +4, +1, +7, +5, +3, -1, -3, -6, +2];
+  return boost.map((b, i) => {
+    const score = Math.min(96, Math.max(20, Math.round(loveScore + b)));
+    const level = score >= 68 ? 'high' : score >= 48 ? 'mid' : 'low';
+    const pool  = LOVE_ACTIONS[level];
+    const pick  = pool[(i * 7 + Math.round(loveScore)) % pool.length];
+    return { ...pick, score, level };
+  });
+}
+
 /* ── Render Love Section ── */
 function renderLoveSection(animal, elements, overall2026) {
-  const dominant = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
-  const la = LOVE_ARCHETYPE[dominant];
-  const elColor = EL_COLOR[dominant];
+  const dominant  = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
+  const la        = LOVE_ARCHETYPE[dominant];
+  const elColor   = EL_COLOR[dominant];
   const loveScore = calcLove2026(animal, elements, overall2026);
-  const zData = ZODIAC[animal];
+  const zData     = ZODIAC[animal];
+  const nowMonth  = new Date().getMonth(); // 0-indexed Jan=0
 
   const tier = loveScore >= 80
-    ? { label: 'High Potential 💘', color: '#f43f5e', zh: '桃花运旺' }
+    ? { label:'High Potential 💘', color:'#f43f5e', zh:'桃花运旺' }
     : loveScore >= 60
-    ? { label: 'Promising 💛', color: '#fb923c', zh: '情缘可期' }
-    : { label: 'Patience Required 🤍', color: '#94a3b8', zh: '修心静待' };
+    ? { label:'Promising 💛',      color:'#fb923c', zh:'情缘可期' }
+    : { label:'Patience Required 🤍', color:'#94a3b8', zh:'修心静待' };
 
+  /* Monthly strip */
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthly = genLoveMonthly(loveScore);
+  const monthlyHTML = monthly.map((d, i) => `
+    <div class="love-month-tile level-${d.level}${i === nowMonth ? ' now-month' : ''}">
+      <div class="love-month-name">${MONTHS[i]}</div>
+      <div class="love-month-emoji">${d.emoji}</div>
+      <div class="love-month-action">${d.action}</div>
+      <div class="love-month-sub">${d.sub}</div>
+    </div>`).join('');
+
+  /* Expanded soul animal cards */
   const soulHTML = zData.compat.map(a => {
-    const br = BRANCHES.find(b => b.animal === a);
-    const col = EL_COLOR[br?.element || 'Fire'];
-    return `<div class="love-soul-chip" style="border-color:${col}44;background:${col}12;color:${col}">
-      <svg viewBox="0 0 100 100" width="16" height="16" style="color:${col}">${ANIMAL_SVGS[a]||''}</svg>${a}
+    const br    = BRANCHES.find(b => b.animal === a);
+    const col   = EL_COLOR[br?.element || 'Fire'];
+    const years = getAnimalYears(a).map(y => `'${String(y).slice(2)}`);
+    const note  = getLoveNote(animal, a);
+    return `<div class="love-soul-card" style="border-left:3px solid ${col}">
+      ${makeMedallion(a, col, 'pillar-med')}
+      <div class="love-soul-info">
+        <div class="love-soul-name" style="color:${col}">${a}</div>
+        <div class="love-soul-note">"${note}"</div>
+        <div class="love-soul-years">${years.map(y=>`<span class="love-soul-year">${y}</span>`).join('')}</div>
+      </div>
     </div>`;
   }).join('');
 
-  const clashHTML = zData.clash.map(a => {
-    return `<div class="love-clash-chip">
+  /* Clash chips */
+  const clashHTML = zData.clash.map(a =>
+    `<div class="love-clash-chip">
       <svg viewBox="0 0 100 100" width="14" height="14" style="color:rgba(255,255,255,0.35)">${ANIMAL_SVGS[a]||''}</svg>${a}
-    </div>`;
-  }).join('');
+    </div>`
+  ).join('');
 
   document.getElementById('love-card').innerHTML = `
     <div class="love-card">
+
       <div class="love-top">
         <div class="love-heart-wrap">
           <svg viewBox="0 0 100 88" class="love-heart-svg">
@@ -1113,28 +1195,36 @@ function renderLoveSection(animal, elements, overall2026) {
         <p class="zh hide">${la.desc_zh}</p>
       </div>
 
-      <div class="love-matches">
-        <div class="love-match-label">♥ Soul Animals</div>
-        <div class="love-soul-row">${soulHTML}</div>
-        <div class="love-match-label" style="margin-top:12px;color:rgba(255,255,255,0.3)">⚡ Handle With Care</div>
-        <div class="love-clash-row">${clashHTML}</div>
+      <div class="love-months-wrap">
+        <div class="love-months-label">Monthly Love Forecast · 月份情感运</div>
+        <div class="love-months-strip">
+          <div class="love-months-row">${monthlyHTML}</div>
+        </div>
       </div>
+
+      <div class="love-matches">
+        <div class="love-match-label" style="margin-bottom:12px">♥ Soul Animals — who to look for</div>
+        <div class="love-soul-cards">${soulHTML}</div>
+        <div class="love-match-label" style="margin-top:16px;color:rgba(255,255,255,0.3)">⚡ Handle With Care</div>
+        <div class="love-clash-row" style="margin-top:8px">${clashHTML}</div>
+      </div>
+
     </div>`;
 
-  // Animate heart fill from bottom up
+  /* Animate heart fill */
   setTimeout(() => {
     const rect = document.getElementById('love-clip-rect');
     if (!rect) return;
-    const targetY = 78 - (loveScore / 100) * 68;
+    const targetY   = 78 - (loveScore / 100) * 68;
     const startTime = performance.now();
     function step(now) {
-      const t = Math.min((now - startTime) / 1600, 1);
+      const t    = Math.min((now - startTime) / 1600, 1);
       const ease = 1 - Math.pow(1 - t, 3);
       rect.setAttribute('y', (78 + (targetY - 78) * ease).toFixed(2));
       if (t < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
-    // Count up
+    /* Count up score */
     let n = 0;
     const iv = setInterval(() => {
       n = Math.min(n + 2, loveScore);
@@ -1142,6 +1232,12 @@ function renderLoveSection(animal, elements, overall2026) {
       if (el) el.textContent = n;
       if (n >= loveScore) clearInterval(iv);
     }, 22);
+    /* Auto-scroll strip to current month */
+    const strip = document.querySelector('.love-months-strip');
+    if (strip) {
+      const tileW  = 92;
+      strip.scrollLeft = Math.max(0, nowMonth * tileW - strip.clientWidth / 2 + tileW / 2);
+    }
   }, 700);
 }
 
