@@ -101,17 +101,25 @@ const ANIMAL_SVGS = {
     <path d="M74,14 L80,11 M74,14 L80,17" stroke="#ff4466" stroke-width="1.8" fill="none" stroke-linecap="round"/>`,
 
   Horse: `
-    <ellipse cx="52" cy="70" rx="28" ry="18" fill="currentColor" transform="rotate(-8,52,70)"/>
-    <path d="M38,56 Q31,42 40,29" stroke="currentColor" stroke-width="15" fill="none" stroke-linecap="round"/>
-    <ellipse cx="40" cy="24" rx="10" ry="14" fill="currentColor" transform="rotate(18,40,24)"/>
-    <path d="M38,31 Q27,27 29,18 Q21,20 23,11 Q15,13 20,5" stroke="currentColor" stroke-width="5.5" fill="none" stroke-linecap="round" opacity="0.65"/>
-    <ellipse cx="46" cy="28" rx="3" ry="2.5" fill="currentColor" opacity="0.45"/>
-    <circle cx="35" cy="20" r="3" fill="white"/>
-    <circle cx="35.5" cy="20.5" r="1.8" fill="#111"/>
-    <circle cx="36" cy="20" r="0.7" fill="white"/>
-    <line x1="36" y1="83" x2="34" y2="96" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" opacity="0.75"/>
-    <line x1="50" y1="85" x2="50" y2="96" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" opacity="0.75"/>
-    <line x1="64" y1="83" x2="66" y2="96" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" opacity="0.75"/>`,
+    <ellipse cx="52" cy="65" rx="30" ry="16" fill="currentColor"/>
+    <ellipse cx="74" cy="58" rx="13" ry="13" fill="currentColor"/>
+    <ellipse cx="30" cy="59" rx="11" ry="14" fill="currentColor"/>
+    <path d="M27,47 Q23,33 32,22" stroke="currentColor" stroke-width="14" fill="none" stroke-linecap="round"/>
+    <ellipse cx="31" cy="16" rx="9" ry="12" fill="currentColor" transform="rotate(12,31,16)"/>
+    <ellipse cx="24" cy="24" rx="7" ry="4.5" fill="currentColor" opacity="0.75"/>
+    <ellipse cx="20" cy="26" rx="1.8" ry="1.2" fill="currentColor" opacity="0.35"/>
+    <path d="M34,5 L31,0 L38,6" fill="currentColor"/>
+    <path d="M39,7 L38,1 L43,8" fill="currentColor" opacity="0.6"/>
+    <circle cx="37" cy="13" r="4" fill="white"/>
+    <circle cx="36.5" cy="13.5" r="2.3" fill="#111"/>
+    <circle cx="37.2" cy="13" r="0.8" fill="white"/>
+    <path d="M35,5 Q46,16 47,32 Q48,42 43,50" stroke="currentColor" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.5"/>
+    <path d="M38,4 Q50,15 51,30 Q52,40 47,48" stroke="currentColor" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.3"/>
+    <path d="M81,60 Q93,50 91,70 Q89,84 84,93" stroke="currentColor" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <rect x="27" y="78" width="7" height="18" rx="3.5" fill="currentColor"/>
+    <rect x="36" y="79" width="7" height="17" rx="3.5" fill="currentColor" opacity="0.65"/>
+    <rect x="60" y="77" width="7" height="19" rx="3.5" fill="currentColor"/>
+    <rect x="69" y="78" width="7" height="18" rx="3.5" fill="currentColor" opacity="0.65"/>`,
 
   Goat: `
     <ellipse cx="50" cy="70" rx="26" ry="20" fill="currentColor"/>

@@ -26,6 +26,94 @@
         Begin Your Reading
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
+      <button class="btn-about-link" onclick="haptic(6); showScreen('about')">What is Bāzì? →</button>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div id="about" class="screen">
+    <div class="nav-bar">
+      <button class="btn-back" onclick="haptic(8); showScreen('splash')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="nav-title">What is Bāzì?</span>
+      <div style="width:40px"></div>
+    </div>
+    <div class="about-scroll">
+
+      <div class="about-hero">
+        <div class="about-hanzi">八字</div>
+        <h2>The Eight Characters</h2>
+        <p>An ancient Chinese system for reading destiny through the moment of your birth</p>
+      </div>
+
+      <div class="about-section">
+        <span class="about-section-icon">🏮</span>
+        <h3>What is Bāzì?</h3>
+        <p>Bāzì (八字) literally means "Eight Characters." It's one of the oldest forms of Chinese metaphysics, developed over 2,000 years ago and refined during the Tang dynasty (618–907 AD).</p>
+        <p>The moment you were born — your year, month, day, and hour — is encoded into eight Chinese characters that reveal your nature, strengths, and the energies flowing through your life.</p>
+      </div>
+
+      <div class="about-section">
+        <span class="about-section-icon">🏛</span>
+        <h3>The Four Pillars (四柱 Sìzhù)</h3>
+        <p>Your birth data maps onto four "pillars," each holding two characters — one Heavenly Stem and one Earthly Branch — giving you eight characters total.</p>
+        <div class="about-pillars-grid">
+          <div class="about-pillar"><span class="about-pillar-zh">年</span><span class="about-pillar-en">Year Pillar</span></div>
+          <div class="about-pillar"><span class="about-pillar-zh">月</span><span class="about-pillar-en">Month Pillar</span></div>
+          <div class="about-pillar"><span class="about-pillar-zh">日</span><span class="about-pillar-en">Day Pillar</span></div>
+          <div class="about-pillar"><span class="about-pillar-zh">时</span><span class="about-pillar-en">Hour Pillar</span></div>
+        </div>
+        <p style="margin-top:14px">The Day Pillar is your core self. Year reflects ancestry and early life. Month governs career and young adulthood. Hour reveals your inner world and later years.</p>
+      </div>
+
+      <div class="about-section">
+        <span class="about-section-icon">⚖️</span>
+        <h3>Five Elements (五行 Wǔxíng)</h3>
+        <p>Every character belongs to one of five elements. Balance matters — too much or too little of any element shapes your personality and path in life.</p>
+        <div class="about-elements-row">
+          <div class="about-element-chip" style="color:#22c55e;border-color:#22c55e;background:rgba(34,197,94,0.08)"><span class="zh">木</span>Wood</div>
+          <div class="about-element-chip" style="color:#ef4444;border-color:#ef4444;background:rgba(239,68,68,0.08)"><span class="zh">火</span>Fire</div>
+          <div class="about-element-chip" style="color:#f59e0b;border-color:#f59e0b;background:rgba(245,158,11,0.08)"><span class="zh">土</span>Earth</div>
+          <div class="about-element-chip" style="color:#94a3b8;border-color:#94a3b8;background:rgba(148,163,184,0.08)"><span class="zh">金</span>Metal</div>
+          <div class="about-element-chip" style="color:#3b82f6;border-color:#3b82f6;background:rgba(59,130,246,0.08)"><span class="zh">水</span>Water</div>
+        </div>
+      </div>
+
+      <div class="about-section">
+        <span class="about-section-icon">🔢</span>
+        <h3>Stems &amp; Branches</h3>
+        <p>Ten Heavenly Stems (天干) and Twelve Earthly Branches (地支) combine in a 60-year cycle. The branches also map to the 12 zodiac animals.</p>
+        <div class="about-stems-row">
+          <div class="about-stem-chip">甲</div><div class="about-stem-chip">乙</div>
+          <div class="about-stem-chip">丙</div><div class="about-stem-chip">丁</div>
+          <div class="about-stem-chip">戊</div><div class="about-stem-chip">己</div>
+          <div class="about-stem-chip">庚</div><div class="about-stem-chip">辛</div>
+          <div class="about-stem-chip">壬</div><div class="about-stem-chip">癸</div>
+        </div>
+      </div>
+
+      <div class="about-section">
+        <span class="about-section-icon">☯️</span>
+        <h3>Yin &amp; Yang (阴阳 Yīn Yáng)</h3>
+        <p>Every element appears in both Yin (陰, receptive) and Yang (陽, active) forms. Your chart's balance shapes how you engage the world versus how you process things within.</p>
+      </div>
+
+      <div class="about-section">
+        <span class="about-section-icon">🌌</span>
+        <h3>Destiny vs. Free Will</h3>
+        <p>Bāzì shows tendencies and potential, not fixed outcomes. Think of it as a weather forecast — knowing the forecast helps you prepare, but you still choose where to go.</p>
+        <p>The goal is self-understanding: to work with your natural energy rather than against it.</p>
+      </div>
+
+      <div class="about-cta">
+        <p>Ready to decode your chart?</p>
+        <button class="btn-primary" onclick="haptic(10); showScreen('input')">
+          Begin Your Reading
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
     </div>
   </div>
 
