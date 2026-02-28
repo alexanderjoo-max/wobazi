@@ -361,18 +361,19 @@ input  { font-family: inherit; }
 }
 .tab-btn {
   flex: 1;
-  padding: 9px 12px;
+  padding: 9px 6px;
   background: transparent;
   border: none;
   border-radius: 100px;
   color: rgba(240,240,255,0.5);
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   cursor: pointer;
   transition: color 0.18s, background 0.18s;
   -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
 }
 .tab-btn.active {
   background: var(--gold);
@@ -1411,6 +1412,133 @@ input  { font-family: inherit; }
 .love-soul-year {
   font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 100px;
   background: rgba(255,255,255,0.07); border: 1px solid var(--border); color: rgba(255,255,255,0.55);
+}
+
+/* ────────────────────────
+   ORACLE TAB
+──────────────────────── */
+.orc-section { padding: 0 !important; }
+
+/* Intro card */
+.orc-intro-card {
+  margin: 16px 16px 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(240,192,64,0.2);
+  padding: 24px 20px 22px;
+}
+.orc-intro-eyebrow {
+  font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 12px;
+}
+.orc-intro-text {
+  font-size: 17px; font-weight: 600; line-height: 1.6;
+  color: var(--text); margin: 0 0 22px;
+}
+.orc-overall-row { display: flex; align-items: center; gap: 16px; }
+.orc-overall-block { flex-shrink: 0; }
+.orc-overall-num { font-size: 64px; font-weight: 800; line-height: 1; letter-spacing: -2px; }
+.orc-overall-label { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; color: var(--muted); margin-top: 3px; }
+.orc-quadrant { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.orc-q-item {
+  display: flex; flex-direction: column; gap: 2px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 10px;
+}
+.orc-q-label { font-size: 9px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); }
+.orc-q-val   { font-size: 22px; font-weight: 800; line-height: 1; color: var(--text); }
+
+/* Sticky section headers */
+.orc-sticky-head {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(7,7,15,0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted);
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  margin-top: 24px;
+}
+
+/* Truth blocks */
+.orc-truth-block {
+  padding: 18px 16px 6px;
+  border-bottom: 1px solid var(--border);
+}
+.orc-truth-label {
+  font-size: 13px; font-weight: 700; margin-bottom: 10px;
+}
+.orc-bar-wrap  { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.orc-bar-track { flex: 1; height: 5px; border-radius: 100px; background: rgba(255,255,255,0.07); }
+.orc-bar-fill  { height: 100%; border-radius: 100px; }
+.orc-bar-num   { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 24px; text-align: right; }
+.orc-truth-body {
+  font-size: 13px; line-height: 1.8; color: rgba(255,255,255,0.68); margin: 0 0 14px;
+}
+.orc-callout {
+  font-size: 12px; line-height: 1.75; font-weight: 500;
+  padding: 11px 14px; border-radius: 10px; margin-bottom: 18px; border-left: 3px solid;
+}
+.orc-callout-warn { background: rgba(251,146,60,0.09); border-color: #fb923c; color: rgba(255,255,255,0.78); }
+.orc-callout-note { background: rgba(34,197,94,0.07);  border-color: #22c55e; color: rgba(255,255,255,0.68); }
+
+/* Year arc */
+.orc-arc-card {
+  margin: 0 16px 4px;
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 14px 12px;
+}
+.orc-arc-meta { display: flex; gap: 20px; margin-bottom: 14px; flex-wrap: wrap; }
+.orc-arc-peak, .orc-arc-trough {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: rgba(255,255,255,0.6);
+}
+.orc-arc-peak strong, .orc-arc-trough strong { color: var(--text); font-weight: 700; }
+.orc-arc-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.orc-arc-svg { margin: 0 -2px; }
+.orc-arc-now {
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  color: var(--muted); text-align: center; margin-top: 6px;
+}
+
+/* Month blocks */
+.orc-month-block {
+  padding: 16px 16px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.orc-month-now {
+  border-left: 3px solid var(--gold);
+  background: rgba(240,192,64,0.03);
+}
+.orc-month-top {
+  display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 5px;
+}
+.orc-month-name  { font-size: 15px; font-weight: 700; }
+.orc-month-score { font-size: 26px; font-weight: 800; line-height: 1; letter-spacing: -0.5px; }
+.orc-month-theme { font-size: 11px; font-weight: 700; letter-spacing: 0.4px; color: var(--muted); margin-bottom: 5px; }
+.orc-month-note  { font-size: 12px; line-height: 1.7; color: rgba(255,255,255,0.5); margin: 0 0 10px; }
+.orc-actions { list-style: none; padding: 0; margin: 8px 0 2px; display: flex; flex-direction: column; gap: 8px; }
+.orc-action-item {
+  font-size: 13px; font-weight: 600; line-height: 1.5; color: var(--text);
+  padding: 11px 14px;
+  background: rgba(240,192,64,0.07); border: 1px solid rgba(240,192,64,0.18);
+  border-radius: 10px;
+}
+
+/* Verdict */
+.orc-verdict {
+  margin: 0 16px 36px;
+  padding: 24px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  text-align: center;
+}
+.orc-verdict-icon { font-size: 32px; margin-bottom: 14px; line-height: 1; }
+.orc-verdict-text {
+  font-size: 14px; line-height: 1.85; color: rgba(255,255,255,0.75); margin: 0; font-style: italic;
 }
 
 /* ────────────────────────

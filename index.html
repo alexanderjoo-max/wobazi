@@ -208,14 +208,9 @@
 
     <div class="results-tab-bar">
       <div class="tab-bar-inner">
-        <button class="tab-btn active" id="tab-btn-fortune" onclick="haptic(6); switchTab('fortune')">
-          <span class="en">Your Fortune</span>
-          <span class="zh hide">今日运势</span>
-        </button>
-        <button class="tab-btn" id="tab-btn-personality" onclick="haptic(6); switchTab('personality')">
-          <span class="en">Your Personality</span>
-          <span class="zh hide">个性命理</span>
-        </button>
+        <button class="tab-btn active" id="tab-btn-fortune" onclick="haptic(6); switchTab('fortune')">Fortune</button>
+        <button class="tab-btn" id="tab-btn-personality" onclick="haptic(6); switchTab('personality')">Personality</button>
+        <button class="tab-btn" id="tab-btn-oracle" onclick="haptic(6); switchTab('oracle')">Oracle</button>
       </div>
     </div>
 
@@ -274,6 +269,11 @@
           <span class="section-sub">2026 · 职业运势</span>
         </div>
         <div id="work-card"></div>
+      </section>
+
+      <!-- Oracle Deep Read -->
+      <section class="section orc-section" data-tab="oracle" id="oracle-section">
+        <div id="oracle-card"></div>
       </section>
 
       <!-- Four Pillars -->

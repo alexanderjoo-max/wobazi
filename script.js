@@ -360,6 +360,7 @@ function showScreen(id) {
 function switchTab(tab) {
   document.getElementById('tab-btn-fortune').classList.toggle('active', tab === 'fortune');
   document.getElementById('tab-btn-personality').classList.toggle('active', tab === 'personality');
+  document.getElementById('tab-btn-oracle').classList.toggle('active', tab === 'oracle');
   document.querySelectorAll('#results .section[data-tab]').forEach(el => {
     el.classList.toggle('hide', el.dataset.tab !== tab || el.classList.contains('data-hidden'));
   });
@@ -532,11 +533,17 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   renderBloodTypeSection(bloodType, dominantEl);
   renderBirthplaceSection(birthplace, dominantEl);
 
+  // Oracle deep read
+  renderOracleTab(animal, elements, fortune, pillars, forecast2026, dominantEl);
+
   showScreen('results');
   haptic([20, 60, 20]);
 
   // Init tab from URL hash (default: fortune)
-  switchTab(location.hash === '#personality' ? 'personality' : 'fortune');
+  const initTab = location.hash === '#personality' ? 'personality'
+                : location.hash === '#oracle'       ? 'oracle'
+                : 'fortune';
+  switchTab(initTab);
 
   // Animate progress rings after screen shows
   setTimeout(() => animateFortune(fortune), 300);
@@ -1554,6 +1561,227 @@ function renderLoveSection(animal, elements, overall2026) {
       strip.scrollLeft = Math.max(0, nowMonth * tileW - strip.clientWidth / 2 + tileW / 2);
     }
   }, 700);
+}
+
+/* ═══════════════════════════════════════
+   ORACLE — Deep Read Tab
+═══════════════════════════════════════ */
+const ORACLE_ANIMAL_INTRO = {
+  Rat:     `Wired for survival, sharper than you let on. 2026 is asking whether you've been surviving or actually living.`,
+  Ox:      `You build slowly and well. The question this year: are you building what you actually want, or what you think you should?`,
+  Tiger:   `The Fire Horse recognises your fire. 2026 doesn't ask if you're capable — it asks if you're brave enough to act on what you already know.`,
+  Rabbit:  `You navigate quietly. But 2026 is not a quiet year — it will ask something of you that requires being seen.`,
+  Dragon:  `Everyone expects things from you. That expectation has shaped you — some of it beautifully, some like a cage. This year, choose which parts to keep.`,
+  Snake:   `You know more than you say, and see more than most notice. 2026 rewards the move you've been holding back.`,
+  Horse:   `A Fire Horse year is your element — but even the wildest horse must decide which direction it's actually running.`,
+  Goat:    `Your read on people is almost always right. The problem is you talk yourself out of it. 2026: stop doing that.`,
+  Monkey:  `You thrive in chaos, and 2026 is chaos. Most signs are stressed by this year. You're in your element — use it.`,
+  Rooster: `You have standards most people don't meet. That's not arrogance — it's accuracy. This year asks if those standards protect you or isolate you.`,
+  Dog:     `Your loyalty is your superpower and your most exploited vulnerability. 2026 will show you clearly which relationships actually deserve it.`,
+  Pig:     `You give freely, sometimes recklessly. This year will show you exactly who gives back — and the answer may surprise you.`,
+};
+
+const ORACLE_LOVE = {
+  high: `Your romantic energy is genuinely strong this year. The right people are being drawn toward you — don't overthink it. If you're in a relationship, this is the year to deepen it intentionally rather than coast. Say the thing you've been leaving unsaid.`,
+  mid:  `Your love life works — but working isn't the same as thriving. Something is being left unsaid, tolerated rather than resolved. The Fire Horse strips away comfortable illusions. Whatever has been quietly bothering you will get louder. Address it before it becomes a crisis.`,
+  low:  `The honest read: something in your love life isn't right, and you already know it. If you're with someone who doesn't make you feel fully chosen — who you're managing more than enjoying — this year makes that impossible to ignore. That's not a punishment. It's clarity you can act on.`,
+};
+
+const ORACLE_CAREER = {
+  high: `Career momentum is real this year. Opportunities in the first half of 2026 are genuine — your only obstacle is your own hesitation. Whatever move you've been deliberating, the window is open. Walk through it before it closes.`,
+  mid:  `Career is moving, not at the speed you want. The bottleneck is almost certainly internal: a conversation not yet had, a decision kept deferring, a gap you're aware of but haven't closed. The Fire Horse rewards those who remove their own obstacles. What's yours?`,
+  low:  `This is not the year to force career momentum — conditions aren't right for aggressive expansion. But it's ideal for strategic repositioning. Quiet, deliberate moves made now will pay off enormously in 2027. Protect what you've built. Don't sprint just because you're anxious.`,
+};
+
+const ORACLE_HEALTH = {
+  high: `Physical energy is solid this year. Your risk isn't weakness — it's overextension. You'll be tempted to push harder than your body wants, especially in high-pressure months. The months you ignore what your body asks for are the ones that create problems later.`,
+  mid:  `Energy will be inconsistent in 2026. Some stretches feel sharp and strong; others drain you unexpectedly. The months you resist slowing down are usually the ones that demand it most. Sleep isn't optional this year — it's strategy.`,
+  low:  `Your body is carrying more than it should. Stress will show up physically in 2026 — it's already starting. Sleep, food, and what you consume mentally matter more right now than they have in years. Start there before trying to fix anything else.`,
+};
+
+const ORACLE_WEALTH = {
+  high: `Wealth conditions are favourable. Opportunities for meaningful financial progress are real — but they require you to act, not just notice. Identify where you want money to go before it arrives, or it will dissolve into noise.`,
+  mid:  `Money flows, but not freely. There are leaks you're not tracking — costs, energy, commitments that don't pay back what they take. Audit before you expand. Tightening now creates the room to move later.`,
+  low:  `2026 is not the year for financial risk. Not because you can't handle it — because the conditions are wrong. Protect what you have. Decisions that feel urgent probably aren't. Patience is the correct move, and it will pay off.`,
+};
+
+function makeOracleArcSVG(months, nowMonth, maxIdx, minIdx) {
+  const W = 340, H = 110, PL = 6, PR = 6, PT = 12, PB = 22;
+  const cW = W - PL - PR, cH = H - PT - PB;
+  const xs = months.map((_, i) => PL + (i / 11) * cW);
+  const ys = months.map(v => PT + cH - (Math.min(100, Math.max(0, v)) / 100) * cH);
+  let line = `M ${xs[0].toFixed(1)},${ys[0].toFixed(1)}`;
+  for (let i = 1; i < months.length; i++) {
+    const cpx = ((xs[i - 1] + xs[i]) / 2).toFixed(1);
+    line += ` C ${cpx},${ys[i-1].toFixed(1)} ${cpx},${ys[i].toFixed(1)} ${xs[i].toFixed(1)},${ys[i].toFixed(1)}`;
+  }
+  const area = `${line} L ${xs[11].toFixed(1)},${H-PB} L ${xs[0].toFixed(1)},${H-PB} Z`;
+  const LABELS = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+  const labels = LABELS.map((l, i) =>
+    `<text x="${xs[i].toFixed(1)}" y="${H-5}" text-anchor="middle" font-size="8" fill="${i === nowMonth ? '#f0c040' : 'rgba(255,255,255,0.28)'}">${l}</text>`
+  ).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;overflow:visible">
+    <defs><linearGradient id="oArcGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0c040" stop-opacity="0.38"/>
+      <stop offset="100%" stop-color="#f0c040" stop-opacity="0.02"/>
+    </linearGradient></defs>
+    <path d="${area}" fill="url(#oArcGrad)"/>
+    <path d="${line}" fill="none" stroke="#f0c040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="${xs[nowMonth].toFixed(1)}" y1="${PT}" x2="${xs[nowMonth].toFixed(1)}" y2="${H-PB}" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="${xs[maxIdx].toFixed(1)}" cy="${ys[maxIdx].toFixed(1)}" r="4.5" fill="#f0c040" stroke="#07070f" stroke-width="1.5"/>
+    <circle cx="${xs[minIdx].toFixed(1)}" cy="${ys[minIdx].toFixed(1)}" r="4" fill="#475569" stroke="#07070f" stroke-width="1.5"/>
+    <circle cx="${xs[nowMonth].toFixed(1)}" cy="${ys[nowMonth].toFixed(1)}" r="4" fill="white" stroke="#07070f" stroke-width="2"/>
+    ${labels}
+  </svg>`;
+}
+
+function renderOracleTab(animal, elements, fortune, pillars, forecast2026, dominantEl) {
+  const monthScores = gen2026Monthly(forecast2026.overall);
+  const now         = new Date();
+  const nowMonth    = now.getMonth();
+  const MONTH_FULL  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const tier = s => s >= 68 ? 'high' : s >= 45 ? 'mid' : 'low';
+
+  const { love, career, health, wealth } = fortune;
+  const overall  = forecast2026.overall;
+  const elColor  = EL_COLOR[dominantEl] || '#f0c040';
+
+  const maxIdx   = monthScores.indexOf(Math.max(...monthScores));
+  const minIdx   = monthScores.indexOf(Math.min(...monthScores));
+  const nowScore = monthScores[nowMonth];
+  const nowTier  = tier(nowScore);
+
+  const THIS_MONTH_ACTIONS = {
+    high: [
+      `Your most important project needs a concrete next step today — not a plan, an action.`,
+      `Reach out to someone you've been meaning to contact. The window is open right now.`,
+      `Make the decision you've been sitting on. Conditions are as good as they'll get.`,
+    ],
+    mid: [
+      `Pick one thing — only one — to focus on this month. Scattered effort won't land.`,
+      `There's a conversation in your life that needs to happen before the month ends. Have it.`,
+      `Look at what's quietly draining you. One commitment probably deserves to be cut.`,
+    ],
+    low: [
+      `This is a recovery month, not a forcing month. What do you actually need right now?`,
+      `Protect your energy deliberately — say no to at least two non-essential things.`,
+      `Use the slower pace to make a decision you've been avoiding. Clarity now beats confusion later.`,
+    ],
+  };
+
+  const MONTH_THEMES = {
+    high: { emoji: '🔥', label: 'Peak Window',   note: `Push hard. Conditions won't be this favourable again for months.`      },
+    mid:  { emoji: '⚡', label: 'Steady Ground', note: `Consistent effort beats sporadic bursts. Show up every day.`            },
+    low:  { emoji: '🌊', label: 'Rest & Reset',  note: `Don't force it. Strategic patience now pays forward.`                  },
+  };
+
+  const loveCallout = love < 50
+    ? `If you're with someone right now and it doesn't feel right — it probably isn't. The person you're currently dating may not be for you, and 2026 will make that undeniable. Trust what you already know.`
+    : love < 65
+    ? `Be honest about what you actually want from your relationship or romantic life. Comfortable and right are not the same thing.`
+    : `Your love energy is genuine this year. Don't overthink what's working.`;
+  const loveCalloutType = love < 65 ? 'warn' : 'note';
+
+  const verdictText = overall >= 70
+    ? `2026 is genuinely yours to shape — not because everything will be easy, but because your chart aligns with this year's energy. The only thing between you and real progress is whether you actually move. Stop waiting for certainty. It won't come. Move anyway.`
+    : overall >= 50
+    ? `2026 is a year of honest reckoning. Not punishing — clarifying. The things that aren't working will become impossible to ignore. That's useful information, not bad luck. Use the friction to make better choices instead of managing around problems you've been tolerating.`
+    : `2026 is a hard year for your chart — and pretending otherwise doesn't help. The Fire Horse is exposing what's out of alignment in your life. That's uncomfortable, but it's also the clearest map you've had in years. The question isn't whether to change. It's what, and how fast.`;
+
+  const verdictIcon = overall >= 70 ? '✦' : overall >= 50 ? '◈' : '◇';
+
+  const bar = (score, color) =>
+    `<div class="orc-bar-wrap">
+      <div class="orc-bar-track"><div class="orc-bar-fill" style="width:${score}%;background:${color}"></div></div>
+      <span class="orc-bar-num">${score}</span>
+    </div>`;
+
+  const arcSVG = makeOracleArcSVG(monthScores, nowMonth, maxIdx, minIdx);
+
+  const next3 = [0, 1, 2].map(offset => {
+    const idx = (nowMonth + offset) % 12;
+    return { name: MONTH_FULL[idx], score: Math.round(monthScores[idx]), t: tier(monthScores[idx]), isnow: offset === 0 };
+  });
+
+  const introText = ORACLE_ANIMAL_INTRO[animal] || `Your chart holds more than most people see. 2026 will show whether you're ready to act on it.`;
+
+  document.getElementById('oracle-card').innerHTML = `
+    <div class="orc-intro-card" style="border-color:${elColor}35;background:linear-gradient(160deg,${elColor}09,transparent 60%)">
+      <div class="orc-intro-eyebrow">The Oracle's Read · 2026</div>
+      <p class="orc-intro-text">${introText}</p>
+      <div class="orc-overall-row">
+        <div class="orc-overall-block">
+          <div class="orc-overall-num" style="color:${elColor}">${overall}</div>
+          <div class="orc-overall-label">Year Score</div>
+        </div>
+        <div class="orc-quadrant">
+          <div class="orc-q-item"><span class="orc-q-label">Love</span><span class="orc-q-val">${love}</span></div>
+          <div class="orc-q-item"><span class="orc-q-label">Career</span><span class="orc-q-val">${career}</span></div>
+          <div class="orc-q-item"><span class="orc-q-label">Health</span><span class="orc-q-val">${health}</span></div>
+          <div class="orc-q-item"><span class="orc-q-label">Wealth</span><span class="orc-q-val">${wealth}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="orc-sticky-head">The Hard Truths</div>
+
+    <div class="orc-truth-block">
+      <div class="orc-truth-label" style="color:#f43f5e">❤ Love &amp; Relationships</div>
+      ${bar(love, '#f43f5e')}
+      <p class="orc-truth-body">${ORACLE_LOVE[tier(love)]}</p>
+      <div class="orc-callout orc-callout-${loveCalloutType}">${loveCallout}</div>
+    </div>
+
+    <div class="orc-truth-block">
+      <div class="orc-truth-label" style="color:#8b5cf6">💼 Career &amp; Ambition</div>
+      ${bar(career, '#8b5cf6')}
+      <p class="orc-truth-body">${ORACLE_CAREER[tier(career)]}</p>
+    </div>
+
+    <div class="orc-truth-block">
+      <div class="orc-truth-label" style="color:#22c55e">⚡ Health &amp; Energy</div>
+      ${bar(health, '#22c55e')}
+      <p class="orc-truth-body">${ORACLE_HEALTH[tier(health)]}</p>
+    </div>
+
+    <div class="orc-truth-block" style="border-bottom:none;margin-bottom:0">
+      <div class="orc-truth-label" style="color:#f59e0b">💰 Wealth &amp; Resources</div>
+      ${bar(wealth, '#f59e0b')}
+      <p class="orc-truth-body">${ORACLE_WEALTH[tier(wealth)]}</p>
+    </div>
+
+    <div class="orc-sticky-head">Your 2026 Arc</div>
+
+    <div class="orc-arc-card">
+      <div class="orc-arc-meta">
+        <div class="orc-arc-peak"><span class="orc-arc-dot" style="background:#f0c040"></span>Peak: <strong>${MONTH_FULL[maxIdx]}</strong></div>
+        <div class="orc-arc-trough"><span class="orc-arc-dot" style="background:#475569"></span>Lowest: <strong>${MONTH_FULL[minIdx]}</strong></div>
+      </div>
+      <div class="orc-arc-svg">${arcSVG}</div>
+      <div class="orc-arc-now">▲ You are here: ${MONTH_FULL[nowMonth]} · ${Math.round(nowScore)}</div>
+    </div>
+
+    <div class="orc-sticky-head">Next 90 Days</div>
+
+    ${next3.map(m => `
+      <div class="orc-month-block${m.isnow ? ' orc-month-now' : ''}">
+        <div class="orc-month-top">
+          <div class="orc-month-name">${m.name}${m.isnow ? ' · Now' : ''}</div>
+          <div class="orc-month-score" style="color:${m.t === 'high' ? '#f0c040' : m.t === 'mid' ? '#94a3b8' : '#64748b'}">${m.score}</div>
+        </div>
+        <div class="orc-month-theme">${MONTH_THEMES[m.t].emoji} ${MONTH_THEMES[m.t].label}</div>
+        <p class="orc-month-note">${MONTH_THEMES[m.t].note}</p>
+        ${m.isnow ? `<ul class="orc-actions">${THIS_MONTH_ACTIONS[nowTier].map(a => `<li class="orc-action-item">→ ${a}</li>`).join('')}</ul>` : ''}
+      </div>
+    `).join('')}
+
+    <div class="orc-sticky-head">The Verdict</div>
+
+    <div class="orc-verdict">
+      <div class="orc-verdict-icon" style="color:${elColor}">${verdictIcon}</div>
+      <p class="orc-verdict-text">${verdictText}</p>
+    </div>
+  `;
 }
 
 /* ═══════════════════════════════════════
