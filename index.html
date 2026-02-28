@@ -153,6 +153,23 @@
           <input type="time" id="birthtime">
         </div>
 
+        <div class="field field-row">
+          <div class="field-col">
+            <label>Place of Birth <span class="label-opt">optional</span></label>
+            <input type="text" id="birthplace" placeholder="City or country" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="field-col">
+            <label>Blood Type <span class="label-opt">optional</span></label>
+            <select id="blood-type" class="select-input">
+              <option value="">Unknown</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="AB">AB</option>
+              <option value="O">O</option>
+            </select>
+          </div>
+        </div>
+
         <button type="submit" class="btn-primary btn-full">
           <span>Reveal My Destiny</span>
           <span class="btn-char">龙</span>
@@ -318,6 +335,24 @@
           <span class="section-sub">阴阳 Yīn Yáng</span>
         </div>
         <div id="yinyang-card"></div>
+      </section>
+
+      <!-- Blood Type Profile -->
+      <section class="section data-hidden" id="blood-section" data-tab="personality">
+        <div class="section-head" data-tip="blood-type">
+          <h3 class="en">Blood Type Profile</h3>
+          <h3 class="zh hide">血型个性</h3>
+        </div>
+        <div id="blood-card"></div>
+      </section>
+
+      <!-- Geographic Energy -->
+      <section class="section data-hidden" id="birthplace-section" data-tab="personality">
+        <div class="section-head" data-tip="birthplace">
+          <h3 class="en">Geographic Energy</h3>
+          <h3 class="zh hide">地理能量</h3>
+        </div>
+        <div id="birthplace-card"></div>
       </section>
 
       <!-- Reading -->

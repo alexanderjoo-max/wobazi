@@ -361,7 +361,7 @@ function switchTab(tab) {
   document.getElementById('tab-btn-fortune').classList.toggle('active', tab === 'fortune');
   document.getElementById('tab-btn-personality').classList.toggle('active', tab === 'personality');
   document.querySelectorAll('#results .section[data-tab]').forEach(el => {
-    el.classList.toggle('hide', el.dataset.tab !== tab);
+    el.classList.toggle('hide', el.dataset.tab !== tab || el.classList.contains('data-hidden'));
   });
   document.querySelector('#results .scroll-body').scrollTop = 0;
   history.replaceState(null, '', location.pathname + '#' + tab);
@@ -431,19 +431,32 @@ function handleSubmit(e) {
   let hour = null;
   if (timeVal) hour = parseInt(timeVal.split(':')[0], 10);
 
-  runLoader(() => renderResults(name, y, m - 1, d, hour));
+  const birthplace = document.getElementById('birthplace').value.trim();
+  const bloodType  = document.getElementById('blood-type').value || null;
+
+  runLoader(() => renderResults(name, y, m - 1, d, hour, birthplace, bloodType));
 }
 
 /* ═══════════════════════════════════════
    UI — Render Results
 ═══════════════════════════════════════ */
-function renderResults(name, year, month, day, hour) {
+function renderResults(name, year, month, day, hour, birthplace = '', bloodType = null) {
   const pillars  = calcBazi(year, month, day, hour);
   const yearPillar = pillars[0];
   const animal   = yearPillar.branch.animal;
   const zData    = ZODIAC[animal];
   const elements = calcElements(pillars);
   const fortune  = calcFortune(animal, elements);
+
+  // Apply blood type fortune modifiers (optional)
+  if (bloodType && BLOOD_TYPE[bloodType]) {
+    const mods = BLOOD_TYPE[bloodType].mod;
+    Object.keys(mods).forEach(k => {
+      if (fortune[k] !== undefined) {
+        fortune[k] = Math.min(99, Math.max(1, fortune[k] + mods[k]));
+      }
+    });
+  }
 
   // Greeting
   const greet = name ? `Hey, ${name} ✦` : 'Your Destiny ✦';
@@ -512,6 +525,12 @@ function renderResults(name, year, month, day, hour) {
 
   // Lucky
   renderLucky(zData.lucky);
+
+  // Optional personality sections — reset first, then populate if data provided
+  document.getElementById('blood-section').classList.add('data-hidden');
+  document.getElementById('birthplace-section').classList.add('data-hidden');
+  renderBloodTypeSection(bloodType, dominantEl);
+  renderBirthplaceSection(birthplace, dominantEl);
 
   showScreen('results');
   haptic([20, 60, 20]);
@@ -734,6 +753,159 @@ function toggleLang() {
   const btn = document.getElementById('lang-btn');
   btn.textContent = isZh ? 'EN' : '中文';
   btn.classList.toggle('zh-active', isZh);
+}
+
+/* ═══════════════════════════════════════
+   BLOOD TYPE + BIRTHPLACE DATA
+═══════════════════════════════════════ */
+const BLOOD_TYPE = {
+  A: {
+    nature: 'The Perfectionist', color: '#ef4444',
+    traits: ['Organised', 'Reliable', 'Sensitive'],
+    desc_en: 'Detail-oriented and conscientious — you bring structure to chaos and take pride in doing things right. In relationships and work your standards are high. Your growth edge: releasing the need for control.',
+    desc_zh: '注重细节、认真负责，善于将混乱化为有序。感情和工作中标准极高。成长方向：放下对掌控的执念。',
+    mod: { career:+4, health:+3, love:-2, wealth:+2 },
+  },
+  B: {
+    nature: 'The Free Spirit', color: '#3b82f6',
+    traits: ['Creative', 'Passionate', 'Independent'],
+    desc_en: 'You live by your own rules — creative, curious, and delightfully unpredictable. Freedom is your oxygen. You thrive when given space and wither under rigid constraints.',
+    desc_zh: '活在自己的规则里——创意无限、热情飞扬。自由是你的氧气，束缚是你的天敌。能量充沛却难以持久。',
+    mod: { love:+5, career:+2, health:-2, wealth:-1 },
+  },
+  AB: {
+    nature: 'The Enigma', color: '#8b5cf6',
+    traits: ['Rational', 'Empathetic', 'Dual-natured'],
+    desc_en: 'You contain multitudes — logic and emotion, introvert and extrovert. This rarity makes you fascinating. You see all sides of every situation: your greatest gift and greatest burden.',
+    desc_zh: '集多面于一身——理性与感性并存，内向与外向交织。能看清局势全貌，既是天赋也是负担。',
+    mod: { career:+5, wealth:+3, love:+3, health:+1 },
+  },
+  O: {
+    nature: 'The Leader', color: '#f59e0b',
+    traits: ['Decisive', 'Competitive', 'Resilient'],
+    desc_en: 'The natural leader — bold, goal-driven, built to endure. You recover fast, compete hard, and inspire through sheer will. Blind spot: slowing down to truly listen.',
+    desc_zh: '天生的领导者——果断、目标明确、意志坚韧。恢复力强，以意志力激励他人。盲点是不善倾听与示弱。',
+    mod: { career:+6, wealth:+5, love:-1, health:+2 },
+  },
+};
+
+const BT_SYNERGY = {
+  'A_Wood':  'Type A precision × Wood patience — a meticulous, methodical builder.',
+  'A_Fire':  'Type A structure tames Fire's impulsivity — raw passion becomes disciplined output.',
+  'A_Earth': 'Earth's reliability amplifies your Type A drive — exceptionally steady and dependable.',
+  'A_Metal': 'Double precision: Metal sharpness × Type A meticulousness. Exceptional standards, exceptional results.',
+  'A_Water': 'Water's intuition softens your rigidity — you think and feel your way to answers.',
+  'B_Wood':  'Wood's expansive creative energy × Type B freedom = unstoppable originality.',
+  'B_Fire':  'Maximum creative heat — brilliant output. Pace yourself; burnout is real.',
+  'B_Earth': 'Earth's grounding gives your Type B spirit the anchor it occasionally needs.',
+  'B_Metal': 'Metal's discipline can feel like a cage — treat it as a creative framework instead.',
+  'B_Water': 'Two free-flowing energies: fluid, artistic, boundless. Deeply intuitive.',
+  'AB_Wood': 'Wood's dual growth mirrors your dual nature — you expand in multiple directions at once.',
+  'AB_Fire': 'Fire ignites one side of you; your rational side channels it into something powerful.',
+  'AB_Earth':'Earth's stability grounds your inner contradictions, giving them form and direction.',
+  'AB_Metal':'Metal's clarity cuts through your complexity — an unusually sharp, effective combination.',
+  'AB_Water':'The deepest pairing: Water flows, you adapt. Profoundly intuitive and empathetic.',
+  'O_Wood':  'Wood's long vision × Type O ambition = a builder of legacies.',
+  'O_Fire':  'Explosive leadership energy. You move mountains — don't burn bridges getting there.',
+  'O_Earth': 'Earth's loyalty × Type O resilience — unshakeable, enduring presence.',
+  'O_Metal': 'Metal sharpens Type O's edge to a fine point: precise, decisive, formidable.',
+  'O_Water': 'Water adds emotional intelligence to Type O's drive — a rare, powerful balance.',
+};
+
+const PLACE_ELEMENT_MAP = [
+  { el:'Wood',  keys:['china','japan','korea','taiwan','hong kong','singapore','vietnam','thailand','cambodia','myanmar','tokyo','beijing','shanghai','seoul','taipei','east asia','southeast asia'] },
+  { el:'Fire',  keys:['india','australia','brazil','south africa','argentina','mexico','colombia','nigeria','kenya','egypt','indonesia','philippines','malaysia','sri lanka','miami','tropical'] },
+  { el:'Metal', keys:['uk','england','france','germany','italy','spain','europe','london','paris','berlin','rome','madrid','amsterdam','switzerland','austria','portugal','netherlands','western europe'] },
+  { el:'Water', keys:['canada','russia','norway','sweden','finland','denmark','iceland','alaska','scotland','ireland','new zealand','scandinavia','north','vancouver','montreal','toronto','chicago','seattle','minneapolis'] },
+  { el:'Earth', keys:['usa','united states','america','new york','california','texas','ohio','illinois','central','turkey','iran','saudi','israel','middle east','midwest'] },
+];
+
+function getPlaceElement(place) {
+  if (!place) return null;
+  const low = place.toLowerCase();
+  for (const { el, keys } of PLACE_ELEMENT_MAP) {
+    if (keys.some(k => low.includes(k))) return el;
+  }
+  return 'Earth'; // geographic centre default
+}
+
+/* ── Blood Type Section ── */
+function renderBloodTypeSection(bloodType, dominantEl) {
+  if (!bloodType || !BLOOD_TYPE[bloodType]) return;
+  const bt       = BLOOD_TYPE[bloodType];
+  const elColor  = EL_COLOR[dominantEl];
+  const synergy  = BT_SYNERGY[`${bloodType}_${dominantEl}`] || '';
+
+  const modHTML = Object.entries(bt.mod)
+    .filter(([,v]) => v !== 0)
+    .map(([k, v]) => `<span class="bt-mod-chip ${v > 0 ? 'bt-pos' : 'bt-neg'}">${v > 0 ? '+' : ''}${v} ${k[0].toUpperCase() + k.slice(1)}</span>`)
+    .join('');
+
+  document.getElementById('blood-section').classList.remove('data-hidden');
+  document.getElementById('blood-card').innerHTML = `
+    <div class="love-card" style="border-color:${bt.color}28;background:${bt.color}06">
+      <div class="love-top" style="padding-bottom:12px">
+        <div class="bt-badge" style="background:${bt.color};color:#07070f">Type ${bloodType}</div>
+        <div class="love-tier-label" style="color:${bt.color}">${bt.nature}</div>
+        <div class="love-traits" style="justify-content:center;margin-top:8px">
+          ${bt.traits.map(t => `<span class="love-trait">${t}</span>`).join('')}
+        </div>
+      </div>
+      <div class="love-desc">
+        <p class="en">${bt.desc_en}</p>
+        <p class="zh hide">${bt.desc_zh}</p>
+      </div>
+      ${synergy ? `<div class="bt-synergy" style="border-top:1px solid ${elColor}20">
+        <div class="bt-synergy-label" style="color:${elColor}">🧬 Type ${bloodType} × ${dominantEl}</div>
+        <div class="bt-synergy-text">${synergy}</div>
+      </div>` : ''}
+      <div class="bt-mods">
+        <div class="bt-mods-label">Fortune modifiers from blood type</div>
+        <div class="bt-mods-row">${modHTML}</div>
+      </div>
+    </div>`;
+}
+
+/* ── Birthplace / Geographic Energy Section ── */
+function renderBirthplaceSection(birthplace, dominantEl) {
+  if (!birthplace) return;
+  const el       = getPlaceElement(birthplace);
+  const elColor  = EL_COLOR[el];
+  const domColor = EL_COLOR[dominantEl];
+  const EL_DIR   = { Wood:'East', Fire:'South', Earth:'Centre', Metal:'West', Water:'North' };
+  const EL_ZH    = { Wood:'木', Fire:'火', Earth:'土', Metal:'金', Water:'水' };
+  const PRODUCE  = { Wood:'Fire', Fire:'Earth', Earth:'Metal', Metal:'Water', Water:'Wood' };
+  const CONTROL  = { Wood:'Earth', Earth:'Water', Water:'Fire', Fire:'Metal', Metal:'Wood' };
+
+  let interaction, interactColor;
+  if (el === dominantEl) {
+    interaction   = `Your birthplace and birth chart share ${el} energy — a resonant, amplifying combination. You are naturally in your element wherever you are.`;
+    interactColor = elColor;
+  } else if (PRODUCE[el] === dominantEl) {
+    interaction   = `${el} (birthplace) feeds ${dominantEl} (birth chart) — your environment has always quietly nurtured your natural strengths.`;
+    interactColor = '#22c55e';
+  } else if (PRODUCE[dominantEl] === el) {
+    interaction   = `Your birth chart's ${dominantEl} energy flows outward into ${el} — you were born to transform the world around you.`;
+    interactColor = '#f0c040';
+  } else if (CONTROL[el] === dominantEl) {
+    interaction   = `${el} (birthplace) presses against ${dominantEl} (birth chart) — a formative pressure that built your resilience and depth.`;
+    interactColor = '#f59e0b';
+  } else {
+    interaction   = `${el} and ${dominantEl} exist in creative tension — two independent forces that shaped a complex, multifaceted character.`;
+    interactColor = '#94a3b8';
+  }
+
+  document.getElementById('birthplace-section').classList.remove('data-hidden');
+  document.getElementById('birthplace-card').innerHTML = `
+    <div class="birthplace-card">
+      <div class="birthplace-top">
+        <div class="birthplace-el-pill" style="background:${elColor}18;border-color:${elColor}35;color:${elColor}">
+          <span class="birthplace-zh">${EL_ZH[el]}</span>${el} · ${EL_DIR[el]}
+        </div>
+        <div class="birthplace-name">${birthplace}</div>
+      </div>
+      <p class="birthplace-interact" style="color:${interactColor}">${interaction}</p>
+    </div>`;
 }
 
 /* ═══════════════════════════════════════
@@ -1482,6 +1654,20 @@ const TIPS = {
     title_zh: '爱情与关系',
     body_en: 'Your love forecast blends your zodiac\'s natural romantic energy with how the 2026 Fire Horse year activates the heart. The archetype reveals how you give and receive love — shaped by your dominant element.',
     body_zh: '爱情运融合了生肖天然的感情能量与2026年火马年对情感的激活。爱情原型揭示了你基于主导五行的给予与接受爱的方式。'
+  },
+  'blood-type': {
+    icon: '🩸',
+    title_en: 'Blood Type Profile',
+    title_zh: '血型个性',
+    body_en: 'East Asian tradition associates blood type with personality and fortune. This profile blends your blood type\'s characteristic energy with your dominant element to reveal a unique combination — and shows how it subtly shifts your fortune scores.',
+    body_zh: '东亚传统将血型与性格及运势相联系。此档案将血型特质与主导五行结合，揭示独特的能量组合，并展示其对运势分数的细微影响。'
+  },
+  'birthplace': {
+    icon: '🌍',
+    title_en: 'Geographic Energy',
+    title_zh: '地理能量',
+    body_en: 'Every place on Earth carries elemental energy based on its direction, climate, and geography. Understanding how your birth chart\'s dominant element interacts with your birthplace element reveals the environmental forces that shaped your earliest years.',
+    body_zh: '地球上每个地方都因方位、气候与地理而蕴含特定五行能量。了解命盘主导五行与出生地五行的互动关系，可揭示塑造你早年成长的环境力量。'
   },
 };
 
