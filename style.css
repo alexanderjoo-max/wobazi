@@ -326,7 +326,21 @@ input  { font-family: inherit; }
   border-bottom: 1px solid var(--border);
 }
 
-.greeting { font-size: 16px; font-weight: 600; }
+@keyframes mysticShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.greeting {
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #f0c040, #c084fc, #f472b6, #818cf8, #f0c040);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: mysticShift 6s ease infinite;
+}
 
 .btn-lang {
   font-family: 'Noto Sans SC', sans-serif;
@@ -375,9 +389,14 @@ input  { font-family: inherit; }
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 }
+@keyframes tabGlow {
+  0%, 100% { box-shadow: 0 0 6px rgba(240,192,64,0.5), 0 0 12px rgba(240,192,64,0.2); }
+  50%       { box-shadow: 0 0 16px rgba(240,192,64,0.9), 0 0 28px rgba(240,192,64,0.4); }
+}
 .tab-btn.active {
   background: var(--gold);
   color: #07070f;
+  animation: tabGlow 2.4s ease-in-out infinite;
 }
 .tab-btn:not(.active):active {
   background: rgba(255,255,255,0.08);
