@@ -434,14 +434,15 @@ function handleSubmit(e) {
 
   const birthplace = document.getElementById('birthplace').value.trim();
   const bloodType  = document.getElementById('blood-type').value || null;
+  const gender     = document.querySelector('input[name="gender"]:checked')?.value || null;
 
-  runLoader(() => renderResults(name, y, m - 1, d, hour, birthplace, bloodType));
+  runLoader(() => renderResults(name, y, m - 1, d, hour, birthplace, bloodType, gender));
 }
 
 /* ═══════════════════════════════════════
    UI — Render Results
 ═══════════════════════════════════════ */
-function renderResults(name, year, month, day, hour, birthplace = '', bloodType = null) {
+function renderResults(name, year, month, day, hour, birthplace = '', bloodType = null, gender = null) {
   const pillars  = calcBazi(year, month, day, hour);
   const yearPillar = pillars[0];
   const animal   = yearPillar.branch.animal;
@@ -530,10 +531,26 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   // Optional personality sections — reset first, then populate if data provided
   document.getElementById('blood-section').classList.add('data-hidden');
   document.getElementById('birthplace-section').classList.add('data-hidden');
+  document.getElementById('kua-section').classList.add('data-hidden');
   renderBloodTypeSection(bloodType, dominantEl);
   renderBirthplaceSection(birthplace, dominantEl);
 
-  // Oracle deep read
+  // New feature renders
+  const nowMonth = new Date().getMonth(); // 0-indexed
+  renderOutfitSection(dominantEl, nowMonth);
+  renderLuckyNumbers(year, month, day, animal, dominantEl);
+  renderAuspiciousDates(animal, dominantEl);
+  renderLuckyFoods(dominantEl);
+  renderCrystals(dominantEl);
+  renderMorningRitual(dominantEl);
+  if (gender) {
+    const kua = calcKua(year, gender);
+    document.getElementById('kua-section').classList.remove('data-hidden');
+    renderKuaSection(kua, dominantEl);
+  }
+  renderLifeDecades(year, dominantEl);
+
+  // Oracle deep read (includes career timing)
   renderOracleTab(animal, elements, fortune, pillars, forecast2026, dominantEl);
 
   showScreen('results');
@@ -2088,6 +2105,577 @@ function render2026Fortune(animal, elements, preCalc = null) {
     });
   }, 500);
 }
+
+/* ═══════════════════════════════════════
+   NEW FEATURE DATA CONSTANTS
+═══════════════════════════════════════ */
+
+/* ── Monthly Outfit Colors (2026 Wood Snake Year) ── */
+const OUTFIT_COLORS = [
+  { month:'Jan', hex:'#1e3a5f', hex2:'#3b6ea8', name:'Navy',          name2:'Steel Blue',  avoid:'Bright White', why:'Water feeds the Wood Snake — deep blues draw in flow and wisdom.' },
+  { month:'Feb', hex:'#2d6a2d', hex2:'#52a452', name:'Forest Green',  name2:'Sage',         avoid:'Dull Gray',    why:'Wood month: anchor the year in your element with grounding greens.' },
+  { month:'Mar', hex:'#6d28d9', hex2:'#a78bfa', name:'Violet',        name2:'Lavender',     avoid:'Muddy Brown',  why:'Spring Wood peaks — violet bridges earth and sky for growth.' },
+  { month:'Apr', hex:'#c2185b', hex2:'#f06292', name:'Crimson',       name2:'Rose',         avoid:'Black',        why:'Fire energy rises — reds draw social magnetism and confidence.' },
+  { month:'May', hex:'#b45309', hex2:'#f59e0b', name:'Amber',         name2:'Ochre',        avoid:'Cold White',   why:'Earth month — warm yellows and ambers ground your energy.' },
+  { month:'Jun', hex:'#9ca3af', hex2:'#e5e7eb', name:'Silver',        name2:'Pearl White',  avoid:'Neon Colors',  why:'Metal energy sharpens — silver and white bring clarity.' },
+  { month:'Jul', hex:'#1e40af', hex2:'#312e81', name:'Midnight Blue', name2:'Indigo',       avoid:'Red',          why:'Water cools peak Fire — blues protect and recalibrate energy.' },
+  { month:'Aug', hex:'#0d9488', hex2:'#5eead4', name:'Teal',          name2:'Seafoam',      avoid:'Harsh Yellow', why:'Late summer — teal bridges Water and Wood for steady flow.' },
+  { month:'Sep', hex:'#92400e', hex2:'#d97706', name:'Bronze',        name2:'Tan',          avoid:'Bright Pink',  why:'Earth element harvests — bronze and tan call in abundance.' },
+  { month:'Oct', hex:'#6b7280', hex2:'#d1d5db', name:'Steel Gray',    name2:'Silver',       avoid:'Orange',       why:'Metal month sharpens — neutral tones keep you decisive.' },
+  { month:'Nov', hex:'#1c1917', hex2:'#374151', name:'Charcoal',      name2:'Dark Slate',   avoid:'Loud Prints',  why:'Water season deepens — dark colors protect inner energy.' },
+  { month:'Dec', hex:'#dc2626', hex2:'#fca5a5', name:'Scarlet',       name2:'Blush Red',    avoid:'Gray',         why:'Year-end Fire surge — reds call in celebration and luck.' },
+];
+
+/* ── Lucky Foods per Element ── */
+const LUCKY_FOODS = {
+  Wood:  {
+    eat:   ['Leafy greens', 'Bean sprouts', 'Lemon & lime', 'Liver (chicken)', 'Walnuts', 'Broccoli'],
+    avoid: ['Excess fried foods', 'Heavy dairy', 'Processed meats'],
+    power: 'Spirulina',
+    powerWhy: 'Concentrated chlorophyll directly feeds Wood energy — detoxifying and growth-boosting.',
+  },
+  Fire:  {
+    eat:   ['Dark berries', 'Red peppers', 'Bitter greens', 'Dark chocolate (70%+)', 'Beets', 'Pomegranate'],
+    avoid: ['Alcohol', 'Cold drinks with ice', 'Excess spice'],
+    power: 'Pomegranate',
+    powerWhy: 'Loaded with antioxidants that protect Fire\'s most vulnerable organ — the heart.',
+  },
+  Earth: {
+    eat:   ['Sweet potato', 'Millet', 'Raw honey', 'Pumpkin', 'Brown rice', 'Butternut squash'],
+    avoid: ['Refined sugar', 'Cold/raw foods in excess', 'Dairy excess'],
+    power: 'Turmeric',
+    powerWhy: 'Warms and supports Earth\'s spleen-stomach system — the center of your body\'s qi.',
+  },
+  Metal: {
+    eat:   ['White radish (daikon)', 'Asian pear', 'Firm tofu', 'Cauliflower', 'Almonds', 'White sesame'],
+    avoid: ['Excess spicy food', 'Processed/packaged meat', 'Smoking'],
+    power: 'Ginger',
+    powerWhy: 'Warms Metal\'s lungs and improves respiratory qi — your body\'s chief weakness.',
+  },
+  Water: {
+    eat:   ['Black sesame seeds', 'Seafood', 'Walnuts', 'Black beans', 'Seaweed', 'Blueberries'],
+    avoid: ['Too much salt', 'Excess caffeine', 'Cold raw foods in winter'],
+    power: 'Miso',
+    powerWhy: 'Fermented salt — nourishes Water\'s kidneys and adrenals without overwhelming them.',
+  },
+};
+
+/* ── Crystals per Element ── */
+const CRYSTALS = {
+  Wood:  [
+    { name:'Green Aventurine', emoji:'🟢', effect:'Amplifies growth and opportunity windows',     carry:'Left wrist' },
+    { name:'Malachite',        emoji:'🌿', effect:'Breaks stuck patterns and drives change',      carry:'Pocket' },
+    { name:'Moss Agate',       emoji:'🪨', effect:'Builds slow, steady momentum and patience',   carry:'Desk or workspace' },
+  ],
+  Fire:  [
+    { name:'Carnelian',        emoji:'🔴', effect:'Ignites motivation, courage, and passion',    carry:'Right pocket' },
+    { name:'Garnet',           emoji:'💎', effect:'Sustains vitality and long-term stamina',      carry:'Left wrist' },
+    { name:'Red Jasper',       emoji:'🧱', effect:'Grounds fiery energy — prevents burnout',     carry:'Desk' },
+  ],
+  Earth: [
+    { name:'Citrine',          emoji:'🌟', effect:'Attracts abundance and mental clarity',        carry:'Purse or wallet' },
+    { name:"Tiger's Eye",      emoji:'🐯', effect:'Builds decisive confidence under pressure',   carry:'Left wrist' },
+    { name:'Yellow Calcite',   emoji:'🪨', effect:'Dissolves self-doubt and indecision',         carry:'Pocket' },
+  ],
+  Metal: [
+    { name:'Clear Quartz',     emoji:'💠', effect:'Amplifies any intention you set clearly',     carry:'Anywhere' },
+    { name:'Selenite',         emoji:'🤍', effect:'Clears mental clutter — use it daily',        carry:'Bedside' },
+    { name:'Amethyst',         emoji:'💜', effect:'Disciplines overthinking, sharpens focus',    carry:'Left wrist' },
+  ],
+  Water: [
+    { name:'Lapis Lazuli',     emoji:'🔵', effect:'Deepens wisdom and activates insight',        carry:'Throat or chest' },
+    { name:'Sodalite',         emoji:'🫐', effect:'Sharpens intuition signals — trust your gut', carry:'Left pocket' },
+    { name:'Blue Lace Agate',  emoji:'🩵', effect:'Calms anxiety and smooths communication',    carry:'Left wrist' },
+  ],
+};
+
+/* ── Morning Ritual per Element ── */
+const MORNING_RITUAL = {
+  Wood: [
+    { step:1, icon:'🌅', title:'Face East at Sunrise', body:'Stand tall and face east — your element\'s direction. Breathe in for 4 counts, hold 2, out for 4. Do this for 3 minutes. Wood energy rises with the sun and you must rise with it.' },
+    { step:2, icon:'🍋', title:'Warm Lemon Water First', body:'Drink warm water with half a fresh lemon before any food, coffee, or phone. This activates Wood\'s liver-gallbladder detox cycle within 15 minutes of waking.' },
+    { step:3, icon:'✍️', title:'Write One Living Intention', body:'Not a to-do list. Write one sentence: what you will grow today. "Today I will deepen X" or "Today I will start Y." Wood energy requires direction or it stagnates.' },
+  ],
+  Fire: [
+    { step:1, icon:'☀️', title:'5 Minutes of Morning Light', body:'Get actual sunlight on your face within 30 minutes of waking. Step outside — no glass. Fire needs the sun to activate. Even 5 minutes on an overcast day counts.' },
+    { step:2, icon:'📣', title:'Say Your Biggest Goal Aloud', body:'Fire energy requires expression. Say your most important goal out loud — not in your head. Say it like you mean it. This activates Fire\'s heart-qi more than any journaling.' },
+    { step:3, icon:'🍳', title:'Eat a Warm Breakfast', body:'Cold food first thing dampens your Fire. Eggs, oats, congee, anything warm. Your digestive fire is most active at 7-9am — use it. Cold smoothies work against you.' },
+  ],
+  Earth: [
+    { step:1, icon:'🦶', title:'Bare Feet on Ground First', body:'Before your phone — two minutes of bare feet on floor or ground. Earth element activates through physical contact with surfaces. This isn\'t metaphor; it resets your nervous system.' },
+    { step:2, icon:'🌅', title:'Breakfast Before Any Screen', body:'Earth\'s spleen-stomach qi peaks from 7-9am. Eat before checking messages, news, or email. You are most metabolically efficient right now — don\'t waste it on cortisol.' },
+    { step:3, icon:'💧', title:'One Act of Care', body:'Water a plant. Text someone "good morning" and mean it. Feed an animal. Earth energy activates through giving — it must flow outward to recharge inward. Do this before it\'s convenient.' },
+  ],
+  Metal: [
+    { step:1, icon:'💧', title:'Cold Water Face Splash', body:'Splash cold water on your face 5-7 times immediately after waking. Metal sharpens through contrast. This activates the lung meridian (Metal\'s organ) and raises alertness faster than coffee.' },
+    { step:2, icon:'🎯', title:'State One Clear Goal', body:'Not "be productive" — one concrete, measurable goal. "Finish the report by noon." "Call Marcus before 10am." Metal energy flows through precision. Vague intentions waste it.' },
+    { step:3, icon:'🧹', title:'Tidy One Surface', body:'Clear your desk, your bedside, or your kitchen counter before leaving the room. Metal flows through order. A cluttered space creates static in your thinking all day.' },
+  ],
+  Water: [
+    { step:1, icon:'🌑', title:'Sit in Quiet Darkness First', body:'Before any light or sound — five minutes of stillness. Sit on the edge of your bed in the dark. Water needs this stillness to surface what your subconscious processed overnight.' },
+    { step:2, icon:'📓', title:'Write 3 Lines — Don\'t Edit', body:'In a notebook, write whatever surfaces: feelings, images, fragments. No editing, no rereading. Water thinks through writing. Suppressing this creates the brain fog Water types often report.' },
+    { step:3, icon:'💧', title:'Room-Temperature Mineral Water', body:'Your kidneys (Water\'s organs) processed everything overnight. Drink room-temperature mineral water — not cold, not filtered tap — before coffee. Support your kidneys first.' },
+  ],
+};
+
+/* ── Kua Directions ── */
+const KUA_DIRS = {
+  1: { dir:'North',     zh:'北', compass:'N',  angle:0,   color:'#3b82f6', desc:'Aligns with career, wisdom, and life-path energy.' },
+  2: { dir:'Southwest', zh:'西南', compass:'SW', angle:225, color:'#f59e0b', desc:'Grounds relationships, nurturing, and home.' },
+  3: { dir:'East',      zh:'东', compass:'E',  angle:90,  color:'#22c55e', desc:'Channels vitality, growth, and fresh starts.' },
+  4: { dir:'Southeast', zh:'东南', compass:'SE', angle:135, color:'#10b981', desc:'Activates wealth, communication, and abundance.' },
+  6: { dir:'Northwest', zh:'西北', compass:'NW', angle:315, color:'#94a3b8', desc:'Draws in mentors, authority, and leadership.' },
+  7: { dir:'West',      zh:'西', compass:'W',  angle:270, color:'#ec4899', desc:'Enhances joy, creativity, and connection.' },
+  8: { dir:'Northeast', zh:'东北', compass:'NE', angle:45,  color:'#a78bfa', desc:'Sharpens knowledge, stillness, and discernment.' },
+  9: { dir:'South',     zh:'南', compass:'S',  angle:180, color:'#ef4444', desc:'Amplifies recognition, fame, and social energy.' },
+};
+
+/* ── Life Decade Theme Colors per Element ── */
+const DECADE_THEMES = {
+  Wood:  [
+    { phase:'Plant',   emoji:'🌱', note:'Foundation years. Build without expecting harvest yet.' },
+    { phase:'Grow',    emoji:'🌿', note:'Momentum builds. Compound effort now.' },
+    { phase:'Bloom',   emoji:'🌸', note:'Peak expression. Visibility and recognition come.' },
+    { phase:'Harvest', emoji:'🌾', note:'Reap what you cultivated. Teach and share.' },
+    { phase:'Rest',    emoji:'🍂', note:'Let go gracefully. Your roots sustain others.' },
+  ],
+  Fire:  [
+    { phase:'Spark',   emoji:'✨', note:'Raw potential ignites. Take risks — this is the time.' },
+    { phase:'Ignite',  emoji:'🔥', note:'Ambition peaks. Pursue boldly, pace carefully.' },
+    { phase:'Blaze',   emoji:'☀️', note:'Maximum output and impact. Lead, create, shine.' },
+    { phase:'Ember',   emoji:'🕯️', note:'Deep warmth over flashy heat. Mentor others.' },
+    { phase:'Return',  emoji:'🌑', note:'Fire returns to soil. Your heat fuels the next cycle.' },
+  ],
+  Earth: [
+    { phase:'Till',    emoji:'⛏️', note:'Prepare the ground. Hard, invisible, necessary work.' },
+    { phase:'Sow',     emoji:'🌰', note:'Plant intentionally. Not everything — the right things.' },
+    { phase:'Tend',    emoji:'🌻', note:'Consistent care over dramatic action. Trust the process.' },
+    { phase:'Reap',    emoji:'🧺', note:'Abundance arrives. Share generously — Earth replenishes.' },
+    { phase:'Compost', emoji:'♻️', note:'Transform experience into wisdom. Enrich what comes next.' },
+  ],
+  Metal: [
+    { phase:'Mine',    emoji:'⛏️', note:'Excavate raw talent. Dig deep into what you\'re made of.' },
+    { phase:'Refine',  emoji:'🔩', note:'Remove impurities. Develop mastery, shed distraction.' },
+    { phase:'Forge',   emoji:'⚒️', note:'Peak precision. Your skills become your identity.' },
+    { phase:'Polish',  emoji:'💎', note:'Excellence recognized. Let others see the work.' },
+    { phase:'Archive', emoji:'📚', note:'Your legacy crystallizes. Preserve and pass it down.' },
+  ],
+  Water: [
+    { phase:'Source',  emoji:'💧', note:'Still and deep. Gather before you flow.' },
+    { phase:'Flow',    emoji:'🌊', note:'Movement gains power. Follow your natural course.' },
+    { phase:'Deepen',  emoji:'🌀', note:'Wisdom accumulates. Others seek your depth.' },
+    { phase:'Still',   emoji:'🏞️', note:'Mastery is quiet. True depth needs no performance.' },
+    { phase:'Return',  emoji:'🌧️', note:'Experience cycles back. You become the source.' },
+  ],
+};
+
+/* ═══════════════════════════════════════
+   NEW FEATURE CALCULATION FUNCTIONS
+═══════════════════════════════════════ */
+
+/* ── Calculate Kua Number (1-9) from birth year + gender ── */
+function calcKua(year, gender) {
+  let s = year.toString().split('').reduce((a,d) => a + parseInt(d), 0);
+  while (s > 9) s = s.toString().split('').reduce((a,d) => a + parseInt(d), 0);
+  let kua;
+  if (gender === 'M') {
+    kua = (year < 2000) ? 10 - s : 9 - s;
+    if (kua <= 0) kua = kua + 9;
+  } else {
+    kua = (year < 2000) ? s + 5 : s + 6;
+    while (kua > 9) kua = kua.toString().split('').reduce((a,d) => a + parseInt(d), 0);
+  }
+  if (kua === 5) kua = (gender === 'M') ? 2 : 8;
+  return kua;
+}
+
+/* ── Get personal lucky numbers ── */
+function getLuckyNumbers(year, month, day, animal, dominantEl) {
+  // Numerology: reduce birth date
+  const sum = year + month + day;
+  const digits = sum.toString().split('').map(Number);
+  let n = digits.reduce((a, b) => a + b, 0);
+  while (n > 9) n = n.toString().split('').map(Number).reduce((a, b) => a + b, 0);
+  // Element numbers
+  const elNums = { Wood:[3,4], Fire:[7,2], Earth:[5,0], Metal:[4,9], Water:[6,1] };
+  const animalNum = (BRANCHES.findIndex(b => b.animal === animal) + 1) || 1;
+  const base = elNums[dominantEl] || [1,2];
+  return [n === 0 ? 9 : n, base[0], base[1], animalNum].filter((v,i,a) => a.indexOf(v)===i);
+}
+
+/* ── Get power days for current + next month ── */
+function getAuspiciousDays(animal, dominantEl) {
+  // Element-based lucky day numbers (by Five Element theory)
+  const elDays = {
+    Wood:  [3, 4, 8, 13, 18, 23, 28],
+    Fire:  [2, 7, 9, 14, 17, 22, 27],
+    Earth: [5, 10, 15, 19, 20, 25, 29],
+    Metal: [4, 9, 16, 21, 24, 26, 30],
+    Water: [1, 6, 11, 16, 21, 26, 28],
+  };
+  // Animal-based power days (branch index modulo 6)
+  const branchIdx = BRANCHES.findIndex(b => b.animal === animal);
+  const animalDays = [1, 2, 3, 4, 5, 6, 7].map(w => ((branchIdx * 2 + w * 3) % 28) + 1);
+  const power = elDays[dominantEl] || [5, 10, 15, 20, 25];
+  const good  = animalDays.filter(d => !power.includes(d)).slice(0, 5);
+  return { power, good };
+}
+
+/* ═══════════════════════════════════════
+   NEW FEATURE RENDER FUNCTIONS
+═══════════════════════════════════════ */
+
+/* ── Render Outfit Section ── */
+function renderOutfitSection(dominantEl, nowMonth) {
+  const elColor = EL_COLOR[dominantEl];
+  // Show prev, current, next month
+  const months = [-1, 0, 1].map(offset => {
+    const idx = ((nowMonth + offset) % 12 + 12) % 12;
+    return { ...OUTFIT_COLORS[idx], isCurrent: offset === 0 };
+  });
+
+  const monthCards = months.map(m => `
+    <div class="outfit-month-card${m.isCurrent ? ' outfit-current' : ''}">
+      <div class="outfit-month-label">${m.month}${m.isCurrent ? ' · Now' : ''}</div>
+      <div class="outfit-swatches-row">
+        <div class="outfit-swatch" style="background:${m.hex}" title="${m.name}">
+          <span class="outfit-swatch-name">${m.name}</span>
+        </div>
+        <div class="outfit-swatch" style="background:${m.hex2}" title="${m.name2}">
+          <span class="outfit-swatch-name">${m.name2}</span>
+        </div>
+      </div>
+      ${m.isCurrent ? `<div class="outfit-why">${m.why}</div>` : ''}
+      <div class="outfit-avoid">Avoid: ${m.avoid}</div>
+    </div>
+  `).join('');
+
+  // Element-based always-wear tip
+  const elTips = {
+    Wood:  'Always: weave in green accessories — even one item anchors your element.',
+    Fire:  'Always: one red or orange accent draws your qi outward into action.',
+    Earth: 'Always: warm neutrals (cream, tan, amber) keep you grounded and magnetic.',
+    Metal: 'Always: clean lines and silver/white tones sharpen your natural precision.',
+    Water: 'Always: deep blues and blacks protect your energy in public settings.',
+  };
+
+  document.getElementById('outfit-card').innerHTML = `
+    <div class="outfit-card">
+      <div class="outfit-months-row">${monthCards}</div>
+      <div class="outfit-el-tip" style="border-left-color:${elColor}">
+        <span class="outfit-el-icon">✦ ${dominantEl} Element</span> — ${elTips[dominantEl]}
+      </div>
+    </div>
+  `;
+}
+
+/* ── Render Lucky Numbers ── */
+function renderLuckyNumbers(year, month, day, animal, dominantEl) {
+  const elColor = EL_COLOR[dominantEl];
+  const nums = getLuckyNumbers(year, month, day, animal, dominantEl);
+
+  function genLottery() {
+    const picks = [];
+    while (picks.length < 6) {
+      const n = Math.floor(Math.random() * 49) + 1;
+      if (!picks.includes(n)) picks.push(n);
+    }
+    return picks.sort((a,b) => a - b);
+  }
+
+  const ballsHTML = nums.map(n =>
+    `<div class="num-ball" style="background:${elColor}22;border-color:${elColor};color:${elColor}">${n}</div>`
+  ).join('');
+
+  document.getElementById('lucky-num-card').innerHTML = `
+    <div class="lucky-num-card">
+      <div class="lucky-num-section">
+        <div class="lucky-num-label">Your Personal Numbers</div>
+        <div class="lucky-num-balls">${ballsHTML}</div>
+      </div>
+      <div class="lucky-num-section">
+        <div class="lucky-num-label">Lottery Pick <span class="lottery-label-sub">tap to regenerate</span></div>
+        <div class="lottery-balls" id="lottery-balls-wrap">
+          ${genLottery().map(n => `<div class="lottery-ball">${n}</div>`).join('')}
+        </div>
+        <button class="lottery-btn" onclick="haptic(8); const w=document.getElementById('lottery-balls-wrap'); const picks=[]; while(picks.length<6){const n=Math.floor(Math.random()*49)+1;if(!picks.includes(n))picks.push(n);} picks.sort((a,b)=>a-b); w.innerHTML=picks.map(n=>'<div class=\\'lottery-ball\\'>' +n+ '</div>').join('');">
+          🎱 New Pick
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+/* ── Render Auspicious Power Days ── */
+function renderAuspiciousDates(animal, dominantEl) {
+  const elColor = EL_COLOR[dominantEl];
+  const { power, good } = getAuspiciousDays(animal, dominantEl);
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0-indexed
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+  const today = now.getDate();
+  const MNAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  const dayHeaders = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d =>
+    `<div class="cal-header">${d}</div>`
+  ).join('');
+
+  const blanks = Array(firstDay).fill('<div class="cal-day cal-blank"></div>').join('');
+  const days = Array.from({length: daysInMonth}, (_, i) => {
+    const d = i + 1;
+    const isPower = power.includes(d);
+    const isGood  = good.includes(d);
+    const isToday = d === today;
+    let cls = 'cal-day';
+    if (isPower) cls += ' cal-power';
+    else if (isGood) cls += ' cal-good';
+    if (isToday) cls += ' cal-today';
+    return `<div class="${cls}" style="${isPower ? `--el-c:${elColor}` : ''}">${d}</div>`;
+  }).join('');
+
+  const legendHTML = `
+    <div class="cal-legend">
+      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power" style="background:${elColor}"></div> Power Day</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-good"></div> Lucky Day</div>
+    </div>
+  `;
+
+  document.getElementById('power-days-card').innerHTML = `
+    <div class="power-days-card">
+      <div class="cal-month-label">${MNAMES[month]} ${year}</div>
+      <div class="cal-grid">
+        ${dayHeaders}
+        ${blanks}
+        ${days}
+      </div>
+      ${legendHTML}
+      <div class="cal-note">Power Days align your dominant element with the most supportive monthly qi. Schedule launches, asks, and key conversations on these dates.</div>
+    </div>
+  `;
+}
+
+/* ── Render Lucky Foods ── */
+function renderLuckyFoods(dominantEl) {
+  const elColor = EL_COLOR[dominantEl];
+  const foods = LUCKY_FOODS[dominantEl];
+  if (!foods) return;
+
+  const eatChips = foods.eat.map(f =>
+    `<div class="food-chip food-eat">${f}</div>`
+  ).join('');
+  const avoidChips = foods.avoid.map(f =>
+    `<div class="food-chip food-avoid">${f}</div>`
+  ).join('');
+
+  document.getElementById('foods-card').innerHTML = `
+    <div class="foods-card">
+      <div class="food-power-card" style="border-left-color:${elColor}">
+        <div class="food-power-icon">⚡</div>
+        <div>
+          <div class="food-power-label">Power Food · ${dominantEl} Element</div>
+          <div class="food-power-name">${foods.power}</div>
+          <div class="food-power-why">${foods.powerWhy}</div>
+        </div>
+      </div>
+      <div class="food-section">
+        <div class="food-section-label" style="color:${elColor}">↑ Eat More</div>
+        <div class="food-chips-row">${eatChips}</div>
+      </div>
+      <div class="food-section">
+        <div class="food-section-label" style="color:#f87171">↓ Limit or Avoid</div>
+        <div class="food-chips-row">${avoidChips}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── Render Crystals ── */
+function renderCrystals(dominantEl) {
+  const elColor = EL_COLOR[dominantEl];
+  const stones = CRYSTALS[dominantEl];
+  if (!stones) return;
+
+  const cards = stones.map(s => `
+    <div class="crystal-card" style="border-left-color:${elColor}">
+      <div class="crystal-emoji">${s.emoji}</div>
+      <div class="crystal-info">
+        <div class="crystal-name">${s.name}</div>
+        <div class="crystal-effect">${s.effect}</div>
+        <div class="crystal-carry-badge">Carry: ${s.carry}</div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('crystals-card').innerHTML = `
+    <div class="crystals-card">${cards}</div>
+  `;
+}
+
+/* ── Render Morning Ritual ── */
+function renderMorningRitual(dominantEl) {
+  const elColor = EL_COLOR[dominantEl];
+  const steps = MORNING_RITUAL[dominantEl];
+  if (!steps) return;
+
+  const stepsHTML = steps.map(s => `
+    <div class="ritual-step" style="border-left-color:${elColor}">
+      <div class="ritual-step-num" style="color:${elColor}">${s.step}</div>
+      <div class="ritual-step-body">
+        <div class="ritual-step-icon">${s.icon}</div>
+        <div class="ritual-step-title">${s.title}</div>
+        <div class="ritual-step-text">${s.body}</div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('ritual-card').innerHTML = `
+    <div class="ritual-card">${stepsHTML}</div>
+  `;
+}
+
+/* ── Render Kua / Sleep Direction ── */
+function renderKuaSection(kua, dominantEl) {
+  const kuaData = KUA_DIRS[kua] || KUA_DIRS[1];
+  const elColor = EL_COLOR[dominantEl];
+  const dirColor = kuaData.color;
+  const angle = kuaData.angle;
+
+  // Simple compass SVG with arrow
+  const arrowX = 80 + 55 * Math.sin(angle * Math.PI / 180);
+  const arrowY = 80 - 55 * Math.cos(angle * Math.PI / 180);
+
+  const compassSvg = `
+    <svg class="kua-compass-svg" viewBox="0 0 160 160">
+      <circle cx="80" cy="80" r="72" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+      <circle cx="80" cy="80" r="50" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      ${['N','NE','E','SE','S','SW','W','NW'].map((dir, i) => {
+        const a = i * 45;
+        const tx = 80 + 62 * Math.sin(a * Math.PI/180);
+        const ty = 80 - 62 * Math.cos(a * Math.PI/180);
+        const isMain = dir === kuaData.compass;
+        return `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="middle"
+          font-size="${isMain ? 11 : 9}" font-weight="${isMain ? 800 : 400}"
+          fill="${isMain ? dirColor : 'rgba(255,255,255,0.3)'}">${dir}</text>`;
+      }).join('')}
+      <line x1="80" y1="80" x2="${arrowX}" y2="${arrowY}" stroke="${dirColor}" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="${arrowX}" cy="${arrowY}" r="6" fill="${dirColor}" opacity="0.9"/>
+      <circle cx="80" cy="80" r="5" fill="rgba(255,255,255,0.15)" stroke="${dirColor}" stroke-width="1.5"/>
+    </svg>
+  `;
+
+  document.getElementById('kua-card').innerHTML = `
+    <div class="kua-card">
+      <div class="kua-compass-wrap">
+        ${compassSvg}
+        <div class="kua-num-badge" style="color:${dirColor}">Kua ${kua}</div>
+      </div>
+      <div class="kua-info">
+        <div class="kua-dir-name" style="color:${dirColor}">${kuaData.dir} · ${kuaData.zh}</div>
+        <div class="kua-dir-label">Your optimal sleep direction</div>
+        <div class="kua-dir-desc">${kuaData.desc}</div>
+        <div class="kua-tip">Point the top of your head toward <strong>${kuaData.dir}</strong> when sleeping. Even approximate alignment activates this qi.</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── Render Life Decades 大运 ── */
+function renderLifeDecades(year, dominantEl) {
+  const elColor = EL_COLOR[dominantEl];
+  const themes = DECADE_THEMES[dominantEl] || DECADE_THEMES.Water;
+  const currentYear = new Date().getFullYear();
+  const age = currentYear - year;
+  const currentDecadeIdx = Math.min(Math.floor(age / 14), themes.length - 1);
+
+  const blocks = themes.map((t, i) => {
+    const startAge = i * 14;
+    const endAge   = startAge + 13;
+    const isCurrent = i === currentDecadeIdx;
+    return `
+      <div class="decade-block${isCurrent ? ' decade-current' : ''}" style="${isCurrent ? `border-color:${elColor};` : ''}">
+        <div class="decade-emoji">${t.emoji}</div>
+        <div class="decade-phase" style="${isCurrent ? `color:${elColor}` : ''}">${t.phase}</div>
+        <div class="decade-age">Age ${startAge}–${endAge}</div>
+        ${isCurrent ? `<div class="decade-note">${t.note}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('decades-card').innerHTML = `
+    <div class="decades-card">
+      <div class="decades-bar">${blocks}</div>
+      <div class="decade-current-detail">
+        <span style="color:${elColor}">You are in the <strong>${themes[currentDecadeIdx].phase}</strong> phase</span> (age ~${currentDecadeIdx*14}–${currentDecadeIdx*14+13}).
+        <span class="decade-note-text">${themes[currentDecadeIdx].note}</span>
+      </div>
+    </div>
+  `;
+}
+
+/* ── Add TIPS entries for new sections ── */
+const NEW_TIPS = {
+  'outfit': {
+    icon: '👗',
+    title_en: 'Feng Shui Outfit Guide',
+    title_zh: '风水穿搭',
+    body_en: 'In feng shui, colors carry elemental qi. Wearing the monthly auspicious color surrounds you with resonant energy before you even say a word. Think of it as portable feng shui — your environment, on your body.',
+    body_zh: '在风水学中，颜色承载五行之气。穿着当月吉祥色彩，等于随身携带风水，以共鸣能量环绕自身。',
+  },
+  'lucky-nums': {
+    icon: '🔢',
+    title_en: 'Lucky Numbers',
+    title_zh: '幸运数字',
+    body_en: 'Your personal numbers are derived from your birth date using numerological reduction, combined with your element\'s archetypal numbers from Chinese cosmology. Use them as apartment numbers, PIN patterns, or lottery picks.',
+    body_zh: '您的幸运数字由生日数字归纳与五行宇宙论中的原型数字共同推算。可用于选择门牌、密码模式或彩票号码。',
+  },
+  'power-days': {
+    icon: '📅',
+    title_en: 'Power Days',
+    title_zh: '吉日',
+    body_en: 'Power Days are dates when your dominant element\'s qi aligns most strongly with the monthly energy flow. Schedule your most important actions — negotiations, launches, proposals — on these days for maximum momentum.',
+    body_zh: '吉日是你主导五行与月度气场最为契合之时。将重要事项——谈判、启动、求婚——安排在这些日子，以获最大气场支持。',
+  },
+  'foods': {
+    icon: '🥗',
+    title_en: 'Lucky Foods',
+    title_zh: '饮食运势',
+    body_en: 'In Traditional Chinese Medicine, food directly nourishes or depletes your elemental energy. Eating in alignment with your dominant element supports the organs that are most vital — and most vulnerable — for your type.',
+    body_zh: '中医认为食物直接滋养或耗损五行能量。按照主导五行调整饮食，有助于支持你最重要也最脆弱的脏腑系统。',
+  },
+  'crystals': {
+    icon: '💎',
+    title_en: 'Crystals & Gems',
+    title_zh: '水晶宝石',
+    body_en: 'Each crystal carries a natural electromagnetic frequency that interacts with human bioelectricity. These recommendations pair your element\'s energy pattern with stones known to amplify, balance, or protect it — based on both Western crystal tradition and Chinese elemental resonance.',
+    body_zh: '每种水晶都带有与人体生物电相互作用的自然电磁频率。这些推荐基于西方水晶传统与中国五行共鸣理论，为你的元素能量配对最佳宝石。',
+  },
+  'ritual': {
+    icon: '🌅',
+    title_en: 'Morning Ritual',
+    title_zh: '元素晨练',
+    body_en: 'The morning is when your qi is most malleable. These three steps are calibrated specifically to your element — they activate the organs, directions, and energy types that give your element maximum momentum for the day ahead.',
+    body_zh: '清晨是气场最易塑造的时刻。这三个步骤专为您的五行定制，激活对应的脏腑、方位与能量类型，为新的一天充分蓄力。',
+  },
+  'kua': {
+    icon: '🧭',
+    title_en: 'Sleep Direction (Kua)',
+    title_zh: '卦数睡眠方向',
+    body_en: 'Your Kua number is a personal feng shui number calculated from your birth year and gender. Aligning your sleeping position so your head points toward your Kua direction is one of the most powerful and effortless feng shui adjustments you can make.',
+    body_zh: '卦数是根据出生年份与性别推算的个人风水数字。将头部朝向卦数方位入睡，是最有效且最省力的风水调整之一。',
+  },
+  'decades': {
+    icon: '🕰️',
+    title_en: 'Life Decades 大运',
+    title_zh: '大运',
+    body_en: '大运 (Dà Yùn) means "Major Luck Cycles" — the 10-year phases that shape the overarching energy of your life chapters. Each phase is themed by your element\'s natural progression. Knowing your current phase helps you work with the cycle rather than against it.',
+    body_zh: '大运即"主要运势周期"——塑造人生各章节整体能量的十年阶段。每个阶段以五行自然演进为主题，了解当前所处阶段有助于顺势而为。',
+  },
+};
+
+// Merge new tips into TIPS
+Object.assign(TIPS, NEW_TIPS);
 
 /* ── Init ── */
 buildStars();

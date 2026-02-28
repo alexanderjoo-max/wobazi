@@ -170,6 +170,14 @@
           </div>
         </div>
 
+        <div class="field">
+          <label>Gender <span class="label-opt">optional — unlocks Feng Shui direction</span></label>
+          <div class="gender-row">
+            <label class="gender-opt"><input type="radio" name="gender" value="M"> ♂ Male</label>
+            <label class="gender-opt"><input type="radio" name="gender" value="F"> ♀ Female</label>
+          </div>
+        </div>
+
         <button type="submit" class="btn-primary btn-full">
           <span>Reveal My Destiny</span>
           <span class="btn-char">龙</span>
@@ -309,6 +317,33 @@
         <div class="fortune-grid" id="fortune-grid"></div>
       </section>
 
+      <!-- Feng Shui Outfit Guide -->
+      <section class="section" data-tab="fortune" data-tip="outfit">
+        <div class="section-head">
+          <h3 class="en">Feng Shui Outfit Guide</h3>
+          <span class="section-sub">2026 · Monthly Colors</span>
+        </div>
+        <div id="outfit-card"></div>
+      </section>
+
+      <!-- Lucky Numbers -->
+      <section class="section" data-tab="fortune" data-tip="lucky-nums">
+        <div class="section-head">
+          <h3 class="en">Lucky Numbers</h3>
+          <span class="section-sub">数字运势</span>
+        </div>
+        <div id="lucky-num-card"></div>
+      </section>
+
+      <!-- Auspicious Power Days -->
+      <section class="section" data-tab="fortune" data-tip="power-days">
+        <div class="section-head">
+          <h3 class="en">Power Days</h3>
+          <span class="section-sub">2026 · 吉日</span>
+        </div>
+        <div id="power-days-card"></div>
+      </section>
+
       <!-- Career Archetype -->
       <section class="section" data-tab="personality">
         <div class="section-head" data-tip="career-archetype">
@@ -353,6 +388,51 @@
           <h3 class="zh hide">地理能量</h3>
         </div>
         <div id="birthplace-card"></div>
+      </section>
+
+      <!-- Lucky Foods -->
+      <section class="section" data-tab="personality" data-tip="foods">
+        <div class="section-head">
+          <h3 class="en">Lucky Foods</h3>
+          <span class="section-sub">Element Nutrition</span>
+        </div>
+        <div id="foods-card"></div>
+      </section>
+
+      <!-- Crystals & Gems -->
+      <section class="section" data-tab="personality" data-tip="crystals">
+        <div class="section-head">
+          <h3 class="en">Crystals &amp; Gems</h3>
+          <span class="section-sub">Energy Stones</span>
+        </div>
+        <div id="crystals-card"></div>
+      </section>
+
+      <!-- Morning Ritual -->
+      <section class="section" data-tab="personality" data-tip="ritual">
+        <div class="section-head">
+          <h3 class="en">Morning Ritual</h3>
+          <span class="section-sub">元素晨练</span>
+        </div>
+        <div id="ritual-card"></div>
+      </section>
+
+      <!-- Feng Shui Direction (Kua) — hidden if no gender -->
+      <section class="section data-hidden" id="kua-section" data-tab="personality" data-tip="kua">
+        <div class="section-head">
+          <h3 class="en">Sleep Direction</h3>
+          <span class="section-sub">卦数 · Feng Shui Kua</span>
+        </div>
+        <div id="kua-card"></div>
+      </section>
+
+      <!-- Life Decades 大运 -->
+      <section class="section" data-tab="personality" data-tip="decades">
+        <div class="section-head">
+          <h3 class="en">Life Decades 大运</h3>
+          <span class="section-sub">Your 10-Year Cycles</span>
+        </div>
+        <div id="decades-card"></div>
       </section>
 
       <!-- Reading -->
