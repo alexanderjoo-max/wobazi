@@ -1081,10 +1081,10 @@ const LOVE_ACTIONS = {
     { emoji:'💛', action:'Love gently',           sub:'Small moments carry the most weight'    },
   ],
   low: [
-    { emoji:'🛡', action:'Protect your energy',  sub:'Lots of disappointment if you chase'    },
-    { emoji:'🔮', action:'Focus on yourself',    sub:'The right timing is coming — not now'   },
-    { emoji:'🌙', action:'Rest and reflect',     sub:"Recharge so you're ready when it comes" },
-    { emoji:'🧘', action:'Set your standards',   sub:'Love yourself first this month'         },
+    { emoji:'💔', action:"Don't do anything",   sub:'Low chance of love this month'           },
+    { emoji:'🚫', action:'Skip it this month',   sub:"The energy isn't there — just wait"     },
+    { emoji:'🌙', action:'Stay in this month',   sub:'Chasing will only lead to disappointment'},
+    { emoji:'🛡', action:'Protect your heart',   sub:'Low love energy — focus inward'          },
   ],
 };
 
