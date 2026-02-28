@@ -357,6 +357,16 @@ function showScreen(id) {
   }
 }
 
+function switchTab(tab) {
+  document.getElementById('tab-btn-fortune').classList.toggle('active', tab === 'fortune');
+  document.getElementById('tab-btn-personality').classList.toggle('active', tab === 'personality');
+  document.querySelectorAll('#results .section[data-tab]').forEach(el => {
+    el.classList.toggle('hide', el.dataset.tab !== tab);
+  });
+  document.querySelector('#results .scroll-body').scrollTop = 0;
+  history.replaceState(null, '', location.pathname + '#' + tab);
+}
+
 /* ── Stars (splash background) ── */
 function buildStars() {
   const container = document.getElementById('stars');
@@ -500,6 +510,9 @@ function renderResults(name, year, month, day, hour) {
 
   showScreen('results');
   haptic([20, 60, 20]);
+
+  // Init tab from URL hash (default: fortune)
+  switchTab(location.hash === '#personality' ? 'personality' : 'fortune');
 
   // Animate progress rings after screen shows
   setTimeout(() => animateFortune(fortune), 300);
@@ -1330,6 +1343,13 @@ const TIPS = {
     body_en: '2026 is 丙午 (Bǐng Wǔ) — the Year of the Fire Horse. This score shows how your birth chart interacts with the Horse\'s blazing, free-spirited energy. Fire Horse years reward boldness and punish hesitation.',
     body_zh: '2026年为丙午年——火马之年。分数反映命盘与火马奔放能量的互动。火马年奖励大胆者，惩罚犹豫者。'
   },
+  'monthly-energy': {
+    icon: '📊',
+    title_en: 'Monthly Energy',
+    title_zh: '月份运势',
+    body_en: 'Each bar shows the relative strength of qi flowing through that month in 2026. Peak bars are when Fire Horse energy aligns best with your chart — ideal for bold moves, launches, and key decisions.',
+    body_zh: '每根柱子代表2026年该月气场强弱。最高峰处为火马能量与你命盘最契合之时，宜大胆行动、启动计划与做出关键决策。'
+  },
   'love-section': {
     icon: '❤️',
     title_en: 'Love & Relationships',
@@ -1489,7 +1509,7 @@ function render2026Fortune(animal, elements, preCalc = null) {
       </div>
       <div class="forecast-aspects">${aspectsHTML}</div>
       <div class="forecast-monthly">
-        <div class="forecast-monthly-title">Monthly Energy · 月份运势</div>
+        <div class="forecast-monthly-title" data-tip="monthly-energy">Monthly Energy · 月份运势</div>
         <div class="month-bars">${barsHTML}</div>
       </div>
       <div class="forecast-insight">

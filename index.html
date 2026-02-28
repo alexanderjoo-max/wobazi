@@ -189,6 +189,17 @@
       </div>
     </div>
 
+    <div class="results-tab-bar">
+      <button class="tab-btn active" id="tab-btn-fortune" onclick="haptic(6); switchTab('fortune')">
+        <span class="en">Your Fortune</span>
+        <span class="zh hide">今日运势</span>
+      </button>
+      <button class="tab-btn" id="tab-btn-personality" onclick="haptic(6); switchTab('personality')">
+        <span class="en">Your Personality</span>
+        <span class="zh hide">个性命理</span>
+      </button>
+    </div>
+
     <div class="scroll-body">
 
       <!-- Hero -->
@@ -206,7 +217,7 @@
       </section>
 
       <!-- 2026 Annual Forecast -->
-      <section class="section">
+      <section class="section" data-tab="fortune">
         <div class="section-head" data-tip="forecast-2026">
           <h3 class="en">2026 Forecast</h3>
           <h3 class="zh hide">2026年运势</h3>
@@ -216,7 +227,7 @@
       </section>
 
       <!-- Daily Fortune -->
-      <section class="section">
+      <section class="section" data-tab="fortune">
         <div class="section-head" data-tip="daily-fortune">
           <h3 class="en">Today's Fortune</h3>
           <h3 class="zh hide">今日运势</h3>
@@ -226,7 +237,7 @@
       </section>
 
       <!-- Love & Relationships -->
-      <section class="section">
+      <section class="section" data-tab="fortune">
         <div class="section-head" data-tip="love-section">
           <h3 class="en">Love &amp; Relationships</h3>
           <h3 class="zh hide">爱情与关系</h3>
@@ -236,7 +247,7 @@
       </section>
 
       <!-- Four Pillars -->
-      <section class="section">
+      <section class="section" data-tab="personality">
         <div class="section-head" data-tip="four-pillars">
           <h3 class="en">Four Pillars</h3>
           <h3 class="zh hide">四柱</h3>
@@ -246,7 +257,7 @@
       </section>
 
       <!-- Element Balance -->
-      <section class="section">
+      <section class="section" data-tab="personality">
         <div class="section-head" data-tip="element-balance">
           <h3 class="en">Element Balance</h3>
           <h3 class="zh hide">五行平衡</h3>
@@ -259,7 +270,7 @@
       </section>
 
       <!-- Fortune -->
-      <section class="section">
+      <section class="section" data-tab="fortune">
         <div class="section-head" data-tip="fortune-cards">
           <h3 class="en">Life Fortune</h3>
           <h3 class="zh hide">命运</h3>
@@ -269,7 +280,7 @@
       </section>
 
       <!-- Career Archetype -->
-      <section class="section">
+      <section class="section" data-tab="personality">
         <div class="section-head" data-tip="career-archetype">
           <h3 class="en">Career Archetype</h3>
           <h3 class="zh hide">职业原型</h3>
@@ -278,7 +289,7 @@
       </section>
 
       <!-- Power Season -->
-      <section class="section">
+      <section class="section" data-tab="personality">
         <div class="section-head" data-tip="power-season">
           <h3 class="en">Power Season</h3>
           <h3 class="zh hide">旺季</h3>
@@ -287,7 +298,7 @@
       </section>
 
       <!-- Yin Yang -->
-      <section class="section">
+      <section class="section" data-tab="personality">
         <div class="section-head" data-tip="yin-yang">
           <h3 class="en">Yin · Yang Balance</h3>
           <h3 class="zh hide">阴阳平衡</h3>
@@ -297,7 +308,7 @@
       </section>
 
       <!-- Reading -->
-      <section class="section">
+      <section class="section" data-tab="personality">
         <div class="section-head" data-tip="zodiac">
           <h3 class="en">Your Reading</h3>
           <h3 class="zh hide">您的命理</h3>
@@ -309,7 +320,7 @@
       </section>
 
       <!-- Compatibility -->
-      <section class="section">
+      <section class="section" data-tab="personality">
         <div class="section-head" data-tip="compatibility">
           <h3 class="en">Compatibility</h3>
           <h3 class="zh hide">生肖相合</h3>
@@ -318,7 +329,7 @@
       </section>
 
       <!-- Lucky -->
-      <section class="section">
+      <section class="section" data-tab="personality">
         <div class="section-head" data-tip="lucky-vibes">
           <h3 class="en">Lucky Vibes</h3>
           <h3 class="zh hide">吉祥元素</h3>
