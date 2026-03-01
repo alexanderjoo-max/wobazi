@@ -727,38 +727,30 @@ const FORTUNE_META = [
 
 function renderFortune(fortune) {
   const grid = document.getElementById('fortune-grid');
-  grid.innerHTML = FORTUNE_META.map(m => `
-    <div class="fortune-card">
-      <div class="fortune-icon">${m.icon}</div>
-      <div class="fortune-label">${_t(m.label, m.label_zh)}</div>
-      <div class="fortune-ring-wrap">
-        <svg class="fortune-ring-svg" viewBox="0 0 44 44">
-          <circle class="ring-bg"   cx="22" cy="22" r="18"/>
-          <circle class="ring-fill" cx="22" cy="22" r="18"
-            id="ring-${m.key}" stroke="${m.color}" stroke-dasharray="0 113"/>
-        </svg>
-        <div class="fortune-score" id="score-${m.key}" style="color:${m.color}">0</div>
-      </div>
-    </div>
-  `).join('');
+  grid.className = 'fortune-bento';
+  grid.innerHTML = FORTUNE_META.map(m => {
+    const s = fortune[m.key];
+    const tierEn = s >= 75 ? 'Excellent ✦' : s >= 55 ? 'Steady' : 'Low';
+    const tierZh = s >= 75 ? '极佳 ✦'        : s >= 55 ? '平稳'   : '低迷';
+    return `
+    <div class="gyro-stat" style="--ga:${m.color}">
+      <div class="gyro-stat-label">${_t(m.label, m.label_zh)}</div>
+      <div class="gyro-stat-num" id="score-${m.key}" style="color:${m.color}">0</div>
+      <div class="gyro-stat-tier">${_t(tierEn, tierZh)}</div>
+      <div class="gyro-spark">${_sparkSVG(_sparkPts(s), m.color)}</div>
+    </div>`;
+  }).join('');
 }
 
 function animateFortune(fortune) {
   FORTUNE_META.forEach(m => {
-    const pct   = fortune[m.key] / 100;
-    const circ  = 113; // 2πr where r=18
-    const dash  = pct * circ;
-    const ring  = document.getElementById(`ring-${m.key}`);
-    const score = document.getElementById(`score-${m.key}`);
-    if (!ring) return;
-    ring.style.transition = 'stroke-dasharray 1.4s ease';
-    ring.setAttribute('stroke-dasharray', `${dash} ${circ}`);
-    // Count up number
+    const el = document.getElementById(`score-${m.key}`);
+    if (!el) return;
     let n = 0;
     const target = fortune[m.key];
     const iv = setInterval(() => {
       n = Math.min(n + 2, target);
-      score.textContent = n;
+      el.textContent = n;
       if (n >= target) clearInterval(iv);
     }, 20);
   });
@@ -833,6 +825,32 @@ function toggleLang() {
 function _t(en, zh) {
   if (!zh) return `<span class="en">${en}</span>`;
   return `<span class="en">${en}</span><span class="zh hide">${zh}</span>`;
+}
+
+/* ── Sparkline helpers (Gyroscope-style) ── */
+function _sparkPts(score) {
+  return [0,1,2,3,4,5,6,7].map(i => {
+    const wave = Math.sin(i * 1.1 + score * 0.05) * 11 + Math.sin(i * 2.3) * 5;
+    return Math.min(99, Math.max(18, score - 20 + i * (20/7) + wave));
+  });
+}
+function _sparkSVG(pts, color) {
+  const W = 100, H = 26;
+  const lo = Math.min(...pts), hi = Math.max(...pts);
+  const range = hi - lo || 1;
+  const coords = pts.map((v, i) => [
+    (i / (pts.length - 1)) * W,
+    H - ((v - lo) / range) * (H - 6) - 3
+  ]);
+  const d = coords.map((p, i) =>
+    (i === 0 ? 'M' : 'L') + ` ${p[0].toFixed(1)} ${p[1].toFixed(1)}`
+  ).join(' ');
+  const [lx, ly] = coords[coords.length - 1];
+  return `<svg viewBox="0 0 100 26" preserveAspectRatio="none">
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="1.5"
+      stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+    <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="2" fill="${color}"/>
+  </svg>`;
 }
 
 /* ═══════════════════════════════════════
@@ -2262,16 +2280,28 @@ function render2026Fortune(animal, elements, preCalc = null) {
 
   const maxM = Math.max(...months);
   const MLABELS = ['J','F','M','A','M','J','J','A','S','O','N','D'];
-  const barsHTML = months.map((v, i) => {
-    const isHigh = v === maxM;
-    const h = Math.round(8 + (v / maxM) * 48);
-    return `<div class="month-bar-col">
-      <div class="month-bar" id="mbar-${i}"
-        style="height:4px;background:${isHigh ? '#f0c040' : EL_COLOR['Fire']+'88'}"
-        data-h="${h}"></div>
-      <div class="month-bar-label">${MLABELS[i]}</div>
-    </div>`;
-  }).join('');
+  const sparkH = 52;
+  const sparkCoords = months.map((v, i) => [
+    (i / 11) * 100,
+    sparkH - 4 - ((v / maxM) * (sparkH - 10))
+  ]);
+  const sparkD = sparkCoords.map((p, i) =>
+    (i === 0 ? 'M' : 'L') + ` ${p[0].toFixed(1)} ${p[1].toFixed(1)}`
+  ).join(' ');
+  const peakIdx = months.indexOf(maxM);
+  const [px, py] = sparkCoords[peakIdx];
+  const sparklineHTML = `
+<div class="forecast-sparkline">
+  <div class="forecast-monthly-title" data-tip="monthly-energy">${_t('Monthly Energy · 2026', '月份运势 · 2026')}</div>
+  <svg class="forecast-sparkline-svg" viewBox="0 0 100 52" preserveAspectRatio="none">
+    <path d="${sparkD}" fill="none" stroke="rgba(240,192,64,0.4)"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="2.5" fill="#f0c040"/>
+  </svg>
+  <div class="forecast-spark-labels">
+    ${MLABELS.map(l => `<span>${l}</span>`).join('')}
+  </div>
+</div>`;
 
   const aspectsHTML = ASPECT_META.map(m => `
     <div class="aspect-item">
@@ -2316,10 +2346,7 @@ function render2026Fortune(animal, elements, preCalc = null) {
         <div class="forecast-sublabel zh hide">2026年运势综合评分</div>
       </div>
       <div class="forecast-aspects">${aspectsHTML}</div>
-      <div class="forecast-monthly">
-        <div class="forecast-monthly-title" data-tip="monthly-energy">Monthly Energy · 月份运势</div>
-        <div class="month-bars">${barsHTML}</div>
-      </div>
+      ${sparklineHTML}
       <div class="forecast-insight">
         <span class="en">${insightEn}</span>
         <div class="forecast-insight-zh zh hide">${insightZh}</div>
@@ -2345,11 +2372,6 @@ function render2026Fortune(animal, elements, preCalc = null) {
     ASPECT_META.forEach(m => {
       const bar = document.getElementById(`asp-bar-${m.key}`);
       if (bar) bar.style.width = aspects[m.key] + '%';
-    });
-    // Month bars
-    months.forEach((_, i) => {
-      const bar = document.getElementById(`mbar-${i}`);
-      if (bar) bar.style.height = bar.dataset.h + 'px';
     });
   }, 500);
 }
