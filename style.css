@@ -776,25 +776,69 @@ input  { font-family: inherit; }
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   position: relative; flex-shrink: 0;
+  overflow: hidden;
 }
-.animal-medallion svg {
-  width: 65%; height: 65%;
-  color: white;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+/* Outer pulsing halo (hero only, rendered outside overflow via absolute) */
+.med-halo {
+  position: absolute; inset: -18%;
+  border-radius: 50%;
+  opacity: 0.08;
+  animation: halo-pulse 3.5s ease-in-out infinite alternate;
+  pointer-events: none; z-index: 0;
 }
+@keyframes halo-pulse {
+  from { transform: scale(0.92); opacity: 0.05; }
+  to   { transform: scale(1.08); opacity: 0.16; }
+}
+/* Slowly rotating constellation star layer */
+.med-stars {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  animation: stars-rotate 70s linear infinite;
+  z-index: 1; pointer-events: none;
+}
+@keyframes stars-rotate { to { transform: rotate(360deg); } }
+/* Two concentric rings */
 .med-ring {
   position: absolute; inset: 0;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.25);
-  animation: med-pulse 3s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.med-ring.med-r1 {
+  border: 2px solid rgba(255,255,255,0.22);
+  animation: med-pulse 4s ease-in-out infinite alternate;
+  z-index: 2;
+}
+.med-ring.med-r2 {
+  inset: 10%;
+  border: 1px dashed rgba(255,255,255,0.12);
+  animation: ring2-spin 28s linear infinite;
+  z-index: 2;
 }
 @keyframes med-pulse {
   from { box-shadow: 0 0 0 0 rgba(255,255,255,0.1); }
-  to   { box-shadow: 0 0 16px 4px rgba(255,255,255,0.15); }
+  to   { box-shadow: 0 0 18px 5px rgba(255,255,255,0.16); }
 }
+@keyframes ring2-spin { to { transform: rotate(360deg); } }
+/* Animal SVG — above the rings */
+.med-anim {
+  width: 65%; height: 65%;
+  position: relative; z-index: 3;
+}
+/* Branch-character watermark (hero only) */
+.med-char {
+  position: absolute; bottom: 11%; right: 9%;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 700; line-height: 1;
+  color: white; opacity: 0.15;
+  z-index: 4; pointer-events: none;
+  font-size: 13px;
+}
+.animal-medallion.hero-med .med-char { font-size: 32px; opacity: 0.13; }
 .animal-medallion.hero-med {
-  width: 150px; height: 150px;
+  width: 158px; height: 158px;
   animation: float 4s ease-in-out infinite;
+  overflow: visible; /* let halo bleed outside */
 }
 .animal-medallion.pillar-med { width: 36px; height: 36px; }
 
@@ -996,21 +1040,76 @@ input  { font-family: inherit; }
 .share-card-preview {
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: linear-gradient(135deg, #1a0a3d, #0f0a2a);
-  padding: 28px 24px;
-  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  background: linear-gradient(145deg, #1a0a3d, #0f0a2a);
+  padding: 24px 20px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
   text-align: center;
   border: 1px solid rgba(255,255,255,0.1);
 }
 .share-wobazi-logo {
-  font-size: 13px; font-weight: 700; letter-spacing: 3px;
+  font-size: 11px; font-weight: 800; letter-spacing: 4px;
   text-transform: uppercase; color: var(--muted);
 }
-.share-animal-big { font-size: 64px; line-height: 1; }
-.share-animal-name { font-size: 28px; font-weight: 700; }
-.share-sub { font-size: 13px; color: var(--muted); }
+/* Animal with glow */
+.share-animal-wrap {
+  position: relative; width: 100px; height: 100px;
+  display: flex; align-items: center; justify-content: center;
+}
+.share-animal-glow {
+  position: absolute; inset: -10px;
+  border-radius: 50%; opacity: 0.18;
+  filter: blur(16px); pointer-events: none;
+}
+/* Archetype badge */
+.share-archetype-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--gold);
+  background: rgba(240,192,64,0.1);
+  border: 1px solid rgba(240,192,64,0.28);
+  border-radius: 100px; padding: 4px 16px;
+}
+/* Chinese name section */
+.share-cn-name-section {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.11);
+  border-radius: 16px; padding: 13px 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.share-cn-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 1.8px;
+  text-transform: uppercase; color: var(--muted);
+}
+.share-cn-chars {
+  display: flex; gap: 8px; width: 100%; justify-content: center;
+}
+.share-cn-char-block {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 10px 6px;
+}
+.share-cn-han {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 30px; font-weight: 700; line-height: 1;
+}
+.share-cn-pin {
+  font-size: 10px; font-weight: 600; color: var(--gold); letter-spacing: 0.3px;
+}
+.share-cn-mn {
+  font-size: 8px; color: var(--muted); text-align: center; line-height: 1.35;
+}
+/* Verdict quote */
+.share-verdict {
+  font-size: 12px; font-style: italic; font-weight: 500;
+  line-height: 1.6; text-align: center;
+  color: rgba(255,255,255,0.82);
+  padding: 4px 6px;
+  border-left: 2px solid var(--gold);
+  margin: 0 6px; text-align: left;
+}
 .share-fortune-row {
-  display: flex; gap: 12px; width: 100%;
+  display: flex; gap: 8px; width: 100%;
 }
 .share-fortune-item {
   flex: 1; display: flex; flex-direction: column;
@@ -1018,10 +1117,10 @@ input  { font-family: inherit; }
   background: rgba(255,255,255,0.06);
   border-radius: 12px; padding: 10px 6px;
 }
-.share-fortune-icon { font-size: 16px; }
-.share-fortune-score { font-size: 18px; font-weight: 700; }
-.share-fortune-lbl { font-size: 9px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
-.share-url { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+.share-fortune-icon { font-size: 14px; }
+.share-fortune-score { font-size: 17px; font-weight: 700; }
+.share-fortune-lbl { font-size: 8px; letter-spacing: 0.8px; color: var(--muted); text-transform: uppercase; }
+.share-url { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; margin-top: 2px; }
 
 .share-buttons { display: flex; flex-direction: column; gap: 10px; }
 .btn-share-action {

@@ -239,6 +239,12 @@ const BRANCHES = [
   { char:'亥', pinyin:'Hài',  animal:'Pig',     element:'Water', emoji:'🐗' },
 ];
 
+/* ── Branch → Chinese character quick lookup ── */
+const BRANCH_CHARS = {
+  Rat:'子', Ox:'丑', Tiger:'寅', Rabbit:'卯', Dragon:'辰', Snake:'巳',
+  Horse:'午', Goat:'未', Monkey:'申', Rooster:'酉', Dog:'戌', Pig:'亥'
+};
+
 /* ── Zodiac Personality Data ── */
 const ZODIAC = {
   Rat:     { traits:['Clever','Charming','Resourceful'],  compat:['Ox','Dragon','Monkey'],  clash:['Horse','Rooster'],  lucky:{ colors:['Blue','Gold','Green'],    numbers:[2,3],    dir:'North'    }, fortune:{ love:78, career:88, health:72, wealth:85 }, desc_en:'The Rat is a master strategist — endlessly curious, quick-witted, and magnetic. You navigate complexity with ease and see opportunity where others see obstacles. Your social intelligence is your greatest asset.', desc_zh:'鼠年生人机智过人，善于发现机遇。天生的战略家，魅力四射，社交能力极强。在复杂局势中游刃有余，总能化危为机。' },
@@ -469,7 +475,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   const dominantEl = Object.entries(elements).sort((a,b)=>b[1]-a[1])[0][0];
 
   // Store share data
-  _shareData = { animal, element: yearPillar.stem.element, polarity: yearPillar.stem.polarity, year, fortune };
+  _shareData = { name, animal, element: yearPillar.stem.element, polarity: yearPillar.stem.polarity, year, fortune, dominantEl };
 
   // Hero card
   document.getElementById('hero-bg').style.background =
@@ -961,12 +967,46 @@ const ALL_SEASONS = [
 ];
 // Water = Winter wraps around; displayed separately in the card footer
 
+/* ── Medallion — constellation star generator ── */
+function genMedStars(animal) {
+  const seed = animal.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const pts  = [];
+  for (let i = 0; i < 8; i++) {
+    const angle = ((seed * (i + 1) * 137.508) % 360) * Math.PI / 180;
+    const r     = 32 + (seed * (i + 3)) % 12;
+    pts.push({
+      x:  +(50 + r * Math.cos(angle)).toFixed(1),
+      y:  +(50 + r * Math.sin(angle)).toFixed(1),
+      r:  0.55 + (i % 3) * 0.45,
+      op: +(0.22 + (i % 4) * 0.08).toFixed(2)
+    });
+  }
+  let s = '';
+  for (let i = 0; i < pts.length - 1; i++) {
+    const dx = pts[i+1].x - pts[i].x, dy = pts[i+1].y - pts[i].y;
+    if (Math.sqrt(dx*dx + dy*dy) < 28) {
+      s += `<line x1="${pts[i].x}" y1="${pts[i].y}" x2="${pts[i+1].x}" y2="${pts[i+1].y}" stroke="white" stroke-width="0.35" opacity="0.18"/>`;
+    }
+  }
+  pts.forEach(p => {
+    s += `<circle cx="${p.x}" cy="${p.y}" r="${p.r}" fill="white" opacity="${p.op}"/>`;
+  });
+  return s;
+}
+
 /* ── Medallion helper ── */
 function makeMedallion(animal, elColor, cls = 'hero-med') {
-  const svg = ANIMAL_SVGS[animal] || '';
+  const svg    = ANIMAL_SVGS[animal] || '';
+  const brChar = BRANCH_CHARS[animal] || '';
+  const stars  = genMedStars(animal);
+  const isHero = cls === 'hero-med';
   return `<div class="animal-medallion ${cls}" style="background:radial-gradient(circle at 40% 35%, ${elColor}55, ${elColor}18);">
-    <div class="med-ring"></div>
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="color:white">${svg}</svg>
+    ${isHero ? `<div class="med-halo" style="background:radial-gradient(circle, ${elColor}88, transparent 70%)"></div>` : ''}
+    <svg class="med-stars" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${stars}</svg>
+    <div class="med-ring med-r1"></div>
+    <div class="med-ring med-r2"></div>
+    <svg class="med-anim" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="color:white;filter:drop-shadow(0 0 10px ${elColor}bb)">${svg}</svg>
+    ${isHero ? `<div class="med-char">${brChar}</div>` : ''}
   </div>`;
 }
 
@@ -1146,20 +1186,114 @@ function renderYinYang(pillars) {
   }, 400);
 }
 
+/* ── Chinese Name Generator data ── */
+const CN_SURNAME_MAP = {
+  A:{char:'安',pinyin:'Ān',meaning:'Peace'},       B:{char:'宝',pinyin:'Bǎo',meaning:'Treasure'},
+  C:{char:'澄',pinyin:'Chéng',meaning:'Clarity'},  D:{char:'道',pinyin:'Dào',meaning:'The Way'},
+  E:{char:'恩',pinyin:'Ēn',meaning:'Grace'},        F:{char:'风',pinyin:'Fēng',meaning:'Wind'},
+  G:{char:'光',pinyin:'Guāng',meaning:'Light'},     H:{char:'惠',pinyin:'Huì',meaning:'Wisdom'},
+  I:{char:'逸',pinyin:'Yì',meaning:'Freedom'},      J:{char:'景',pinyin:'Jǐng',meaning:'Brilliance'},
+  K:{char:'坤',pinyin:'Kūn',meaning:'Earth power'}, L:{char:'龙',pinyin:'Lóng',meaning:'Dragon'},
+  M:{char:'明',pinyin:'Míng',meaning:'Radiant'},    N:{char:'宁',pinyin:'Níng',meaning:'Serenity'},
+  O:{char:'欧',pinyin:'Ōu',meaning:'Vast horizon'}, P:{char:'鹏',pinyin:'Péng',meaning:'Great bird'},
+  Q:{char:'乾',pinyin:'Qián',meaning:'Heaven'},     R:{char:'瑞',pinyin:'Ruì',meaning:'Fortune'},
+  S:{char:'圣',pinyin:'Shèng',meaning:'Sacred'},    T:{char:'天',pinyin:'Tiān',meaning:'Heaven'},
+  U:{char:'宇',pinyin:'Yǔ',meaning:'Universe'},     V:{char:'伟',pinyin:'Wěi',meaning:'Greatness'},
+  W:{char:'文',pinyin:'Wén',meaning:'Wisdom'},      X:{char:'熙',pinyin:'Xī',meaning:'Radiant light'},
+  Y:{char:'云',pinyin:'Yún',meaning:'Cloud'},       Z:{char:'震',pinyin:'Zhèn',meaning:'Thunder'},
+};
+
+const CN_ELEMENT_CHAR = {
+  Wood:  [{char:'林',pinyin:'Lín',meaning:'Forest'},{char:'青',pinyin:'Qīng',meaning:'Vibrant green'},{char:'苍',pinyin:'Cāng',meaning:'Deep verdure'}],
+  Fire:  [{char:'炎',pinyin:'Yán',meaning:'Blazing'},{char:'辉',pinyin:'Huī',meaning:'Brilliant light'},{char:'烨',pinyin:'Yè',meaning:'Blazing glory'}],
+  Earth: [{char:'坤',pinyin:'Kūn',meaning:'Earth strength'},{char:'厚',pinyin:'Hòu',meaning:'Abundant'},{char:'嵩',pinyin:'Sōng',meaning:'Mountain spirit'}],
+  Metal: [{char:'锋',pinyin:'Fēng',meaning:'Sharp brilliance'},{char:'铭',pinyin:'Míng',meaning:'Inscribed legacy'},{char:'钧',pinyin:'Jūn',meaning:'Noble gold'}],
+  Water: [{char:'泽',pinyin:'Zé',meaning:'Flowing grace'},{char:'渊',pinyin:'Yuān',meaning:'Deep wisdom'},{char:'澜',pinyin:'Lán',meaning:'Great waves'}],
+};
+
+const CN_ANIMAL_CHAR = {
+  Rat:     {char:'聪',pinyin:'Cōng',meaning:'Brilliance'},    Ox:      {char:'毅',pinyin:'Yì',meaning:'Steadfast will'},
+  Tiger:   {char:'威',pinyin:'Wēi',meaning:'Majestic power'}, Rabbit:  {char:'瑛',pinyin:'Yīng',meaning:'Jade grace'},
+  Dragon:  {char:'龙',pinyin:'Lóng',meaning:'Dragon spirit'}, Snake:   {char:'慧',pinyin:'Huì',meaning:'Deep wisdom'},
+  Horse:   {char:'骏',pinyin:'Jùn',meaning:'Noble steed'},    Goat:    {char:'艺',pinyin:'Yì',meaning:'Artistry'},
+  Monkey:  {char:'灵',pinyin:'Líng',meaning:'Clever spirit'}, Rooster: {char:'鸣',pinyin:'Míng',meaning:'Brilliant call'},
+  Dog:     {char:'忠',pinyin:'Zhōng',meaning:'Loyalty'},      Pig:     {char:'福',pinyin:'Fú',meaning:'Prosperity'},
+};
+
+const DESTINY_ARCHETYPES = {
+  Wood:  ['The Silent Builder','The Ancient Grove','The Jade Architect'],
+  Fire:  ['The Burning Star','The Phoenix Rising','The Solar Sovereign'],
+  Earth: ['The Unshakeable','The Mountain Lord','The Harvest Oracle'],
+  Metal: ['The Iron Sovereign','The Blade of Truth','The Gold Arbiter'],
+  Water: ['The Deep Current','The Mystic Tide','The Hidden Oracle'],
+};
+
+const SHARE_VERDICTS = [
+  'Most people in your life cannot handle your depth.',
+  'You were never meant to fit in — you were meant to lead.',
+  'Your sensitivity is your greatest weapon, not your weakness.',
+  'You have been playing small. The stars say it ends now.',
+  'People misread you constantly. That is their limitation.',
+  'You feel everything deeply. That is not a flaw — it is your gift.',
+  'You are built to lead empires, not follow orders.',
+  'The one you are settling for is not the one you are destined for.',
+  'Your instincts are sharper than your logic. Trust them.',
+  'You do not need their validation. You never did.',
+];
+
+function genChineseName(name, animal, dominantEl) {
+  const clean   = ((name || '').trim().toUpperCase());
+  const initial = clean[0] || 'W';
+  const surname = CN_SURNAME_MAP[initial] || CN_SURNAME_MAP['W'];
+  const elChars = CN_ELEMENT_CHAR[dominantEl] || CN_ELEMENT_CHAR.Water;
+  const elIdx   = clean[1] ? clean.charCodeAt(1) % elChars.length : 0;
+  const elChar  = elChars[elIdx];
+  const anChar  = CN_ANIMAL_CHAR[animal] || CN_ANIMAL_CHAR.Rat;
+  return { surname, elChar, anChar };
+}
+
 /* ── Share Card ── */
 let _shareData = {};
 
 function showShareCard() {
   const o = _shareData;
   if (!o.animal) return;
-  const elColor = EL_COLOR[o.element];
-  document.getElementById('share-card-preview').innerHTML = `
+  const elColor  = EL_COLOR[o.element];
+  const cn       = genChineseName(o.name, o.animal, o.dominantEl);
+  const arcList  = DESTINY_ARCHETYPES[o.dominantEl] || DESTINY_ARCHETYPES.Water;
+  const arcIdx   = (o.year + BRANCHES.findIndex(b => b.animal === o.animal)) % arcList.length;
+  const archetype = arcList[arcIdx];
+  const vIdx     = (o.year * 7 + BRANCHES.findIndex(b => b.animal === o.animal) * 3) % SHARE_VERDICTS.length;
+  const verdict  = SHARE_VERDICTS[vIdx];
+
+  const card = document.getElementById('share-card-preview');
+  card.style.cssText = `background:linear-gradient(145deg,${elColor}22,#1a0a3d 45%,#0c0820);border:1px solid ${elColor}44;`;
+
+  card.innerHTML = `
     <div class="share-wobazi-logo">✦ WOBAZI ✦</div>
-    <div class="share-animal-big">
-      <svg viewBox="0 0 100 100" width="80" height="80" style="color:${elColor}">${ANIMAL_SVGS[o.animal]||''}</svg>
+    <div class="share-animal-wrap">
+      <div class="share-animal-glow" style="background:${elColor}"></div>
+      <svg viewBox="0 0 100 100" width="96" height="96"
+           style="color:${elColor};filter:drop-shadow(0 0 18px ${elColor}cc);position:relative;z-index:1">
+        ${ANIMAL_SVGS[o.animal]||''}
+      </svg>
     </div>
-    <div class="share-animal-name">${o.animal}</div>
-    <div class="share-sub">${o.element} ${o.polarity} · Year ${o.year}</div>
+    <div class="share-archetype-badge">${archetype}</div>
+
+    <div class="share-cn-name-section">
+      <div class="share-cn-label">✦ Your Chinese Destiny Name</div>
+      <div class="share-cn-chars">
+        ${[cn.surname, cn.elChar, cn.anChar].map(c => `
+          <div class="share-cn-char-block">
+            <div class="share-cn-han" style="color:${elColor}">${c.char}</div>
+            <div class="share-cn-pin">${c.pinyin}</div>
+            <div class="share-cn-mn">${c.meaning}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="share-verdict">"${verdict}"</div>
+
     <div class="share-fortune-row">
       ${[['❤️','Love',o.fortune.love,'#f43f5e'],['💼','Career',o.fortune.career,'#8b5cf6'],
          ['🌿','Health',o.fortune.health,'#22c55e'],['💰','Wealth',o.fortune.wealth,'#f59e0b']]
@@ -1180,15 +1314,36 @@ function closeShare() {
 
 async function doShare() {
   haptic(15);
-  const o = _shareData;
-  const text = `I'm a ${o.element} ${o.animal} (${o.polarity}) 🐉\nLove ${o.fortune.love} · Career ${o.fortune.career} · Health ${o.fortune.health} · Wealth ${o.fortune.wealth}\nDiscover your Chinese destiny →`;
+  const o       = _shareData;
+  const cn      = genChineseName(o.name, o.animal, o.dominantEl);
+  const cnFull  = cn.surname.char + cn.elChar.char + cn.anChar.char;
+  const cnPin   = [cn.surname.pinyin, cn.elChar.pinyin, cn.anChar.pinyin].join(' ');
+  const cnMean  = `${cn.surname.meaning} · ${cn.elChar.meaning} · ${cn.anChar.meaning}`;
+  const arcList = DESTINY_ARCHETYPES[o.dominantEl] || DESTINY_ARCHETYPES.Water;
+  const arcIdx  = (o.year + BRANCHES.findIndex(b => b.animal === o.animal)) % arcList.length;
+  const archetype = arcList[arcIdx];
+  const vIdx    = (o.year * 7 + BRANCHES.findIndex(b => b.animal === o.animal) * 3) % SHARE_VERDICTS.length;
+  const verdict = SHARE_VERDICTS[vIdx];
+
+  const lines = [
+    `✦ My Chinese destiny name is ${cnFull}`,
+    `(${cnPin} — "${cnMean}")`,
+    ``,
+    `I am ${archetype} — ${o.element} ${o.animal} (${o.polarity})`,
+    ``,
+    `"${verdict}"`,
+    ``,
+    `Love ${o.fortune.love} · Career ${o.fortune.career} · Health ${o.fortune.health} · Wealth ${o.fortune.wealth}`,
+    ``,
+    `→ Discover your Chinese destiny at wobazi.com`,
+  ];
+  const text = lines.join('\n');
+
   if (navigator.share) {
-    try {
-      await navigator.share({ title: 'My Wobazi Reading', text, url: 'https://wobazi.com' });
-    } catch (_) {}
+    try { await navigator.share({ title: 'My Wobazi Destiny', text, url: 'https://wobazi.com' }); } catch (_) {}
   } else if (navigator.clipboard) {
     await navigator.clipboard.writeText(text + '\nhttps://wobazi.com');
-    alert('Copied to clipboard!');
+    alert('Copied to clipboard! ✦');
   }
 }
 
