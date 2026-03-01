@@ -822,9 +822,10 @@ function toggleLang() {
   isZh = !isZh;
   document.querySelectorAll('.en').forEach(el => el.classList.toggle('hide', isZh));
   document.querySelectorAll('.zh').forEach(el => el.classList.toggle('hide', !isZh));
-  const btn = document.getElementById('lang-btn');
-  btn.textContent = isZh ? 'EN' : '中文';
-  btn.classList.toggle('zh-active', isZh);
+  document.querySelectorAll('.btn-lang').forEach(btn => {
+    btn.textContent = isZh ? 'EN' : '中文';
+    btn.classList.toggle('zh-active', isZh);
+  });
   document.documentElement.lang = isZh ? 'zh-CN' : 'en';
 }
 
@@ -1967,7 +1968,7 @@ function renderOracleTab(animal, elements, fortune, pillars, forecast2026, domin
   });
 
   const introTextEn = ORACLE_ANIMAL_INTRO[animal] || `Your chart holds more than most people see. 2026 will show whether you're ready to act on it.`;
-  const introTextZh = ORACLE_ANIMAL_INTRO_ZH?.[animal] || `你的命盘蕴含的，远比大多数人所见的更多。2026年将揭示你是否准备好付诸行动。`;
+  const introTextZh = `你的命盘蕴含的，远比大多数人所见的更多。2026年将揭示你是否准备好付诸行动。`;
 
   document.getElementById('oracle-card').innerHTML = `
     <div class="orc-intro-card" style="border-color:${elColor}35;background:linear-gradient(160deg,${elColor}09,transparent 60%)">
