@@ -269,6 +269,34 @@ const EL_COLOR = {
   Metal: '#94a3b8',
   Water: '#3b82f6',
 };
+const EL_ZH    = { Wood:'木', Fire:'火', Earth:'土', Metal:'金', Water:'水' };
+const ANIMAL_ZH = {
+  Rat:'鼠', Ox:'牛', Tiger:'虎', Rabbit:'兔', Dragon:'龙', Snake:'蛇',
+  Horse:'马', Goat:'羊', Monkey:'猴', Rooster:'鸡', Dog:'狗', Pig:'猪',
+};
+const COLOR_ZH = {
+  Blue:'蓝色', Gold:'金色', Green:'绿色', Yellow:'黄色', White:'白色',
+  Grey:'灰色', Orange:'橙色', Pink:'粉色', Purple:'紫色', Black:'黑色',
+  Red:'红色', Brown:'棕色', Silver:'银色', Teal:'青绿色',
+};
+const DIR_ZH = {
+  North:'北', Northeast:'东北', East:'东', Southeast:'东南',
+  South:'南', Southwest:'西南', West:'西', Northwest:'西北',
+};
+const TRAIT_ZH = {
+  Clever:'机智', Charming:'魅力四射', Resourceful:'随机应变',
+  Dependable:'可靠', Patient:'耐心', Strong:'坚强',
+  Bold:'大胆', Magnetic:'磁场强', Fearless:'无畏',
+  Graceful:'优雅', Intuitive:'直觉敏锐', Diplomatic:'圆融',
+  Visionary:'远见卓识', Powerful:'强大', Lucky:'幸运',
+  Wise:'睿智', Mysterious:'神秘', Elegant:'雅致',
+  'Free-spirited':'自由奔放', Energetic:'充满活力', Wild:'热烈奔放',
+  Creative:'创意无限', Gentle:'温和', Empathetic:'共情力强',
+  Inventive:'富有创意', Witty:'机智', Unstoppable:'锐不可当',
+  Precise:'精准', Confident:'自信', Loyal:'忠诚',
+  Just:'正直', Protective:'守护',
+  Generous:'慷慨', Sincere:'真诚', Optimistic:'乐观',
+};
 
 /* ── Month Branch lookup (approximate, solar calendar) ── */
 // [Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
@@ -476,8 +504,9 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   }
 
   // Greeting
-  const greet = name ? `Hey, ${name} ✦` : 'Your Destiny ✦';
-  document.getElementById('greeting').textContent = greet;
+  const greetEn = name ? `Hey, ${name} ✦` : 'Your Destiny ✦';
+  const greetZh = name ? `你好，${name} ✦` : '你的命运 ✦';
+  document.getElementById('greeting').innerHTML = _t(greetEn, greetZh);
 
   const elColor = EL_COLOR[yearPillar.stem.element];
   const dominantEl = Object.entries(elements).sort((a,b)=>b[1]-a[1])[0][0];
@@ -490,21 +519,21 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     `linear-gradient(135deg, ${elColor}28, ${elColor}55, #0f0f1c)`;
   document.getElementById('hero-medallion').innerHTML =
     makeMedallion(animal, elColor, 'hero-med');
-  document.getElementById('hero-year-tag').textContent =
-    `Year of the ${animal} · ${year}`;
-  document.getElementById('hero-name').textContent = animal;
+  document.getElementById('hero-year-tag').innerHTML =
+    _t(`Year of the ${animal} · ${year}`, `${ANIMAL_ZH[animal]}年 · ${year}`);
+  document.getElementById('hero-name').innerHTML = _t(animal, ANIMAL_ZH[animal]);
   document.getElementById('hero-chinese').textContent =
     yearPillar.stem.char + yearPillar.branch.char;
 
   const badgeEl = document.getElementById('hero-badges');
   badgeEl.innerHTML = [
-    yearPillar.stem.element,
-    yearPillar.stem.polarity,
+    _t(yearPillar.stem.element, EL_ZH[yearPillar.stem.element]),
+    _t(yearPillar.stem.polarity, yearPillar.stem.polarity === 'Yang' ? '阳' : '阴'),
     yearPillar.branch.pinyin,
   ].map(t => `<span class="badge">${t}</span>`).join('');
 
   document.getElementById('trait-pills').innerHTML =
-    zData.traits.map(t => `<span class="trait-pill">${t}</span>`).join('');
+    zData.traits.map(t => `<span class="trait-pill">${_t(t, TRAIT_ZH[t] || t)}</span>`).join('');
 
   // Daily fortune
   renderDailyFortune(animal);
@@ -739,11 +768,10 @@ function animateFortune(fortune) {
 function renderCompat(animal, zData) {
   const wrap = document.getElementById('compat-wrap');
   const goodRow = zData.compat.map(a => {
-    const d = ZODIAC[a];
-    return `<span class="compat-chip good">${BRANCHES.find(b=>b.animal===a)?.emoji} ${a}</span>`;
+    return `<span class="compat-chip good">${BRANCHES.find(b=>b.animal===a)?.emoji} ${_t(a, ANIMAL_ZH[a])}</span>`;
   }).join('');
   const badRow = zData.clash.map(a => {
-    return `<span class="compat-chip bad">${BRANCHES.find(b=>b.animal===a)?.emoji} ${a}</span>`;
+    return `<span class="compat-chip bad">${BRANCHES.find(b=>b.animal===a)?.emoji} ${_t(a, ANIMAL_ZH[a])}</span>`;
   }).join('');
   wrap.innerHTML = `
     <div class="compat-group">
@@ -765,7 +793,7 @@ function renderLucky(lucky) {
       <div class="lucky-icon">🎨</div>
       <div class="lucky-title">${_t('Colors','幸运颜色')}</div>
       <div class="lucky-values">
-        ${lucky.colors.map(c=>`<span class="lucky-val">${c}</span>`).join('')}
+        ${lucky.colors.map(c=>`<span class="lucky-val">${_t(c, COLOR_ZH[c] || c)}</span>`).join('')}
       </div>
     </div>
     <div class="lucky-card">
@@ -779,7 +807,7 @@ function renderLucky(lucky) {
       <div class="lucky-icon">🧭</div>
       <div class="lucky-title">${_t('Direction','幸运方位')}</div>
       <div class="lucky-values">
-        <span class="lucky-val">${lucky.dir}</span>
+        <span class="lucky-val">${_t(lucky.dir, DIR_ZH[lucky.dir] || lucky.dir)}</span>
       </div>
     </div>
   `;
@@ -1861,7 +1889,8 @@ function renderOracleTab(animal, elements, fortune, pillars, forecast2026, domin
   const monthScores = gen2026Monthly(forecast2026.overall);
   const now         = new Date();
   const nowMonth    = now.getMonth();
-  const MONTH_FULL  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const MONTH_FULL    = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const MONTH_FULL_ZH = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
   const tier = s => s >= 68 ? 'high' : s >= 45 ? 'mid' : 'low';
 
   const { love, career, health, wealth } = fortune;
@@ -1897,30 +1926,30 @@ function renderOracleTab(animal, elements, fortune, pillars, forecast2026, domin
     low:  { emoji: '🌊', label: 'Rest & Reset',   label_zh: '缓月', note: `Don't force it. Strategic patience now pays forward.`,                   note_zh: `不要强迫。此刻的战略耐心将换来未来回报。` },
   };
 
-  const loveCallout = isZh
-    ? (love < 50
-      ? `如果你现在和某人在一起但感觉不对——很可能确实不对。你目前约会的人可能不适合你，2026年会让这一点无可否认。相信你已经知道的。`
-      : love < 65
-      ? `诚实面对你真正想从这段关系或情感生活中得到什么。舒适和正确不是同一件事。`
-      : `今年你的爱情能量是真实的。不要把正在运作的事情想太复杂。`)
-    : (love < 50
-      ? `If you're with someone right now and it doesn't feel right — it probably isn't. The person you're currently dating may not be for you, and 2026 will make that undeniable. Trust what you already know.`
-      : love < 65
-      ? `Be honest about what you actually want from your relationship or romantic life. Comfortable and right are not the same thing.`
-      : `Your love energy is genuine this year. Don't overthink what's working.`);
+  const loveCalloutEn = love < 50
+    ? `If you're with someone right now and it doesn't feel right — it probably isn't. The person you're currently dating may not be for you, and 2026 will make that undeniable. Trust what you already know.`
+    : love < 65
+    ? `Be honest about what you actually want from your relationship or romantic life. Comfortable and right are not the same thing.`
+    : `Your love energy is genuine this year. Don't overthink what's working.`;
+  const loveCalloutZh = love < 50
+    ? `如果你现在和某人在一起但感觉不对——很可能确实不对。你目前约会的人可能不适合你，2026年会让这一点无可否认。相信你已经知道的。`
+    : love < 65
+    ? `诚实面对你真正想从这段关系或情感生活中得到什么。舒适和正确不是同一件事。`
+    : `今年你的爱情能量是真实的。不要把正在运作的事情想太复杂。`;
+  const loveCallout = loveCalloutEn; // used for loveCalloutType logic
   const loveCalloutType = love < 65 ? 'warn' : 'note';
 
-  const verdictText = isZh
-    ? (overall >= 70
-      ? `2026年真正属于你去塑造——不是因为一切都会简单，而是因为你的命盘与今年的能量契合。站在你和真正进步之间的唯一事物，是你是否真的行动了。停止等待确定性，它不会来。无论如何，动起来。`
-      : overall >= 50
-      ? `2026年是诚实清算的一年。不是惩罚——而是澄清。那些不运作的事情将变得无法忽视。这是有用的信息，不是坏运气。用这种摩擦做出更好的选择，而不是继续管理那些你一直在容忍的问题。`
-      : `2026年对你的命盘来说是艰难的一年——假装不是这样没有帮助。火马年正在暴露你生活中不对齐的地方。这不舒服，但也是你多年来拥有的最清晰的地图。问题不是是否要改变，而是改变什么，以及多快。`)
-    : (overall >= 70
-      ? `2026 is genuinely yours to shape — not because everything will be easy, but because your chart aligns with this year's energy. The only thing between you and real progress is whether you actually move. Stop waiting for certainty. It won't come. Move anyway.`
-      : overall >= 50
-      ? `2026 is a year of honest reckoning. Not punishing — clarifying. The things that aren't working will become impossible to ignore. That's useful information, not bad luck. Use the friction to make better choices instead of managing around problems you've been tolerating.`
-      : `2026 is a hard year for your chart — and pretending otherwise doesn't help. The Fire Horse is exposing what's out of alignment in your life. That's uncomfortable, but it's also the clearest map you've had in years. The question isn't whether to change. It's what, and how fast.`);
+  const verdictTextEn = overall >= 70
+    ? `2026 is genuinely yours to shape — not because everything will be easy, but because your chart aligns with this year's energy. The only thing between you and real progress is whether you actually move. Stop waiting for certainty. It won't come. Move anyway.`
+    : overall >= 50
+    ? `2026 is a year of honest reckoning. Not punishing — clarifying. The things that aren't working will become impossible to ignore. That's useful information, not bad luck. Use the friction to make better choices instead of managing around problems you've been tolerating.`
+    : `2026 is a hard year for your chart — and pretending otherwise doesn't help. The Fire Horse is exposing what's out of alignment in your life. That's uncomfortable, but it's also the clearest map you've had in years. The question isn't whether to change. It's what, and how fast.`;
+  const verdictTextZh = overall >= 70
+    ? `2026年真正属于你去塑造——不是因为一切都会简单，而是因为你的命盘与今年的能量契合。站在你和真正进步之间的唯一事物，是你是否真的行动了。停止等待确定性，它不会来。无论如何，动起来。`
+    : overall >= 50
+    ? `2026年是诚实清算的一年。不是惩罚——而是澄清。那些不运作的事情将变得无法忽视。这是有用的信息，不是坏运气。用这种摩擦做出更好的选择，而不是继续管理那些你一直在容忍的问题。`
+    : `2026年对你的命盘来说是艰难的一年——假装不是这样没有帮助。火马年正在暴露你生活中不对齐的地方。这不舒服，但也是你多年来拥有的最清晰的地图。问题不是是否要改变，而是改变什么，以及多快。`;
+  const verdictText = verdictTextEn; // used for verdictIcon logic below
 
   const verdictIcon = overall >= 70 ? '✦' : overall >= 50 ? '◈' : '◇';
 
@@ -1934,15 +1963,16 @@ function renderOracleTab(animal, elements, fortune, pillars, forecast2026, domin
 
   const next3 = [0, 1, 2].map(offset => {
     const idx = (nowMonth + offset) % 12;
-    return { name: MONTH_FULL[idx], score: Math.round(monthScores[idx]), t: tier(monthScores[idx]), isnow: offset === 0 };
+    return { name: _t(MONTH_FULL[idx], MONTH_FULL_ZH[idx]), score: Math.round(monthScores[idx]), t: tier(monthScores[idx]), isnow: offset === 0 };
   });
 
-  const introText = ORACLE_ANIMAL_INTRO[animal] || `Your chart holds more than most people see. 2026 will show whether you're ready to act on it.`;
+  const introTextEn = ORACLE_ANIMAL_INTRO[animal] || `Your chart holds more than most people see. 2026 will show whether you're ready to act on it.`;
+  const introTextZh = ORACLE_ANIMAL_INTRO_ZH?.[animal] || `你的命盘蕴含的，远比大多数人所见的更多。2026年将揭示你是否准备好付诸行动。`;
 
   document.getElementById('oracle-card').innerHTML = `
     <div class="orc-intro-card" style="border-color:${elColor}35;background:linear-gradient(160deg,${elColor}09,transparent 60%)">
       <div class="orc-intro-eyebrow">${_t("The Oracle's Read · 2026",'神谕解读 · 2026')}</div>
-      <p class="orc-intro-text">${introText}</p>
+      <p class="orc-intro-text">${_t(introTextEn, introTextZh)}</p>
       <div class="orc-overall-row">
         <div class="orc-overall-block">
           <div class="orc-overall-num" style="color:${elColor}">${overall}</div>
@@ -1962,37 +1992,37 @@ function renderOracleTab(animal, elements, fortune, pillars, forecast2026, domin
     <div class="orc-truth-block">
       <div class="orc-truth-label" style="color:#f43f5e">${_t('❤ Love &amp; Relationships','❤ 爱情与关系')}</div>
       ${bar(love, '#f43f5e')}
-      <p class="orc-truth-body">${isZh ? ORACLE_LOVE_ZH[tier(love)] : ORACLE_LOVE[tier(love)]}</p>
-      <div class="orc-callout orc-callout-${loveCalloutType}">${loveCallout}</div>
+      <p class="orc-truth-body">${_t(ORACLE_LOVE[tier(love)], ORACLE_LOVE_ZH[tier(love)])}</p>
+      <div class="orc-callout orc-callout-${loveCalloutType}">${_t(loveCalloutEn, loveCalloutZh)}</div>
     </div>
 
     <div class="orc-truth-block">
       <div class="orc-truth-label" style="color:#8b5cf6">${_t('💼 Career &amp; Ambition','💼 事业与抱负')}</div>
       ${bar(career, '#8b5cf6')}
-      <p class="orc-truth-body">${isZh ? ORACLE_CAREER_ZH[tier(career)] : ORACLE_CAREER[tier(career)]}</p>
+      <p class="orc-truth-body">${_t(ORACLE_CAREER[tier(career)], ORACLE_CAREER_ZH[tier(career)])}</p>
     </div>
 
     <div class="orc-truth-block">
       <div class="orc-truth-label" style="color:#22c55e">${_t('⚡ Health &amp; Energy','⚡ 健康与能量')}</div>
       ${bar(health, '#22c55e')}
-      <p class="orc-truth-body">${isZh ? ORACLE_HEALTH_ZH[tier(health)] : ORACLE_HEALTH[tier(health)]}</p>
+      <p class="orc-truth-body">${_t(ORACLE_HEALTH[tier(health)], ORACLE_HEALTH_ZH[tier(health)])}</p>
     </div>
 
     <div class="orc-truth-block" style="border-bottom:none;margin-bottom:0">
       <div class="orc-truth-label" style="color:#f59e0b">${_t('💰 Wealth &amp; Resources','💰 财运与资源')}</div>
       ${bar(wealth, '#f59e0b')}
-      <p class="orc-truth-body">${isZh ? ORACLE_WEALTH_ZH[tier(wealth)] : ORACLE_WEALTH[tier(wealth)]}</p>
+      <p class="orc-truth-body">${_t(ORACLE_WEALTH[tier(wealth)], ORACLE_WEALTH_ZH[tier(wealth)])}</p>
     </div>
 
     <div class="orc-sticky-head">${_t('Your 2026 Arc','2026年运势弧线')}</div>
 
     <div class="orc-arc-card">
       <div class="orc-arc-meta">
-        <div class="orc-arc-peak"><span class="orc-arc-dot" style="background:#f0c040"></span>${_t('Peak:','最旺月：')} <strong>${MONTH_FULL[maxIdx]}</strong></div>
-        <div class="orc-arc-trough"><span class="orc-arc-dot" style="background:#475569"></span>${_t('Lowest:','最低月：')} <strong>${MONTH_FULL[minIdx]}</strong></div>
+        <div class="orc-arc-peak"><span class="orc-arc-dot" style="background:#f0c040"></span>${_t('Peak:','最旺月：')} <strong>${_t(MONTH_FULL[maxIdx], MONTH_FULL_ZH[maxIdx])}</strong></div>
+        <div class="orc-arc-trough"><span class="orc-arc-dot" style="background:#475569"></span>${_t('Lowest:','最低月：')} <strong>${_t(MONTH_FULL[minIdx], MONTH_FULL_ZH[minIdx])}</strong></div>
       </div>
       <div class="orc-arc-svg">${arcSVG}</div>
-      <div class="orc-arc-now">▲ ${_t('You are here:','当前所在：')} ${MONTH_FULL[nowMonth]} · ${Math.round(nowScore)}</div>
+      <div class="orc-arc-now">▲ ${_t('You are here:','当前所在：')} ${_t(MONTH_FULL[nowMonth], MONTH_FULL_ZH[nowMonth])} · ${Math.round(nowScore)}</div>
     </div>
 
     <div class="orc-sticky-head">${_t('Next 90 Days','未来90天')}</div>
@@ -2013,7 +2043,7 @@ function renderOracleTab(animal, elements, fortune, pillars, forecast2026, domin
 
     <div class="orc-verdict">
       <div class="orc-verdict-icon" style="color:${elColor}">${verdictIcon}</div>
-      <p class="orc-verdict-text">${verdictText}</p>
+      <p class="orc-verdict-text">${_t(verdictTextEn, verdictTextZh)}</p>
     </div>
   `;
 }
@@ -2329,18 +2359,18 @@ function render2026Fortune(animal, elements, preCalc = null) {
 
 /* ── Monthly Outfit Colors (2026 Wood Snake Year) ── */
 const OUTFIT_COLORS = [
-  { month:'Jan', hex:'#1e3a5f', hex2:'#3b6ea8', name:'Navy',          name2:'Steel Blue',  avoid:'Bright White', avoid_zh:'亮白色',    why:'Water feeds the Wood Snake — deep blues draw in flow and wisdom.',           why_zh:'水生木蛇——深蓝汲引流动与智慧之气。' },
-  { month:'Feb', hex:'#2d6a2d', hex2:'#52a452', name:'Forest Green',  name2:'Sage',         avoid:'Dull Gray',    avoid_zh:'暗灰色',    why:'Wood month: anchor the year in your element with grounding greens.',          why_zh:'木月，以深绿稳固根基，锚定全年能量。' },
-  { month:'Mar', hex:'#6d28d9', hex2:'#a78bfa', name:'Violet',        name2:'Lavender',     avoid:'Muddy Brown',  avoid_zh:'泥棕色',    why:'Spring Wood peaks — violet bridges earth and sky for growth.',                why_zh:'春木盛极——紫色桥接天地，助力生长。' },
-  { month:'Apr', hex:'#c2185b', hex2:'#f06292', name:'Crimson',       name2:'Rose',         avoid:'Black',        avoid_zh:'黑色',      why:'Fire energy rises — reds draw social magnetism and confidence.',              why_zh:'火气上升——红色凝聚社交魅力与自信之力。' },
-  { month:'May', hex:'#b45309', hex2:'#f59e0b', name:'Amber',         name2:'Ochre',        avoid:'Cold White',   avoid_zh:'冷白色',    why:'Earth month — warm yellows and ambers ground your energy.',                   why_zh:'土月——暖黄与琥珀稳固能量根基。' },
-  { month:'Jun', hex:'#9ca3af', hex2:'#e5e7eb', name:'Silver',        name2:'Pearl White',  avoid:'Neon Colors',  avoid_zh:'霓虹色',    why:'Metal energy sharpens — silver and white bring clarity.',                     why_zh:'金气锐利——银白带来清醒与澄明之境。' },
-  { month:'Jul', hex:'#1e40af', hex2:'#312e81', name:'Midnight Blue', name2:'Indigo',       avoid:'Red',          avoid_zh:'红色',      why:'Water cools peak Fire — blues protect and recalibrate energy.',               why_zh:'水凉顶火——蓝色守护并重新校准能量。' },
-  { month:'Aug', hex:'#0d9488', hex2:'#5eead4', name:'Teal',          name2:'Seafoam',      avoid:'Harsh Yellow', avoid_zh:'刺眼黄',    why:'Late summer — teal bridges Water and Wood for steady flow.',                  why_zh:'夏末青绿桥接水木，维持稳定流动之气。' },
-  { month:'Sep', hex:'#92400e', hex2:'#d97706', name:'Bronze',        name2:'Tan',          avoid:'Bright Pink',  avoid_zh:'亮粉色',    why:'Earth element harvests — bronze and tan call in abundance.',                  why_zh:'土旺收获之时——铜棕召唤丰盛入门。' },
-  { month:'Oct', hex:'#6b7280', hex2:'#d1d5db', name:'Steel Gray',    name2:'Silver',       avoid:'Orange',       avoid_zh:'橙色',      why:'Metal month sharpens — neutral tones keep you decisive.',                     why_zh:'金月锐利——中性色调保持清晰果断。' },
-  { month:'Nov', hex:'#1c1917', hex2:'#374151', name:'Charcoal',      name2:'Dark Slate',   avoid:'Loud Prints',  avoid_zh:'大印花',    why:'Water season deepens — dark colors protect inner energy.',                    why_zh:'水季加深——深色护持内在能量储备。' },
-  { month:'Dec', hex:'#dc2626', hex2:'#fca5a5', name:'Scarlet',       name2:'Blush Red',    avoid:'Gray',         avoid_zh:'灰色',      why:'Year-end Fire surge — reds call in celebration and luck.',                    why_zh:'年末火气上涌——红色召唤喜悦与好运。' },
+  { month:'Jan', hex:'#1e3a5f', hex2:'#3b6ea8', name:'Navy',          name_zh:'深蓝',     name2:'Steel Blue',  name2_zh:'钢蓝',     avoid:'Bright White', avoid_zh:'亮白色',    why:'Water feeds the Wood Snake — deep blues draw in flow and wisdom.',           why_zh:'水生木蛇——深蓝汲引流动与智慧之气。' },
+  { month:'Feb', hex:'#2d6a2d', hex2:'#52a452', name:'Forest Green',  name_zh:'深林绿',   name2:'Sage',        name2_zh:'鼠尾草绿', avoid:'Dull Gray',    avoid_zh:'暗灰色',    why:'Wood month: anchor the year in your element with grounding greens.',          why_zh:'木月，以深绿稳固根基，锚定全年能量。' },
+  { month:'Mar', hex:'#6d28d9', hex2:'#a78bfa', name:'Violet',        name_zh:'紫色',     name2:'Lavender',    name2_zh:'薰衣草紫', avoid:'Muddy Brown',  avoid_zh:'泥棕色',    why:'Spring Wood peaks — violet bridges earth and sky for growth.',                why_zh:'春木盛极——紫色桥接天地，助力生长。' },
+  { month:'Apr', hex:'#c2185b', hex2:'#f06292', name:'Crimson',       name_zh:'深红',     name2:'Rose',        name2_zh:'玫瑰红',   avoid:'Black',        avoid_zh:'黑色',      why:'Fire energy rises — reds draw social magnetism and confidence.',              why_zh:'火气上升——红色凝聚社交魅力与自信之力。' },
+  { month:'May', hex:'#b45309', hex2:'#f59e0b', name:'Amber',         name_zh:'琥珀色',   name2:'Ochre',       name2_zh:'赭黄色',   avoid:'Cold White',   avoid_zh:'冷白色',    why:'Earth month — warm yellows and ambers ground your energy.',                   why_zh:'土月——暖黄与琥珀稳固能量根基。' },
+  { month:'Jun', hex:'#9ca3af', hex2:'#e5e7eb', name:'Silver',        name_zh:'银色',     name2:'Pearl White', name2_zh:'珍珠白',   avoid:'Neon Colors',  avoid_zh:'霓虹色',    why:'Metal energy sharpens — silver and white bring clarity.',                     why_zh:'金气锐利——银白带来清醒与澄明之境。' },
+  { month:'Jul', hex:'#1e40af', hex2:'#312e81', name:'Midnight Blue', name_zh:'午夜蓝',   name2:'Indigo',      name2_zh:'靛蓝',     avoid:'Red',          avoid_zh:'红色',      why:'Water cools peak Fire — blues protect and recalibrate energy.',               why_zh:'水凉顶火——蓝色守护并重新校准能量。' },
+  { month:'Aug', hex:'#0d9488', hex2:'#5eead4', name:'Teal',          name_zh:'青绿',     name2:'Seafoam',     name2_zh:'海沫绿',   avoid:'Harsh Yellow', avoid_zh:'刺眼黄',    why:'Late summer — teal bridges Water and Wood for steady flow.',                  why_zh:'夏末青绿桥接水木，维持稳定流动之气。' },
+  { month:'Sep', hex:'#92400e', hex2:'#d97706', name:'Bronze',        name_zh:'古铜色',   name2:'Tan',         name2_zh:'棕褐',     avoid:'Bright Pink',  avoid_zh:'亮粉色',    why:'Earth element harvests — bronze and tan call in abundance.',                  why_zh:'土旺收获之时——铜棕召唤丰盛入门。' },
+  { month:'Oct', hex:'#6b7280', hex2:'#d1d5db', name:'Steel Gray',    name_zh:'钢灰',     name2:'Silver',      name2_zh:'银色',     avoid:'Orange',       avoid_zh:'橙色',      why:'Metal month sharpens — neutral tones keep you decisive.',                     why_zh:'金月锐利——中性色调保持清晰果断。' },
+  { month:'Nov', hex:'#1c1917', hex2:'#374151', name:'Charcoal',      name_zh:'炭灰',     name2:'Dark Slate',  name2_zh:'深石板',   avoid:'Loud Prints',  avoid_zh:'大印花',    why:'Water season deepens — dark colors protect inner energy.',                    why_zh:'水季加深——深色护持内在能量储备。' },
+  { month:'Dec', hex:'#dc2626', hex2:'#fca5a5', name:'Scarlet',       name_zh:'深红',     name2:'Blush Red',   name2_zh:'腮红',     avoid:'Gray',         avoid_zh:'灰色',      why:'Year-end Fire surge — reds call in celebration and luck.',                    why_zh:'年末火气上涌——红色召唤喜悦与好运。' },
 ];
 
 /* ── Lucky Foods per Element ── */
@@ -2596,9 +2626,21 @@ function renderTodayActionsCard(dominantEl, nowMonth) {
 
   // Derive 3 concise actions
   const actions = [
-    { icon: '👗', label: `Wear <strong>${outfit.name}</strong>`,   sub: outfit.why.split('—')[1]?.trim() || outfit.why },
-    { icon: ritual[0].icon, label: `<strong>${ritual[0].title}</strong>`, sub: ritual[0].body.split('.')[0] + '.' },
-    { icon: ritual[1].icon, label: `<strong>${ritual[1].title}</strong>`, sub: ritual[1].body.split('.')[0] + '.' },
+    {
+      icon: '👗',
+      label: `${_t('Wear','穿')} <strong>${_t(outfit.name, outfit.name_zh || outfit.name)}</strong>`,
+      sub: _t(outfit.why.split('—')[1]?.trim() || outfit.why, outfit.why_zh),
+    },
+    {
+      icon: ritual[0].icon,
+      label: `<strong>${_t(ritual[0].title, ritual[0].title_zh)}</strong>`,
+      sub: _t(ritual[0].body.split('.')[0] + '.', (ritual[0].body_zh || '').split('。')[0] + '。'),
+    },
+    {
+      icon: ritual[1].icon,
+      label: `<strong>${_t(ritual[1].title, ritual[1].title_zh)}</strong>`,
+      sub: _t(ritual[1].body.split('.')[0] + '.', (ritual[1].body_zh || '').split('。')[0] + '。'),
+    },
   ];
 
   const itemsHTML = actions.map(a => `
@@ -2632,13 +2674,13 @@ function renderOutfitSection(dominantEl, nowMonth) {
 
   const monthCards = months.map(m => `
     <div class="outfit-month-card${m.isCurrent ? ' outfit-current' : ''}">
-      <div class="outfit-month-label">${m.month}${m.isCurrent ? ' · Now' : ''}</div>
+      <div class="outfit-month-label">${m.month}${m.isCurrent ? ` · ${_t('Now','当前')}` : ''}</div>
       <div class="outfit-swatches-row">
         <div class="outfit-swatch" style="background:${m.hex}" title="${m.name}">
-          <span class="outfit-swatch-name">${m.name}</span>
+          <span class="outfit-swatch-name">${_t(m.name, m.name_zh || m.name)}</span>
         </div>
         <div class="outfit-swatch" style="background:${m.hex2}" title="${m.name2}">
-          <span class="outfit-swatch-name">${m.name2}</span>
+          <span class="outfit-swatch-name">${_t(m.name2, m.name2_zh || m.name2)}</span>
         </div>
       </div>
       ${m.isCurrent ? `<div class="outfit-why">${_t(m.why, m.why_zh)}</div>` : ''}
