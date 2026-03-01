@@ -405,6 +405,14 @@ const LOADING_MSGS = [
   'Mapping your destiny…',
   'Almost there…',
 ];
+const LOADING_MSGS_ZH = [
+  '正在对齐天干…',
+  '解读地支中…',
+  '推算四柱命盘…',
+  '卜问易经…',
+  '绘制命运图谱…',
+  '即将完成…',
+];
 
 function runLoader(callback) {
   showScreen('loading');
@@ -413,7 +421,7 @@ function runLoader(callback) {
   let step = 0;
   const total = LOADING_MSGS.length;
   const iv = setInterval(() => {
-    msgEl.textContent = LOADING_MSGS[step];
+    msgEl.textContent = isZh ? LOADING_MSGS_ZH[step] : LOADING_MSGS[step];
     fillEl.style.width = ((step + 1) / total * 100) + '%';
     step++;
     if (step >= total) {
@@ -634,11 +642,15 @@ function renderRadar(elements) {
 
   // Labels
   const labelOffsets = [[0,-14],[18,-4],[12,14],[-12,14],[-18,-4]];
+  const EL_ZH_NAMES = { Wood:'木', Fire:'火', Earth:'土', Metal:'金', Water:'水' };
   const labelEls = els.map((el, i) => {
     const [x,y] = pt(i, 1.18);
     return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle"
       font-family="Space Grotesk, sans-serif" font-size="9" font-weight="700"
-      fill="${EL_COLOR[el]}" letter-spacing="1">${el.toUpperCase()}</text>`;
+      fill="${EL_COLOR[el]}" letter-spacing="1" class="en">${el.toUpperCase()}</text>` +
+      `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle"
+      font-family="Noto Sans SC, sans-serif" font-size="11" font-weight="700"
+      fill="${EL_COLOR[el]}" class="zh hide">${EL_ZH_NAMES[el]}</text>`;
   }).join('');
 
   svg.innerHTML = `
@@ -659,7 +671,7 @@ function renderRadar(elements) {
     return `<div class="legend-item">
       <div class="legend-dot" style="background:${EL_COLOR[el]}"></div>
       <div class="legend-info">
-        <span class="legend-name">${el}</span>
+        <span class="legend-name en">${el}</span><span class="legend-name zh hide">${EL_ZH_NAMES[el]}</span>
         <div class="legend-bar-track">
           <div class="legend-bar-fill" style="width:0%;background:${EL_COLOR[el]}"
             data-pct="${pct}"></div>
@@ -678,10 +690,10 @@ function renderRadar(elements) {
 
 /* ── Fortune Cards ── */
 const FORTUNE_META = [
-  { key:'love',   icon:'❤️',  label:'Love',   color:'#f43f5e', circ:138 },
-  { key:'career', icon:'💼',  label:'Career', color:'#8b5cf6', circ:138 },
-  { key:'health', icon:'🌿',  label:'Health', color:'#22c55e', circ:138 },
-  { key:'wealth', icon:'💰',  label:'Wealth', color:'#f59e0b', circ:138 },
+  { key:'love',   icon:'❤️',  label:'Love',   label_zh:'爱情', color:'#f43f5e', circ:138 },
+  { key:'career', icon:'💼',  label:'Career', label_zh:'事业', color:'#8b5cf6', circ:138 },
+  { key:'health', icon:'🌿',  label:'Health', label_zh:'健康', color:'#22c55e', circ:138 },
+  { key:'wealth', icon:'💰',  label:'Wealth', label_zh:'财运', color:'#f59e0b', circ:138 },
 ];
 
 function renderFortune(fortune) {
@@ -689,7 +701,7 @@ function renderFortune(fortune) {
   grid.innerHTML = FORTUNE_META.map(m => `
     <div class="fortune-card">
       <div class="fortune-icon">${m.icon}</div>
-      <div class="fortune-label">${m.label}</div>
+      <div class="fortune-label">${_t(m.label, m.label_zh)}</div>
       <div class="fortune-ring-wrap">
         <svg class="fortune-ring-svg" viewBox="0 0 44 44">
           <circle class="ring-bg"   cx="22" cy="22" r="18"/>
@@ -735,11 +747,11 @@ function renderCompat(animal, zData) {
   }).join('');
   wrap.innerHTML = `
     <div class="compat-group">
-      <div class="compat-group-label">Best matches ✦</div>
+      <div class="compat-group-label">${_t('Best matches ✦','最佳配对 ✦')}</div>
       <div class="compat-row">${goodRow}</div>
     </div>
     <div class="compat-group">
-      <div class="compat-group-label">Challenging</div>
+      <div class="compat-group-label">${_t('Challenging','冲克')}</div>
       <div class="compat-row">${badRow}</div>
     </div>
   `;
@@ -751,21 +763,21 @@ function renderLucky(lucky) {
   grid.innerHTML = `
     <div class="lucky-card">
       <div class="lucky-icon">🎨</div>
-      <div class="lucky-title">Colors</div>
+      <div class="lucky-title">${_t('Colors','幸运颜色')}</div>
       <div class="lucky-values">
         ${lucky.colors.map(c=>`<span class="lucky-val">${c}</span>`).join('')}
       </div>
     </div>
     <div class="lucky-card">
       <div class="lucky-icon">🎲</div>
-      <div class="lucky-title">Numbers</div>
+      <div class="lucky-title">${_t('Numbers','幸运数字')}</div>
       <div class="lucky-values">
         ${lucky.numbers.map(n=>`<span class="lucky-val">${n}</span>`).join('')}
       </div>
     </div>
     <div class="lucky-card">
       <div class="lucky-icon">🧭</div>
-      <div class="lucky-title">Direction</div>
+      <div class="lucky-title">${_t('Direction','幸运方位')}</div>
       <div class="lucky-values">
         <span class="lucky-val">${lucky.dir}</span>
       </div>
@@ -1031,32 +1043,34 @@ function renderDailyFortune(userAnimal) {
   const todayAnimal    = BRANCHES[todayBranchIdx].animal;
   const userZodiac     = ZODIAC[userAnimal];
 
-  let score, color, levelLabel, msg_en, msg_zh;
+  let score, color, levelLabel, levelLabel_zh, msg_en, msg_zh;
   if (userZodiac.compat.includes(todayAnimal)) {
     score = 85 + Math.floor(Math.random() * 12);
-    color = '#22c55e'; levelLabel = 'Auspicious';
+    color = '#22c55e'; levelLabel = 'Auspicious'; levelLabel_zh = '大吉';
     msg_en = `Today's energy flows with you. The ${todayAnimal} day amplifies your natural power — make your boldest moves now.`;
     msg_zh = `今日能量与你同频。${todayAnimal}日增强你的天赋能量，大胆出击，正当时。`;
   } else if (userZodiac.clash.includes(todayAnimal)) {
     score = 38 + Math.floor(Math.random() * 18);
-    color = '#ef4444'; levelLabel = 'Challenging';
+    color = '#ef4444'; levelLabel = 'Challenging'; levelLabel_zh = '冲煞';
     msg_en = `The ${todayAnimal} day creates friction with your chart. Navigate slowly, hold decisions until tomorrow, and protect your energy.`;
     msg_zh = `今日${todayAnimal}日与你的命盘有冲突。放缓节奏，重要决定推迟到明天，注意保护自己的能量。`;
   } else {
     score = 60 + Math.floor(Math.random() * 22);
-    color = '#f0c040'; levelLabel = 'Balanced';
+    color = '#f0c040'; levelLabel = 'Balanced'; levelLabel_zh = '平稳';
     msg_en = `A steady ${todayAnimal} day — neither tailwind nor headwind. Focus on consistency, refine the details, and trust the process.`;
     msg_zh = `今日${todayAnimal}日平稳，无明显顺逆之风。专注于一致性，打磨细节，相信过程。`;
   }
 
-  const dateLabel = now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  const dateLabel = isZh
+    ? now.toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric' })
+    : now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
   document.getElementById('today-date-label').textContent = dateLabel;
 
   const card = document.getElementById('daily-card');
   card.innerHTML = `<div class="daily-fortune-card">
     <div class="daily-top">
       <div>
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Today's Day Animal</div>
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${_t("Today's Day Animal",'今日日柱')}</div>
         <div class="daily-animal-chip">
           <svg viewBox="0 0 100 100" width="22" height="22" style="color:${color}">${ANIMAL_SVGS[todayAnimal]||''}</svg>
           ${todayAnimal}
@@ -1064,7 +1078,7 @@ function renderDailyFortune(userAnimal) {
       </div>
       <div class="daily-score-wrap">
         <div class="daily-score-num" id="daily-score-num" style="color:${color}">0</div>
-        <div class="daily-score-label">${levelLabel}</div>
+        <div class="daily-score-label">${_t(levelLabel, levelLabel_zh)}</div>
       </div>
     </div>
     <div class="daily-bar-track">
@@ -1288,7 +1302,7 @@ function showShareCard() {
     <div class="share-archetype-badge">${archetype}</div>
 
     <div class="share-cn-name-section">
-      <div class="share-cn-label">✦ Your Chinese Destiny Name</div>
+      <div class="share-cn-label">${_t('✦ Your Chinese Destiny Name','✦ 你的命运汉名')}</div>
       <div class="share-cn-chars">
         ${[cn.surname, cn.elChar, cn.anChar].map(c => `
           <div class="share-cn-char-block">
@@ -1374,22 +1388,22 @@ function initDateInputs() {
 ═══════════════════════════════════════ */
 const WORK_ACTIONS = {
   high: [
-    { emoji:'🚀', action:'Push hard this month',  sub:'Energy and output are at their peak'      },
-    { emoji:'💡', action:'Pitch the big idea',     sub:'Momentum is firmly on your side'          },
-    { emoji:'📈', action:'Take on more',           sub:'Your capacity is higher than usual'        },
-    { emoji:'🏆', action:'Go for the promotion',  sub:'Visibility and recognition are strong'     },
+    { emoji:'🚀', action:'Push hard this month',  action_zh:'本月全力冲刺',  sub:'Energy and output are at their peak',      sub_zh:'能量与产出达到顶峰' },
+    { emoji:'💡', action:'Pitch the big idea',     action_zh:'提出大想法',    sub:'Momentum is firmly on your side',          sub_zh:'势头正在你这边' },
+    { emoji:'📈', action:'Take on more',           action_zh:'承担更多',      sub:'Your capacity is higher than usual',        sub_zh:'你的承载力高于平时' },
+    { emoji:'🏆', action:'Go for the promotion',  action_zh:'争取晋升',      sub:'Visibility and recognition are strong',     sub_zh:'曝光度与认可度双高' },
   ],
   mid: [
-    { emoji:'📋', action:'Focus on the plan',      sub:'Steady execution beats inspiration now'   },
-    { emoji:'🤝', action:'Strengthen alliances',   sub:'Collaboration will move things forward'   },
-    { emoji:'📚', action:'Invest in skills',       sub:'A quieter month is good for learning'     },
-    { emoji:'⚙️', action:'Handle the details',     sub:'Systems and processes need attention now' },
+    { emoji:'📋', action:'Focus on the plan',      action_zh:'聚焦执行计划', sub:'Steady execution beats inspiration now',   sub_zh:'稳健执行胜过灵感爆发' },
+    { emoji:'🤝', action:'Strengthen alliances',   action_zh:'巩固合作关系', sub:'Collaboration will move things forward',   sub_zh:'协作将推动事情前进' },
+    { emoji:'📚', action:'Invest in skills',       action_zh:'投资自我提升', sub:'A quieter month is good for learning',     sub_zh:'较平静的月份适合学习' },
+    { emoji:'⚙️', action:'Handle the details',     action_zh:'处理细节',     sub:'Systems and processes need attention now', sub_zh:'系统与流程需要关注' },
   ],
   low: [
-    { emoji:'🔇', action:'Keep a low profile',    sub:'Not the time to draw attention'            },
-    { emoji:'⏸',  action:'Pause major moves',     sub:'Obstacles will resolve on their own'       },
-    { emoji:'🛠',  action:'Fix what is broken',    sub:'Maintenance over ambition this month'      },
-    { emoji:'🧘', action:'Conserve your energy',  sub:"Pushing hard won't pay off right now"      },
+    { emoji:'🔇', action:'Keep a low profile',    action_zh:'保持低调',     sub:'Not the time to draw attention',            sub_zh:'现在不是出风头的时候' },
+    { emoji:'⏸',  action:'Pause major moves',     action_zh:'暂停重大行动', sub:'Obstacles will resolve on their own',       sub_zh:'障碍将自行化解' },
+    { emoji:'🛠',  action:'Fix what is broken',    action_zh:'修复问题',     sub:'Maintenance over ambition this month',      sub_zh:'本月以维护为主，非进取' },
+    { emoji:'🧘', action:'Conserve your energy',  action_zh:'保存精力',     sub:"Pushing hard won't pay off right now",      sub_zh:'强行推进本月无法获益' },
   ],
 };
 
@@ -1430,14 +1444,15 @@ function renderWorkSection(animal, elements, forecast2026) {
     ? { label:'Steady Progress 📈', color:'#3b82f6', zh:'稳步前行' }
     : { label:'Consolidation Phase 🛠', color:'#64748b', zh:'蓄势待发' };
 
-  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTHS    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTHS_ZH = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   const monthly = genWorkMonthly(workScore);
   const monthlyHTML = monthly.map((d, i) => `
     <div class="love-month-tile level-${d.level}${i === nowMonth ? ' now-month work-now' : ''}">
-      <div class="love-month-name">${MONTHS[i]}</div>
+      <div class="love-month-name">${_t(MONTHS[i], MONTHS_ZH[i])}</div>
       <div class="love-month-emoji">${d.emoji}</div>
-      <div class="love-month-action">${d.action}</div>
-      <div class="love-month-sub">${d.sub}</div>
+      <div class="love-month-action">${_t(d.action, d.action_zh)}</div>
+      <div class="love-month-sub">${_t(d.sub, d.sub_zh)}</div>
     </div>`).join('');
 
   document.getElementById('work-card').innerHTML = `
@@ -1447,16 +1462,16 @@ function renderWorkSection(animal, elements, forecast2026) {
           <div class="work-score-num" id="work-score-num">0</div>
           <div class="work-score-label">/ 100</div>
         </div>
-        <div class="love-tier-label" style="color:${tier.color}">${tier.label}</div>
+        <div class="love-tier-label" style="color:${tier.color}">${_t(tier.label, tier.zh)}</div>
         <div class="love-sublabel en">Your 2026 career momentum</div>
         <div class="love-sublabel zh hide">${tier.zh} · 2026年事业运</div>
       </div>
       <div class="love-archetype" style="border-color:${elColor}25">
         <div class="love-archetype-emoji">${ca.icon}</div>
         <div class="love-archetype-info">
-          <div class="love-archetype-title" style="color:${elColor}">${ca.name}</div>
-          <div class="love-archetype-tagline">${ca.tagline}</div>
-          <div class="love-traits">${ca.roles.slice(0,3).map(r=>`<span class="love-trait">${r}</span>`).join('')}</div>
+          <div class="love-archetype-title" style="color:${elColor}">${_t(ca.name, ca.name_zh)}</div>
+          <div class="love-archetype-tagline">${_t(ca.tagline, ca.tagline_zh)}</div>
+          <div class="love-traits">${ca.roles.slice(0,3).map((r,i)=>`<span class="love-trait">${_t(r, ca.roles_zh?.[i])}</span>`).join('')}</div>
         </div>
       </div>
       <div class="love-months-wrap">
@@ -1493,39 +1508,44 @@ const HEART_PATH = 'M 50 78 C 20 62 2 48 2 32 C 2 16 15 10 26 10 C 36 10 45 15 5
 
 const LOVE_ARCHETYPE = {
   Wood:  {
-    title: 'The Nurturer', emoji: '🌿',
-    tagline: 'Patient · Devoted · Slow-burning',
+    title: 'The Nurturer', title_zh: '守护者', emoji: '🌿',
+    tagline: 'Patient · Devoted · Slow-burning', tagline_zh: '耐心·专一·慢热',
     desc_en: 'You love through acts of care and quiet consistency. You build slowly, but what you build lasts a lifetime. Partners feel deeply safe with you.',
     desc_zh: '你以关怀与持久表达爱意，缓慢建立却经久不衰，伴侣在你身边感到深深的安全感。',
-    traits: ['Devoted', 'Patient', 'Nurturing'], language: 'Acts of Service',
+    traits: ['Devoted', 'Patient', 'Nurturing'], traits_zh: ['专一','耐心','呵护'],
+    language: 'Acts of Service', language_zh: '行动服务',
   },
   Fire:  {
-    title: 'The Flame', emoji: '❤️‍🔥',
-    tagline: 'Intense · Magnetic · All-or-nothing',
+    title: 'The Flame', title_zh: '烈焰', emoji: '❤️‍🔥',
+    tagline: 'Intense · Magnetic · All-or-nothing', tagline_zh: '炽烈·磁场·全或无',
     desc_en: 'You love like wildfire — consuming, electric, impossible to ignore. You draw people in effortlessly. The challenge is sustaining that heat over time.',
     desc_zh: '你的爱如烈火——炽烈、充满电力、势不可挡。魅力自然流露，挑战在于持久燃烧。',
-    traits: ['Magnetic', 'Passionate', 'Bold'], language: 'Words of Affirmation',
+    traits: ['Magnetic', 'Passionate', 'Bold'], traits_zh: ['磁场强','热情','大胆'],
+    language: 'Words of Affirmation', language_zh: '肯定话语',
   },
   Earth: {
-    title: 'The Anchor', emoji: '🤎',
-    tagline: 'Loyal · Steady · The one who stays',
+    title: 'The Anchor', title_zh: '锚点', emoji: '🤎',
+    tagline: 'Loyal · Steady · The one who stays', tagline_zh: '忠诚·稳定·永远在场',
     desc_en: 'You love with unshakeable loyalty. You\'re the person who shows up — in storms and in stillness. You give quietly and endlessly. You need to feel truly needed.',
     desc_zh: '你以不可动摇的忠诚去爱，风雨晴朗都始终出现，默默付出。你需要被人真正需要。',
-    traits: ['Loyal', 'Reliable', 'Grounding'], language: 'Quality Time',
+    traits: ['Loyal', 'Reliable', 'Grounding'], traits_zh: ['忠诚','可靠','踏实'],
+    language: 'Quality Time', language_zh: '共处时光',
   },
   Metal: {
-    title: 'The Enigma', emoji: '🩶',
-    tagline: 'Selective · Precise · Fiercely devoted',
+    title: 'The Enigma', title_zh: '谜', emoji: '🩶',
+    tagline: 'Selective · Precise · Fiercely devoted', tagline_zh: '挑剔·精准·绝对忠诚',
     desc_en: 'You don\'t fall easily — but when you do, it\'s absolute. Your love is a fortress: rare entry, total protection. Vulnerability is your greatest frontier.',
     desc_zh: '你不轻易动情，但一旦爱上便是全然投入。你的爱是堡垒，难以进入，却给予全面守护。',
-    traits: ['Selective', 'Devoted', 'Protective'], language: 'Acts of Service',
+    traits: ['Selective', 'Devoted', 'Protective'], traits_zh: ['挑剔','忠诚','守护'],
+    language: 'Acts of Service', language_zh: '行动服务',
   },
   Water: {
-    title: 'The Dreamer', emoji: '💙',
-    tagline: 'Romantic · Intuitive · Soul-deep',
+    title: 'The Dreamer', title_zh: '梦想家', emoji: '💙',
+    tagline: 'Romantic · Intuitive · Soul-deep', tagline_zh: '浪漫·直觉·灵魂深处',
     desc_en: 'You love with your whole soul — poetic, intuitive, and boundlessly empathetic. You feel what others feel before they say it. Guard your heart wisely.',
     desc_zh: '你以整个灵魂去爱——浪漫、直觉敏锐、共情力无边。能在对方开口前感知其情绪，守护好自己的心。',
-    traits: ['Romantic', 'Empathetic', 'Intuitive'], language: 'Physical Touch',
+    traits: ['Romantic', 'Empathetic', 'Intuitive'], traits_zh: ['浪漫','共情','直觉'],
+    language: 'Physical Touch', language_zh: '肢体接触',
   },
 };
 
@@ -1572,22 +1592,22 @@ function getLoveNote(userAnimal, matchAnimal) {
 /* ── Monthly love advice ── */
 const LOVE_ACTIONS = {
   high: [
-    { emoji:'✨', action:'Say yes to everything', sub:'High chance of getting what you want'  },
-    { emoji:'❤️', action:'Make the first move',   sub:'Stars are aligned in your favour'      },
-    { emoji:'🔥', action:'Be bold — act now',     sub:'Your energy is magnetic right now'     },
-    { emoji:'🌟', action:'Put yourself out there',sub:'A meaningful connection is very close'  },
+    { emoji:'✨', action:'Say yes to everything', action_zh:'全盘接受',      sub:'High chance of getting what you want',  sub_zh:'获得所求的几率极高' },
+    { emoji:'❤️', action:'Make the first move',   action_zh:'主动出击',      sub:'Stars are aligned in your favour',      sub_zh:'星象正与你同频' },
+    { emoji:'🔥', action:'Be bold — act now',     action_zh:'大胆行动',      sub:'Your energy is magnetic right now',     sub_zh:'此刻你的能量极具吸引力' },
+    { emoji:'🌟', action:'Put yourself out there',action_zh:'走出去',        sub:'A meaningful connection is very close',  sub_zh:'有意义的缘分近在眼前' },
   ],
   mid: [
-    { emoji:'🌿', action:'Deepen what you have',  sub:'Quality over new connections'           },
-    { emoji:'💬', action:'Have the conversation', sub:'Clarity will bring you much closer'     },
-    { emoji:'🕊', action:'Keep showing up',       sub:'Consistency is your love language now'  },
-    { emoji:'💛', action:'Love gently',           sub:'Small moments carry the most weight'    },
+    { emoji:'🌿', action:'Deepen what you have',  action_zh:'深化已有关系',  sub:'Quality over new connections',           sub_zh:'质量胜于新缘分' },
+    { emoji:'💬', action:'Have the conversation', action_zh:'开口说清楚',    sub:'Clarity will bring you much closer',     sub_zh:'清晰表达会让你们更近' },
+    { emoji:'🕊', action:'Keep showing up',       action_zh:'持续出现',      sub:'Consistency is your love language now',  sub_zh:'稳定是此刻的爱语' },
+    { emoji:'💛', action:'Love gently',           action_zh:'温柔去爱',      sub:'Small moments carry the most weight',    sub_zh:'小细节承载最大份量' },
   ],
   low: [
-    { emoji:'💔', action:"Don't do anything",   sub:'Low chance of love this month'           },
-    { emoji:'🚫', action:'Skip it this month',   sub:"The energy isn't there — just wait"     },
-    { emoji:'🌙', action:'Stay in this month',   sub:'Chasing will only lead to disappointment'},
-    { emoji:'🛡', action:'Protect your heart',   sub:'Low love energy — focus inward'          },
+    { emoji:'💔', action:"Don't do anything",   action_zh:'什么都别做',    sub:'Low chance of love this month',           sub_zh:'本月爱情机遇极低' },
+    { emoji:'🚫', action:'Skip it this month',   action_zh:'本月略过',      sub:"The energy isn't there — just wait",     sub_zh:'时机未到，静待即可' },
+    { emoji:'🌙', action:'Stay in this month',   action_zh:'宅家陪自己',    sub:'Chasing will only lead to disappointment',sub_zh:'强求只会带来失落' },
+    { emoji:'🛡', action:'Protect your heart',   action_zh:'守护内心',      sub:'Low love energy — focus inward',          sub_zh:'爱情能量低，向内看' },
   ],
 };
 
@@ -1619,14 +1639,15 @@ function renderLoveSection(animal, elements, overall2026) {
     : { label:'Patience Required 🤍', color:'#94a3b8', zh:'修心静待' };
 
   /* Monthly strip */
-  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTHS    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTHS_ZH = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   const monthly = genLoveMonthly(loveScore);
   const monthlyHTML = monthly.map((d, i) => `
     <div class="love-month-tile level-${d.level}${i === nowMonth ? ' now-month' : ''}">
-      <div class="love-month-name">${MONTHS[i]}</div>
+      <div class="love-month-name">${_t(MONTHS[i], MONTHS_ZH[i])}</div>
       <div class="love-month-emoji">${d.emoji}</div>
-      <div class="love-month-action">${d.action}</div>
-      <div class="love-month-sub">${d.sub}</div>
+      <div class="love-month-action">${_t(d.action, d.action_zh)}</div>
+      <div class="love-month-sub">${_t(d.sub, d.sub_zh)}</div>
     </div>`).join('');
 
   /* Expanded soul animal cards */
@@ -1675,7 +1696,7 @@ function renderLoveSection(animal, elements, overall2026) {
             <span class="love-score-pct">%</span>
           </div>
         </div>
-        <div class="love-tier-label" style="color:${tier.color}">${tier.label}</div>
+        <div class="love-tier-label" style="color:${tier.color}">${_t(tier.label, tier.zh)}</div>
         <div class="love-sublabel en">Chance of a meaningful connection in 2026</div>
         <div class="love-sublabel zh hide">${tier.zh} · 2026年情感运势</div>
       </div>
@@ -1683,13 +1704,13 @@ function renderLoveSection(animal, elements, overall2026) {
       <div class="love-archetype" style="border-color:${elColor}25">
         <div class="love-archetype-emoji">${la.emoji}</div>
         <div class="love-archetype-info">
-          <div class="love-archetype-title" style="color:${elColor}">${la.title}</div>
-          <div class="love-archetype-tagline">${la.tagline}</div>
-          <div class="love-traits">${la.traits.map(t=>`<span class="love-trait">${t}</span>`).join('')}</div>
+          <div class="love-archetype-title" style="color:${elColor}">${_t(la.title, la.title_zh)}</div>
+          <div class="love-archetype-tagline">${_t(la.tagline, la.tagline_zh)}</div>
+          <div class="love-traits">${la.traits.map((t,i)=>`<span class="love-trait">${_t(t, la.traits_zh?.[i])}</span>`).join('')}</div>
         </div>
         <div class="love-lang-badge">
           <div class="love-lang-icon">🗣</div>
-          <div class="love-lang-text">${la.language}</div>
+          <div class="love-lang-text">${_t(la.language, la.language_zh)}</div>
         </div>
       </div>
 
@@ -1706,9 +1727,9 @@ function renderLoveSection(animal, elements, overall2026) {
       </div>
 
       <div class="love-matches">
-        <div class="love-match-label" style="margin-bottom:12px">♥ Soul Animals — who to look for</div>
+        <div class="love-match-label" style="margin-bottom:12px">${_t('♥ Soul Animals — who to look for','♥ 灵魂生肖 — 寻找这些人')}</div>
         <div class="love-soul-cards">${soulHTML}</div>
-        <div class="love-match-label" style="margin-top:16px;color:rgba(255,255,255,0.3)">⚡ Handle With Care</div>
+        <div class="love-match-label" style="margin-top:16px;color:rgba(255,255,255,0.3)">${_t('⚡ Handle With Care','⚡ 需要谨慎相处')}</div>
         <div class="love-clash-row" style="margin-top:8px">${clashHTML}</div>
       </div>
 
@@ -1767,11 +1788,21 @@ const ORACLE_LOVE = {
   mid:  `Your love life works — but working isn't the same as thriving. Something is being left unsaid, tolerated rather than resolved. The Fire Horse strips away comfortable illusions. Whatever has been quietly bothering you will get louder. Address it before it becomes a crisis.`,
   low:  `The honest read: something in your love life isn't right, and you already know it. If you're with someone who doesn't make you feel fully chosen — who you're managing more than enjoying — this year makes that impossible to ignore. That's not a punishment. It's clarity you can act on.`,
 };
+const ORACLE_LOVE_ZH = {
+  high: `今年你的桃花运确实旺盛。合适的人正被你吸引——不要想太多。若你身处一段关系中，这正是深化它的一年，而非得过且过。把那句一直没说出口的话说出来。`,
+  mid:  `你的感情生活运作着，但运作并不等于蓬勃。有些话没说，有些事被容忍而非解决。火马年剥去舒适的幻象。那些悄悄困扰你的事情会越来越响。在它演变成危机之前，正面面对。`,
+  low:  `说实话：你感情生活里有些事不对劲，你自己也知道。若你身边的人没有让你感到被全然选择——你是在管理这段关系而非享受它——2026年会让这一切无法再被忽视。这不是惩罚，而是你可以行动的清醒。`,
+};
 
 const ORACLE_CAREER = {
   high: `Career momentum is real this year. Opportunities in the first half of 2026 are genuine — your only obstacle is your own hesitation. Whatever move you've been deliberating, the window is open. Walk through it before it closes.`,
   mid:  `Career is moving, not at the speed you want. The bottleneck is almost certainly internal: a conversation not yet had, a decision kept deferring, a gap you're aware of but haven't closed. The Fire Horse rewards those who remove their own obstacles. What's yours?`,
   low:  `This is not the year to force career momentum — conditions aren't right for aggressive expansion. But it's ideal for strategic repositioning. Quiet, deliberate moves made now will pay off enormously in 2027. Protect what you've built. Don't sprint just because you're anxious.`,
+};
+const ORACLE_CAREER_ZH = {
+  high: `今年职业势头真实存在。2026年上半年机会千载难逢，唯一的障碍是你自己的犹豫。无论你在考虑哪步棋，窗口已经打开。在它关闭之前走进去。`,
+  mid:  `职业在推进，但不是你想要的速度。瓶颈几乎肯定是内部的：一次未进行的谈话，一个不断推迟的决定，一个你知道却没有填补的缺口。火马年奖励那些清除自身障碍的人。你的障碍是什么？`,
+  low:  `今年不是强推职业势头的时机，条件不适合激进扩张。但这是战略性重新定位的理想时机。现在做出的安静而刻意的举动，将在2027年带来巨大回报。保护你已建立的成果，不要因焦虑而狂奔。`,
 };
 
 const ORACLE_HEALTH = {
@@ -1779,11 +1810,21 @@ const ORACLE_HEALTH = {
   mid:  `Energy will be inconsistent in 2026. Some stretches feel sharp and strong; others drain you unexpectedly. The months you resist slowing down are usually the ones that demand it most. Sleep isn't optional this year — it's strategy.`,
   low:  `Your body is carrying more than it should. Stress will show up physically in 2026 — it's already starting. Sleep, food, and what you consume mentally matter more right now than they have in years. Start there before trying to fix anything else.`,
 };
+const ORACLE_HEALTH_ZH = {
+  high: `今年身体能量扎实。你的风险不是虚弱，而是过度延伸。你会被诱惑推得比身体想要的更猛，尤其在高压月份。那些你无视身体需求的月份，正是日后制造问题的月份。`,
+  mid:  `2026年能量会不稳定。某些时段感觉锐利而强壮，另一些时段则出乎意料地耗尽你。那些你抗拒放慢的月份，通常是最需要放慢的月份。今年睡眠不是可选项，而是策略。`,
+  low:  `你的身体承载了超过它应有的重量。2026年压力将以身体的方式显现，而且已经开始了。睡眠、饮食和你精神上消化的东西，现在比多年来都更重要。先从这里开始，再尝试修复其他事情。`,
+};
 
 const ORACLE_WEALTH = {
   high: `Wealth conditions are favourable. Opportunities for meaningful financial progress are real — but they require you to act, not just notice. Identify where you want money to go before it arrives, or it will dissolve into noise.`,
   mid:  `Money flows, but not freely. There are leaks you're not tracking — costs, energy, commitments that don't pay back what they take. Audit before you expand. Tightening now creates the room to move later.`,
   low:  `2026 is not the year for financial risk. Not because you can't handle it — because the conditions are wrong. Protect what you have. Decisions that feel urgent probably aren't. Patience is the correct move, and it will pay off.`,
+};
+const ORACLE_WEALTH_ZH = {
+  high: `财运条件有利。实现有意义财务进展的机会是真实的，但需要你行动，而不仅仅是注意到它。在钱到来之前就确定它要去哪里，否则它将消散在噪音中。`,
+  mid:  `金钱在流动，但不自由。有些漏洞你没有追踪——成本、精力、那些付出比回报多的承诺。扩张前先审计。现在收紧，才能为日后行动创造空间。`,
+  low:  `2026年不是承担财务风险的时机。不是因为你承受不了，而是因为条件不对。保护你所拥有的。那些感觉紧迫的决定可能并不紧迫。耐心是正确的举动，而且会有回报。`,
 };
 
 function makeOracleArcSVG(months, nowMonth, maxIdx, minIdx) {
@@ -1851,23 +1892,35 @@ function renderOracleTab(animal, elements, fortune, pillars, forecast2026, domin
   };
 
   const MONTH_THEMES = {
-    high: { emoji: '🔥', label: 'Peak Window',   note: `Push hard. Conditions won't be this favourable again for months.`      },
-    mid:  { emoji: '⚡', label: 'Steady Ground', note: `Consistent effort beats sporadic bursts. Show up every day.`            },
-    low:  { emoji: '🌊', label: 'Rest & Reset',  note: `Don't force it. Strategic patience now pays forward.`                  },
+    high: { emoji: '🔥', label: 'Peak Window',   label_zh: '旺月',  note: `Push hard. Conditions won't be this favourable again for months.`,      note_zh: `全力冲刺。这样的好时机数月内不会再有。` },
+    mid:  { emoji: '⚡', label: 'Steady Ground',  label_zh: '稳月', note: `Consistent effort beats sporadic bursts. Show up every day.`,            note_zh: `持续努力胜过零散爆发。每天都要出现。` },
+    low:  { emoji: '🌊', label: 'Rest & Reset',   label_zh: '缓月', note: `Don't force it. Strategic patience now pays forward.`,                   note_zh: `不要强迫。此刻的战略耐心将换来未来回报。` },
   };
 
-  const loveCallout = love < 50
-    ? `If you're with someone right now and it doesn't feel right — it probably isn't. The person you're currently dating may not be for you, and 2026 will make that undeniable. Trust what you already know.`
-    : love < 65
-    ? `Be honest about what you actually want from your relationship or romantic life. Comfortable and right are not the same thing.`
-    : `Your love energy is genuine this year. Don't overthink what's working.`;
+  const loveCallout = isZh
+    ? (love < 50
+      ? `如果你现在和某人在一起但感觉不对——很可能确实不对。你目前约会的人可能不适合你，2026年会让这一点无可否认。相信你已经知道的。`
+      : love < 65
+      ? `诚实面对你真正想从这段关系或情感生活中得到什么。舒适和正确不是同一件事。`
+      : `今年你的爱情能量是真实的。不要把正在运作的事情想太复杂。`)
+    : (love < 50
+      ? `If you're with someone right now and it doesn't feel right — it probably isn't. The person you're currently dating may not be for you, and 2026 will make that undeniable. Trust what you already know.`
+      : love < 65
+      ? `Be honest about what you actually want from your relationship or romantic life. Comfortable and right are not the same thing.`
+      : `Your love energy is genuine this year. Don't overthink what's working.`);
   const loveCalloutType = love < 65 ? 'warn' : 'note';
 
-  const verdictText = overall >= 70
-    ? `2026 is genuinely yours to shape — not because everything will be easy, but because your chart aligns with this year's energy. The only thing between you and real progress is whether you actually move. Stop waiting for certainty. It won't come. Move anyway.`
-    : overall >= 50
-    ? `2026 is a year of honest reckoning. Not punishing — clarifying. The things that aren't working will become impossible to ignore. That's useful information, not bad luck. Use the friction to make better choices instead of managing around problems you've been tolerating.`
-    : `2026 is a hard year for your chart — and pretending otherwise doesn't help. The Fire Horse is exposing what's out of alignment in your life. That's uncomfortable, but it's also the clearest map you've had in years. The question isn't whether to change. It's what, and how fast.`;
+  const verdictText = isZh
+    ? (overall >= 70
+      ? `2026年真正属于你去塑造——不是因为一切都会简单，而是因为你的命盘与今年的能量契合。站在你和真正进步之间的唯一事物，是你是否真的行动了。停止等待确定性，它不会来。无论如何，动起来。`
+      : overall >= 50
+      ? `2026年是诚实清算的一年。不是惩罚——而是澄清。那些不运作的事情将变得无法忽视。这是有用的信息，不是坏运气。用这种摩擦做出更好的选择，而不是继续管理那些你一直在容忍的问题。`
+      : `2026年对你的命盘来说是艰难的一年——假装不是这样没有帮助。火马年正在暴露你生活中不对齐的地方。这不舒服，但也是你多年来拥有的最清晰的地图。问题不是是否要改变，而是改变什么，以及多快。`)
+    : (overall >= 70
+      ? `2026 is genuinely yours to shape — not because everything will be easy, but because your chart aligns with this year's energy. The only thing between you and real progress is whether you actually move. Stop waiting for certainty. It won't come. Move anyway.`
+      : overall >= 50
+      ? `2026 is a year of honest reckoning. Not punishing — clarifying. The things that aren't working will become impossible to ignore. That's useful information, not bad luck. Use the friction to make better choices instead of managing around problems you've been tolerating.`
+      : `2026 is a hard year for your chart — and pretending otherwise doesn't help. The Fire Horse is exposing what's out of alignment in your life. That's uncomfortable, but it's also the clearest map you've had in years. The question isn't whether to change. It's what, and how fast.`);
 
   const verdictIcon = overall >= 70 ? '✦' : overall >= 50 ? '◈' : '◇';
 
@@ -1888,75 +1941,75 @@ function renderOracleTab(animal, elements, fortune, pillars, forecast2026, domin
 
   document.getElementById('oracle-card').innerHTML = `
     <div class="orc-intro-card" style="border-color:${elColor}35;background:linear-gradient(160deg,${elColor}09,transparent 60%)">
-      <div class="orc-intro-eyebrow">The Oracle's Read · 2026</div>
+      <div class="orc-intro-eyebrow">${_t("The Oracle's Read · 2026",'神谕解读 · 2026')}</div>
       <p class="orc-intro-text">${introText}</p>
       <div class="orc-overall-row">
         <div class="orc-overall-block">
           <div class="orc-overall-num" style="color:${elColor}">${overall}</div>
-          <div class="orc-overall-label">Year Score</div>
+          <div class="orc-overall-label">${_t('Year Score','年度总分')}</div>
         </div>
         <div class="orc-quadrant">
-          <div class="orc-q-item"><span class="orc-q-label">Love</span><span class="orc-q-val">${love}</span></div>
-          <div class="orc-q-item"><span class="orc-q-label">Career</span><span class="orc-q-val">${career}</span></div>
-          <div class="orc-q-item"><span class="orc-q-label">Health</span><span class="orc-q-val">${health}</span></div>
-          <div class="orc-q-item"><span class="orc-q-label">Wealth</span><span class="orc-q-val">${wealth}</span></div>
+          <div class="orc-q-item"><span class="orc-q-label">${_t('Love','爱情')}</span><span class="orc-q-val">${love}</span></div>
+          <div class="orc-q-item"><span class="orc-q-label">${_t('Career','事业')}</span><span class="orc-q-val">${career}</span></div>
+          <div class="orc-q-item"><span class="orc-q-label">${_t('Health','健康')}</span><span class="orc-q-val">${health}</span></div>
+          <div class="orc-q-item"><span class="orc-q-label">${_t('Wealth','财运')}</span><span class="orc-q-val">${wealth}</span></div>
         </div>
       </div>
     </div>
 
-    <div class="orc-sticky-head">The Hard Truths</div>
+    <div class="orc-sticky-head">${_t('The Hard Truths','关键洞见')}</div>
 
     <div class="orc-truth-block">
-      <div class="orc-truth-label" style="color:#f43f5e">❤ Love &amp; Relationships</div>
+      <div class="orc-truth-label" style="color:#f43f5e">${_t('❤ Love &amp; Relationships','❤ 爱情与关系')}</div>
       ${bar(love, '#f43f5e')}
-      <p class="orc-truth-body">${ORACLE_LOVE[tier(love)]}</p>
+      <p class="orc-truth-body">${isZh ? ORACLE_LOVE_ZH[tier(love)] : ORACLE_LOVE[tier(love)]}</p>
       <div class="orc-callout orc-callout-${loveCalloutType}">${loveCallout}</div>
     </div>
 
     <div class="orc-truth-block">
-      <div class="orc-truth-label" style="color:#8b5cf6">💼 Career &amp; Ambition</div>
+      <div class="orc-truth-label" style="color:#8b5cf6">${_t('💼 Career &amp; Ambition','💼 事业与抱负')}</div>
       ${bar(career, '#8b5cf6')}
-      <p class="orc-truth-body">${ORACLE_CAREER[tier(career)]}</p>
+      <p class="orc-truth-body">${isZh ? ORACLE_CAREER_ZH[tier(career)] : ORACLE_CAREER[tier(career)]}</p>
     </div>
 
     <div class="orc-truth-block">
-      <div class="orc-truth-label" style="color:#22c55e">⚡ Health &amp; Energy</div>
+      <div class="orc-truth-label" style="color:#22c55e">${_t('⚡ Health &amp; Energy','⚡ 健康与能量')}</div>
       ${bar(health, '#22c55e')}
-      <p class="orc-truth-body">${ORACLE_HEALTH[tier(health)]}</p>
+      <p class="orc-truth-body">${isZh ? ORACLE_HEALTH_ZH[tier(health)] : ORACLE_HEALTH[tier(health)]}</p>
     </div>
 
     <div class="orc-truth-block" style="border-bottom:none;margin-bottom:0">
-      <div class="orc-truth-label" style="color:#f59e0b">💰 Wealth &amp; Resources</div>
+      <div class="orc-truth-label" style="color:#f59e0b">${_t('💰 Wealth &amp; Resources','💰 财运与资源')}</div>
       ${bar(wealth, '#f59e0b')}
-      <p class="orc-truth-body">${ORACLE_WEALTH[tier(wealth)]}</p>
+      <p class="orc-truth-body">${isZh ? ORACLE_WEALTH_ZH[tier(wealth)] : ORACLE_WEALTH[tier(wealth)]}</p>
     </div>
 
-    <div class="orc-sticky-head">Your 2026 Arc</div>
+    <div class="orc-sticky-head">${_t('Your 2026 Arc','2026年运势弧线')}</div>
 
     <div class="orc-arc-card">
       <div class="orc-arc-meta">
-        <div class="orc-arc-peak"><span class="orc-arc-dot" style="background:#f0c040"></span>Peak: <strong>${MONTH_FULL[maxIdx]}</strong></div>
-        <div class="orc-arc-trough"><span class="orc-arc-dot" style="background:#475569"></span>Lowest: <strong>${MONTH_FULL[minIdx]}</strong></div>
+        <div class="orc-arc-peak"><span class="orc-arc-dot" style="background:#f0c040"></span>${_t('Peak:','最旺月：')} <strong>${MONTH_FULL[maxIdx]}</strong></div>
+        <div class="orc-arc-trough"><span class="orc-arc-dot" style="background:#475569"></span>${_t('Lowest:','最低月：')} <strong>${MONTH_FULL[minIdx]}</strong></div>
       </div>
       <div class="orc-arc-svg">${arcSVG}</div>
-      <div class="orc-arc-now">▲ You are here: ${MONTH_FULL[nowMonth]} · ${Math.round(nowScore)}</div>
+      <div class="orc-arc-now">▲ ${_t('You are here:','当前所在：')} ${MONTH_FULL[nowMonth]} · ${Math.round(nowScore)}</div>
     </div>
 
-    <div class="orc-sticky-head">Next 90 Days</div>
+    <div class="orc-sticky-head">${_t('Next 90 Days','未来90天')}</div>
 
     ${next3.map(m => `
       <div class="orc-month-block${m.isnow ? ' orc-month-now' : ''}">
         <div class="orc-month-top">
-          <div class="orc-month-name">${m.name}${m.isnow ? ' · Now' : ''}</div>
+          <div class="orc-month-name">${m.name}${m.isnow ? ` · ${_t('Now','当前')}` : ''}</div>
           <div class="orc-month-score" style="color:${m.t === 'high' ? '#f0c040' : m.t === 'mid' ? '#94a3b8' : '#64748b'}">${m.score}</div>
         </div>
-        <div class="orc-month-theme">${MONTH_THEMES[m.t].emoji} ${MONTH_THEMES[m.t].label}</div>
-        <p class="orc-month-note">${MONTH_THEMES[m.t].note}</p>
+        <div class="orc-month-theme">${MONTH_THEMES[m.t].emoji} ${isZh ? MONTH_THEMES[m.t].label_zh : MONTH_THEMES[m.t].label}</div>
+        <p class="orc-month-note">${isZh ? MONTH_THEMES[m.t].note_zh : MONTH_THEMES[m.t].note}</p>
         ${m.isnow ? `<ul class="orc-actions">${THIS_MONTH_ACTIONS[nowTier].map(a => `<li class="orc-action-item">→ ${a}</li>`).join('')}</ul>` : ''}
       </div>
     `).join('')}
 
-    <div class="orc-sticky-head">The Verdict</div>
+    <div class="orc-sticky-head">${_t('The Verdict','命运裁决')}</div>
 
     <div class="orc-verdict">
       <div class="orc-verdict-icon" style="color:${elColor}">${verdictIcon}</div>
@@ -2170,10 +2223,10 @@ function render2026Fortune(animal, elements, preCalc = null) {
     : `火马年能量对你的命盘有压力，以耐心、谋略为主，避免冒进，以长远视角稳步前行。`;
 
   const ASPECT_META = [
-    { key:'career', label:'Career', icon:'💼', color:'#8b5cf6' },
-    { key:'love',   label:'Love',   icon:'❤️',  color:'#f43f5e' },
-    { key:'wealth', label:'Wealth', icon:'💰',  color:'#f59e0b' },
-    { key:'health', label:'Health', icon:'🌿',  color:'#22c55e' },
+    { key:'career', label:'Career', label_zh:'事业', icon:'💼', color:'#8b5cf6' },
+    { key:'love',   label:'Love',   label_zh:'爱情', icon:'❤️',  color:'#f43f5e' },
+    { key:'wealth', label:'Wealth', label_zh:'财运', icon:'💰',  color:'#f59e0b' },
+    { key:'health', label:'Health', label_zh:'健康', icon:'🌿',  color:'#22c55e' },
   ];
 
   const maxM = Math.max(...months);
@@ -2192,7 +2245,7 @@ function render2026Fortune(animal, elements, preCalc = null) {
   const aspectsHTML = ASPECT_META.map(m => `
     <div class="aspect-item">
       <div class="aspect-header">
-        <div class="aspect-name">${m.icon} ${m.label}</div>
+        <div class="aspect-name">${m.icon} ${_t(m.label, m.label_zh)}</div>
         <div class="aspect-score" style="color:${m.color}">${aspects[m.key]}</div>
       </div>
       <div class="aspect-bar-track">

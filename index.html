@@ -40,14 +40,14 @@
       <div class="logo-wrap">
         <div class="logo-chinese">八字</div>
         <h1 class="logo-text">wobazi</h1>
-        <p class="logo-sub">Chinese Destiny Engine</p>
+        <p class="logo-sub"><span class="en">Chinese Destiny Engine</span><span class="zh hide">中国命运引擎</span></p>
       </div>
-      <p class="splash-tagline">Decode your fate through the ancient<br>art of the Four Pillars</p>
+      <p class="splash-tagline"><span class="en">Decode your fate through the ancient<br>art of the Four Pillars</span><span class="zh hide">通过八字古法<br>解码你的命运</span></p>
       <button class="btn-primary" onclick="haptic(10); showScreen('input')">
-        Begin Your Reading
+        <span class="en">Begin Your Reading</span><span class="zh hide">开始算命</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
-      <button class="btn-about-link" onclick="haptic(6); showScreen('about')">What is Bāzì? →</button>
+      <button class="btn-about-link" onclick="haptic(6); showScreen('about')"><span class="en">What is Bāzì? →</span><span class="zh hide">什么是八字？→</span></button>
     </div>
   </div>
 
@@ -130,7 +130,7 @@
       <div class="about-cta">
         <p>Ready to decode your chart?</p>
         <button class="btn-primary" onclick="haptic(10); showScreen('input')">
-          Begin Your Reading
+          <span class="en">Begin Your Reading</span><span class="zh hide">开始算命</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </div>
@@ -144,22 +144,22 @@
       <button class="btn-back" onclick="haptic(8); showScreen('splash')">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
-      <span class="nav-title">Birth Chart</span>
+      <span class="nav-title"><span class="en">Birth Chart</span><span class="zh hide">出生命盘</span></span>
       <div style="width:40px"></div>
     </div>
     <div class="input-body">
       <div class="input-intro">
         <div class="intro-icon">✦</div>
-        <p>Enter your details to unlock your<br><strong>Four Pillars of Destiny</strong></p>
+        <p><span class="en">Enter your details to unlock your<br><strong>Four Pillars of Destiny</strong></span><span class="zh hide">输入出生信息，解锁<br><strong>四柱命盘</strong></span></p>
       </div>
       <form id="bazi-form" onsubmit="handleSubmit(event)">
         <div class="field">
-          <label>Name <span class="label-opt">optional</span></label>
+          <label><span class="en">Name <span class="label-opt">optional</span></span><span class="zh hide">姓名 <span class="label-opt">可选</span></span></label>
           <input type="text" id="name" placeholder="What do we call you?" autocomplete="off" spellcheck="false">
         </div>
 
         <div class="field">
-          <label>Date of Birth <span class="label-req">*</span></label>
+          <label><span class="en">Date of Birth <span class="label-req">*</span></span><span class="zh hide">出生日期 <span class="label-req">*</span></span></label>
           <div class="date-trio">
             <input type="number" id="birth-day"   class="date-part" placeholder="DD"   min="1"    max="31"   inputmode="numeric">
             <span class="date-sep">/</span>
@@ -170,17 +170,17 @@
         </div>
 
         <div class="field">
-          <label>Time of Birth <span class="label-opt">optional — unlocks Hour Pillar</span></label>
+          <label><span class="en">Time of Birth <span class="label-opt">optional — unlocks Hour Pillar</span></span><span class="zh hide">出生时间 <span class="label-opt">可选 — 解锁时柱</span></span></label>
           <input type="time" id="birthtime">
         </div>
 
         <div class="field field-row">
           <div class="field-col">
-            <label>Place of Birth <span class="label-opt">optional</span></label>
+            <label><span class="en">Place of Birth <span class="label-opt">optional</span></span><span class="zh hide">出生地 <span class="label-opt">可选</span></span></label>
             <input type="text" id="birthplace" placeholder="City or country" autocomplete="off" spellcheck="false">
           </div>
           <div class="field-col">
-            <label>Blood Type <span class="label-opt">optional</span></label>
+            <label><span class="en">Blood Type <span class="label-opt">optional</span></span><span class="zh hide">血型 <span class="label-opt">可选</span></span></label>
             <select id="blood-type" class="select-input">
               <option value="">Unknown</option>
               <option value="A">A</option>
@@ -192,15 +192,15 @@
         </div>
 
         <div class="field">
-          <label>Gender <span class="label-opt">optional — unlocks Feng Shui direction</span></label>
+          <label><span class="en">Gender <span class="label-opt">optional — unlocks Feng Shui direction</span></span><span class="zh hide">性别 <span class="label-opt">可选 — 解锁风水方位</span></span></label>
           <div class="gender-row">
-            <label class="gender-opt"><input type="radio" name="gender" value="M"> ♂ Male</label>
-            <label class="gender-opt"><input type="radio" name="gender" value="F"> ♀ Female</label>
+            <label class="gender-opt"><input type="radio" name="gender" value="M"> ♂ <span class="en">Male</span><span class="zh hide">男</span></label>
+            <label class="gender-opt"><input type="radio" name="gender" value="F"> ♀ <span class="en">Female</span><span class="zh hide">女</span></label>
           </div>
         </div>
 
         <button type="submit" class="btn-primary btn-full">
-          <span>Reveal My Destiny</span>
+          <span class="en">Reveal My Destiny</span><span class="zh hide">揭示我的命运</span>
           <span class="btn-char">龙</span>
         </button>
       </form>
@@ -237,9 +237,9 @@
 
     <div class="results-tab-bar">
       <div class="tab-bar-inner">
-        <button class="tab-btn active" id="tab-btn-fortune" onclick="haptic(6); switchTab('fortune')">Fortune</button>
-        <button class="tab-btn" id="tab-btn-personality" onclick="haptic(6); switchTab('personality')">Personality</button>
-        <button class="tab-btn" id="tab-btn-actions" onclick="haptic(6); switchTab('actions')">Actions</button>
+        <button class="tab-btn active" id="tab-btn-fortune" onclick="haptic(6); switchTab('fortune')"><span class="en">Fortune</span><span class="zh hide">运势</span></button>
+        <button class="tab-btn" id="tab-btn-personality" onclick="haptic(6); switchTab('personality')"><span class="en">Personality</span><span class="zh hide">性格</span></button>
+        <button class="tab-btn" id="tab-btn-actions" onclick="haptic(6); switchTab('actions')"><span class="en">Actions</span><span class="zh hide">行动</span></button>
       </div>
     </div>
 
@@ -284,7 +284,8 @@
       <section class="section" data-tab="fortune" id="today-actions-section">
         <div class="section-head">
           <h3 class="en">Today's Action Plan</h3>
-          <span class="section-sub">3 things to do now</span>
+          <h3 class="zh hide">今日行动计划</h3>
+          <span class="section-sub"><span class="en">3 things to do now</span><span class="zh hide">立即行动的3件事</span></span>
         </div>
         <div id="today-actions-card"></div>
       </section>
@@ -352,7 +353,8 @@
       <section class="section" data-tab="actions" data-tip="outfit">
         <div class="section-head">
           <h3 class="en">Feng Shui Outfit Guide</h3>
-          <span class="section-sub">2026 · Monthly Colors</span>
+          <h3 class="zh hide">风水穿搭指南</h3>
+          <span class="section-sub"><span class="en">2026 · Monthly Colors</span><span class="zh hide">2026 · 月度色彩</span></span>
         </div>
         <div id="outfit-card"></div>
       </section>
@@ -361,6 +363,7 @@
       <section class="section" data-tab="actions" data-tip="lucky-nums">
         <div class="section-head">
           <h3 class="en">Lucky Numbers</h3>
+          <h3 class="zh hide">幸运数字</h3>
           <span class="section-sub">数字运势</span>
         </div>
         <div id="lucky-num-card"></div>
@@ -425,7 +428,8 @@
       <section class="section" data-tab="actions" data-tip="foods">
         <div class="section-head">
           <h3 class="en">Lucky Foods</h3>
-          <span class="section-sub">Element Nutrition</span>
+          <h3 class="zh hide">幸运食物</h3>
+          <span class="section-sub"><span class="en">Element Nutrition</span><span class="zh hide">五行饮食</span></span>
         </div>
         <div id="foods-card"></div>
       </section>
@@ -434,7 +438,8 @@
       <section class="section" data-tab="actions" data-tip="crystals">
         <div class="section-head">
           <h3 class="en">Crystals &amp; Gems</h3>
-          <span class="section-sub">Energy Stones</span>
+          <h3 class="zh hide">水晶宝石</h3>
+          <span class="section-sub"><span class="en">Energy Stones</span><span class="zh hide">能量宝石</span></span>
         </div>
         <div id="crystals-card"></div>
       </section>
@@ -443,6 +448,7 @@
       <section class="section" data-tab="actions" data-tip="ritual">
         <div class="section-head">
           <h3 class="en">Morning Ritual</h3>
+          <h3 class="zh hide">晨间仪式</h3>
           <span class="section-sub">元素晨练</span>
         </div>
         <div id="ritual-card"></div>
@@ -452,6 +458,7 @@
       <section class="section data-hidden" id="kua-section" data-tab="actions" data-tip="kua">
         <div class="section-head">
           <h3 class="en">Sleep Direction</h3>
+          <h3 class="zh hide">睡眠方位</h3>
           <span class="section-sub">卦数 · Feng Shui Kua</span>
         </div>
         <div id="kua-card"></div>
@@ -461,7 +468,8 @@
       <section class="section" data-tab="personality" data-tip="decades">
         <div class="section-head">
           <h3 class="en">Life Decades 大运</h3>
-          <span class="section-sub">Your 10-Year Cycles</span>
+          <h3 class="zh hide">人生大运</h3>
+          <span class="section-sub"><span class="en">Your 10-Year Cycles</span><span class="zh hide">十年大运周期</span></span>
         </div>
         <div id="decades-card"></div>
       </section>
@@ -513,9 +521,9 @@
       <div class="share-buttons">
         <button class="btn-share-action primary-share" onclick="doShare()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          Share My Reading
+          <span class="en">Share My Reading</span><span class="zh hide">分享我的命运</span>
         </button>
-        <button class="btn-share-action secondary-share" onclick="closeShare()">Close</button>
+        <button class="btn-share-action secondary-share" onclick="closeShare()"><span class="en">Close</span><span class="zh hide">关闭</span></button>
       </div>
     </div>
   </div>
@@ -530,10 +538,10 @@
       <div class="tip-title-zh" id="tip-title-zh"></div>
       <div class="tip-body-en" id="tip-body-en"></div>
       <div class="tip-body-zh" id="tip-body-zh"></div>
-      <button class="tip-close" onclick="closeTip()">Got it ✓</button>
+      <button class="tip-close" onclick="closeTip()"><span class="en">Got it ✓</span><span class="zh hide">知道了 ✓</span></button>
     </div>
   </div>
 
-  <script src="script.js?v=7"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>
