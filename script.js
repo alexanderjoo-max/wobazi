@@ -358,9 +358,10 @@ function showScreen(id) {
 }
 
 function switchTab(tab) {
-  document.getElementById('tab-btn-fortune').classList.toggle('active', tab === 'fortune');
-  document.getElementById('tab-btn-personality').classList.toggle('active', tab === 'personality');
-  document.getElementById('tab-btn-actions').classList.toggle('active', tab === 'actions');
+  ['fortune', 'personality', 'actions'].forEach(t => {
+    const btn = document.getElementById('tab-btn-' + t);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
   document.querySelectorAll('#results .section[data-tab]').forEach(el => {
     el.classList.toggle('hide', el.dataset.tab !== tab || el.classList.contains('data-hidden'));
   });
