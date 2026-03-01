@@ -785,6 +785,13 @@ function toggleLang() {
   const btn = document.getElementById('lang-btn');
   btn.textContent = isZh ? 'EN' : '中文';
   btn.classList.toggle('zh-active', isZh);
+  document.documentElement.lang = isZh ? 'zh-CN' : 'en';
+}
+
+/* ── Bilingual text helper ── */
+function _t(en, zh) {
+  if (!zh) return `<span class="en">${en}</span>`;
+  return `<span class="en">${en}</span><span class="zh hide">${zh}</span>`;
 }
 
 /* ═══════════════════════════════════════
@@ -944,26 +951,26 @@ function renderBirthplaceSection(birthplace, dominantEl) {
    Extra Zodiac Data — Career + Season
 ═══════════════════════════════════════ */
 const CAREER_ARCHETYPE = {
-  Wood:  { icon:'🌿', name:'The Cultivator',  tagline:'Builder · Educator · Healer', roles:['Medicine','Education','Architecture','Environmental Science','Coaching'] },
-  Fire:  { icon:'🔥', name:'The Visionary',   tagline:'Leader · Artist · Performer',  roles:['Entrepreneurship','Entertainment','Marketing','Politics','Design'] },
-  Earth: { icon:'🌍', name:'The Anchor',      tagline:'Manager · Mediator · Founder', roles:['Business','Real Estate','Finance','HR','Consulting'] },
-  Metal: { icon:'⚡', name:'The Executor',    tagline:'Engineer · Analyst · Strategist', roles:['Engineering','Law','Finance','Science','Military'] },
-  Water: { icon:'💧', name:'The Strategist',  tagline:'Thinker · Writer · Philosopher', roles:['Writing','Research','Philosophy','Tech','Intelligence'] },
+  Wood:  { icon:'🌿', name:'The Cultivator',  name_zh:'耕耘者',  tagline:'Builder · Educator · Healer',        tagline_zh:'建设者 · 教育者 · 治愈者',     roles:['Medicine','Education','Architecture','Environmental Science','Coaching'],       roles_zh:['医疗','教育','建筑','环境科学','教练'] },
+  Fire:  { icon:'🔥', name:'The Visionary',   name_zh:'远见者',  tagline:'Leader · Artist · Performer',         tagline_zh:'领袖 · 艺术家 · 表演者',        roles:['Entrepreneurship','Entertainment','Marketing','Politics','Design'],            roles_zh:['创业','娱乐','市场营销','政治','设计'] },
+  Earth: { icon:'🌍', name:'The Anchor',      name_zh:'定锚者',  tagline:'Manager · Mediator · Founder',        tagline_zh:'管理者 · 调解者 · 创始人',      roles:['Business','Real Estate','Finance','HR','Consulting'],                          roles_zh:['商业','房地产','金融','人力资源','咨询'] },
+  Metal: { icon:'⚡', name:'The Executor',    name_zh:'执行者',  tagline:'Engineer · Analyst · Strategist',     tagline_zh:'工程师 · 分析师 · 战略家',      roles:['Engineering','Law','Finance','Science','Military'],                            roles_zh:['工程','法律','金融','科学','军事'] },
+  Water: { icon:'💧', name:'The Strategist',  name_zh:'谋略者',  tagline:'Thinker · Writer · Philosopher',      tagline_zh:'思想家 · 作家 · 哲学家',        roles:['Writing','Research','Philosophy','Tech','Intelligence'],                       roles_zh:['写作','研究','哲学','科技','情报'] },
 };
 
 const POWER_SEASON = {
-  Wood:  { season:'Spring', emoji:'🌸', vibe:'Growth & new beginnings' },
-  Fire:  { season:'Summer', emoji:'☀️', vibe:'Peak energy & visibility' },
-  Earth: { season:'Harvest',emoji:'🍂', vibe:'Stability & abundance' },
-  Metal: { season:'Autumn', emoji:'🍁', vibe:'Precision & clarity' },
-  Water: { season:'Winter', emoji:'❄️', vibe:'Reflection & strategy' },
+  Wood:  { season:'Spring', season_zh:'春季', emoji:'🌸', vibe:'Growth & new beginnings',     vibe_zh:'生长与新开始' },
+  Fire:  { season:'Summer', season_zh:'夏季', emoji:'☀️', vibe:'Peak energy & visibility',    vibe_zh:'巅峰能量与曝光度' },
+  Earth: { season:'Harvest',season_zh:'收获季',emoji:'🍂', vibe:'Stability & abundance',      vibe_zh:'稳定与丰收' },
+  Metal: { season:'Autumn', season_zh:'秋季', emoji:'🍁', vibe:'Precision & clarity',         vibe_zh:'精确与清晰' },
+  Water: { season:'Winter', season_zh:'冬季', emoji:'❄️', vibe:'Reflection & strategy',       vibe_zh:'省思与谋略' },
 };
 
 const ALL_SEASONS = [
-  { key:'Wood',  label:'Spring', emoji:'🌸', vibe:'Growth' },
-  { key:'Fire',  label:'Summer', emoji:'☀️', vibe:'Visibility' },
-  { key:'Earth', label:'Harvest',emoji:'🍂', vibe:'Abundance' },
-  { key:'Metal', label:'Autumn', emoji:'🍁', vibe:'Clarity' },
+  { key:'Wood',  label:'Spring', label_zh:'春季', emoji:'🌸', vibe:'Growth',      vibe_zh:'生长' },
+  { key:'Fire',  label:'Summer', label_zh:'夏季', emoji:'☀️', vibe:'Visibility',  vibe_zh:'曝光' },
+  { key:'Earth', label:'Harvest',label_zh:'收获季',emoji:'🍂', vibe:'Abundance',  vibe_zh:'丰收' },
+  { key:'Metal', label:'Autumn', label_zh:'秋季', emoji:'🍁', vibe:'Clarity',     vibe_zh:'清晰' },
 ];
 // Water = Winter wraps around; displayed separately in the card footer
 
@@ -1090,10 +1097,10 @@ function renderCareerArchetype(dominantEl) {
     <div class="career-card" style="border-color:${col}22">
       <div class="career-icon-wrap">${ca.icon}</div>
       <div class="career-info">
-        <div class="career-archetype-name" style="color:${col}">${ca.name}</div>
-        <div class="career-tagline en">${ca.tagline}</div>
+        <div class="career-archetype-name" style="color:${col}">${_t(ca.name, ca.name_zh)}</div>
+        <div class="career-tagline">${_t(ca.tagline, ca.tagline_zh)}</div>
         <div class="career-roles">
-          ${ca.roles.map(r=>`<span class="career-role-chip">${r}</span>`).join('')}
+          ${ca.roles.map((r,i)=>`<span class="career-role-chip">${_t(r, ca.roles_zh?.[i])}</span>`).join('')}
         </div>
       </div>
     </div>`;
@@ -1103,11 +1110,11 @@ function renderCareerArchetype(dominantEl) {
 function renderPowerSeason(dominantEl) {
   const ps = POWER_SEASON[dominantEl];
   const seasons = [
-    { key:'Wood',  label:'Spring', emoji:'🌸', vibe:'Growth & new beginnings' },
-    { key:'Fire',  label:'Summer', emoji:'☀️',  vibe:'Peak energy & visibility' },
-    { key:'Earth', label:'Harvest',emoji:'🍂', vibe:'Stability & abundance' },
-    { key:'Metal', label:'Autumn', emoji:'🍁', vibe:'Precision & clarity' },
-    { key:'Water', label:'Winter', emoji:'❄️',  vibe:'Reflection & strategy' },
+    { key:'Wood',  label:'Spring', label_zh:'春季', emoji:'🌸', vibe:'Growth & new beginnings',  vibe_zh:'生长与新开始' },
+    { key:'Fire',  label:'Summer', label_zh:'夏季', emoji:'☀️', vibe:'Peak energy & visibility', vibe_zh:'巅峰能量与曝光度' },
+    { key:'Earth', label:'Harvest',label_zh:'收获季',emoji:'🍂', vibe:'Stability & abundance',   vibe_zh:'稳定与丰收' },
+    { key:'Metal', label:'Autumn', label_zh:'秋季', emoji:'🍁', vibe:'Precision & clarity',      vibe_zh:'精确与清晰' },
+    { key:'Water', label:'Winter', label_zh:'冬季', emoji:'❄️', vibe:'Reflection & strategy',    vibe_zh:'省思与谋略' },
   ];
   const segmentColors = { Wood:'#22c55e', Fire:'#ef4444', Earth:'#f59e0b', Metal:'#94a3b8', Water:'#3b82f6' };
 
@@ -1119,9 +1126,9 @@ function renderPowerSeason(dominantEl) {
     <div class="season-item ${s.key===dominantEl?'active':''}">
       <div class="season-emoji">${s.emoji}</div>
       <div class="season-name" style="${s.key===dominantEl?`color:${segmentColors[s.key]}`:''}">
-        ${s.label}${s.key===dominantEl?'':''}
+        ${_t(s.label, s.label_zh)}
       </div>
-      ${s.key===dominantEl?`<span class="power-badge">YOUR PEAK</span>`:`<div class="season-vibe">${s.vibe}</div>`}
+      ${s.key===dominantEl?`<span class="power-badge">${_t('YOUR PEAK','你的旺季')}</span>`:`<div class="season-vibe">${_t(s.vibe, s.vibe_zh)}</div>`}
     </div>`).join('');
 
   document.getElementById('season-card').innerHTML = `
@@ -2269,160 +2276,205 @@ function render2026Fortune(animal, elements, preCalc = null) {
 
 /* ── Monthly Outfit Colors (2026 Wood Snake Year) ── */
 const OUTFIT_COLORS = [
-  { month:'Jan', hex:'#1e3a5f', hex2:'#3b6ea8', name:'Navy',          name2:'Steel Blue',  avoid:'Bright White', why:'Water feeds the Wood Snake — deep blues draw in flow and wisdom.' },
-  { month:'Feb', hex:'#2d6a2d', hex2:'#52a452', name:'Forest Green',  name2:'Sage',         avoid:'Dull Gray',    why:'Wood month: anchor the year in your element with grounding greens.' },
-  { month:'Mar', hex:'#6d28d9', hex2:'#a78bfa', name:'Violet',        name2:'Lavender',     avoid:'Muddy Brown',  why:'Spring Wood peaks — violet bridges earth and sky for growth.' },
-  { month:'Apr', hex:'#c2185b', hex2:'#f06292', name:'Crimson',       name2:'Rose',         avoid:'Black',        why:'Fire energy rises — reds draw social magnetism and confidence.' },
-  { month:'May', hex:'#b45309', hex2:'#f59e0b', name:'Amber',         name2:'Ochre',        avoid:'Cold White',   why:'Earth month — warm yellows and ambers ground your energy.' },
-  { month:'Jun', hex:'#9ca3af', hex2:'#e5e7eb', name:'Silver',        name2:'Pearl White',  avoid:'Neon Colors',  why:'Metal energy sharpens — silver and white bring clarity.' },
-  { month:'Jul', hex:'#1e40af', hex2:'#312e81', name:'Midnight Blue', name2:'Indigo',       avoid:'Red',          why:'Water cools peak Fire — blues protect and recalibrate energy.' },
-  { month:'Aug', hex:'#0d9488', hex2:'#5eead4', name:'Teal',          name2:'Seafoam',      avoid:'Harsh Yellow', why:'Late summer — teal bridges Water and Wood for steady flow.' },
-  { month:'Sep', hex:'#92400e', hex2:'#d97706', name:'Bronze',        name2:'Tan',          avoid:'Bright Pink',  why:'Earth element harvests — bronze and tan call in abundance.' },
-  { month:'Oct', hex:'#6b7280', hex2:'#d1d5db', name:'Steel Gray',    name2:'Silver',       avoid:'Orange',       why:'Metal month sharpens — neutral tones keep you decisive.' },
-  { month:'Nov', hex:'#1c1917', hex2:'#374151', name:'Charcoal',      name2:'Dark Slate',   avoid:'Loud Prints',  why:'Water season deepens — dark colors protect inner energy.' },
-  { month:'Dec', hex:'#dc2626', hex2:'#fca5a5', name:'Scarlet',       name2:'Blush Red',    avoid:'Gray',         why:'Year-end Fire surge — reds call in celebration and luck.' },
+  { month:'Jan', hex:'#1e3a5f', hex2:'#3b6ea8', name:'Navy',          name2:'Steel Blue',  avoid:'Bright White', avoid_zh:'亮白色',    why:'Water feeds the Wood Snake — deep blues draw in flow and wisdom.',           why_zh:'水生木蛇——深蓝汲引流动与智慧之气。' },
+  { month:'Feb', hex:'#2d6a2d', hex2:'#52a452', name:'Forest Green',  name2:'Sage',         avoid:'Dull Gray',    avoid_zh:'暗灰色',    why:'Wood month: anchor the year in your element with grounding greens.',          why_zh:'木月，以深绿稳固根基，锚定全年能量。' },
+  { month:'Mar', hex:'#6d28d9', hex2:'#a78bfa', name:'Violet',        name2:'Lavender',     avoid:'Muddy Brown',  avoid_zh:'泥棕色',    why:'Spring Wood peaks — violet bridges earth and sky for growth.',                why_zh:'春木盛极——紫色桥接天地，助力生长。' },
+  { month:'Apr', hex:'#c2185b', hex2:'#f06292', name:'Crimson',       name2:'Rose',         avoid:'Black',        avoid_zh:'黑色',      why:'Fire energy rises — reds draw social magnetism and confidence.',              why_zh:'火气上升——红色凝聚社交魅力与自信之力。' },
+  { month:'May', hex:'#b45309', hex2:'#f59e0b', name:'Amber',         name2:'Ochre',        avoid:'Cold White',   avoid_zh:'冷白色',    why:'Earth month — warm yellows and ambers ground your energy.',                   why_zh:'土月——暖黄与琥珀稳固能量根基。' },
+  { month:'Jun', hex:'#9ca3af', hex2:'#e5e7eb', name:'Silver',        name2:'Pearl White',  avoid:'Neon Colors',  avoid_zh:'霓虹色',    why:'Metal energy sharpens — silver and white bring clarity.',                     why_zh:'金气锐利——银白带来清醒与澄明之境。' },
+  { month:'Jul', hex:'#1e40af', hex2:'#312e81', name:'Midnight Blue', name2:'Indigo',       avoid:'Red',          avoid_zh:'红色',      why:'Water cools peak Fire — blues protect and recalibrate energy.',               why_zh:'水凉顶火——蓝色守护并重新校准能量。' },
+  { month:'Aug', hex:'#0d9488', hex2:'#5eead4', name:'Teal',          name2:'Seafoam',      avoid:'Harsh Yellow', avoid_zh:'刺眼黄',    why:'Late summer — teal bridges Water and Wood for steady flow.',                  why_zh:'夏末青绿桥接水木，维持稳定流动之气。' },
+  { month:'Sep', hex:'#92400e', hex2:'#d97706', name:'Bronze',        name2:'Tan',          avoid:'Bright Pink',  avoid_zh:'亮粉色',    why:'Earth element harvests — bronze and tan call in abundance.',                  why_zh:'土旺收获之时——铜棕召唤丰盛入门。' },
+  { month:'Oct', hex:'#6b7280', hex2:'#d1d5db', name:'Steel Gray',    name2:'Silver',       avoid:'Orange',       avoid_zh:'橙色',      why:'Metal month sharpens — neutral tones keep you decisive.',                     why_zh:'金月锐利——中性色调保持清晰果断。' },
+  { month:'Nov', hex:'#1c1917', hex2:'#374151', name:'Charcoal',      name2:'Dark Slate',   avoid:'Loud Prints',  avoid_zh:'大印花',    why:'Water season deepens — dark colors protect inner energy.',                    why_zh:'水季加深——深色护持内在能量储备。' },
+  { month:'Dec', hex:'#dc2626', hex2:'#fca5a5', name:'Scarlet',       name2:'Blush Red',    avoid:'Gray',         avoid_zh:'灰色',      why:'Year-end Fire surge — reds call in celebration and luck.',                    why_zh:'年末火气上涌——红色召唤喜悦与好运。' },
 ];
 
 /* ── Lucky Foods per Element ── */
 const LUCKY_FOODS = {
   Wood:  {
-    eat:   ['Leafy greens', 'Bean sprouts', 'Lemon & lime', 'Liver (chicken)', 'Walnuts', 'Broccoli'],
-    avoid: ['Excess fried foods', 'Heavy dairy', 'Processed meats'],
-    power: 'Spirulina',
-    powerWhy: 'Concentrated chlorophyll directly feeds Wood energy — detoxifying and growth-boosting.',
+    eat:      ['Leafy greens', 'Bean sprouts', 'Lemon & lime', 'Liver (chicken)', 'Walnuts', 'Broccoli'],
+    eat_zh:   ['绿叶蔬菜', '豆芽', '柠檬青柠', '鸡肝', '核桃', '西兰花'],
+    avoid:    ['Excess fried foods', 'Heavy dairy', 'Processed meats'],
+    avoid_zh: ['过度油炸食物', '厚重乳制品', '加工肉类'],
+    power: 'Spirulina', power_zh: '螺旋藻',
+    powerWhy:    'Concentrated chlorophyll directly feeds Wood energy — detoxifying and growth-boosting.',
+    powerWhy_zh: '浓缩叶绿素直接滋养木元素——排毒促进生长。',
   },
   Fire:  {
-    eat:   ['Dark berries', 'Red peppers', 'Bitter greens', 'Dark chocolate (70%+)', 'Beets', 'Pomegranate'],
-    avoid: ['Alcohol', 'Cold drinks with ice', 'Excess spice'],
-    power: 'Pomegranate',
-    powerWhy: 'Loaded with antioxidants that protect Fire\'s most vulnerable organ — the heart.',
+    eat:      ['Dark berries', 'Red peppers', 'Bitter greens', 'Dark chocolate (70%+)', 'Beets', 'Pomegranate'],
+    eat_zh:   ['深色浆果', '红椒', '苦绿蔬', '黑巧克力（70%+）', '甜菜', '石榴'],
+    avoid:    ['Alcohol', 'Cold drinks with ice', 'Excess spice'],
+    avoid_zh: ['酒精', '加冰冷饮', '过度辛辣'],
+    power: 'Pomegranate', power_zh: '石榴',
+    powerWhy:    'Loaded with antioxidants that protect Fire\'s most vulnerable organ — the heart.',
+    powerWhy_zh: '富含抗氧化剂，守护火最脆弱的器官——心脏。',
   },
   Earth: {
-    eat:   ['Sweet potato', 'Millet', 'Raw honey', 'Pumpkin', 'Brown rice', 'Butternut squash'],
-    avoid: ['Refined sugar', 'Cold/raw foods in excess', 'Dairy excess'],
-    power: 'Turmeric',
-    powerWhy: 'Warms and supports Earth\'s spleen-stomach system — the center of your body\'s qi.',
+    eat:      ['Sweet potato', 'Millet', 'Raw honey', 'Pumpkin', 'Brown rice', 'Butternut squash'],
+    eat_zh:   ['红薯', '小米', '天然蜂蜜', '南瓜', '糙米', '牛油果南瓜'],
+    avoid:    ['Refined sugar', 'Cold/raw foods in excess', 'Dairy excess'],
+    avoid_zh: ['精制糖', '过度生冷食物', '乳制品过量'],
+    power: 'Turmeric', power_zh: '姜黄',
+    powerWhy:    'Warms and supports Earth\'s spleen-stomach system — the center of your body\'s qi.',
+    powerWhy_zh: '温暖并支撑土的脾胃系统——你身体气机的中枢。',
   },
   Metal: {
-    eat:   ['White radish (daikon)', 'Asian pear', 'Firm tofu', 'Cauliflower', 'Almonds', 'White sesame'],
-    avoid: ['Excess spicy food', 'Processed/packaged meat', 'Smoking'],
-    power: 'Ginger',
-    powerWhy: 'Warms Metal\'s lungs and improves respiratory qi — your body\'s chief weakness.',
+    eat:      ['White radish (daikon)', 'Asian pear', 'Firm tofu', 'Cauliflower', 'Almonds', 'White sesame'],
+    eat_zh:   ['白萝卜', '亚洲梨', '嫩豆腐', '花椰菜', '杏仁', '白芝麻'],
+    avoid:    ['Excess spicy food', 'Processed/packaged meat', 'Smoking'],
+    avoid_zh: ['过度辛辣', '加工包装肉类', '吸烟'],
+    power: 'Ginger', power_zh: '生姜',
+    powerWhy:    'Warms Metal\'s lungs and improves respiratory qi — your body\'s chief weakness.',
+    powerWhy_zh: '温暖金之肺气，改善呼吸之气——你身体最薄弱之处。',
   },
   Water: {
-    eat:   ['Black sesame seeds', 'Seafood', 'Walnuts', 'Black beans', 'Seaweed', 'Blueberries'],
-    avoid: ['Too much salt', 'Excess caffeine', 'Cold raw foods in winter'],
-    power: 'Miso',
-    powerWhy: 'Fermented salt — nourishes Water\'s kidneys and adrenals without overwhelming them.',
+    eat:      ['Black sesame seeds', 'Seafood', 'Walnuts', 'Black beans', 'Seaweed', 'Blueberries'],
+    eat_zh:   ['黑芝麻', '海鲜', '核桃', '黑豆', '海藻', '蓝莓'],
+    avoid:    ['Too much salt', 'Excess caffeine', 'Cold raw foods in winter'],
+    avoid_zh: ['过多盐分', '过量咖啡因', '冬季生冷食物'],
+    power: 'Miso', power_zh: '味噌',
+    powerWhy:    'Fermented salt — nourishes Water\'s kidneys and adrenals without overwhelming them.',
+    powerWhy_zh: '发酵盐——滋养水之肾脏与肾上腺，而不致过量。',
   },
 };
 
 /* ── Crystals per Element ── */
 const CRYSTALS = {
   Wood:  [
-    { name:'Green Aventurine', emoji:'🟢', effect:'Amplifies growth and opportunity windows',     carry:'Left wrist' },
-    { name:'Malachite',        emoji:'🌿', effect:'Breaks stuck patterns and drives change',      carry:'Pocket' },
-    { name:'Moss Agate',       emoji:'🪨', effect:'Builds slow, steady momentum and patience',   carry:'Desk or workspace' },
+    { name:'Green Aventurine', emoji:'🟢', effect:'Amplifies growth and opportunity windows',     effect_zh:'放大成长机遇窗口',         carry:'Left wrist',          carry_zh:'左手腕' },
+    { name:'Malachite',        emoji:'🌿', effect:'Breaks stuck patterns and drives change',      effect_zh:'打破困局，推动改变',         carry:'Pocket',              carry_zh:'口袋' },
+    { name:'Moss Agate',       emoji:'🪨', effect:'Builds slow, steady momentum and patience',   effect_zh:'积累缓慢稳定的势头与耐心',   carry:'Desk or workspace',   carry_zh:'书桌或工作区' },
   ],
   Fire:  [
-    { name:'Carnelian',        emoji:'🔴', effect:'Ignites motivation, courage, and passion',    carry:'Right pocket' },
-    { name:'Garnet',           emoji:'💎', effect:'Sustains vitality and long-term stamina',      carry:'Left wrist' },
-    { name:'Red Jasper',       emoji:'🧱', effect:'Grounds fiery energy — prevents burnout',     carry:'Desk' },
+    { name:'Carnelian',        emoji:'🔴', effect:'Ignites motivation, courage, and passion',    effect_zh:'点燃动力、勇气与热情',       carry:'Right pocket',        carry_zh:'右口袋' },
+    { name:'Garnet',           emoji:'💎', effect:'Sustains vitality and long-term stamina',      effect_zh:'维持活力与长期耐力',         carry:'Left wrist',          carry_zh:'左手腕' },
+    { name:'Red Jasper',       emoji:'🧱', effect:'Grounds fiery energy — prevents burnout',     effect_zh:'接地火焰能量，防止燃尽',     carry:'Desk',                carry_zh:'书桌' },
   ],
   Earth: [
-    { name:'Citrine',          emoji:'🌟', effect:'Attracts abundance and mental clarity',        carry:'Purse or wallet' },
-    { name:"Tiger's Eye",      emoji:'🐯', effect:'Builds decisive confidence under pressure',   carry:'Left wrist' },
-    { name:'Yellow Calcite',   emoji:'🪨', effect:'Dissolves self-doubt and indecision',         carry:'Pocket' },
+    { name:'Citrine',          emoji:'🌟', effect:'Attracts abundance and mental clarity',        effect_zh:'吸引丰盛与心智清晰',         carry:'Purse or wallet',     carry_zh:'钱包或手提包' },
+    { name:"Tiger's Eye",      emoji:'🐯', effect:'Builds decisive confidence under pressure',   effect_zh:'在压力下建立果断自信',       carry:'Left wrist',          carry_zh:'左手腕' },
+    { name:'Yellow Calcite',   emoji:'🪨', effect:'Dissolves self-doubt and indecision',         effect_zh:'化解自我怀疑与优柔寡断',     carry:'Pocket',              carry_zh:'口袋' },
   ],
   Metal: [
-    { name:'Clear Quartz',     emoji:'💠', effect:'Amplifies any intention you set clearly',     carry:'Anywhere' },
-    { name:'Selenite',         emoji:'🤍', effect:'Clears mental clutter — use it daily',        carry:'Bedside' },
-    { name:'Amethyst',         emoji:'💜', effect:'Disciplines overthinking, sharpens focus',    carry:'Left wrist' },
+    { name:'Clear Quartz',     emoji:'💠', effect:'Amplifies any intention you set clearly',     effect_zh:'放大任何你清晰设定的意图',   carry:'Anywhere',            carry_zh:'随处皆可' },
+    { name:'Selenite',         emoji:'🤍', effect:'Clears mental clutter — use it daily',        effect_zh:'清除心智杂乱——每日使用',     carry:'Bedside',             carry_zh:'床头' },
+    { name:'Amethyst',         emoji:'💜', effect:'Disciplines overthinking, sharpens focus',    effect_zh:'约束过度思虑，锐化专注',     carry:'Left wrist',          carry_zh:'左手腕' },
   ],
   Water: [
-    { name:'Lapis Lazuli',     emoji:'🔵', effect:'Deepens wisdom and activates insight',        carry:'Throat or chest' },
-    { name:'Sodalite',         emoji:'🫐', effect:'Sharpens intuition signals — trust your gut', carry:'Left pocket' },
-    { name:'Blue Lace Agate',  emoji:'🩵', effect:'Calms anxiety and smooths communication',    carry:'Left wrist' },
+    { name:'Lapis Lazuli',     emoji:'🔵', effect:'Deepens wisdom and activates insight',        effect_zh:'深化智慧，激活洞察',         carry:'Throat or chest',     carry_zh:'喉部或胸前' },
+    { name:'Sodalite',         emoji:'🫐', effect:'Sharpens intuition signals — trust your gut', effect_zh:'强化直觉信号——相信本能',     carry:'Left pocket',         carry_zh:'左口袋' },
+    { name:'Blue Lace Agate',  emoji:'🩵', effect:'Calms anxiety and smooths communication',    effect_zh:'平息焦虑，顺畅沟通',         carry:'Left wrist',          carry_zh:'左手腕' },
   ],
 };
 
 /* ── Morning Ritual per Element ── */
 const MORNING_RITUAL = {
   Wood: [
-    { step:1, icon:'🌅', title:'Face East at Sunrise', body:'Stand tall and face east — your element\'s direction. Breathe in for 4 counts, hold 2, out for 4. Do this for 3 minutes. Wood energy rises with the sun and you must rise with it.' },
-    { step:2, icon:'🍋', title:'Warm Lemon Water First', body:'Drink warm water with half a fresh lemon before any food, coffee, or phone. This activates Wood\'s liver-gallbladder detox cycle within 15 minutes of waking.' },
-    { step:3, icon:'✍️', title:'Write One Living Intention', body:'Not a to-do list. Write one sentence: what you will grow today. "Today I will deepen X" or "Today I will start Y." Wood energy requires direction or it stagnates.' },
+    { step:1, icon:'🌅', title:'Face East at Sunrise',    title_zh:'日出时朝向东方',
+      body:'Stand tall and face east — your element\'s direction. Breathe in for 4 counts, hold 2, out for 4. Do this for 3 minutes. Wood energy rises with the sun and you must rise with it.',
+      body_zh:'站直身体，面朝东方——你元素的方向。吸气4秒，屏息2秒，呼气4秒，持续3分钟。木气随日出而升，你亦须随之而起。' },
+    { step:2, icon:'🍋', title:'Warm Lemon Water First',  title_zh:'先饮温柠檬水',
+      body:'Drink warm water with half a fresh lemon before any food, coffee, or phone. This activates Wood\'s liver-gallbladder detox cycle within 15 minutes of waking.',
+      body_zh:'进食、喝咖啡或看手机前，先饮加半颗新鲜柠檬的温水。此举可在醒后15分钟内激活木之肝胆排毒周期。' },
+    { step:3, icon:'✍️', title:'Write One Living Intention', title_zh:'书写一个成长意图',
+      body:'Not a to-do list. Write one sentence: what you will grow today. "Today I will deepen X" or "Today I will start Y." Wood energy requires direction or it stagnates.',
+      body_zh:'不是待办清单——写一句话：今天你将培育什么。"今天我将深耕X"或"今天我将开启Y"。木能需要方向，否则会停滞。' },
   ],
   Fire: [
-    { step:1, icon:'☀️', title:'5 Minutes of Morning Light', body:'Get actual sunlight on your face within 30 minutes of waking. Step outside — no glass. Fire needs the sun to activate. Even 5 minutes on an overcast day counts.' },
-    { step:2, icon:'📣', title:'Say Your Biggest Goal Aloud', body:'Fire energy requires expression. Say your most important goal out loud — not in your head. Say it like you mean it. This activates Fire\'s heart-qi more than any journaling.' },
-    { step:3, icon:'🍳', title:'Eat a Warm Breakfast', body:'Cold food first thing dampens your Fire. Eggs, oats, congee, anything warm. Your digestive fire is most active at 7-9am — use it. Cold smoothies work against you.' },
+    { step:1, icon:'☀️', title:'5 Minutes of Morning Light', title_zh:'5分钟晨光浴',
+      body:'Get actual sunlight on your face within 30 minutes of waking. Step outside — no glass. Fire needs the sun to activate. Even 5 minutes on an overcast day counts.',
+      body_zh:'醒后30分钟内让阳光直射脸部。走到室外——不隔玻璃。火需要太阳来激活。即便阴天，5分钟也有效。' },
+    { step:2, icon:'📣', title:'Say Your Biggest Goal Aloud', title_zh:'大声说出你最大的目标',
+      body:'Fire energy requires expression. Say your most important goal out loud — not in your head. Say it like you mean it. This activates Fire\'s heart-qi more than any journaling.',
+      body_zh:'火能需要表达。大声说出你最重要的目标——不要只在脑中默想。要说得像你真心相信。这比任何日记更能激活火之心气。' },
+    { step:3, icon:'🍳', title:'Eat a Warm Breakfast', title_zh:'吃温热早餐',
+      body:'Cold food first thing dampens your Fire. Eggs, oats, congee, anything warm. Your digestive fire is most active at 7-9am — use it. Cold smoothies work against you.',
+      body_zh:'起床就吃冷食会抑制你的火气。鸡蛋、燕麦、粥品——任何温热的食物。你的消化之火在早上7-9点最旺——善加利用。' },
   ],
   Earth: [
-    { step:1, icon:'🦶', title:'Bare Feet on Ground First', body:'Before your phone — two minutes of bare feet on floor or ground. Earth element activates through physical contact with surfaces. This isn\'t metaphor; it resets your nervous system.' },
-    { step:2, icon:'🌅', title:'Breakfast Before Any Screen', body:'Earth\'s spleen-stomach qi peaks from 7-9am. Eat before checking messages, news, or email. You are most metabolically efficient right now — don\'t waste it on cortisol.' },
-    { step:3, icon:'💧', title:'One Act of Care', body:'Water a plant. Text someone "good morning" and mean it. Feed an animal. Earth energy activates through giving — it must flow outward to recharge inward. Do this before it\'s convenient.' },
+    { step:1, icon:'🦶', title:'Bare Feet on Ground First', title_zh:'先赤脚踩地',
+      body:'Before your phone — two minutes of bare feet on floor or ground. Earth element activates through physical contact with surfaces. This isn\'t metaphor; it resets your nervous system.',
+      body_zh:'先于手机之前——赤脚踩在地板或地面两分钟。土元素通过与地表的物理接触来激活。这并非比喻，它真实重置你的神经系统。' },
+    { step:2, icon:'🌅', title:'Breakfast Before Any Screen', title_zh:'先吃早餐再看屏幕',
+      body:'Earth\'s spleen-stomach qi peaks from 7-9am. Eat before checking messages, news, or email. You are most metabolically efficient right now — don\'t waste it on cortisol.',
+      body_zh:'土的脾胃气在早上7-9点最旺。先用餐，再查信息、新闻或邮件。此时你的代谢效率最高——不要浪费在皮质醇上。' },
+    { step:3, icon:'💧', title:'One Act of Care', title_zh:'做一件关怀之事',
+      body:'Water a plant. Text someone "good morning" and mean it. Feed an animal. Earth energy activates through giving — it must flow outward to recharge inward. Do this before it\'s convenient.',
+      body_zh:'浇一棵植物。真心地给某人发"早安"。喂一只动物。土能通过给予而激活——必须向外流动才能向内充电。在还不方便时就去做。' },
   ],
   Metal: [
-    { step:1, icon:'💧', title:'Cold Water Face Splash', body:'Splash cold water on your face 5-7 times immediately after waking. Metal sharpens through contrast. This activates the lung meridian (Metal\'s organ) and raises alertness faster than coffee.' },
-    { step:2, icon:'🎯', title:'State One Clear Goal', body:'Not "be productive" — one concrete, measurable goal. "Finish the report by noon." "Call Marcus before 10am." Metal energy flows through precision. Vague intentions waste it.' },
-    { step:3, icon:'🧹', title:'Tidy One Surface', body:'Clear your desk, your bedside, or your kitchen counter before leaving the room. Metal flows through order. A cluttered space creates static in your thinking all day.' },
+    { step:1, icon:'💧', title:'Cold Water Face Splash', title_zh:'冷水拍脸',
+      body:'Splash cold water on your face 5-7 times immediately after waking. Metal sharpens through contrast. This activates the lung meridian (Metal\'s organ) and raises alertness faster than coffee.',
+      body_zh:'醒来后立即用冷水拍脸5-7次。金通过对比而锐化。这比咖啡更快激活肺经（金的器官），提升清醒度。' },
+    { step:2, icon:'🎯', title:'State One Clear Goal', title_zh:'设定一个清晰目标',
+      body:'Not "be productive" — one concrete, measurable goal. "Finish the report by noon." "Call Marcus before 10am." Metal energy flows through precision. Vague intentions waste it.',
+      body_zh:'不是"要高效"——而是一个具体可量化的目标。"中午前完成报告。""上午10点前联系Marcus。"金能通过精确而流动，模糊的意图会消耗它。' },
+    { step:3, icon:'🧹', title:'Tidy One Surface', title_zh:'整理一个平面',
+      body:'Clear your desk, your bedside, or your kitchen counter before leaving the room. Metal flows through order. A cluttered space creates static in your thinking all day.',
+      body_zh:'离开房间前清理书桌、床头或厨房台面。金通过秩序流动。杂乱的空间会给你整天的思维造成干扰。' },
   ],
   Water: [
-    { step:1, icon:'🌑', title:'Sit in Quiet Darkness First', body:'Before any light or sound — five minutes of stillness. Sit on the edge of your bed in the dark. Water needs this stillness to surface what your subconscious processed overnight.' },
-    { step:2, icon:'📓', title:'Write 3 Lines — Don\'t Edit', body:'In a notebook, write whatever surfaces: feelings, images, fragments. No editing, no rereading. Water thinks through writing. Suppressing this creates the brain fog Water types often report.' },
-    { step:3, icon:'💧', title:'Room-Temperature Mineral Water', body:'Your kidneys (Water\'s organs) processed everything overnight. Drink room-temperature mineral water — not cold, not filtered tap — before coffee. Support your kidneys first.' },
+    { step:1, icon:'🌑', title:'Sit in Quiet Darkness First', title_zh:'先在静暗中独坐',
+      body:'Before any light or sound — five minutes of stillness. Sit on the edge of your bed in the dark. Water needs this stillness to surface what your subconscious processed overnight.',
+      body_zh:'在任何光线或声音之前——五分钟的静默。坐在黑暗中床沿。水需要这份静默，让潜意识夜间处理的内容浮现。' },
+    { step:2, icon:'📓', title:'Write 3 Lines — Don\'t Edit', title_zh:'写三行——不要修改',
+      body:'In a notebook, write whatever surfaces: feelings, images, fragments. No editing, no rereading. Water thinks through writing. Suppressing this creates the brain fog Water types often report.',
+      body_zh:'在笔记本上写下浮现的任何内容：感受、意象、碎片。不修改，不重读。水通过书写思考。压抑这一过程会造成水型人常有的脑雾。' },
+    { step:3, icon:'💧', title:'Room-Temperature Mineral Water', title_zh:'饮室温矿泉水',
+      body:'Your kidneys (Water\'s organs) processed everything overnight. Drink room-temperature mineral water — not cold, not filtered tap — before coffee. Support your kidneys first.',
+      body_zh:'你的肾脏（水的器官）整夜运转。在喝咖啡前先饮室温矿泉水——不要冰的，不要普通过滤水。先滋养肾脏。' },
   ],
 };
 
 /* ── Kua Directions ── */
 const KUA_DIRS = {
-  1: { dir:'North',     zh:'北', compass:'N',  angle:0,   color:'#3b82f6', desc:'Aligns with career, wisdom, and life-path energy.' },
-  2: { dir:'Southwest', zh:'西南', compass:'SW', angle:225, color:'#f59e0b', desc:'Grounds relationships, nurturing, and home.' },
-  3: { dir:'East',      zh:'东', compass:'E',  angle:90,  color:'#22c55e', desc:'Channels vitality, growth, and fresh starts.' },
-  4: { dir:'Southeast', zh:'东南', compass:'SE', angle:135, color:'#10b981', desc:'Activates wealth, communication, and abundance.' },
-  6: { dir:'Northwest', zh:'西北', compass:'NW', angle:315, color:'#94a3b8', desc:'Draws in mentors, authority, and leadership.' },
-  7: { dir:'West',      zh:'西', compass:'W',  angle:270, color:'#ec4899', desc:'Enhances joy, creativity, and connection.' },
-  8: { dir:'Northeast', zh:'东北', compass:'NE', angle:45,  color:'#a78bfa', desc:'Sharpens knowledge, stillness, and discernment.' },
-  9: { dir:'South',     zh:'南', compass:'S',  angle:180, color:'#ef4444', desc:'Amplifies recognition, fame, and social energy.' },
+  1: { dir:'North',     zh:'北',   compass:'N',  angle:0,   color:'#3b82f6', desc:'Aligns with career, wisdom, and life-path energy.',       desc_zh:'与事业、智慧、人生道路的能量对齐。' },
+  2: { dir:'Southwest', zh:'西南', compass:'SW', angle:225, color:'#f59e0b', desc:'Grounds relationships, nurturing, and home.',               desc_zh:'稳固情感、滋养之气与家庭根基。' },
+  3: { dir:'East',      zh:'东',   compass:'E',  angle:90,  color:'#22c55e', desc:'Channels vitality, growth, and fresh starts.',             desc_zh:'汇聚生命力、成长与新开始之气。' },
+  4: { dir:'Southeast', zh:'东南', compass:'SE', angle:135, color:'#10b981', desc:'Activates wealth, communication, and abundance.',          desc_zh:'激活财富、沟通与丰盛能量。' },
+  6: { dir:'Northwest', zh:'西北', compass:'NW', angle:315, color:'#94a3b8', desc:'Draws in mentors, authority, and leadership.',             desc_zh:'招引贵人、权威与领导力量。' },
+  7: { dir:'West',      zh:'西',   compass:'W',  angle:270, color:'#ec4899', desc:'Enhances joy, creativity, and connection.',                desc_zh:'增进喜悦、创意与人际连结。' },
+  8: { dir:'Northeast', zh:'东北', compass:'NE', angle:45,  color:'#a78bfa', desc:'Sharpens knowledge, stillness, and discernment.',          desc_zh:'磨砺知识、静定与洞察力。' },
+  9: { dir:'South',     zh:'南',   compass:'S',  angle:180, color:'#ef4444', desc:'Amplifies recognition, fame, and social energy.',          desc_zh:'放大声誉、名望与社交能量。' },
 };
 
 /* ── Life Decade Theme Colors per Element ── */
 const DECADE_THEMES = {
   Wood:  [
-    { phase:'Plant',   emoji:'🌱', note:'Foundation years. Build without expecting harvest yet.' },
-    { phase:'Grow',    emoji:'🌿', note:'Momentum builds. Compound effort now.' },
-    { phase:'Bloom',   emoji:'🌸', note:'Peak expression. Visibility and recognition come.' },
-    { phase:'Harvest', emoji:'🌾', note:'Reap what you cultivated. Teach and share.' },
-    { phase:'Rest',    emoji:'🍂', note:'Let go gracefully. Your roots sustain others.' },
+    { phase:'Plant',   phase_zh:'播种', emoji:'🌱', note:'Foundation years. Build without expecting harvest yet.',       note_zh:'奠基之年，播种耕耘，无需急于收获。' },
+    { phase:'Grow',    phase_zh:'生长', emoji:'🌿', note:'Momentum builds. Compound effort now.',                        note_zh:'势头累积，此时复利耕耘效果最佳。' },
+    { phase:'Bloom',   phase_zh:'绽放', emoji:'🌸', note:'Peak expression. Visibility and recognition come.',            note_zh:'巅峰绽放，能见度与认可纷至沓来。' },
+    { phase:'Harvest', phase_zh:'收获', emoji:'🌾', note:'Reap what you cultivated. Teach and share.',                   note_zh:'收获所耕，传授分享。' },
+    { phase:'Rest',    phase_zh:'休养', emoji:'🍂', note:'Let go gracefully. Your roots sustain others.',                note_zh:'从容放手，你的根仍在滋养他人。' },
   ],
   Fire:  [
-    { phase:'Spark',   emoji:'✨', note:'Raw potential ignites. Take risks — this is the time.' },
-    { phase:'Ignite',  emoji:'🔥', note:'Ambition peaks. Pursue boldly, pace carefully.' },
-    { phase:'Blaze',   emoji:'☀️', note:'Maximum output and impact. Lead, create, shine.' },
-    { phase:'Ember',   emoji:'🕯️', note:'Deep warmth over flashy heat. Mentor others.' },
-    { phase:'Return',  emoji:'🌑', note:'Fire returns to soil. Your heat fuels the next cycle.' },
+    { phase:'Spark',   phase_zh:'点火', emoji:'✨', note:'Raw potential ignites. Take risks — this is the time.',        note_zh:'原始潜能点燃，冒险此刻当时。' },
+    { phase:'Ignite',  phase_zh:'燃起', emoji:'🔥', note:'Ambition peaks. Pursue boldly, pace carefully.',              note_zh:'雄心顶峰，大胆追求，节奏需稳。' },
+    { phase:'Blaze',   phase_zh:'烈焰', emoji:'☀️', note:'Maximum output and impact. Lead, create, shine.',             note_zh:'最大产出与影响力，领导、创造、发光。' },
+    { phase:'Ember',   phase_zh:'余烬', emoji:'🕯️', note:'Deep warmth over flashy heat. Mentor others.',               note_zh:'以深沉温暖代替耀眼热度，成为他人的导师。' },
+    { phase:'Return',  phase_zh:'回归', emoji:'🌑', note:'Fire returns to soil. Your heat fuels the next cycle.',       note_zh:'火归于土，你的热量滋养下一个循环。' },
   ],
   Earth: [
-    { phase:'Till',    emoji:'⛏️', note:'Prepare the ground. Hard, invisible, necessary work.' },
-    { phase:'Sow',     emoji:'🌰', note:'Plant intentionally. Not everything — the right things.' },
-    { phase:'Tend',    emoji:'🌻', note:'Consistent care over dramatic action. Trust the process.' },
-    { phase:'Reap',    emoji:'🧺', note:'Abundance arrives. Share generously — Earth replenishes.' },
-    { phase:'Compost', emoji:'♻️', note:'Transform experience into wisdom. Enrich what comes next.' },
+    { phase:'Till',    phase_zh:'耕耘', emoji:'⛏️', note:'Prepare the ground. Hard, invisible, necessary work.',        note_zh:'准备土壤，艰辛而隐形，但不可或缺。' },
+    { phase:'Sow',     phase_zh:'播种', emoji:'🌰', note:'Plant intentionally. Not everything — the right things.',     note_zh:'有意识地播种，不求量多——只种对的事。' },
+    { phase:'Tend',    phase_zh:'培育', emoji:'🌻', note:'Consistent care over dramatic action. Trust the process.',    note_zh:'持续呵护胜于大动作，相信过程。' },
+    { phase:'Reap',    phase_zh:'收获', emoji:'🧺', note:'Abundance arrives. Share generously — Earth replenishes.',    note_zh:'丰盛到来，慷慨分享——土元素自会补给。' },
+    { phase:'Compost', phase_zh:'转化', emoji:'♻️', note:'Transform experience into wisdom. Enrich what comes next.',  note_zh:'将经历化为智慧，为下一阶段注入养分。' },
   ],
   Metal: [
-    { phase:'Mine',    emoji:'⛏️', note:'Excavate raw talent. Dig deep into what you\'re made of.' },
-    { phase:'Refine',  emoji:'🔩', note:'Remove impurities. Develop mastery, shed distraction.' },
-    { phase:'Forge',   emoji:'⚒️', note:'Peak precision. Your skills become your identity.' },
-    { phase:'Polish',  emoji:'💎', note:'Excellence recognized. Let others see the work.' },
-    { phase:'Archive', emoji:'📚', note:'Your legacy crystallizes. Preserve and pass it down.' },
+    { phase:'Mine',    phase_zh:'挖掘', emoji:'⛏️', note:'Excavate raw talent. Dig deep into what you\'re made of.',   note_zh:'挖掘原始天赋，深探你的本质所在。' },
+    { phase:'Refine',  phase_zh:'提炼', emoji:'🔩', note:'Remove impurities. Develop mastery, shed distraction.',      note_zh:'去除杂质，精炼技艺，舍弃干扰。' },
+    { phase:'Forge',   phase_zh:'锻造', emoji:'⚒️', note:'Peak precision. Your skills become your identity.',          note_zh:'精准顶峰，技艺成为你的身份标识。' },
+    { phase:'Polish',  phase_zh:'抛光', emoji:'💎', note:'Excellence recognized. Let others see the work.',            note_zh:'卓越获认可，让他人看见你的成就。' },
+    { phase:'Archive', phase_zh:'传承', emoji:'📚', note:'Your legacy crystallizes. Preserve and pass it down.',       note_zh:'遗产结晶，保存并传承下去。' },
   ],
   Water: [
-    { phase:'Source',  emoji:'💧', note:'Still and deep. Gather before you flow.' },
-    { phase:'Flow',    emoji:'🌊', note:'Movement gains power. Follow your natural course.' },
-    { phase:'Deepen',  emoji:'🌀', note:'Wisdom accumulates. Others seek your depth.' },
-    { phase:'Still',   emoji:'🏞️', note:'Mastery is quiet. True depth needs no performance.' },
-    { phase:'Return',  emoji:'🌧️', note:'Experience cycles back. You become the source.' },
+    { phase:'Source',  phase_zh:'源头', emoji:'💧', note:'Still and deep. Gather before you flow.',                    note_zh:'静而深邃，蓄积于内，方能流动。' },
+    { phase:'Flow',    phase_zh:'流动', emoji:'🌊', note:'Movement gains power. Follow your natural course.',          note_zh:'流动积蓄力量，顺势而为，走自己的路。' },
+    { phase:'Deepen',  phase_zh:'深化', emoji:'🌀', note:'Wisdom accumulates. Others seek your depth.',               note_zh:'智慧积淀，他人慕你之深邃而来。' },
+    { phase:'Still',   phase_zh:'沉静', emoji:'🏞️', note:'Mastery is quiet. True depth needs no performance.',        note_zh:'精通归于平静，真正的深度无需表演。' },
+    { phase:'Return',  phase_zh:'归源', emoji:'🌧️', note:'Experience cycles back. You become the source.',            note_zh:'经历轮回，你已成为源头。' },
   ],
 };
 
@@ -2510,7 +2562,7 @@ function renderTodayActionsCard(dominantEl, nowMonth) {
     <div class="today-actions-card" style="border-left-color:${elColor}">
       ${itemsHTML}
       <button class="tap-actions-link" onclick="haptic(6); switchTab('actions')">
-        See full Action Plan — outfit, foods, rituals, lucky numbers →
+        ${_t('See full Action Plan — outfit, foods, rituals, lucky numbers →', '查看完整行动计划——穿搭、饮食、仪式、幸运数字 →')}
       </button>
     </div>
   `;
@@ -2536,25 +2588,25 @@ function renderOutfitSection(dominantEl, nowMonth) {
           <span class="outfit-swatch-name">${m.name2}</span>
         </div>
       </div>
-      ${m.isCurrent ? `<div class="outfit-why">${m.why}</div>` : ''}
-      <div class="outfit-avoid">Avoid: ${m.avoid}</div>
+      ${m.isCurrent ? `<div class="outfit-why">${_t(m.why, m.why_zh)}</div>` : ''}
+      <div class="outfit-avoid">${_t('Avoid','忌穿')}: ${_t(m.avoid, m.avoid_zh)}</div>
     </div>
   `).join('');
 
   // Element-based always-wear tip
   const elTips = {
-    Wood:  'Always: weave in green accessories — even one item anchors your element.',
-    Fire:  'Always: one red or orange accent draws your qi outward into action.',
-    Earth: 'Always: warm neutrals (cream, tan, amber) keep you grounded and magnetic.',
-    Metal: 'Always: clean lines and silver/white tones sharpen your natural precision.',
-    Water: 'Always: deep blues and blacks protect your energy in public settings.',
+    Wood:  ['Always: weave in green accessories — even one item anchors your element.', '常备：佩戴绿色配饰——哪怕一件也能锚定你的元素能量。'],
+    Fire:  ['Always: one red or orange accent draws your qi outward into action.',      '常备：一件红色或橙色点缀，将气机向外引向行动。'],
+    Earth: ['Always: warm neutrals (cream, tan, amber) keep you grounded and magnetic.','常备：暖中性色（米色、棕褐、琥珀）令你沉稳而有磁场。'],
+    Metal: ['Always: clean lines and silver/white tones sharpen your natural precision.','常备：简洁线条与银白色调，磨砺你天生的精准之气。'],
+    Water: ['Always: deep blues and blacks protect your energy in public settings.',     '常备：深蓝与黑色在公共场合守护你的能量。'],
   };
 
   document.getElementById('outfit-card').innerHTML = `
     <div class="outfit-card">
       <div class="outfit-months-row">${monthCards}</div>
       <div class="outfit-el-tip" style="border-left-color:${elColor}">
-        <span class="outfit-el-icon">✦ ${dominantEl} Element</span> — ${elTips[dominantEl]}
+        <span class="outfit-el-icon">✦ ${_t(dominantEl + ' Element', dominantEl + ' 元素')}</span> — ${_t(elTips[dominantEl][0], elTips[dominantEl][1])}
       </div>
     </div>
   `;
@@ -2581,11 +2633,11 @@ function renderLuckyNumbers(year, month, day, animal, dominantEl) {
   document.getElementById('lucky-num-card').innerHTML = `
     <div class="lucky-num-card">
       <div class="lucky-num-section">
-        <div class="lucky-num-label">Your Personal Numbers</div>
+        <div class="lucky-num-label">${_t('Your Personal Numbers', '你的专属数字')}</div>
         <div class="lucky-num-balls">${ballsHTML}</div>
       </div>
       <div class="lucky-num-section">
-        <div class="lucky-num-label">Lottery Pick <span class="lottery-label-sub">tap to regenerate</span></div>
+        <div class="lucky-num-label">${_t('Lottery Pick', '彩票选号')} <span class="lottery-label-sub">${_t('tap to regenerate', '点击重新生成')}</span></div>
         <div class="lottery-balls" id="lottery-balls-wrap">
           ${genLottery().map(n => `<div class="lottery-ball">${n}</div>`).join('')}
         </div>
@@ -2628,8 +2680,8 @@ function renderAuspiciousDates(animal, dominantEl) {
 
   const legendHTML = `
     <div class="cal-legend">
-      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power" style="background:${elColor}"></div> Power Day</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-good"></div> Lucky Day</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power" style="background:${elColor}"></div> ${_t('Power Day', '吉日')}</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-good"></div> ${_t('Lucky Day', '幸运日')}</div>
     </div>
   `;
 
@@ -2642,7 +2694,7 @@ function renderAuspiciousDates(animal, dominantEl) {
         ${days}
       </div>
       ${legendHTML}
-      <div class="cal-note">Power Days align your dominant element with the most supportive monthly qi. Schedule launches, asks, and key conversations on these dates.</div>
+      <div class="cal-note">${_t('Power Days align your dominant element with the most supportive monthly qi. Schedule launches, asks, and key conversations on these dates.', '吉日是你主导五行与月度气场最契合之时。将启动、提案、关键对话安排在这些日子，事半功倍。')}</div>
     </div>
   `;
 }
@@ -2653,11 +2705,11 @@ function renderLuckyFoods(dominantEl) {
   const foods = LUCKY_FOODS[dominantEl];
   if (!foods) return;
 
-  const eatChips = foods.eat.map(f =>
-    `<div class="food-chip food-eat">${f}</div>`
+  const eatChips = foods.eat.map((f,i) =>
+    `<div class="food-chip food-eat">${_t(f, foods.eat_zh?.[i])}</div>`
   ).join('');
-  const avoidChips = foods.avoid.map(f =>
-    `<div class="food-chip food-avoid">${f}</div>`
+  const avoidChips = foods.avoid.map((f,i) =>
+    `<div class="food-chip food-avoid">${_t(f, foods.avoid_zh?.[i])}</div>`
   ).join('');
 
   document.getElementById('foods-card').innerHTML = `
@@ -2665,17 +2717,17 @@ function renderLuckyFoods(dominantEl) {
       <div class="food-power-card" style="border-left-color:${elColor}">
         <div class="food-power-icon">⚡</div>
         <div>
-          <div class="food-power-label">Power Food · ${dominantEl} Element</div>
-          <div class="food-power-name">${foods.power}</div>
-          <div class="food-power-why">${foods.powerWhy}</div>
+          <div class="food-power-label">${_t('Power Food · ' + dominantEl + ' Element', '核心食物 · ' + dominantEl + '元素')}</div>
+          <div class="food-power-name">${_t(foods.power, foods.power_zh)}</div>
+          <div class="food-power-why">${_t(foods.powerWhy, foods.powerWhy_zh)}</div>
         </div>
       </div>
       <div class="food-section">
-        <div class="food-section-label" style="color:${elColor}">↑ Eat More</div>
+        <div class="food-section-label" style="color:${elColor}">${_t('↑ Eat More', '↑ 多吃')}</div>
         <div class="food-chips-row">${eatChips}</div>
       </div>
       <div class="food-section">
-        <div class="food-section-label" style="color:#f87171">↓ Limit or Avoid</div>
+        <div class="food-section-label" style="color:#f87171">${_t('↓ Limit or Avoid', '↓ 少吃或避免')}</div>
         <div class="food-chips-row">${avoidChips}</div>
       </div>
     </div>
@@ -2693,8 +2745,8 @@ function renderCrystals(dominantEl) {
       <div class="crystal-emoji">${s.emoji}</div>
       <div class="crystal-info">
         <div class="crystal-name">${s.name}</div>
-        <div class="crystal-effect">${s.effect}</div>
-        <div class="crystal-carry-badge">Carry: ${s.carry}</div>
+        <div class="crystal-effect">${_t(s.effect, s.effect_zh)}</div>
+        <div class="crystal-carry-badge">${_t('Carry', '携带')}: ${_t(s.carry, s.carry_zh)}</div>
       </div>
     </div>
   `).join('');
@@ -2715,8 +2767,8 @@ function renderMorningRitual(dominantEl) {
       <div class="ritual-step-num" style="color:${elColor}">${s.step}</div>
       <div class="ritual-step-body">
         <div class="ritual-step-icon">${s.icon}</div>
-        <div class="ritual-step-title">${s.title}</div>
-        <div class="ritual-step-text">${s.body}</div>
+        <div class="ritual-step-title">${_t(s.title, s.title_zh)}</div>
+        <div class="ritual-step-text">${_t(s.body, s.body_zh)}</div>
       </div>
     </div>
   `).join('');
@@ -2764,9 +2816,9 @@ function renderKuaSection(kua, dominantEl) {
       </div>
       <div class="kua-info">
         <div class="kua-dir-name" style="color:${dirColor}">${kuaData.dir} · ${kuaData.zh}</div>
-        <div class="kua-dir-label">Your optimal sleep direction</div>
-        <div class="kua-dir-desc">${kuaData.desc}</div>
-        <div class="kua-tip">Point the top of your head toward <strong>${kuaData.dir}</strong> when sleeping. Even approximate alignment activates this qi.</div>
+        <div class="kua-dir-label">${_t('Your optimal sleep direction', '你的最佳睡眠方向')}</div>
+        <div class="kua-dir-desc">${_t(kuaData.desc, kuaData.desc_zh)}</div>
+        <div class="kua-tip">${_t('Point the top of your head toward', '睡眠时头顶朝向')} <strong>${_t(kuaData.dir, kuaData.zh)}</strong>${_t(' when sleeping. Even approximate alignment activates this qi.', '。即使大致对齐也能激活此气场。')}</div>
       </div>
     </div>
   `;
@@ -2787,9 +2839,9 @@ function renderLifeDecades(year, dominantEl) {
     return `
       <div class="decade-block${isCurrent ? ' decade-current' : ''}" style="${isCurrent ? `border-color:${elColor};` : ''}">
         <div class="decade-emoji">${t.emoji}</div>
-        <div class="decade-phase" style="${isCurrent ? `color:${elColor}` : ''}">${t.phase}</div>
-        <div class="decade-age">Age ${startAge}–${endAge}</div>
-        ${isCurrent ? `<div class="decade-note">${t.note}</div>` : ''}
+        <div class="decade-phase" style="${isCurrent ? `color:${elColor}` : ''}">${_t(t.phase, t.phase_zh)}</div>
+        <div class="decade-age">${_t('Age', '年龄')} ${startAge}–${endAge}</div>
+        ${isCurrent ? `<div class="decade-note">${_t(t.note, t.note_zh)}</div>` : ''}
       </div>
     `;
   }).join('');
@@ -2798,8 +2850,8 @@ function renderLifeDecades(year, dominantEl) {
     <div class="decades-card">
       <div class="decades-bar">${blocks}</div>
       <div class="decade-current-detail">
-        <span style="color:${elColor}">You are in the <strong>${themes[currentDecadeIdx].phase}</strong> phase</span> (age ~${currentDecadeIdx*14}–${currentDecadeIdx*14+13}).
-        <span class="decade-note-text">${themes[currentDecadeIdx].note}</span>
+        <span style="color:${elColor}">${_t('You are in the', '你正处于')} <strong>${_t(themes[currentDecadeIdx].phase, themes[currentDecadeIdx].phase_zh)}</strong> ${_t('phase', '阶段')}</span> (${_t('age','年龄')} ~${currentDecadeIdx*14}–${currentDecadeIdx*14+13}).
+        <span class="decade-note-text">${_t(themes[currentDecadeIdx].note, themes[currentDecadeIdx].note_zh)}</span>
       </div>
     </div>
   `;
