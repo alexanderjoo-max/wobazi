@@ -83,6 +83,9 @@ input  { font-family: inherit; }
 }
 
 .logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.logo-vert { width: 130px; height: auto; }
+.nav-logo { height: 22px; width: auto; display: block; flex-shrink: 0; }
+.header-left { display: flex; align-items: center; gap: 12px; }
 
 .logo-chinese {
   font-family: 'Noto Sans SC', sans-serif;
@@ -3120,4 +3123,103 @@ input  { font-family: inherit; }
   color: rgba(240,240,255,0.45) !important;
   line-height: 1.7 !important;
   margin: 0 !important;
+}
+
+/* ── Life Areas (Today tab) ── */
+.life-areas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.life-area-tile {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-align: center;
+}
+.la-icon { font-size: 20px; line-height: 1; }
+.la-name {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--muted);
+}
+.la-status { font-size: 12px; font-weight: 700; }
+
+/* ── Insight Cards (Today tab) ── */
+.insight-cards { display: flex; flex-direction: column; gap: 10px; }
+.insight-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.insight-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.insight-text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(240,240,255,0.85);
+}
+
+/* ── Actions Preview Card (Today tab) ── */
+.actions-preview-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+}
+.actions-preview-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.actions-preview-title { font-size: 14px; font-weight: 700; }
+.btn-see-all {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 600;
+  padding: 0;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+.btn-see-all:hover { opacity: 1; }
+
+/* ── You Profile Header ── */
+.you-profile-card {
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid;
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.you-profile-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+}
+.you-profile-identity {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.you-profile-badge {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid var(--border);
 }

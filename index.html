@@ -38,9 +38,8 @@
     <div class="stars" id="stars"></div>
     <div class="splash-content">
       <div class="logo-wrap">
-        <div class="logo-chinese">八字</div>
-        <h1 class="logo-text">wobazi</h1>
-        <p class="logo-sub"><span class="en">Chinese Destiny Engine</span><span class="zh hide">中国命运引擎</span></p>
+        <img src="Logos/SVG/rev-vert.svg" class="logo-vert" alt="Wobazi">
+        <p class="logo-sub"><span class="en">Chinese Destiny System</span><span class="zh hide">中国命运系统</span></p>
       </div>
       <p class="splash-tagline"><span class="en">Decode your fate through the ancient<br>art of the Four Pillars</span><span class="zh hide">通过八字古法<br>解码你的命运</span></p>
       <button class="btn-lang splash-lang-btn" onclick="toggleLang()">中文</button>
@@ -58,7 +57,7 @@
       <button class="btn-back" onclick="haptic(8); showScreen(_prevAboutFrom || 'splash')">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
-      <span class="nav-title">What is Bāzì?</span>
+      <img src="Logos/SVG/rev-horiz.svg" class="nav-logo" alt="Wobazi">
       <div style="width:40px"></div>
     </div>
 
@@ -451,7 +450,7 @@
       <button class="btn-back" onclick="haptic(8); showScreen('splash')">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
-      <span class="nav-title"><span class="en">Birth Chart</span><span class="zh hide">出生命盘</span></span>
+      <img src="Logos/SVG/rev-horiz.svg" class="nav-logo" alt="Wobazi">
       <div style="width:40px"></div>
     </div>
     <div class="input-body">
@@ -533,7 +532,10 @@
   <!-- RESULTS -->
   <div id="results" class="screen">
     <div class="results-header">
-      <div id="greeting" class="greeting"></div>
+      <div class="header-left">
+        <img src="Logos/SVG/rev-horiz.svg" class="nav-logo" alt="Wobazi">
+        <div id="greeting" class="greeting"></div>
+      </div>
       <div class="header-actions">
         <button class="btn-about-icon" onclick="haptic(6); showAbout()">What is Bāzì?</button>
         <button class="btn-share-icon" id="share-btn" onclick="haptic(8); showShareCard()" title="Share">
@@ -545,9 +547,9 @@
 
     <div class="results-tab-bar">
       <div class="tab-bar-inner">
-        <button class="tab-btn active" id="tab-btn-fortune" onclick="haptic(6); switchTab('fortune')"><span class="en">Fortune</span><span class="zh hide">运势</span></button>
-        <button class="tab-btn" id="tab-btn-personality" onclick="haptic(6); switchTab('personality')"><span class="en">Personality</span><span class="zh hide">性格</span></button>
+        <button class="tab-btn active" id="tab-btn-today" onclick="haptic(6); switchTab('today')"><span class="en">Today</span><span class="zh hide">今日</span></button>
         <button class="tab-btn" id="tab-btn-actions" onclick="haptic(6); switchTab('actions')"><span class="en">Actions</span><span class="zh hide">行动</span></button>
+        <button class="tab-btn" id="tab-btn-you" onclick="haptic(6); switchTab('you')"><span class="en">You</span><span class="zh hide">你</span></button>
       </div>
     </div>
 
@@ -576,18 +578,13 @@
         <div id="trait-pills" style="display:none"></div>
       </section>
 
-      <!-- 2026 Annual Forecast -->
-      <section class="section" data-tab="fortune">
-        <div class="section-head" data-tip="forecast-2026">
-          <h3 class="en">2026 Forecast</h3>
-          <h3 class="zh hide">2026年运势</h3>
-          <span class="section-sub">丙午 · Fire Horse</span>
-        </div>
-        <div id="forecast-card"></div>
+      <!-- You: Profile Header -->
+      <section class="section" data-tab="you" id="you-profile-section">
+        <div id="you-profile-header"></div>
       </section>
 
       <!-- Daily Fortune -->
-      <section class="section" data-tab="fortune">
+      <section class="section" data-tab="today">
         <div class="section-head" data-tip="daily-fortune">
           <h3 class="en">Today's Fortune</h3>
           <h3 class="zh hide">今日运势</h3>
@@ -596,8 +593,48 @@
         <div id="daily-card"></div>
       </section>
 
+      <!-- Today: Life Areas -->
+      <section class="section" data-tab="today">
+        <div class="section-head">
+          <h3 class="en">Life Areas</h3>
+          <h3 class="zh hide">生活领域</h3>
+          <span class="section-sub"><span class="en">Today's status</span><span class="zh hide">今日状态</span></span>
+        </div>
+        <div class="life-areas-grid" id="life-areas-grid"></div>
+      </section>
+
+      <!-- Today: Insights -->
+      <section class="section" data-tab="today">
+        <div class="section-head">
+          <h3 class="en">Insights</h3>
+          <h3 class="zh hide">洞察</h3>
+        </div>
+        <div class="insight-cards" id="insight-cards"></div>
+      </section>
+
+      <!-- Today: Actions Preview -->
+      <section class="section" data-tab="today">
+        <div class="actions-preview-card">
+          <div class="actions-preview-top">
+            <div class="actions-preview-title"><span class="en">Top 3 Actions Today</span><span class="zh hide">今日3项行动</span></div>
+            <button class="btn-see-all" onclick="haptic(6); switchTab('actions')"><span class="en">Full plan →</span><span class="zh hide">完整计划 →</span></button>
+          </div>
+          <div id="actions-preview-list"></div>
+        </div>
+      </section>
+
+      <!-- 2026 Annual Forecast -->
+      <section class="section" data-tab="today">
+        <div class="section-head" data-tip="forecast-2026">
+          <h3 class="en">2026 Forecast</h3>
+          <h3 class="zh hide">2026年运势</h3>
+          <span class="section-sub">丙午 · Fire Horse</span>
+        </div>
+        <div id="forecast-card"></div>
+      </section>
+
       <!-- Today's Action Plan (compact summary) -->
-      <section class="section" data-tab="fortune" id="today-actions-section">
+      <section class="section" data-tab="actions" id="today-actions-section">
         <div class="section-head">
           <h3 class="en">Today's Action Plan</h3>
           <h3 class="zh hide">今日行动计划</h3>
@@ -607,7 +644,7 @@
       </section>
 
       <!-- Love & Relationships -->
-      <section class="section" data-tab="fortune">
+      <section class="section" data-tab="today">
         <div class="section-head" data-tip="love-section">
           <h3 class="en">Love &amp; Relationships</h3>
           <h3 class="zh hide">爱情与关系</h3>
@@ -617,7 +654,7 @@
       </section>
 
       <!-- Work & Career -->
-      <section class="section" data-tab="fortune">
+      <section class="section" data-tab="today">
         <div class="section-head" data-tip="work-section">
           <h3 class="en">Work &amp; Career</h3>
           <h3 class="zh hide">事业运势</h3>
@@ -632,7 +669,7 @@
       </section>
 
       <!-- Four Pillars -->
-      <section class="section" data-tab="personality">
+      <section class="section" data-tab="you">
         <div class="section-head" data-tip="four-pillars">
           <h3 class="en">Four Pillars</h3>
           <h3 class="zh hide">四柱</h3>
@@ -642,7 +679,7 @@
       </section>
 
       <!-- Element Balance -->
-      <section class="section" data-tab="personality">
+      <section class="section" data-tab="you">
         <div class="section-head" data-tip="element-balance">
           <h3 class="en">Element Balance</h3>
           <h3 class="zh hide">五行平衡</h3>
@@ -656,7 +693,7 @@
       </section>
 
       <!-- Fortune -->
-      <section class="section" data-tab="fortune">
+      <section class="section" data-tab="you">
         <div class="section-head" data-tip="fortune-cards">
           <h3 class="en">Life Fortune</h3>
           <h3 class="zh hide">命运</h3>
@@ -686,7 +723,7 @@
       </section>
 
       <!-- Auspicious Power Days -->
-      <section class="section" data-tab="fortune" data-tip="power-days">
+      <section class="section" data-tab="actions" data-tip="power-days">
         <div class="section-head">
           <h3 class="en">Power Days</h3>
           <span class="section-sub">2026 · 吉日</span>
@@ -695,7 +732,7 @@
       </section>
 
       <!-- Career Archetype -->
-      <section class="section" data-tab="personality">
+      <section class="section" data-tab="you">
         <div class="section-head" data-tip="career-archetype">
           <h3 class="en">Career Archetype</h3>
           <h3 class="zh hide">职业原型</h3>
@@ -704,7 +741,7 @@
       </section>
 
       <!-- Power Season -->
-      <section class="section" data-tab="personality">
+      <section class="section" data-tab="you">
         <div class="section-head" data-tip="power-season">
           <h3 class="en">Power Season</h3>
           <h3 class="zh hide">旺季</h3>
@@ -713,7 +750,7 @@
       </section>
 
       <!-- Yin Yang -->
-      <section class="section" data-tab="personality">
+      <section class="section" data-tab="you">
         <div class="section-head" data-tip="yin-yang">
           <h3 class="en">Yin · Yang Balance</h3>
           <h3 class="zh hide">阴阳平衡</h3>
@@ -723,7 +760,7 @@
       </section>
 
       <!-- Blood Type Profile -->
-      <section class="section data-hidden" id="blood-section" data-tab="personality">
+      <section class="section data-hidden" id="blood-section" data-tab="you">
         <div class="section-head" data-tip="blood-type">
           <h3 class="en">Blood Type Profile</h3>
           <h3 class="zh hide">血型个性</h3>
@@ -732,7 +769,7 @@
       </section>
 
       <!-- Geographic Energy -->
-      <section class="section data-hidden" id="birthplace-section" data-tab="personality">
+      <section class="section data-hidden" id="birthplace-section" data-tab="you">
         <div class="section-head" data-tip="birthplace">
           <h3 class="en">Geographic Energy</h3>
           <h3 class="zh hide">地理能量</h3>
@@ -781,7 +818,7 @@
       </section>
 
       <!-- Life Decades 大运 -->
-      <section class="section" data-tab="personality" data-tip="decades">
+      <section class="section" data-tab="you" data-tip="decades">
         <div class="section-head">
           <h3 class="en">Life Decades 大运</h3>
           <h3 class="zh hide">人生大运</h3>
@@ -791,7 +828,7 @@
       </section>
 
       <!-- Reading -->
-      <section class="section" data-tab="personality">
+      <section class="section" data-tab="you">
         <div class="section-head" data-tip="zodiac">
           <h3 class="en">Your Reading</h3>
           <h3 class="zh hide">您的命理</h3>
@@ -803,7 +840,7 @@
       </section>
 
       <!-- Compatibility -->
-      <section class="section" data-tab="personality">
+      <section class="section" data-tab="you">
         <div class="section-head" data-tip="compatibility">
           <h3 class="en">Compatibility</h3>
           <h3 class="zh hide">生肖相合</h3>
@@ -812,7 +849,7 @@
       </section>
 
       <!-- Lucky -->
-      <section class="section" data-tab="personality">
+      <section class="section" data-tab="you">
         <div class="section-head" data-tip="lucky-vibes">
           <h3 class="en">Lucky Vibes</h3>
           <h3 class="zh hide">吉祥元素</h3>

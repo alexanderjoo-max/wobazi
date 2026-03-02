@@ -408,7 +408,7 @@ function scrollAbout(id) {
 }
 
 function switchTab(tab) {
-  ['fortune', 'personality', 'actions'].forEach(t => {
+  ['today', 'actions', 'you'].forEach(t => {
     const btn = document.getElementById('tab-btn-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
   });
@@ -520,8 +520,8 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   }
 
   // Greeting — simple name
-  const greetEn = name ? `Hello, ${name} ✦` : 'Your Destiny ✦';
-  const greetZh = name ? `你好，${name} ✦` : '你的命运 ✦';
+  const greetEn = name ? `Hello, ${name} ✦` : '';
+  const greetZh = name ? `你好，${name} ✦` : '';
   document.getElementById('greeting').innerHTML = _t(greetEn, greetZh);
 
   const elColor = EL_COLOR[yearPillar.stem.element];
@@ -587,6 +587,12 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     <div class="hc-bullet"><span class="hc-bullet-key">${_t('DO','做')}</span><span>${_t(heroDo.title, heroDo.title_zh)}</span></div>
     <div class="hc-bullet"><span class="hc-bullet-key">${_t('AVOID','避')}</span><span>${_t(heroAvoidEn, heroAvoidZh)}</span></div>
     <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span>${_t(heroWatchEn, heroWatchZh)}</span></div>`;
+
+  // Today / You tab new sections
+  renderLifeAreas(fortune, heroIsCompat, heroIsClash);
+  renderInsightCards(_t(heroMsgEn, heroMsgZh), fortune, dominantEl);
+  renderActionsPreview(heroDo, heroAvoidEn, heroAvoidZh, heroWatchEn, heroWatchZh);
+  renderYouProfile(animal, yearPillar, elColor);
 
   // Daily fortune
   renderDailyFortune(animal);
@@ -654,10 +660,10 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   showScreen('results');
   haptic([20, 60, 20]);
 
-  // Init tab from URL hash (default: fortune)
-  const initTab = location.hash === '#personality' ? 'personality'
-                : location.hash === '#actions'      ? 'actions'
-                : 'fortune';
+  // Init tab from URL hash (default: today)
+  const initTab = location.hash === '#you'     ? 'you'
+                : location.hash === '#actions' ? 'actions'
+                : 'today';
   switchTab(initTab);
 
   // Animate progress rings after screen shows
@@ -3090,6 +3096,101 @@ const NEW_TIPS = {
 
 // Merge new tips into TIPS
 Object.assign(TIPS, NEW_TIPS);
+
+/* ── Life Areas (Today tab) ── */
+function renderLifeAreas(fortune, heroIsCompat, heroIsClash) {
+  const el = document.getElementById('life-areas-grid');
+  if (!el) return;
+  const col = s => s >= 66 ? '#22c55e' : s >= 40 ? '#f0c040' : '#ef4444';
+  const lbl = s => s >= 66 ? ['Strong','旺'] : s >= 40 ? ['Mixed','平'] : ['Caution','弱'];
+  const socialScore = heroIsCompat ? 80 : heroIsClash ? 30 : 60;
+  const avg = Math.round((fortune.love + fortune.career + fortune.health + fortune.wealth) / 4);
+  const riskScore = 100 - avg;
+  const riskLbl = riskScore < 34 ? ['Low','低'] : riskScore < 60 ? ['Medium','中'] : ['High','高'];
+  const areas = [
+    { icon:'💼', en:'Work',   zh:'事业', s: fortune.career, l: lbl(fortune.career) },
+    { icon:'💰', en:'Money',  zh:'财运', s: fortune.wealth, l: lbl(fortune.wealth) },
+    { icon:'❤️', en:'Love',   zh:'爱情', s: fortune.love,   l: lbl(fortune.love)   },
+    { icon:'🌐', en:'Social', zh:'社交', s: socialScore,    l: lbl(socialScore)    },
+    { icon:'🌿', en:'Energy', zh:'精力', s: fortune.health, l: lbl(fortune.health) },
+    { icon:'⚡', en:'Risk',   zh:'风险', s: riskScore,      l: riskLbl, inv: true  },
+  ];
+  el.innerHTML = areas.map(a => `
+    <div class="life-area-tile">
+      <div class="la-icon">${a.icon}</div>
+      <div class="la-name"><span class="en">${a.en}</span><span class="zh hide">${a.zh}</span></div>
+      <div class="la-status" style="color:${a.inv ? col(100 - a.s) : col(a.s)}">
+        <span class="en">${a.l[0]}</span><span class="zh hide">${a.l[1]}</span>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Insight Cards (Today tab) ── */
+function renderInsightCards(todayMsg, fortune, dominantEl) {
+  const el = document.getElementById('insight-cards');
+  if (!el) return;
+  const loveScore = fortune.love, careerScore = fortune.career;
+  const loveTip = loveScore >= 66
+    ? _t('Connections flow easily — a good time to reach out and deepen bonds.', '感情顺畅，适合主动联系、深化关系。')
+    : loveScore >= 40
+    ? _t('Keep expectations balanced — focus on understanding before action.', '保持平衡期望，行动前先寻求理解。')
+    : _t('Protect your emotional energy today — quality over quantity in social time.', '今日注意保护情感能量，社交质量优于数量。');
+  const workTip = careerScore >= 66
+    ? _t('Career energy is high — take initiative and present bold ideas.', '事业运旺，主动出击，大胆提出想法。')
+    : careerScore >= 40
+    ? _t('Steady progress over bold moves — finish what is already in motion.', '稳扎稳打优于冒进，完成手头已有的工作。')
+    : _t('Avoid major work decisions today — observe and gather information instead.', '今日避免重大工作决定，以观察与收集信息为主。');
+  const elTips = {
+    Wood:  _t('Your Wood energy favors growth and collaboration — say yes to new connections.', '木气利于成长与合作，对新连接说是。'),
+    Fire:  _t('Your Fire energy brings charisma today — lead, inspire, and be visible.', '火气今日带来魅力，引领他人，展现自我。'),
+    Earth: _t('Your Earth energy grounds you — trust your gut and support those around you.', '土气令你沉稳，相信直觉，支持身边的人。'),
+    Metal: _t('Your Metal energy sharpens focus today — ideal for precision and detail work.', '金气今日提升专注，适合精细与细节工作。'),
+    Water: _t('Your Water energy flows — adapt quickly and listen more than you speak.', '水气流动，迅速适应，多听少说。'),
+  };
+  const cards = [
+    { icon:'🌅', text: todayMsg },
+    { icon:'❤️', text: loveTip },
+    { icon:'💼', text: workTip },
+    { icon:'✨', text: elTips[dominantEl] || '' },
+  ];
+  el.innerHTML = cards.map(c => `
+    <div class="insight-card">
+      <span class="insight-icon">${c.icon}</span>
+      <p class="insight-text">${c.text}</p>
+    </div>`).join('');
+}
+
+/* ── Actions Preview Card (Today tab) ── */
+function renderActionsPreview(heroDo, heroAvoidEn, heroAvoidZh, heroWatchEn, heroWatchZh) {
+  const el = document.getElementById('actions-preview-list');
+  if (!el) return;
+  el.innerHTML = [
+    { key:'DO',    key_zh:'做',  en: heroDo.title, zh: heroDo.title_zh },
+    { key:'AVOID', key_zh:'避',  en: heroAvoidEn,  zh: heroAvoidZh     },
+    { key:'WATCH', key_zh:'注意',en: heroWatchEn,  zh: heroWatchZh     },
+  ].map(item => `
+    <div class="hc-bullet">
+      <span class="hc-bullet-key">${_t(item.key, item.key_zh)}</span>
+      <span>${_t(item.en, item.zh)}</span>
+    </div>`).join('');
+}
+
+/* ── You Profile Header (You tab) ── */
+function renderYouProfile(animal, yearPillar, elColor) {
+  const el = document.getElementById('you-profile-header');
+  if (!el) return;
+  const emoji = BRANCHES.find(b => b.animal === animal)?.emoji || '';
+  const stem = yearPillar.stem;
+  el.innerHTML = `
+    <div class="you-profile-card" style="border-color:${elColor}55">
+      <div class="you-profile-label"><span class="en">Wǒ Bāzì Profile</span><span class="zh hide">我的八字命盘</span></div>
+      <div class="you-profile-identity">
+        <span class="you-profile-badge" style="background:${elColor}22;color:${elColor}">${emoji} <span class="en">${stem.element} ${animal}</span><span class="zh hide">${EL_ZH[stem.element]}${ANIMAL_ZH[animal]}</span></span>
+        <span class="you-profile-badge"><span class="en">${stem.polarity}</span><span class="zh hide">${stem.polarity === 'Yang' ? '阳' : '阴'}</span></span>
+        <span class="you-profile-badge">${stem.char}${yearPillar.branch.char}</span>
+      </div>
+    </div>`;
+}
 
 /* ── Init ── */
 buildStars();
