@@ -519,14 +519,10 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     });
   }
 
-  // Greeting — large zodiac title + small name sub-line
-  const zodiacTitleEn = `${yearPillar.stem.element} ${animal}`;
-  const zodiacTitleZh = `${EL_ZH[yearPillar.stem.element]}${ANIMAL_ZH[animal]}`;
-  const greetSubEn = name ? `Hey, ${name} ✦` : 'Your Destiny ✦';
-  const greetSubZh = name ? `你好，${name} ✦` : '你的命运 ✦';
-  document.getElementById('greeting').innerHTML =
-    `<div class="greeting-zodiac">${_t(zodiacTitleEn, zodiacTitleZh)}</div>` +
-    `<div class="greeting-sub">${_t(greetSubEn, greetSubZh)}</div>`;
+  // Greeting — simple name
+  const greetEn = name ? `Hello, ${name} ✦` : 'Your Destiny ✦';
+  const greetZh = name ? `你好，${name} ✦` : '你的命运 ✦';
+  document.getElementById('greeting').innerHTML = _t(greetEn, greetZh);
 
   const elColor = EL_COLOR[yearPillar.stem.element];
   const dominantEl = Object.entries(elements).sort((a,b)=>b[1]-a[1])[0][0];
@@ -583,8 +579,9 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
                     : '分心——今天专注一件事';
   const heroEmoji = BRANCHES.find(b => b.animal === animal)?.emoji || '';
   document.getElementById('hero-today-label').innerHTML = _t(`TODAY · ${heroDateStr}`, `今日 · ${heroDateStr}`);
-  document.getElementById('hero-profile-chip').innerHTML =
-    `${heroEmoji} ${_t(animal, ANIMAL_ZH[animal])} · ${_t(yearPillar.stem.element, EL_ZH[yearPillar.stem.element])}`;
+  document.getElementById('hero-zodiac-title').innerHTML =
+    `${heroEmoji} ${_t(`${yearPillar.stem.element} ${animal}`, `${EL_ZH[yearPillar.stem.element]}${ANIMAL_ZH[animal]}`)}`;
+  document.getElementById('hero-profile-chip').innerHTML = '';
   document.getElementById('hero-summary-msg').innerHTML = _t(heroMsgEn, heroMsgZh);
   document.getElementById('hero-bullets').innerHTML = `
     <div class="hc-bullet"><span class="hc-bullet-key">${_t('DO','做')}</span><span>${_t(heroDo.title, heroDo.title_zh)}</span></div>
