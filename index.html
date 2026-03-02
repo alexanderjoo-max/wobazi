@@ -48,86 +48,392 @@
         <span class="en">Begin Your Reading</span><span class="zh hide">开始算命</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
-      <button class="btn-about-link" onclick="haptic(6); showScreen('about')"><span class="en">What is Bāzì? →</span><span class="zh hide">什么是八字？→</span></button>
+      <button class="btn-about-link" onclick="haptic(6); showAbout()"><span class="en">What is Bāzì? →</span><span class="zh hide">什么是八字？→</span></button>
     </div>
   </div>
 
   <!-- ABOUT -->
   <div id="about" class="screen">
     <div class="nav-bar">
-      <button class="btn-back" onclick="haptic(8); showScreen('splash')">
+      <button class="btn-back" onclick="haptic(8); showScreen(_prevAboutFrom || 'splash')">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="nav-title">What is Bāzì?</span>
       <div style="width:40px"></div>
     </div>
+
+    <!-- Sticky TOC chips -->
+    <div class="about-toc-bar">
+      <div class="about-toc-inner">
+        <button class="about-toc-chip" onclick="scrollAbout('ab-intro')">Intro</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-pillars')">4 Pillars</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-stems')">10 Stems</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-branches')">12 Branches</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-elements')">5 Elements</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-yinyang')">Yin &amp; Yang</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-cycle')">60-Year Cycle</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-zodiac')">12 Animals</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-daymaster')">Day Master</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-compat')">Compatibility</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-reading')">How it Works</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-philosophy')">Free Will</button>
+      </div>
+    </div>
+
     <div class="about-scroll">
 
-      <div class="about-hero">
+      <!-- ① INTRO -->
+      <div class="about-hero" id="ab-intro">
         <div class="about-hanzi">八字</div>
         <h2>The Eight Characters</h2>
-        <p>An ancient Chinese system for reading destiny through the moment of your birth</p>
+        <p>An ancient Chinese destiny system — 2,000 years old, startlingly precise</p>
       </div>
 
       <div class="about-section">
-        <span class="about-section-icon">🏮</span>
-        <h3>What is Bāzì?</h3>
-        <p>Bāzì (八字) literally means "Eight Characters." It's one of the oldest forms of Chinese metaphysics, developed over 2,000 years ago and refined during the Tang dynasty (618–907 AD).</p>
-        <p>The moment you were born — your year, month, day, and hour — is encoded into eight Chinese characters that reveal your nature, strengths, and the energies flowing through your life.</p>
+        <h3>What is Bāzì? (八字)</h3>
+        <p>Bāzì (八字) literally means "Eight Characters." It is one of the oldest forms of Chinese metaphysics, refined during the Tang dynasty (618–907 AD) and still practiced widely across East Asia today.</p>
+        <p>The system holds that your precise birth moment — year, month, day, and hour — encodes eight Chinese characters that reveal your nature, the elemental forces shaping your life, and the timing of your most important opportunities and challenges.</p>
+        <div class="about-callout">
+          <strong>The core idea:</strong> You are not separate from nature. Your birth moment places you in a specific position within the flowing cycle of natural forces — and that position shapes everything.
+        </div>
       </div>
 
-      <div class="about-section">
-        <span class="about-section-icon">🏛</span>
+      <!-- ② FOUR PILLARS -->
+      <div class="about-section" id="ab-pillars">
         <h3>The Four Pillars (四柱 Sìzhù)</h3>
-        <p>Your birth data maps onto four "pillars," each holding two characters — one Heavenly Stem and one Earthly Branch — giving you eight characters total.</p>
-        <div class="about-pillars-grid">
-          <div class="about-pillar"><span class="about-pillar-zh">年</span><span class="about-pillar-en">Year Pillar</span></div>
-          <div class="about-pillar"><span class="about-pillar-zh">月</span><span class="about-pillar-en">Month Pillar</span></div>
-          <div class="about-pillar"><span class="about-pillar-zh">日</span><span class="about-pillar-en">Day Pillar</span></div>
-          <div class="about-pillar"><span class="about-pillar-zh">时</span><span class="about-pillar-en">Hour Pillar</span></div>
+        <p>Your birth data maps onto four "pillars." Each pillar has two characters — a <strong>Heavenly Stem</strong> (天干) on top and an <strong>Earthly Branch</strong> (地支) below. Four pillars × two characters = eight characters.</p>
+        <div class="about-pillars-visual">
+          <div class="about-pillar-col">
+            <div class="about-pillar-head">年柱</div>
+            <div class="about-pillar-stem" style="background:rgba(240,192,64,0.12)">Stem</div>
+            <div class="about-pillar-branch">Branch</div>
+            <div class="about-pillar-foot">Year</div>
+          </div>
+          <div class="about-pillar-col">
+            <div class="about-pillar-head">月柱</div>
+            <div class="about-pillar-stem" style="background:rgba(96,165,250,0.12)">Stem</div>
+            <div class="about-pillar-branch">Branch</div>
+            <div class="about-pillar-foot">Month</div>
+          </div>
+          <div class="about-pillar-col about-pillar-self">
+            <div class="about-pillar-head">日柱</div>
+            <div class="about-pillar-stem" style="background:rgba(192,132,252,0.22)">Stem ✦</div>
+            <div class="about-pillar-branch">Branch</div>
+            <div class="about-pillar-foot">Day</div>
+          </div>
+          <div class="about-pillar-col">
+            <div class="about-pillar-head">时柱</div>
+            <div class="about-pillar-stem" style="background:rgba(74,222,128,0.12)">Stem</div>
+            <div class="about-pillar-branch">Branch</div>
+            <div class="about-pillar-foot">Hour</div>
+          </div>
         </div>
-        <p style="margin-top:14px">The Day Pillar is your core self. Year reflects ancestry and early life. Month governs career and young adulthood. Hour reveals your inner world and later years.</p>
+        <div class="about-pillar-meanings">
+          <div class="about-pillar-meaning">
+            <div class="about-pm-head" style="color:var(--gold)">Year Pillar 年</div>
+            <p>Ancestry, early childhood, your generation's collective energy, how society sees you</p>
+          </div>
+          <div class="about-pillar-meaning">
+            <div class="about-pm-head" style="color:#60a5fa">Month Pillar 月</div>
+            <p>Career environment, ages 15–30, parents &amp; mentors, the world you operate in daily</p>
+          </div>
+          <div class="about-pillar-meaning">
+            <div class="about-pm-head" style="color:#c084fc">Day Pillar 日 ✦</div>
+            <p>Your core self — the Day Stem IS you. Your spouse/partner energy also lives here</p>
+          </div>
+          <div class="about-pillar-meaning">
+            <div class="about-pm-head" style="color:#4ade80">Hour Pillar 时</div>
+            <p>Inner world, children, career output, the life you build after 40</p>
+          </div>
+        </div>
       </div>
 
-      <div class="about-section">
-        <span class="about-section-icon">⚖️</span>
+      <!-- ③ TEN HEAVENLY STEMS -->
+      <div class="about-section" id="ab-stems">
+        <h3>Ten Heavenly Stems (天干 Tiāngān)</h3>
+        <p>The Stems cycle through five elements in Yang then Yin form. Every year, month, day, and hour is assigned a Stem. The Day Stem is your <em>Day Master</em> — your elemental identity.</p>
+        <div class="about-stems-table">
+          <div class="ast-header">
+            <span>天干</span><span>Pinyin</span><span>Polarity</span><span>Element</span><span>Image</span><span>Keywords</span>
+          </div>
+          <div class="ast-row"><span class="ast-zh" style="color:#22c55e">甲</span><span>jiǎ</span><span class="ast-yang">Yang ☀</span><span style="color:#22c55e">Wood</span><span>Tall Tree</span><span>Leadership, growth, vision</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#22c55e">乙</span><span>yǐ</span><span class="ast-yin">Yin 🌙</span><span style="color:#22c55e">Wood</span><span>Vine / Flower</span><span>Adaptability, grace, intuition</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#ef4444">丙</span><span>bǐng</span><span class="ast-yang">Yang ☀</span><span style="color:#ef4444">Fire</span><span>The Sun</span><span>Charisma, warmth, generosity</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#ef4444">丁</span><span>dīng</span><span class="ast-yin">Yin 🌙</span><span style="color:#ef4444">Fire</span><span>Candle / Lamp</span><span>Insight, focus, inner light</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#f59e0b">戊</span><span>wù</span><span class="ast-yang">Yang ☀</span><span style="color:#f59e0b">Earth</span><span>Mountain</span><span>Steadiness, trust, protection</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#f59e0b">己</span><span>jǐ</span><span class="ast-yin">Yin 🌙</span><span style="color:#f59e0b">Earth</span><span>Fields / Garden</span><span>Nurturing, patience, receptivity</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#94a3b8">庚</span><span>gēng</span><span class="ast-yang">Yang ☀</span><span style="color:#94a3b8">Metal</span><span>Sword / Axe</span><span>Justice, courage, decisiveness</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#94a3b8">辛</span><span>xīn</span><span class="ast-yin">Yin 🌙</span><span style="color:#94a3b8">Metal</span><span>Jewel / Needle</span><span>Precision, refinement, sensitivity</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#3b82f6">壬</span><span>rén</span><span class="ast-yang">Yang ☀</span><span style="color:#3b82f6">Water</span><span>Ocean / River</span><span>Intelligence, ambition, flow</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#3b82f6">癸</span><span>guǐ</span><span class="ast-yin">Yin 🌙</span><span style="color:#3b82f6">Water</span><span>Rain / Mist</span><span>Intuition, mystery, depth</span></div>
+        </div>
+      </div>
+
+      <!-- ④ TWELVE EARTHLY BRANCHES -->
+      <div class="about-section" id="ab-branches">
+        <h3>Twelve Earthly Branches (地支 Dìzhī)</h3>
+        <p>The Branches cycle in 12 steps. Each governs a zodiac animal, an element, a season, a month, and a two-hour window — linking the heavens to time itself.</p>
+        <div class="about-branches-table">
+          <div class="abt-header">
+            <span>地支</span><span>Animal</span><span>Element</span><span>Season</span><span>Hours</span>
+          </div>
+          <div class="abt-row"><span class="abt-zh">子</span><span>🐭 Rat</span><span style="color:#3b82f6">Water</span><span>Winter</span><span>23–01</span></div>
+          <div class="abt-row"><span class="abt-zh">丑</span><span>🐮 Ox</span><span style="color:#f59e0b">Earth</span><span>Winter</span><span>01–03</span></div>
+          <div class="abt-row"><span class="abt-zh">寅</span><span>🐯 Tiger</span><span style="color:#22c55e">Wood</span><span>Spring</span><span>03–05</span></div>
+          <div class="abt-row"><span class="abt-zh">卯</span><span>🐰 Rabbit</span><span style="color:#22c55e">Wood</span><span>Spring</span><span>05–07</span></div>
+          <div class="abt-row"><span class="abt-zh">辰</span><span>🐲 Dragon</span><span style="color:#f59e0b">Earth</span><span>Spring</span><span>07–09</span></div>
+          <div class="abt-row"><span class="abt-zh">巳</span><span>🐍 Snake</span><span style="color:#ef4444">Fire</span><span>Summer</span><span>09–11</span></div>
+          <div class="abt-row"><span class="abt-zh">午</span><span>🐴 Horse</span><span style="color:#ef4444">Fire</span><span>Summer</span><span>11–13</span></div>
+          <div class="abt-row"><span class="abt-zh">未</span><span>🐐 Goat</span><span style="color:#f59e0b">Earth</span><span>Summer</span><span>13–15</span></div>
+          <div class="abt-row"><span class="abt-zh">申</span><span>🐒 Monkey</span><span style="color:#94a3b8">Metal</span><span>Autumn</span><span>15–17</span></div>
+          <div class="abt-row"><span class="abt-zh">酉</span><span>🐓 Rooster</span><span style="color:#94a3b8">Metal</span><span>Autumn</span><span>17–19</span></div>
+          <div class="abt-row"><span class="abt-zh">戌</span><span>🐕 Dog</span><span style="color:#f59e0b">Earth</span><span>Autumn</span><span>19–21</span></div>
+          <div class="abt-row"><span class="abt-zh">亥</span><span>🐷 Pig</span><span style="color:#3b82f6">Water</span><span>Winter</span><span>21–23</span></div>
+        </div>
+      </div>
+
+      <!-- ⑤ FIVE ELEMENTS -->
+      <div class="about-section" id="ab-elements">
         <h3>Five Elements (五行 Wǔxíng)</h3>
-        <p>Every character belongs to one of five elements. Balance matters — too much or too little of any element shapes your personality and path in life.</p>
-        <div class="about-elements-row">
-          <div class="about-element-chip" style="color:#22c55e;border-color:#22c55e;background:rgba(34,197,94,0.08)"><span class="zh">木</span>Wood</div>
-          <div class="about-element-chip" style="color:#ef4444;border-color:#ef4444;background:rgba(239,68,68,0.08)"><span class="zh">火</span>Fire</div>
-          <div class="about-element-chip" style="color:#f59e0b;border-color:#f59e0b;background:rgba(245,158,11,0.08)"><span class="zh">土</span>Earth</div>
-          <div class="about-element-chip" style="color:#94a3b8;border-color:#94a3b8;background:rgba(148,163,184,0.08)"><span class="zh">金</span>Metal</div>
-          <div class="about-element-chip" style="color:#3b82f6;border-color:#3b82f6;background:rgba(59,130,246,0.08)"><span class="zh">水</span>Water</div>
+        <p>Everything in the chart belongs to one of five dynamic forces. Balance — or the lack of it — defines your personality, health tendencies, and what you need most in life.</p>
+        <div class="about-elements-grid">
+          <div class="about-el-card" style="--ec:#22c55e">
+            <div class="aec-zh">木</div>
+            <div class="aec-name" style="color:#22c55e">Wood</div>
+            <div class="aec-traits">Growth · Vision · Benevolence</div>
+            <div class="aec-organs">Liver · Gallbladder</div>
+            <div class="aec-season">Spring 🌱</div>
+          </div>
+          <div class="about-el-card" style="--ec:#ef4444">
+            <div class="aec-zh">火</div>
+            <div class="aec-name" style="color:#ef4444">Fire</div>
+            <div class="aec-traits">Passion · Warmth · Joy</div>
+            <div class="aec-organs">Heart · Small Intestine</div>
+            <div class="aec-season">Summer 🔥</div>
+          </div>
+          <div class="about-el-card" style="--ec:#f59e0b">
+            <div class="aec-zh">土</div>
+            <div class="aec-name" style="color:#f59e0b">Earth</div>
+            <div class="aec-traits">Stability · Trust · Nurturing</div>
+            <div class="aec-organs">Spleen · Stomach</div>
+            <div class="aec-season">Transition 🌍</div>
+          </div>
+          <div class="about-el-card" style="--ec:#94a3b8">
+            <div class="aec-zh">金</div>
+            <div class="aec-name" style="color:#94a3b8">Metal</div>
+            <div class="aec-traits">Clarity · Justice · Precision</div>
+            <div class="aec-organs">Lungs · Large Intestine</div>
+            <div class="aec-season">Autumn 🍂</div>
+          </div>
+          <div class="about-el-card" style="--ec:#3b82f6">
+            <div class="aec-zh">水</div>
+            <div class="aec-name" style="color:#3b82f6">Water</div>
+            <div class="aec-traits">Wisdom · Flow · Depth</div>
+            <div class="aec-organs">Kidneys · Bladder</div>
+            <div class="aec-season">Winter 💧</div>
+          </div>
+        </div>
+        <div class="about-cycle-wrap">
+          <div class="about-cycle-label">Generating Cycle 相生 · each element nourishes the next →</div>
+          <div class="about-cycle-row">
+            <div class="about-cycle-node" style="color:#22c55e">Wood</div>
+            <div class="about-cycle-arrow">→</div>
+            <div class="about-cycle-node" style="color:#ef4444">Fire</div>
+            <div class="about-cycle-arrow">→</div>
+            <div class="about-cycle-node" style="color:#f59e0b">Earth</div>
+            <div class="about-cycle-arrow">→</div>
+            <div class="about-cycle-node" style="color:#94a3b8">Metal</div>
+            <div class="about-cycle-arrow">→</div>
+            <div class="about-cycle-node" style="color:#3b82f6">Water</div>
+            <div class="about-cycle-arrow">→</div>
+            <div class="about-cycle-node" style="color:#22c55e">Wood ↺</div>
+          </div>
+        </div>
+        <div class="about-cycle-wrap" style="margin-top:12px">
+          <div class="about-cycle-label">Controlling Cycle 相克 · each element restrains another ✕</div>
+          <div class="about-control-grid">
+            <div class="acg-row"><span style="color:#22c55e">Wood</span><span class="acg-arrow">✕</span><span style="color:#f59e0b">Earth</span></div>
+            <div class="acg-row"><span style="color:#ef4444">Fire</span><span class="acg-arrow">✕</span><span style="color:#94a3b8">Metal</span></div>
+            <div class="acg-row"><span style="color:#f59e0b">Earth</span><span class="acg-arrow">✕</span><span style="color:#3b82f6">Water</span></div>
+            <div class="acg-row"><span style="color:#94a3b8">Metal</span><span class="acg-arrow">✕</span><span style="color:#22c55e">Wood</span></div>
+            <div class="acg-row"><span style="color:#3b82f6">Water</span><span class="acg-arrow">✕</span><span style="color:#ef4444">Fire</span></div>
+          </div>
         </div>
       </div>
 
-      <div class="about-section">
-        <span class="about-section-icon">🔢</span>
-        <h3>Stems &amp; Branches</h3>
-        <p>Ten Heavenly Stems (天干) and Twelve Earthly Branches (地支) combine in a 60-year cycle. The branches also map to the 12 zodiac animals.</p>
-        <div class="about-stems-row">
-          <div class="about-stem-chip">甲</div><div class="about-stem-chip">乙</div>
-          <div class="about-stem-chip">丙</div><div class="about-stem-chip">丁</div>
-          <div class="about-stem-chip">戊</div><div class="about-stem-chip">己</div>
-          <div class="about-stem-chip">庚</div><div class="about-stem-chip">辛</div>
-          <div class="about-stem-chip">壬</div><div class="about-stem-chip">癸</div>
-        </div>
-      </div>
-
-      <div class="about-section">
-        <span class="about-section-icon">☯️</span>
+      <!-- ⑥ YIN & YANG -->
+      <div class="about-section" id="ab-yinyang">
         <h3>Yin &amp; Yang (阴阳 Yīn Yáng)</h3>
-        <p>Every element appears in both Yin (陰, receptive) and Yang (陽, active) forms. Your chart's balance shapes how you engage the world versus how you process things within.</p>
+        <p>Every element has two faces — Yang (陽, active, outward) and Yin (陰, receptive, inward). Neither is better. Both are essential forces in the universe and in your chart.</p>
+        <div class="about-yy-grid">
+          <div class="about-yy-card" style="border-color:rgba(255,220,60,0.3)">
+            <div class="ayy-symbol">☀️</div>
+            <div class="ayy-name">Yang 陽</div>
+            <div class="ayy-traits">Active · Outward · Expanding<br>Decisive · Initiating · Giving</div>
+          </div>
+          <div class="about-yy-card" style="border-color:rgba(148,163,220,0.3)">
+            <div class="ayy-symbol">🌙</div>
+            <div class="ayy-name">Yin 陰</div>
+            <div class="ayy-traits">Receptive · Inward · Contracting<br>Reflective · Responding · Receiving</div>
+          </div>
+        </div>
+        <p style="margin-top:12px">In your chart, each of your 8 characters is either Yin or Yang. The balance shapes whether you tend to lead or support, initiate or complete, speak or listen.</p>
       </div>
 
-      <div class="about-section">
-        <span class="about-section-icon">🌌</span>
-        <h3>Destiny vs. Free Will</h3>
-        <p>Bāzì shows tendencies and potential, not fixed outcomes. Think of it as a weather forecast — knowing the forecast helps you prepare, but you still choose where to go.</p>
-        <p>The goal is self-understanding: to work with your natural energy rather than against it.</p>
+      <!-- ⑦ 60-YEAR CYCLE -->
+      <div class="about-section" id="ab-cycle">
+        <h3>The 60-Year Cycle (六十甲子)</h3>
+        <p>Ten Stems × Twelve Branches interlock into exactly 60 unique pairs — the 六十甲子. After 60 years the pattern resets, which is why 60th birthdays are especially significant in Chinese culture.</p>
+        <div class="about-cycle60-grid">
+          <div class="ac60-header"><span>#</span><span>Pair</span><span>Name</span><span>Years (examples)</span></div>
+          <div class="ac60-row"><span>1</span><span class="ac60-zh">甲子</span><span>Yang Wood Rat</span><span>1924 · 1984 · 2044</span></div>
+          <div class="ac60-row"><span>2</span><span class="ac60-zh">乙丑</span><span>Yin Wood Ox</span><span>1925 · 1985 · 2045</span></div>
+          <div class="ac60-row"><span>3</span><span class="ac60-zh">丙寅</span><span>Yang Fire Tiger</span><span>1926 · 1986 · 2046</span></div>
+          <div class="ac60-row"><span>4</span><span class="ac60-zh">丁卯</span><span>Yin Fire Rabbit</span><span>1927 · 1987 · 2047</span></div>
+          <div class="ac60-row"><span>5</span><span class="ac60-zh">戊辰</span><span>Yang Earth Dragon</span><span>1928 · 1988 · 2048</span></div>
+          <div class="ac60-row"><span>6</span><span class="ac60-zh">己巳</span><span>Yin Earth Snake</span><span>1929 · 1989 · 2049</span></div>
+          <div class="ac60-row"><span>7</span><span class="ac60-zh">庚午</span><span>Yang Metal Horse</span><span>1930 · 1990 · 2050</span></div>
+          <div class="ac60-row"><span>8</span><span class="ac60-zh">辛未</span><span>Yin Metal Goat</span><span>1931 · 1991 · 2051</span></div>
+          <div class="ac60-row"><span>9</span><span class="ac60-zh">壬申</span><span>Yang Water Monkey</span><span>1932 · 1992 · 2052</span></div>
+          <div class="ac60-row"><span>10</span><span class="ac60-zh">癸酉</span><span>Yin Water Rooster</span><span>1933 · 1993 · 2053</span></div>
+          <div class="ac60-row"><span>11</span><span class="ac60-zh">甲戌</span><span>Yang Wood Dog</span><span>1934 · 1994 · 2054</span></div>
+          <div class="ac60-row"><span>12</span><span class="ac60-zh">乙亥</span><span>Yin Wood Pig</span><span>1935 · 1995 · 2055</span></div>
+        </div>
+        <p style="margin-top:10px">The remaining 48 pairs continue the same pattern through all Stem × Branch combinations until the cycle completes.</p>
       </div>
 
+      <!-- ⑧ 12 ZODIAC ANIMALS -->
+      <div class="about-section" id="ab-zodiac">
+        <h3>The 12 Zodiac Animals (生肖 Shēngxiào)</h3>
+        <p>Each Branch corresponds to an animal. Your birth year gives your zodiac sign — but in Bāzì, your Day and Month branch animals are equally important for your full picture.</p>
+        <div class="about-zodiac-grid">
+          <div class="about-z-card"><div class="azc-emoji">🐭</div><div class="azc-name">Rat</div><div class="azc-years">1924 · 36 · 48 · 60 · 72 · 84 · 96 · 2008 · 20</div><div class="azc-trait" style="color:#3b82f6">Water · Clever</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐮</div><div class="azc-name">Ox</div><div class="azc-years">1925 · 37 · 49 · 61 · 73 · 85 · 97 · 2009 · 21</div><div class="azc-trait" style="color:#f59e0b">Earth · Patient</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐯</div><div class="azc-name">Tiger</div><div class="azc-years">1926 · 38 · 50 · 62 · 74 · 86 · 98 · 2010 · 22</div><div class="azc-trait" style="color:#22c55e">Wood · Brave</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐰</div><div class="azc-name">Rabbit</div><div class="azc-years">1927 · 39 · 51 · 63 · 75 · 87 · 99 · 2011 · 23</div><div class="azc-trait" style="color:#22c55e">Wood · Gentle</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐲</div><div class="azc-name">Dragon</div><div class="azc-years">1928 · 40 · 52 · 64 · 76 · 88 · 2000 · 12 · 24</div><div class="azc-trait" style="color:#f59e0b">Earth · Gifted</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐍</div><div class="azc-name">Snake</div><div class="azc-years">1929 · 41 · 53 · 65 · 77 · 89 · 2001 · 13 · 25</div><div class="azc-trait" style="color:#ef4444">Fire · Wise</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐴</div><div class="azc-name">Horse</div><div class="azc-years">1930 · 42 · 54 · 66 · 78 · 90 · 2002 · 14 · 26</div><div class="azc-trait" style="color:#ef4444">Fire · Free</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐐</div><div class="azc-name">Goat</div><div class="azc-years">1931 · 43 · 55 · 67 · 79 · 91 · 2003 · 15 · 27</div><div class="azc-trait" style="color:#f59e0b">Earth · Creative</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐒</div><div class="azc-name">Monkey</div><div class="azc-years">1932 · 44 · 56 · 68 · 80 · 92 · 2004 · 16 · 28</div><div class="azc-trait" style="color:#94a3b8">Metal · Witty</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐓</div><div class="azc-name">Rooster</div><div class="azc-years">1933 · 45 · 57 · 69 · 81 · 93 · 2005 · 17 · 29</div><div class="azc-trait" style="color:#94a3b8">Metal · Sharp</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐕</div><div class="azc-name">Dog</div><div class="azc-years">1934 · 46 · 58 · 70 · 82 · 94 · 2006 · 18 · 30</div><div class="azc-trait" style="color:#f59e0b">Earth · Loyal</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐷</div><div class="azc-name">Pig</div><div class="azc-years">1935 · 47 · 59 · 71 · 83 · 95 · 2007 · 19 · 31</div><div class="azc-trait" style="color:#3b82f6">Water · Generous</div></div>
+        </div>
+      </div>
+
+      <!-- ⑨ DAY MASTER -->
+      <div class="about-section" id="ab-daymaster">
+        <h3>The Day Master (日主 Rìzhǔ)</h3>
+        <p>The Day Stem is your <em>Day Master</em> — the elemental identity of your core self. It is the single most important character in your chart. Everything else is read relative to it.</p>
+        <div class="about-dm-table">
+          <div class="adm-header"><span>Day Master</span><span>Archetype</span><span>Core Strength</span><span>Blind Spot</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#22c55e">甲 Yang Wood</span><span>The Oak</span><span>Leadership, drive</span><span>Rigidity, control</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#22c55e">乙 Yin Wood</span><span>The Vine</span><span>Adaptability, tact</span><span>Over-reliance, drift</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#ef4444">丙 Yang Fire</span><span>The Sun</span><span>Charisma, generosity</span><span>Impulsiveness, scatter</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#ef4444">丁 Yin Fire</span><span>The Flame</span><span>Insight, focus</span><span>Perfectionism, anxiety</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#f59e0b">戊 Yang Earth</span><span>The Mountain</span><span>Steadiness, trust</span><span>Stubbornness, inertia</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#f59e0b">己 Yin Earth</span><span>The Valley</span><span>Nurturing, practical</span><span>Worry, self-doubt</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#94a3b8">庚 Yang Metal</span><span>The Sword</span><span>Decisive, principled</span><span>Harshness, inflexibility</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#94a3b8">辛 Yin Metal</span><span>The Gem</span><span>Refinement, precision</span><span>Sensitivity, vanity</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#3b82f6">壬 Yang Water</span><span>The Ocean</span><span>Intelligence, ambition</span><span>Overthinking, restless</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#3b82f6">癸 Yin Water</span><span>The Rain</span><span>Intuition, depth</span><span>Secretiveness, fragility</span></div>
+        </div>
+      </div>
+
+      <!-- ⑩ COMPATIBILITY -->
+      <div class="about-section" id="ab-compat">
+        <h3>Compatibility &amp; Clashes (合冲 Hé Chōng)</h3>
+        <p>The Branches interact in predictable patterns — some harmonious, some tense. These relationships show up between pillars in your own chart and between your chart and other people's.</p>
+        <div class="about-compat-label">Six Harmonies 六合 — natural allies</div>
+        <div class="about-compat-grid">
+          <div class="about-compat-pair">🐭 Rat + 🐮 Ox</div>
+          <div class="about-compat-pair">🐯 Tiger + 🐷 Pig</div>
+          <div class="about-compat-pair">🐰 Rabbit + 🐕 Dog</div>
+          <div class="about-compat-pair">🐲 Dragon + 🐓 Rooster</div>
+          <div class="about-compat-pair">🐍 Snake + 🐒 Monkey</div>
+          <div class="about-compat-pair">🐴 Horse + 🐐 Goat</div>
+        </div>
+        <div class="about-compat-label" style="margin-top:16px">Six Conflicts 六冲 — opposing forces</div>
+        <div class="about-compat-grid">
+          <div class="about-compat-pair clash">🐭 Rat ✕ 🐴 Horse</div>
+          <div class="about-compat-pair clash">🐮 Ox ✕ 🐐 Goat</div>
+          <div class="about-compat-pair clash">🐯 Tiger ✕ 🐒 Monkey</div>
+          <div class="about-compat-pair clash">🐰 Rabbit ✕ 🐓 Rooster</div>
+          <div class="about-compat-pair clash">🐲 Dragon ✕ 🐕 Dog</div>
+          <div class="about-compat-pair clash">🐍 Snake ✕ 🐷 Pig</div>
+        </div>
+        <div class="about-compat-label" style="margin-top:16px">Three Harmony Trios 三合 — power combinations</div>
+        <div class="about-trio-grid">
+          <div class="about-trio"><span style="color:#3b82f6">💧 Water Trio</span><span>🐭 Rat · 🐲 Dragon · 🐒 Monkey</span></div>
+          <div class="about-trio"><span style="color:#22c55e">🌿 Wood Trio</span><span>🐰 Rabbit · 🐐 Goat · 🐷 Pig</span></div>
+          <div class="about-trio"><span style="color:#ef4444">🔥 Fire Trio</span><span>🐯 Tiger · 🐴 Horse · 🐕 Dog</span></div>
+          <div class="about-trio"><span style="color:#94a3b8">⚙️ Metal Trio</span><span>🐍 Snake · 🐓 Rooster · 🐮 Ox</span></div>
+        </div>
+      </div>
+
+      <!-- ⑪ HOW FORTUNE IS READ -->
+      <div class="about-section" id="ab-reading">
+        <h3>How Fortune is Read (六步推算)</h3>
+        <p>A reading works in layers — from your lifetime blueprint down to what's active right now. Each layer adds precision.</p>
+        <div class="about-reading-steps">
+          <div class="about-rs-step">
+            <div class="ars-num">1</div>
+            <div class="ars-body">
+              <div class="ars-title">Establish the Four Pillars</div>
+              <p>Convert birth date and time into Year, Month, Day, and Hour pillars using the traditional Chinese lunisolar calendar — not simply the Gregorian date.</p>
+            </div>
+          </div>
+          <div class="about-rs-step">
+            <div class="ars-num">2</div>
+            <div class="ars-body">
+              <div class="ars-title">Identify the Day Master</div>
+              <p>The Day Stem is you — your elemental core. Is your Day Master strong or weak? Supported by other characters or drained by them?</p>
+            </div>
+          </div>
+          <div class="about-rs-step">
+            <div class="ars-num">3</div>
+            <div class="ars-body">
+              <div class="ars-title">Map Element Balance</div>
+              <p>Count and weigh all 8 characters by element. Excess and deficiency reveal personality extremes, health tendencies, and the types of years that will challenge or support you.</p>
+            </div>
+          </div>
+          <div class="about-rs-step">
+            <div class="ars-num">4</div>
+            <div class="ars-body">
+              <div class="ars-title">Read the 10-Year Luck Pillars (大运)</div>
+              <p>Every 10 years your chart enters a new energetic environment. These Luck Pillars determine the major themes and opportunities of each decade of your life.</p>
+            </div>
+          </div>
+          <div class="about-rs-step">
+            <div class="ars-num">5</div>
+            <div class="ars-body">
+              <div class="ars-title">Overlay the Annual Pillar (流年)</div>
+              <p>Each year brings a new Stem+Branch pair that interacts with your natal chart and current Luck Pillar. This is why some years feel aligned and others feel grinding — it's measurable.</p>
+            </div>
+          </div>
+          <div class="about-rs-step">
+            <div class="ars-num">6</div>
+            <div class="ars-body">
+              <div class="ars-title">Synthesize into a Reading</div>
+              <p>All layers combine: your strengths, repeating patterns, best windows for major decisions, and how to work with — not against — your elemental nature.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⑫ FREE WILL -->
+      <div class="about-section" id="ab-philosophy">
+        <h3>Destiny &amp; Free Will (命运与自由意志)</h3>
+        <p>Bāzì doesn't predict a fixed future. It reveals the energetic terrain of your life — the hills and valleys, the seasons of growth and consolidation.</p>
+        <div class="about-callout">
+          <strong>The metaphor masters use:</strong> Bāzì is a weather forecast, not a prison sentence. A forecast tells you it will rain — you still choose whether to carry an umbrella, dance in it, or stay inside.
+        </div>
+        <p style="margin-top:12px">Understanding your chart doesn't limit you. It shows where your natural current flows strongest — so you can swim with it instead of exhausting yourself fighting against it.</p>
+        <p style="margin-top:8px">The Chinese tradition holds that <em>命 (fate)</em> sets the stage, but <em>运 (timing &amp; effort)</em> and <em>风水 (environment)</em> shape the outcome. Your chart is one-third of the story.</p>
+      </div>
+
+      <!-- CTA -->
       <div class="about-cta">
         <p>Ready to decode your chart?</p>
         <button class="btn-primary" onclick="haptic(10); showScreen('input')">
@@ -229,6 +535,9 @@
     <div class="results-header">
       <div id="greeting" class="greeting"></div>
       <div class="header-actions">
+        <button class="btn-about-icon" onclick="haptic(6); showAbout()" title="What is Bāzì?">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button>
         <button class="btn-share-icon" id="share-btn" onclick="haptic(8); showShareCard()" title="Share">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         </button>
@@ -550,6 +859,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=11"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>

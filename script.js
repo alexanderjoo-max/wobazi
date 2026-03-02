@@ -383,12 +383,28 @@ function calcFortune(animal, elements) {
 /* ═══════════════════════════════════════
    UI — Screen Navigation
 ═══════════════════════════════════════ */
+let _prevAboutFrom = 'splash';
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 'results') {
     document.getElementById('results').querySelector('.scroll-body').scrollTop = 0;
   }
+}
+
+function showAbout() {
+  const active = document.querySelector('.screen.active');
+  _prevAboutFrom = active ? active.id : 'splash';
+  showScreen('about');
+}
+
+function scrollAbout(id) {
+  const el = document.getElementById(id);
+  const scroll = document.querySelector('#about .about-scroll');
+  if (!el || !scroll) return;
+  const top = el.getBoundingClientRect().top - scroll.getBoundingClientRect().top + scroll.scrollTop - 8;
+  scroll.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
 }
 
 function switchTab(tab) {
@@ -503,10 +519,14 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     });
   }
 
-  // Greeting
-  const greetEn = name ? `Hey, ${name} ✦` : 'Your Destiny ✦';
-  const greetZh = name ? `你好，${name} ✦` : '你的命运 ✦';
-  document.getElementById('greeting').innerHTML = _t(greetEn, greetZh);
+  // Greeting — large zodiac title + small name sub-line
+  const zodiacTitleEn = `${yearPillar.stem.element} ${animal}`;
+  const zodiacTitleZh = `${EL_ZH[yearPillar.stem.element]}${ANIMAL_ZH[animal]}`;
+  const greetSubEn = name ? `Hey, ${name} ✦` : 'Your Destiny ✦';
+  const greetSubZh = name ? `你好，${name} ✦` : '你的命运 ✦';
+  document.getElementById('greeting').innerHTML =
+    `<div class="greeting-zodiac">${_t(zodiacTitleEn, zodiacTitleZh)}</div>` +
+    `<div class="greeting-sub">${_t(greetSubEn, greetSubZh)}</div>`;
 
   const elColor = EL_COLOR[yearPillar.stem.element];
   const dominantEl = Object.entries(elements).sort((a,b)=>b[1]-a[1])[0][0];

@@ -341,6 +341,19 @@ input  { font-family: inherit; }
   background-clip: text;
   animation: mysticShift 6s ease infinite;
 }
+.greeting-zodiac {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+.greeting-sub {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.6;
+  margin-top: 2px;
+  letter-spacing: 0.02em;
+}
 
 .btn-lang {
   font-family: 'Noto Sans SC', sans-serif;
@@ -355,6 +368,18 @@ input  { font-family: inherit; }
 }
 .btn-lang:active { background: rgba(255,255,255,0.14); }
 .btn-lang.zh-active { background: var(--gold-dim); border-color: var(--gold); }
+
+.btn-about-icon {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50%;
+  color: rgba(240,240,255,0.55);
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+.btn-about-icon:active { background: rgba(255,255,255,0.12); color: var(--gold); }
 
 /* ── Results Tab Bar ── */
 .results-tab-bar {
@@ -2579,4 +2604,502 @@ input  { font-family: inherit; }
   display: block;
   margin-top: 4px;
   font-size: 12px;
+}
+
+/* ════════════════════════════════════════
+   ABOUT PAGE — Comprehensive Bāzì Guide
+════════════════════════════════════════ */
+
+/* ── TOC chip bar ── */
+.about-toc-bar {
+  flex-shrink: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: rgba(0,0,0,0.2);
+}
+.about-toc-bar::-webkit-scrollbar { display: none; }
+.about-toc-inner {
+  display: flex;
+  gap: 6px;
+  width: max-content;
+}
+.about-toc-chip {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 5px 12px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(240,240,255,0.6);
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+.about-toc-chip:active { background: var(--gold-dim); color: var(--gold); }
+
+/* ── Section headings (override icon rule since new sections don't use icons) ── */
+.about-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; color: var(--gold); }
+
+/* ── Callout box ── */
+.about-callout {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: rgba(240,192,64,0.06);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: 13px;
+  color: rgba(240,240,255,0.75);
+  line-height: 1.7;
+}
+
+/* ── Four Pillars visual diagram ── */
+.about-pillars-visual {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 14px 0 10px;
+}
+.about-pillar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+.about-pillar-col.about-pillar-self .about-pillar-stem {
+  border: 1.5px solid rgba(192,132,252,0.5) !important;
+}
+.about-pillar-head {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.about-pillar-stem {
+  width: 100%;
+  padding: 7px 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.1);
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(240,240,255,0.6);
+  letter-spacing: 0.02em;
+}
+.about-pillar-branch {
+  width: 100%;
+  padding: 7px 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  font-size: 10px;
+  color: rgba(240,240,255,0.35);
+}
+.about-pillar-foot {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.about-pillar-meanings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+.about-pillar-meaning {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+.about-pm-head {
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.about-pillar-meaning p {
+  font-size: 11px !important;
+  line-height: 1.6 !important;
+  color: rgba(240,240,255,0.45) !important;
+}
+
+/* ── Heavenly Stems table ── */
+.about-stems-table {
+  margin-top: 14px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.ast-header, .ast-row {
+  display: grid;
+  grid-template-columns: 32px 48px 68px 50px 90px 1fr;
+  gap: 0;
+  align-items: center;
+  padding: 7px 10px;
+  font-size: 11px;
+}
+.ast-header {
+  background: rgba(255,255,255,0.05);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(240,240,255,0.35);
+}
+.ast-row {
+  border-top: 1px solid rgba(255,255,255,0.05);
+  color: rgba(240,240,255,0.65);
+}
+.ast-row:nth-child(even) { background: rgba(255,255,255,0.015); }
+.ast-zh {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+.ast-yang { color: rgba(255,210,60,0.7); }
+.ast-yin  { color: rgba(148,163,220,0.7); }
+
+/* ── Earthly Branches table ── */
+.about-branches-table {
+  margin-top: 14px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.abt-header, .abt-row {
+  display: grid;
+  grid-template-columns: 32px 100px 60px 60px 60px;
+  gap: 0;
+  align-items: center;
+  padding: 7px 10px;
+  font-size: 11px;
+}
+.abt-header {
+  background: rgba(255,255,255,0.05);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(240,240,255,0.35);
+}
+.abt-row {
+  border-top: 1px solid rgba(255,255,255,0.05);
+  color: rgba(240,240,255,0.65);
+}
+.abt-row:nth-child(even) { background: rgba(255,255,255,0.015); }
+.abt-zh {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+/* ── Five Elements grid ── */
+.about-elements-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+  margin: 14px 0 12px;
+}
+.about-el-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid color-mix(in srgb, var(--ec) 30%, transparent);
+  border-top: 2px solid var(--ec);
+  border-radius: var(--radius-md);
+  padding: 10px 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.aec-zh {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ec);
+  line-height: 1;
+}
+.aec-name {
+  font-size: 11px;
+  font-weight: 700;
+}
+.aec-traits {
+  font-size: 8.5px;
+  color: rgba(240,240,255,0.4);
+  line-height: 1.4;
+}
+.aec-organs {
+  font-size: 8px;
+  color: rgba(240,240,255,0.3);
+  margin-top: 2px;
+}
+.aec-season {
+  font-size: 9px;
+  color: rgba(240,240,255,0.45);
+  margin-top: 2px;
+}
+
+/* ── Element cycle diagrams ── */
+.about-cycle-wrap {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+.about-cycle-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(240,240,255,0.35);
+  margin-bottom: 10px;
+}
+.about-cycle-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.about-cycle-node {
+  font-size: 12px;
+  font-weight: 700;
+}
+.about-cycle-arrow {
+  font-size: 11px;
+  color: rgba(240,240,255,0.25);
+}
+.about-control-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+}
+.acg-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.acg-arrow {
+  color: rgba(240,240,255,0.25);
+  font-size: 11px;
+}
+
+/* ── Yin & Yang cards ── */
+.about-yy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0 8px;
+}
+.about-yy-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid;
+  border-radius: var(--radius-lg);
+  padding: 14px 12px;
+  text-align: center;
+}
+.ayy-symbol { font-size: 28px; margin-bottom: 6px; }
+.ayy-name {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: rgba(240,240,255,0.8);
+}
+.ayy-traits {
+  font-size: 11px;
+  color: rgba(240,240,255,0.4);
+  line-height: 1.7;
+}
+
+/* ── 60-Year Cycle table ── */
+.about-cycle60-grid {
+  margin-top: 14px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.ac60-header, .ac60-row {
+  display: grid;
+  grid-template-columns: 28px 48px 1fr 110px;
+  gap: 0;
+  align-items: center;
+  padding: 7px 10px;
+  font-size: 11px;
+}
+.ac60-header {
+  background: rgba(255,255,255,0.05);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(240,240,255,0.35);
+}
+.ac60-row {
+  border-top: 1px solid rgba(255,255,255,0.05);
+  color: rgba(240,240,255,0.6);
+}
+.ac60-row:nth-child(even) { background: rgba(255,255,255,0.015); }
+.ac60-zh {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+/* ── 12 Zodiac Animals grid ── */
+.about-zodiac-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+.about-z-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-md);
+  padding: 10px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.azc-emoji { font-size: 22px; line-height: 1; }
+.azc-name  { font-size: 12px; font-weight: 700; color: rgba(240,240,255,0.85); }
+.azc-years {
+  font-size: 8px;
+  color: rgba(240,240,255,0.3);
+  line-height: 1.5;
+  word-break: break-all;
+}
+.azc-trait { font-size: 9px; font-weight: 600; }
+
+/* ── Day Master table ── */
+.about-dm-table {
+  margin-top: 14px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.adm-header, .adm-row {
+  display: grid;
+  grid-template-columns: 120px 90px 1fr 1fr;
+  gap: 0;
+  align-items: start;
+  padding: 8px 10px;
+  font-size: 11px;
+}
+.adm-header {
+  background: rgba(255,255,255,0.05);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(240,240,255,0.35);
+}
+.adm-row {
+  border-top: 1px solid rgba(255,255,255,0.05);
+  color: rgba(240,240,255,0.6);
+}
+.adm-row:nth-child(even) { background: rgba(255,255,255,0.015); }
+.adm-zh { font-weight: 700; font-size: 11px; }
+
+/* ── Compatibility section ── */
+.about-compat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(240,240,255,0.4);
+  margin: 12px 0 8px;
+}
+.about-compat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.about-compat-pair {
+  background: rgba(74,222,128,0.06);
+  border: 1px solid rgba(74,222,128,0.15);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  font-size: 12px;
+  color: rgba(240,240,255,0.7);
+  text-align: center;
+}
+.about-compat-pair.clash {
+  background: rgba(239,68,68,0.06);
+  border-color: rgba(239,68,68,0.18);
+}
+.about-trio-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.about-trio {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 600;
+  gap: 8px;
+}
+.about-trio span:last-child {
+  color: rgba(240,240,255,0.5);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+/* ── How Fortune is Read — numbered steps ── */
+.about-reading-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+.about-rs-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 12px 14px;
+}
+.ars-num {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(240,192,64,0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--gold);
+}
+.ars-body { flex: 1; }
+.ars-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(240,240,255,0.85);
+  margin-bottom: 4px;
+}
+.ars-body p {
+  font-size: 12px !important;
+  color: rgba(240,240,255,0.45) !important;
+  line-height: 1.7 !important;
+  margin: 0 !important;
 }
