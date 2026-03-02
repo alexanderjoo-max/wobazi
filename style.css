@@ -370,16 +370,21 @@ input  { font-family: inherit; }
 .btn-lang.zh-active { background: var(--gold-dim); border-color: var(--gold); }
 
 .btn-about-icon {
-  width: 34px; height: 34px;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 50%;
-  color: rgba(240,240,255,0.55);
-  transition: background 0.2s, color 0.2s;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: none;
+  border: none;
+  color: rgba(240,240,255,0.45);
+  padding: 0;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: rgba(240,240,255,0.2);
+  transition: color 0.2s;
   flex-shrink: 0;
 }
-.btn-about-icon:active { background: rgba(255,255,255,0.12); color: var(--gold); }
+.btn-about-icon:active { color: var(--gold); text-decoration-color: var(--gold); }
 
 /* ── Results Tab Bar ── */
 .results-tab-bar {
