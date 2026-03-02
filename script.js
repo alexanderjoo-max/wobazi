@@ -407,10 +407,20 @@ function scrollAbout(id) {
   scroll.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
 }
 
+function scrollResults(id) {
+  const el = document.getElementById(id);
+  const scroll = document.querySelector('#results .scroll-body');
+  if (!el || !scroll) return;
+  const top = el.getBoundingClientRect().top - scroll.getBoundingClientRect().top + scroll.scrollTop - 8;
+  scroll.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+}
+
 function switchTab(tab) {
   ['today', 'actions', 'you'].forEach(t => {
     const btn = document.getElementById('tab-btn-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
+    const toc = document.getElementById('toc-' + t);
+    if (toc) toc.classList.toggle('hide', t !== tab);
   });
   document.querySelectorAll('#results .section[data-tab]').forEach(el => {
     el.classList.toggle('hide', el.dataset.tab !== tab || el.classList.contains('data-hidden'));

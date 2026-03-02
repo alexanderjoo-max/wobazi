@@ -3223,3 +3223,37 @@ input  { font-family: inherit; }
   background: rgba(255,255,255,0.07);
   border: 1px solid var(--border);
 }
+
+/* ── Results Tab Chip Bars ── */
+.results-toc-bar {
+  flex-shrink: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.results-toc-bar::-webkit-scrollbar { display: none; }
+.results-toc-inner {
+  display: flex;
+  gap: 6px;
+  padding: 6px 14px;
+  width: max-content;
+}
+.results-toc-chip {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.results-toc-chip:hover {
+  background: rgba(255,255,255,0.12);
+  color: var(--text);
+  border-color: rgba(255,255,255,0.2);
+}

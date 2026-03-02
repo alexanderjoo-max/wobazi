@@ -553,6 +553,42 @@
       </div>
     </div>
 
+    <!-- Tab section chip bars -->
+    <div class="results-toc-bar" id="toc-today">
+      <div class="results-toc-inner">
+        <button class="results-toc-chip" onclick="scrollResults('res-daily')"><span class="en">Fortune</span><span class="zh hide">运势</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-life-areas')"><span class="en">Life Areas</span><span class="zh hide">领域</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-insights')"><span class="en">Insights</span><span class="zh hide">洞察</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-actions-preview')"><span class="en">Actions</span><span class="zh hide">行动</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-forecast')"><span class="en">Forecast</span><span class="zh hide">预测</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-love')"><span class="en">Love</span><span class="zh hide">爱情</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-work')"><span class="en">Work</span><span class="zh hide">事业</span></button>
+      </div>
+    </div>
+    <div class="results-toc-bar hide" id="toc-actions">
+      <div class="results-toc-inner">
+        <button class="results-toc-chip" onclick="scrollResults('today-actions-section')"><span class="en">Plan</span><span class="zh hide">计划</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('oracle-section')"><span class="en">Oracle</span><span class="zh hide">神谕</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-outfit')"><span class="en">Outfit</span><span class="zh hide">穿搭</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-lucky-nums')"><span class="en">Numbers</span><span class="zh hide">数字</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-power-days')"><span class="en">Power Days</span><span class="zh hide">吉日</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-foods')"><span class="en">Foods</span><span class="zh hide">食物</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-crystals')"><span class="en">Crystals</span><span class="zh hide">水晶</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-ritual')"><span class="en">Ritual</span><span class="zh hide">仪式</span></button>
+      </div>
+    </div>
+    <div class="results-toc-bar hide" id="toc-you">
+      <div class="results-toc-inner">
+        <button class="results-toc-chip" onclick="scrollResults('you-profile-section')"><span class="en">Profile</span><span class="zh hide">档案</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-pillars')"><span class="en">Pillars</span><span class="zh hide">四柱</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-elements')"><span class="en">Elements</span><span class="zh hide">五行</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-fortune')"><span class="en">Fortune</span><span class="zh hide">命运</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-career')"><span class="en">Career</span><span class="zh hide">职业</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-season')"><span class="en">Season</span><span class="zh hide">旺季</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-yinyang')"><span class="en">Yin Yang</span><span class="zh hide">阴阳</span></button>
+      </div>
+    </div>
+
     <div class="scroll-body">
 
       <!-- Today Summary (compact hero) -->
@@ -584,7 +620,7 @@
       </section>
 
       <!-- Daily Fortune -->
-      <section class="section" data-tab="today">
+      <section class="section" data-tab="today" id="res-daily">
         <div class="section-head" data-tip="daily-fortune">
           <h3 class="en">Today's Fortune</h3>
           <h3 class="zh hide">今日运势</h3>
@@ -594,7 +630,7 @@
       </section>
 
       <!-- Today: Life Areas -->
-      <section class="section" data-tab="today">
+      <section class="section" data-tab="today" id="res-life-areas">
         <div class="section-head">
           <h3 class="en">Life Areas</h3>
           <h3 class="zh hide">生活领域</h3>
@@ -604,7 +640,7 @@
       </section>
 
       <!-- Today: Insights -->
-      <section class="section" data-tab="today">
+      <section class="section" data-tab="today" id="res-insights">
         <div class="section-head">
           <h3 class="en">Insights</h3>
           <h3 class="zh hide">洞察</h3>
@@ -613,7 +649,7 @@
       </section>
 
       <!-- Today: Actions Preview -->
-      <section class="section" data-tab="today">
+      <section class="section" data-tab="today" id="res-actions-preview">
         <div class="actions-preview-card">
           <div class="actions-preview-top">
             <div class="actions-preview-title"><span class="en">Top 3 Actions Today</span><span class="zh hide">今日3项行动</span></div>
@@ -624,7 +660,7 @@
       </section>
 
       <!-- 2026 Annual Forecast -->
-      <section class="section" data-tab="today">
+      <section class="section" data-tab="today" id="res-forecast">
         <div class="section-head" data-tip="forecast-2026">
           <h3 class="en">2026 Forecast</h3>
           <h3 class="zh hide">2026年运势</h3>
@@ -644,7 +680,7 @@
       </section>
 
       <!-- Love & Relationships -->
-      <section class="section" data-tab="today">
+      <section class="section" data-tab="today" id="res-love">
         <div class="section-head" data-tip="love-section">
           <h3 class="en">Love &amp; Relationships</h3>
           <h3 class="zh hide">爱情与关系</h3>
@@ -654,7 +690,7 @@
       </section>
 
       <!-- Work & Career -->
-      <section class="section" data-tab="today">
+      <section class="section" data-tab="today" id="res-work">
         <div class="section-head" data-tip="work-section">
           <h3 class="en">Work &amp; Career</h3>
           <h3 class="zh hide">事业运势</h3>
@@ -669,7 +705,7 @@
       </section>
 
       <!-- Four Pillars -->
-      <section class="section" data-tab="you">
+      <section class="section" data-tab="you" id="res-pillars">
         <div class="section-head" data-tip="four-pillars">
           <h3 class="en">Four Pillars</h3>
           <h3 class="zh hide">四柱</h3>
@@ -679,7 +715,7 @@
       </section>
 
       <!-- Element Balance -->
-      <section class="section" data-tab="you">
+      <section class="section" data-tab="you" id="res-elements">
         <div class="section-head" data-tip="element-balance">
           <h3 class="en">Element Balance</h3>
           <h3 class="zh hide">五行平衡</h3>
@@ -693,7 +729,7 @@
       </section>
 
       <!-- Fortune -->
-      <section class="section" data-tab="you">
+      <section class="section" data-tab="you" id="res-fortune">
         <div class="section-head" data-tip="fortune-cards">
           <h3 class="en">Life Fortune</h3>
           <h3 class="zh hide">命运</h3>
@@ -703,7 +739,7 @@
       </section>
 
       <!-- Feng Shui Outfit Guide -->
-      <section class="section" data-tab="actions" data-tip="outfit">
+      <section class="section" data-tab="actions" data-tip="outfit" id="res-outfit">
         <div class="section-head">
           <h3 class="en">Feng Shui Outfit Guide</h3>
           <h3 class="zh hide">风水穿搭指南</h3>
@@ -713,7 +749,7 @@
       </section>
 
       <!-- Lucky Numbers -->
-      <section class="section" data-tab="actions" data-tip="lucky-nums">
+      <section class="section" data-tab="actions" data-tip="lucky-nums" id="res-lucky-nums">
         <div class="section-head">
           <h3 class="en">Lucky Numbers</h3>
           <h3 class="zh hide">幸运数字</h3>
@@ -723,7 +759,7 @@
       </section>
 
       <!-- Auspicious Power Days -->
-      <section class="section" data-tab="actions" data-tip="power-days">
+      <section class="section" data-tab="actions" data-tip="power-days" id="res-power-days">
         <div class="section-head">
           <h3 class="en">Power Days</h3>
           <span class="section-sub">2026 · 吉日</span>
@@ -732,7 +768,7 @@
       </section>
 
       <!-- Career Archetype -->
-      <section class="section" data-tab="you">
+      <section class="section" data-tab="you" id="res-career">
         <div class="section-head" data-tip="career-archetype">
           <h3 class="en">Career Archetype</h3>
           <h3 class="zh hide">职业原型</h3>
@@ -741,7 +777,7 @@
       </section>
 
       <!-- Power Season -->
-      <section class="section" data-tab="you">
+      <section class="section" data-tab="you" id="res-season">
         <div class="section-head" data-tip="power-season">
           <h3 class="en">Power Season</h3>
           <h3 class="zh hide">旺季</h3>
@@ -750,7 +786,7 @@
       </section>
 
       <!-- Yin Yang -->
-      <section class="section" data-tab="you">
+      <section class="section" data-tab="you" id="res-yinyang">
         <div class="section-head" data-tip="yin-yang">
           <h3 class="en">Yin · Yang Balance</h3>
           <h3 class="zh hide">阴阳平衡</h3>
@@ -778,7 +814,7 @@
       </section>
 
       <!-- Lucky Foods -->
-      <section class="section" data-tab="actions" data-tip="foods">
+      <section class="section" data-tab="actions" data-tip="foods" id="res-foods">
         <div class="section-head">
           <h3 class="en">Lucky Foods</h3>
           <h3 class="zh hide">幸运食物</h3>
@@ -788,7 +824,7 @@
       </section>
 
       <!-- Crystals & Gems -->
-      <section class="section" data-tab="actions" data-tip="crystals">
+      <section class="section" data-tab="actions" data-tip="crystals" id="res-crystals">
         <div class="section-head">
           <h3 class="en">Crystals &amp; Gems</h3>
           <h3 class="zh hide">水晶宝石</h3>
@@ -798,7 +834,7 @@
       </section>
 
       <!-- Morning Ritual -->
-      <section class="section" data-tab="actions" data-tip="ritual">
+      <section class="section" data-tab="actions" data-tip="ritual" id="res-ritual">
         <div class="section-head">
           <h3 class="en">Morning Ritual</h3>
           <h3 class="zh hide">晨间仪式</h3>
