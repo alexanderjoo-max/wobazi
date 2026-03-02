@@ -535,6 +535,42 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   document.getElementById('trait-pills').innerHTML =
     zData.traits.map(t => `<span class="trait-pill">${_t(t, TRAIT_ZH[t] || t)}</span>`).join('');
 
+  // Compact hero: Today Summary
+  const heroNow = new Date();
+  const heroDateStr = heroNow.toLocaleDateString('en-GB', { day:'numeric', month:'short' }).toUpperCase();
+  const heroTodayIdx  = calcDayBranch(heroNow.getFullYear(), heroNow.getMonth(), heroNow.getDate());
+  const heroTodayAnimal = BRANCHES[heroTodayIdx].animal;
+  const heroIsCompat  = zData.compat.includes(heroTodayAnimal);
+  const heroIsClash   = zData.clash.includes(heroTodayAnimal);
+  const heroMsgEn = heroIsCompat
+    ? `Today's ${heroTodayAnimal} day flows with your chart — make bold moves.`
+    : heroIsClash
+    ? `Today's ${heroTodayAnimal} day creates friction with your chart — move slowly.`
+    : `A steady ${heroTodayAnimal} day — stay consistent and trust the process.`;
+  const heroMsgZh = heroIsCompat
+    ? `今日${ANIMAL_ZH[heroTodayAnimal]}日与命盘相合，大胆行动。`
+    : heroIsClash
+    ? `今日${ANIMAL_ZH[heroTodayAnimal]}日与命盘有冲，放缓节奏。`
+    : `今日${ANIMAL_ZH[heroTodayAnimal]}日平稳，坚持一致，相信过程。`;
+  const heroDo    = MORNING_RITUAL[dominantEl][0];
+  const heroAvoidEn = LUCKY_FOODS[dominantEl].avoid[0];
+  const heroAvoidZh = LUCKY_FOODS[dominantEl].avoid_zh[0];
+  const heroWatchEn = heroIsCompat ? 'Opportunities aligned with your long-term goals'
+                    : heroIsClash  ? 'Impulsive decisions — pause before acting'
+                    : 'Distraction — keep focus on one thing today';
+  const heroWatchZh = heroIsCompat ? '与长期目标相符的机遇'
+                    : heroIsClash  ? '冲动决定——行动前先暂停'
+                    : '分心——今天专注一件事';
+  const heroEmoji = BRANCHES.find(b => b.animal === animal)?.emoji || '';
+  document.getElementById('hero-today-label').innerHTML = _t(`TODAY · ${heroDateStr}`, `今日 · ${heroDateStr}`);
+  document.getElementById('hero-profile-chip').innerHTML =
+    `${heroEmoji} ${_t(animal, ANIMAL_ZH[animal])} · ${_t(yearPillar.stem.element, EL_ZH[yearPillar.stem.element])}`;
+  document.getElementById('hero-summary-msg').innerHTML = _t(heroMsgEn, heroMsgZh);
+  document.getElementById('hero-bullets').innerHTML = `
+    <div class="hc-bullet"><span class="hc-bullet-key">${_t('DO','做')}</span><span>${_t(heroDo.title, heroDo.title_zh)}</span></div>
+    <div class="hc-bullet"><span class="hc-bullet-key">${_t('AVOID','避')}</span><span>${_t(heroAvoidEn, heroAvoidZh)}</span></div>
+    <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span>${_t(heroWatchEn, heroWatchZh)}</span></div>`;
+
   // Daily fortune
   renderDailyFortune(animal);
 

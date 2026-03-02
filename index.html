@@ -246,19 +246,26 @@
 
     <div class="scroll-body">
 
-      <!-- Hero -->
-      <section class="hero-card" id="hero-card">
+      <!-- Today Summary (compact hero) -->
+      <section class="hero-compact" id="hero-card">
         <div class="hero-bg" id="hero-bg"></div>
-        <div class="hero-content">
-          <div class="hero-medallion" id="hero-medallion"></div>
-          <div class="hero-text">
-            <div class="hero-year-tag" id="hero-year-tag"></div>
-            <h1 class="hero-name" id="hero-name"></h1>
-            <div class="hero-chinese" id="hero-chinese"></div>
-            <div class="hero-badges" id="hero-badges"></div>
+        <div class="hc-inner">
+          <div class="hc-left">
+            <div class="hc-top-row">
+              <span class="hc-today-lbl" id="hero-today-label">TODAY</span>
+              <span class="hc-profile-chip" id="hero-profile-chip"></span>
+            </div>
+            <div class="hc-msg" id="hero-summary-msg"></div>
+            <div class="hc-bullets" id="hero-bullets"></div>
           </div>
+          <div class="hc-med" id="hero-medallion"></div>
         </div>
-        <div class="trait-pills" id="trait-pills"></div>
+        <!-- Kept for JS compatibility, not displayed -->
+        <h1 id="hero-name" style="display:none"></h1>
+        <div id="hero-chinese" style="display:none"></div>
+        <div id="hero-year-tag" style="display:none"></div>
+        <div id="hero-badges" style="display:none"></div>
+        <div id="trait-pills" style="display:none"></div>
       </section>
 
       <!-- 2026 Annual Forecast -->
@@ -543,6 +550,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=10"></script>
+  <script src="script.js?v=11"></script>
 </body>
 </html>
