@@ -109,9 +109,7 @@ app.use('/og-card.png', express.static(path.join(__dirname, 'og-card.png')));
 /* ── SEO: Sitemap & Robots ── */
 app.get('/sitemap.xml', (req, res) => {
   const pages = [
-    { loc: '/', priority: '1.0', changefreq: 'weekly' },
-    { loc: '/what-is-bazi', priority: '0.9', changefreq: 'monthly' },
-    { loc: '/bazi-calculator', priority: '0.9', changefreq: 'monthly' },
+    { loc: '/what-is-bazi', priority: '1.0', changefreq: 'monthly' },
     { loc: '/four-pillars-of-destiny', priority: '0.8', changefreq: 'monthly' },
     { loc: '/chinese-astrology', priority: '0.8', changefreq: 'monthly' },
     { loc: '/day-master', priority: '0.8', changefreq: 'monthly' },
@@ -163,12 +161,7 @@ function checkRateLimit(ip) {
 const seoBase = { baseUrl: 'https://wobazi.com' };
 
 app.get('/', (req, res) => {
-  res.render('pages/home', {
-    ...seoBase,
-    title: 'WoBazi | Chinese Astrology & Four Pillars of Destiny',
-    description: 'Discover your Chinese destiny with BaZi (Four Pillars of Destiny). Free birth chart calculator, daily readings, AI-powered fortune insights, and compatibility analysis.',
-    canonical: '/',
-  });
+  res.redirect(301, '/app');
 });
 
 app.get('/what-is-bazi', (req, res) => {
@@ -182,36 +175,7 @@ app.get('/what-is-bazi', (req, res) => {
 });
 
 app.get('/bazi-calculator', (req, res) => {
-  res.render('pages/bazi-calculator', {
-    ...seoBase,
-    title: 'Free BaZi Calculator | Four Pillars of Destiny Chart | WoBazi',
-    description: 'Calculate your BaZi (Four Pillars of Destiny) chart for free. Enter your birth date to discover your Day Master, element balance, zodiac animal, and fortune scores.',
-    canonical: '/bazi-calculator',
-    bazi,
-    result: null,
-  });
-});
-
-app.post('/bazi-calculator', (req, res) => {
-  const { year, month, day, hour, gender } = req.body;
-  const y = parseInt(year), m = parseInt(month), d = parseInt(day);
-  const h = hour !== '' && hour !== undefined ? parseInt(hour) : null;
-
-  const pillars = bazi.calcBazi(y, m, d, h);
-  const elements = bazi.calcElements(pillars);
-  const animal = pillars[0].branch.animal;
-  const fortune = bazi.calcFortune(animal, elements);
-  const dominant = bazi.getDominant(elements);
-  const dayMaster = pillars[2].stem;
-
-  res.render('pages/bazi-calculator', {
-    ...seoBase,
-    title: 'Your BaZi Chart | Four Pillars of Destiny | WoBazi',
-    description: `Your BaZi chart: ${dayMaster.char} ${dayMaster.element} Day Master. Discover your Four Pillars, element balance, and fortune scores.`,
-    canonical: '/bazi-calculator',
-    bazi,
-    result: { pillars, elements, animal, fortune, dominant, dayMaster, year: y, month: m, day: d, hour: h, gender },
-  });
+  res.redirect(301, '/app');
 });
 
 app.get('/four-pillars-of-destiny', (req, res) => {
