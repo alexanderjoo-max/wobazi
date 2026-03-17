@@ -103,6 +103,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/app', express.static(path.join(__dirname, 'app')));
 // Serve logos and og-card from root for backward compat
 app.use('/Logos', express.static(path.join(__dirname, 'Logos')));
+app.use('/app/Logos', express.static(path.join(__dirname, 'Logos')));
 app.use('/og-card.png', express.static(path.join(__dirname, 'og-card.png')));
 
 /* ── SEO: Sitemap & Robots ── */
