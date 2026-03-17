@@ -1508,6 +1508,7 @@ function showShareCard() {
           <div class="share-fortune-lbl">${lb}</div>
         </div>`).join('')}
     </div>
+    <div class="share-cta-line">✦ Discover your destiny ✦</div>
     <div class="share-url">wobazi.com</div>`;
 
   document.getElementById('share-overlay').classList.remove('hide');

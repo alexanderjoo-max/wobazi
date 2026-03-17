@@ -29,7 +29,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=15">
+  <link rel="stylesheet" href="style.css?v=16">
 </head>
 <body>
 
@@ -489,20 +489,21 @@
           <input type="text" id="name" placeholder="What do we call you?" autocomplete="off" spellcheck="false">
         </div>
 
-        <div class="field">
-          <label><span class="en">Date of Birth <span class="label-req">*</span></span><span class="zh hide">出生日期 <span class="label-req">*</span></span></label>
-          <div class="date-trio">
-            <input type="number" id="birth-day"   class="date-part" placeholder="DD"   min="1"    max="31"   inputmode="numeric">
-            <span class="date-sep">/</span>
-            <input type="number" id="birth-month" class="date-part" placeholder="MM"   min="1"    max="12"   inputmode="numeric">
-            <span class="date-sep">/</span>
-            <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1920" max="2030" inputmode="numeric">
+        <div class="field field-row field-datetime">
+          <div class="field-col field-col-date">
+            <label><span class="en">Date of Birth <span class="label-req">*</span></span><span class="zh hide">出生日期 <span class="label-req">*</span></span></label>
+            <div class="date-trio">
+              <input type="number" id="birth-day"   class="date-part" placeholder="DD"   min="1"    max="31"   inputmode="numeric">
+              <span class="date-sep">/</span>
+              <input type="number" id="birth-month" class="date-part" placeholder="MM"   min="1"    max="12"   inputmode="numeric">
+              <span class="date-sep">/</span>
+              <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1920" max="2030" inputmode="numeric">
+            </div>
           </div>
-        </div>
-
-        <div class="field">
-          <label><span class="en">Time of Birth <span class="label-opt">optional — unlocks Hour Pillar</span></span><span class="zh hide">出生时间 <span class="label-opt">可选 — 解锁时柱</span></span></label>
-          <input type="time" id="birthtime">
+          <div class="field-col field-col-time">
+            <label><span class="en">Time <span class="label-opt">optional</span></span><span class="zh hide">时间 <span class="label-opt">可选</span></span></label>
+            <input type="time" id="birthtime" class="time-input">
+          </div>
         </div>
 
         <div class="field field-row">
@@ -547,7 +548,7 @@
         <div class="bagua-ring bagua-outer"></div>
         <div class="bagua-ring bagua-inner"></div>
         <div class="taiji-wrap">
-          <div class="taiji">☯</div>
+          <div class="taiji">八字</div>
           <div class="taiji-ring r1"></div>
           <div class="taiji-ring r2"></div>
           <div class="taiji-ring r3"></div>
@@ -1001,16 +1002,27 @@
         </div>
       </section>
 
-      <div class="results-footer">
-        <div class="footer-extras">
-          <button class="btn-about-icon footer-about" onclick="haptic(6); showAbout()">What is Bāzì?</button>
-          <button class="btn-lang footer-lang" onclick="toggleLang()">中文</button>
+      <footer class="results-footer">
+        <div class="footer-actions">
+          <button class="footer-link" onclick="haptic(6); showAbout()">
+            <span class="en">What is Bāzì?</span><span class="zh hide">什么是八字？</span>
+          </button>
+          <span class="footer-dot">·</span>
+          <button class="footer-link" onclick="haptic(8); showScreen('input')">
+            <span class="en">New Reading</span><span class="zh hide">重新算命</span>
+          </button>
+          <span class="footer-dot">·</span>
+          <button class="footer-link" onclick="toggleLang()">
+            <span class="en">中文</span><span class="zh hide">English</span>
+          </button>
         </div>
-        <button class="btn-secondary" onclick="haptic(8); showScreen('input')">
-          <span class="en">New Reading</span>
-          <span class="zh hide">重新算命</span>
-        </button>
-      </div>
+        <div class="footer-brand">
+          <img src="Logos/SVG/rev-horiz.svg" class="footer-logo" alt="Wobazi">
+          <p class="footer-tagline"><span class="en">Ancient wisdom, modern clarity</span><span class="zh hide">古老智慧，现代洞见</span></p>
+        </div>
+        <p class="footer-copy">© 2026 Wobazi. <span class="en">All rights reserved.</span><span class="zh hide">保留所有权利。</span></p>
+        <p class="footer-disclaimer"><span class="en">For entertainment &amp; self-reflection purposes only. Not a substitute for professional advice.</span><span class="zh hide">仅供娱乐与自我反思。不能替代专业建议。</span></p>
+      </footer>
     </div>
   </div>
 
@@ -1123,6 +1135,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=15"></script>
+  <script src="script.js?v=16"></script>
 </body>
 </html>
