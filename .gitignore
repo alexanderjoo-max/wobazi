@@ -3,3 +3,7 @@ node_modules/
 wobazi.db
 wobazi.db-wal
 wobazi.db-shm
+.DS_Store
+.claude/
+Google OAuth/
+Logos/

@@ -42,8 +42,48 @@ db.exec(`
   );
 `);
 
+/* ── SQLite Session Store (survives server restarts) ── */
+db.exec(`
+  CREATE TABLE IF NOT EXISTS sessions (
+    sid TEXT PRIMARY KEY,
+    sess TEXT NOT NULL,
+    expired INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_sessions_expired ON sessions(expired);
+`);
+
+class SqliteStore extends session.Store {
+  constructor() { super(); this._cleanup(); }
+  _cleanup() {
+    db.prepare('DELETE FROM sessions WHERE expired < ?').run(Date.now());
+    setTimeout(() => this._cleanup(), 15 * 60 * 1000); // every 15 min
+  }
+  get(sid, cb) {
+    try {
+      const row = db.prepare('SELECT sess FROM sessions WHERE sid = ? AND expired > ?').get(sid, Date.now());
+      cb(null, row ? JSON.parse(row.sess) : null);
+    } catch (e) { cb(e); }
+  }
+  set(sid, sess, cb) {
+    try {
+      const maxAge = sess.cookie?.maxAge || 30 * 24 * 60 * 60 * 1000;
+      const expired = Date.now() + maxAge;
+      db.prepare('INSERT OR REPLACE INTO sessions (sid, sess, expired) VALUES (?, ?, ?)').run(sid, JSON.stringify(sess), expired);
+      cb?.(null);
+    } catch (e) { cb?.(e); }
+  }
+  destroy(sid, cb) {
+    try {
+      db.prepare('DELETE FROM sessions WHERE sid = ?').run(sid);
+      cb?.(null);
+    } catch (e) { cb?.(e); }
+  }
+  touch(sid, sess, cb) { this.set(sid, sess, cb); }
+}
+
 /* ── Session ── */
 app.use(session({
+  store: new SqliteStore(),
   secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
   resave: false,
   saveUninitialized: false,
@@ -89,7 +129,7 @@ app.get('/auth/google', (req, res) => {
     response_type: 'code',
     scope: 'openid profile email',
     access_type: 'offline',
-    prompt: 'consent',
+    prompt: 'select_account',
   });
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
 });
