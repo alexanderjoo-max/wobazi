@@ -391,6 +391,9 @@ function showScreen(id) {
   if (id === 'results') {
     document.getElementById('results').querySelector('.scroll-body').scrollTop = 0;
   }
+  // Show/hide floating Oracle FAB
+  const fab = document.getElementById('oracle-fab');
+  if (fab) fab.classList.toggle('hide', id !== 'results');
 }
 
 function showAbout() {
@@ -416,7 +419,7 @@ function scrollResults(id) {
 }
 
 function switchTab(tab) {
-  ['today', 'actions', 'you'].forEach(t => {
+  ['today', 'you', 'actions', 'relationships'].forEach(t => {
     const btn = document.getElementById('tab-btn-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
     const toc = document.getElementById('toc-' + t);
@@ -3232,6 +3235,9 @@ function isNoblemanDay(userAnimal, todayAnimal) {
 
 /* ── Show Oracle screen ── */
 function showOracle() {
+  openOracleDrawer();
+  return;
+  // Legacy full-screen mode below (kept for reference)
   if (!_shareData || !_shareData.animal) {
     alert('Complete your BaZi profile first to unlock the Oracle');
     return;
@@ -3612,6 +3618,261 @@ showScreen = function(id) {
   }
   _origShowScreen(id);
 };
+
+/* ═══════════════════════════════════════
+   ORACLE DRAWER
+═══════════════════════════════════════ */
+let _drawerOracleHistory = [];
+let _drawerOracleSending = false;
+let _drawerOracleTodayData = null;
+
+function openOracleDrawer() {
+  if (!_shareData || !_shareData.animal) {
+    alert('Complete your BaZi profile first to unlock the Oracle');
+    return;
+  }
+
+  const backdrop = document.getElementById('oracle-drawer-backdrop');
+  const drawer = document.getElementById('oracle-drawer');
+  backdrop.classList.remove('hide');
+  drawer.classList.remove('hide');
+  // Force layout before adding show class for CSS transition
+  void drawer.offsetHeight;
+  backdrop.classList.add('show');
+  drawer.classList.add('show');
+
+  // Populate context bar
+  const today = calcTodayPillar();
+  const userAnimal = _shareData.animal;
+  const zData = ZODIAC[userAnimal];
+  const isClash = zData.clash.includes(today.animal);
+  const isCompat = zData.compat.includes(today.animal);
+  const nobleman = isNoblemanDay(userAnimal, today.animal);
+
+  let score;
+  if (isCompat) score = 85 + Math.floor(Math.random() * 12);
+  else if (isClash) score = 38 + Math.floor(Math.random() * 18);
+  else score = 60 + Math.floor(Math.random() * 22);
+
+  const clashColor = isClash ? '#ef4444' : isCompat ? '#22c55e' : '#f0c040';
+  const clashLabel = isClash ? 'Clash' : isCompat ? 'Harmony' : 'Neutral';
+
+  document.getElementById('oracle-drawer-ctx').innerHTML = `
+    <div class="oracle-ctx-pill">
+      <span class="ctx-dot" style="background:${EL_COLOR[today.stem.element]}"></span>
+      ${today.stem.char}${today.branch.char} ${today.animal} Day
+    </div>
+    <div class="oracle-ctx-pill">
+      <span class="ctx-dot" style="background:${clashColor}"></span>
+      ${clashLabel}
+    </div>
+    <div class="oracle-ctx-pill">Force ${score}</div>
+    <div class="oracle-ctx-pill" style="${nobleman ? 'color:var(--gold);border-color:rgba(240,192,64,0.3)' : ''}">
+      ${nobleman ? '✦ Nobleman' : 'No Nobleman'}
+    </div>
+  `;
+
+  _drawerOracleTodayData = { stem: today.stem.char, branch: today.branch.char, animal: today.animal, isClash, isCompat, score, nobleman };
+}
+
+function closeOracleDrawer() {
+  const backdrop = document.getElementById('oracle-drawer-backdrop');
+  const drawer = document.getElementById('oracle-drawer');
+  backdrop.classList.remove('show');
+  drawer.classList.remove('show');
+  setTimeout(() => {
+    backdrop.classList.add('hide');
+    drawer.classList.add('hide');
+  }, 350);
+}
+
+function sendOracleChipDrawer(btn) {
+  const msg = btn.textContent.trim();
+  document.getElementById('oracle-drawer-input').value = msg;
+  sendOracleDrawerMessage();
+}
+
+async function sendOracleDrawerMessage() {
+  if (_drawerOracleSending) return;
+  const input = document.getElementById('oracle-drawer-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  if (!checkOracleRateLimit()) {
+    const messagesEl = document.getElementById('oracle-drawer-messages');
+    messagesEl.insertAdjacentHTML('beforeend',
+      `<div class="oracle-limit-msg">You've reached your daily Oracle limit (10 questions). Return tomorrow for fresh guidance.</div>`);
+    messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    return;
+  }
+
+  _drawerOracleSending = true;
+  input.value = '';
+  input.style.height = 'auto';
+
+  document.getElementById('oracle-drawer-chips').classList.add('hide');
+
+  const messagesEl = document.getElementById('oracle-drawer-messages');
+
+  const userBubble = document.createElement('div');
+  userBubble.className = 'oracle-msg oracle-msg-user';
+  userBubble.textContent = msg;
+  messagesEl.appendChild(userBubble);
+
+  const typingEl = document.createElement('div');
+  typingEl.className = 'oracle-typing';
+  typingEl.innerHTML = '<div class="oracle-typing-dot"></div><div class="oracle-typing-dot"></div><div class="oracle-typing-dot"></div>';
+  messagesEl.appendChild(typingEl);
+  typingEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+  const chartData = {
+    animal: _shareData.animal,
+    element: _shareData.element,
+    polarity: _shareData.polarity,
+    dominantEl: _shareData.dominantEl,
+    fortune: _shareData.fortune,
+    pillars: null,
+    today: _drawerOracleTodayData,
+  };
+
+  try {
+    const response = await fetch('/api/oracle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: msg,
+        chartData,
+        conversationHistory: _drawerOracleHistory,
+      }),
+    });
+
+    if (response.status === 429) {
+      typingEl.remove();
+      const data = await response.json();
+      messagesEl.insertAdjacentHTML('beforeend',
+        `<div class="oracle-limit-msg">${data.error}</div>`);
+      messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      _drawerOracleSending = false;
+      return;
+    }
+
+    const oracleBubble = document.createElement('div');
+    oracleBubble.className = 'oracle-msg oracle-msg-oracle';
+    oracleBubble.textContent = '';
+
+    let fullText = '';
+    let firstToken = true;
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const payload = line.slice(6);
+        if (payload === '[DONE]') continue;
+
+        try {
+          const data = JSON.parse(payload);
+          if (data.error) {
+            typingEl.remove();
+            messagesEl.insertAdjacentHTML('beforeend',
+              `<div class="oracle-error-msg">${data.error}</div>`);
+            messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            _drawerOracleSending = false;
+            return;
+          }
+          if (data.token) {
+            if (firstToken) {
+              typingEl.remove();
+              messagesEl.appendChild(oracleBubble);
+              firstToken = false;
+            }
+            fullText += data.token;
+            oracleBubble.innerHTML = parseOracleResponse(fullText);
+            oracleBubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        } catch (e) { /* skip */ }
+      }
+    }
+
+    if (firstToken) {
+      typingEl.remove();
+      messagesEl.insertAdjacentHTML('beforeend',
+        `<div class="oracle-error-msg">The Oracle is temporarily unavailable — try again in a moment.</div>`);
+      messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else {
+      _drawerOracleHistory.push({ role: 'user', content: msg });
+      _drawerOracleHistory.push({ role: 'assistant', content: fullText });
+      incrementOracleCount();
+    }
+  } catch (err) {
+    console.error('[Oracle drawer fetch error]', err);
+    typingEl.remove();
+    messagesEl.insertAdjacentHTML('beforeend',
+      `<div class="oracle-error-msg">The Oracle is temporarily unavailable — try again in a moment.</div>`);
+    messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+
+  _drawerOracleSending = false;
+}
+
+/* ═══════════════════════════════════════
+   COMPATIBILITY CHECK (Relationships tab)
+═══════════════════════════════════════ */
+function checkCompatibility() {
+  const day = parseInt(document.getElementById('partner-day').value);
+  const month = parseInt(document.getElementById('partner-month').value);
+  const year = parseInt(document.getElementById('partner-year').value);
+  const resultEl = document.getElementById('compat-result');
+
+  if (!day || !month || !year || year < 1920 || year > 2025) {
+    resultEl.innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:16px;font-size:13px">Please enter a valid birth date.</p>';
+    return;
+  }
+
+  // Calculate partner's zodiac animal
+  const animals = ['Monkey','Rooster','Dog','Pig','Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat'];
+  const partnerAnimal = animals[year % 12];
+  const userAnimal = _shareData ? _shareData.animal : null;
+
+  if (!userAnimal) {
+    resultEl.innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:16px;font-size:13px">Complete your reading first.</p>';
+    return;
+  }
+
+  const zData = ZODIAC[userAnimal];
+  const isCompat = zData.compat.includes(partnerAnimal);
+  const isClash = zData.clash.includes(partnerAnimal);
+
+  let verdict, color, desc;
+  if (isCompat) {
+    verdict = 'Harmonious Match'; color = '#22c55e';
+    desc = `Your ${userAnimal} and their ${partnerAnimal} form a natural alliance. This pairing supports mutual growth, trust, and ease.`;
+  } else if (isClash) {
+    verdict = 'Challenging Dynamic'; color = '#ef4444';
+    desc = `Your ${userAnimal} and their ${partnerAnimal} sit in opposition. This creates tension but also powerful chemistry — awareness is key.`;
+  } else {
+    verdict = 'Neutral Energy'; color = '#f0c040';
+    desc = `Your ${userAnimal} and their ${partnerAnimal} have a neutral connection. The relationship dynamics depend more on your monthly and daily pillars.`;
+  }
+
+  resultEl.innerHTML = `
+    <div style="margin-top:20px;padding:16px;background:rgba(255,255,255,0.03);border:1px solid ${color}33;border-radius:var(--radius-md);text-align:center">
+      <div style="font-size:24px;margin-bottom:8px">${ZODIAC[userAnimal]?.emoji || ''} + ${ZODIAC[partnerAnimal]?.emoji || ''}</div>
+      <div style="font-size:15px;font-weight:700;color:${color};margin-bottom:8px">${verdict}</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6">${desc}</p>
+    </div>
+  `;
+}
 
 /* ── Init ── */
 buildStars();

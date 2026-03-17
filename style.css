@@ -344,6 +344,20 @@ input  { font-family: inherit; }
   background-clip: text;
   animation: mysticShift 6s ease infinite;
 }
+/* Mobile: move about/lang to footer, shrink logo */
+.footer-extras { display: none; }
+@media (max-width: 480px) {
+  .results-header .nav-logo { height: 11px; }
+  .results-header .btn-about-icon,
+  .results-header .btn-lang { display: none; }
+  .footer-extras {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+}
 .greeting-zodiac {
   font-size: 22px;
   font-weight: 800;
@@ -905,7 +919,7 @@ input  { font-family: inherit; }
 .lucky-val { font-size: 12px; font-weight: 600; color: var(--text); }
 
 /* ── Footer ── */
-.results-footer { display: flex; justify-content: center; padding-top: 8px; }
+.results-footer { display: flex; flex-direction: column; align-items: center; padding-top: 8px; }
 
 /* ── Reveal Animations ── */
 .reveal {
@@ -3490,4 +3504,174 @@ input  { font-family: inherit; }
 .nav-user-avatar {
   width: 28px; height: 28px; border-radius: 50%;
   border: 1.5px solid var(--gold); object-fit: cover; cursor: pointer;
+}
+
+/* ────────────────────────
+   FLOATING ORACLE BUTTON
+──────────────────────── */
+.oracle-fab {
+  position: fixed;
+  bottom: 88px;
+  right: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #C9A84C;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.4), 0 2px 8px rgba(0,0,0,0.3);
+  z-index: 900;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+.oracle-fab:active { transform: scale(0.92); }
+.oracle-fab-char {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ────────────────────────
+   ORACLE DRAWER
+──────────────────────── */
+.oracle-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 950;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.oracle-drawer-backdrop.show { opacity: 1; }
+
+.oracle-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 85vh;
+  background: var(--bg);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  z-index: 960;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  border-top: 1px solid var(--border);
+}
+.oracle-drawer.show { transform: translateY(0); }
+
+.oracle-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px 8px;
+  position: relative;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.oracle-drawer-handle {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.2);
+}
+.oracle-drawer-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  padding-top: 8px;
+}
+.oracle-drawer-close {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  font-size: 24px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+}
+.oracle-drawer-close:active { color: var(--text); }
+
+.oracle-drawer-ctx {
+  flex-shrink: 0;
+  display: flex;
+  gap: 6px;
+  padding: 8px 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid var(--border);
+}
+.oracle-drawer-ctx::-webkit-scrollbar { display: none; }
+
+.oracle-drawer-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 80px;
+}
+
+.oracle-drawer-input {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--bg) 70%, transparent);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* ────────────────────────
+   RELATIONSHIPS TAB
+──────────────────────── */
+.coming-soon-card {
+  text-align: center;
+  padding: 32px 24px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.coming-soon-icon {
+  display: block;
+  font-size: 28px;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.compat-check-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+.compat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+.compat-input-row .date-part {
+  width: 60px;
+  text-align: center;
+}
+.compat-input-row .date-part.year {
+  width: 80px;
 }

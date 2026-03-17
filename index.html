@@ -573,8 +573,9 @@
     <div class="results-tab-bar">
       <div class="tab-bar-inner">
         <button class="tab-btn active" id="tab-btn-today" onclick="haptic(6); switchTab('today')"><span class="en">Today</span><span class="zh hide">今日</span></button>
-        <button class="tab-btn" id="tab-btn-actions" onclick="haptic(6); switchTab('actions')"><span class="en">Actions</span><span class="zh hide">行动</span></button>
         <button class="tab-btn" id="tab-btn-you" onclick="haptic(6); switchTab('you')"><span class="en">You</span><span class="zh hide">你</span></button>
+        <button class="tab-btn" id="tab-btn-actions" onclick="haptic(6); switchTab('actions')"><span class="en">Actions</span><span class="zh hide">行动</span></button>
+        <button class="tab-btn" id="tab-btn-relationships" onclick="haptic(6); switchTab('relationships')"><span class="en">Relationships</span><span class="zh hide">关系</span></button>
       </div>
     </div>
 
@@ -586,19 +587,16 @@
         <button class="results-toc-chip" onclick="scrollResults('res-insights')"><span class="en">Insights</span><span class="zh hide">洞察</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-actions-preview')"><span class="en">Actions</span><span class="zh hide">行动</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-forecast')"><span class="en">Forecast</span><span class="zh hide">预测</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-love')"><span class="en">Love</span><span class="zh hide">爱情</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-work')"><span class="en">Work</span><span class="zh hide">事业</span></button>
       </div>
     </div>
     <div class="results-toc-bar hide" id="toc-actions">
       <div class="results-toc-inner">
         <button class="results-toc-chip" onclick="scrollResults('today-actions-section')"><span class="en">Plan</span><span class="zh hide">计划</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('oracle-section')"><span class="en">Oracle</span><span class="zh hide">神谕</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-outfit')"><span class="en">Outfit</span><span class="zh hide">穿搭</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-foods')"><span class="en">Foods</span><span class="zh hide">食物</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-lucky-nums')"><span class="en">Numbers</span><span class="zh hide">数字</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-power-days')"><span class="en">Power Days</span><span class="zh hide">吉日</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-foods')"><span class="en">Foods</span><span class="zh hide">食物</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-crystals')"><span class="en">Crystals</span><span class="zh hide">水晶</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-ritual')"><span class="en">Ritual</span><span class="zh hide">仪式</span></button>
       </div>
     </div>
@@ -611,6 +609,15 @@
         <button class="results-toc-chip" onclick="scrollResults('res-career')"><span class="en">Career</span><span class="zh hide">职业</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-season')"><span class="en">Season</span><span class="zh hide">旺季</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-yinyang')"><span class="en">Yin Yang</span><span class="zh hide">阴阳</span></button>
+      </div>
+    </div>
+    <div class="results-toc-bar hide" id="toc-relationships">
+      <div class="results-toc-inner">
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-profile')"><span class="en">Profile</span><span class="zh hide">档案</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-compat')"><span class="en">Compatibility</span><span class="zh hide">相合</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-forecast')"><span class="en">Forecast</span><span class="zh hide">预测</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-soul')"><span class="en">Soul Animals</span><span class="zh hide">灵兽</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-business')"><span class="en">Business</span><span class="zh hide">商业</span></button>
       </div>
     </div>
 
@@ -714,11 +721,11 @@
         <div id="today-actions-card"></div>
       </section>
 
-      <!-- Love & Relationships -->
-      <section class="section" data-tab="today" id="res-love">
+      <!-- Love & Relationships (moved to Relationships tab) -->
+      <section class="section" data-tab="relationships" id="res-rel-forecast">
         <div class="section-head" data-tip="love-section">
-          <h3 class="en">Love &amp; Relationships</h3>
-          <h3 class="zh hide">爱情与关系</h3>
+          <h3 class="en">Monthly Love Forecast</h3>
+          <h3 class="zh hide">每月爱情运势</h3>
           <span class="section-sub">2026 · 情缘运势</span>
         </div>
         <div id="love-card"></div>
@@ -732,11 +739,6 @@
           <span class="section-sub">2026 · 职业运势</span>
         </div>
         <div id="work-card"></div>
-      </section>
-
-      <!-- Oracle Deep Read (Actions tab) -->
-      <section class="section orc-section" data-tab="actions" id="oracle-section">
-        <div id="oracle-card"></div>
       </section>
 
       <!-- Four Pillars -->
@@ -858,17 +860,7 @@
         <div id="foods-card"></div>
       </section>
 
-      <!-- Crystals & Gems -->
-      <section class="section" data-tab="actions" data-tip="crystals" id="res-crystals">
-        <div class="section-head">
-          <h3 class="en">Crystals &amp; Gems</h3>
-          <h3 class="zh hide">水晶宝石</h3>
-          <span class="section-sub"><span class="en">Energy Stones</span><span class="zh hide">能量宝石</span></span>
-        </div>
-        <div id="crystals-card"></div>
-      </section>
-
-      <!-- Morning Ritual -->
+      <!-- Morning Ritual (includes Crystals) -->
       <section class="section" data-tab="actions" data-tip="ritual" id="res-ritual">
         <div class="section-head">
           <h3 class="en">Morning Ritual</h3>
@@ -876,6 +868,14 @@
           <span class="section-sub">元素晨练</span>
         </div>
         <div id="ritual-card"></div>
+        <div class="ritual-crystals-sub" id="res-crystals">
+          <div class="section-head" style="margin-top:24px">
+            <h3 class="en">Crystals &amp; Gems</h3>
+            <h3 class="zh hide">水晶宝石</h3>
+            <span class="section-sub"><span class="en">Energy Stones</span><span class="zh hide">能量宝石</span></span>
+          </div>
+          <div id="crystals-card"></div>
+        </div>
       </section>
 
       <!-- Feng Shui Direction (Kua) — hidden if no gender -->
@@ -910,10 +910,10 @@
         </div>
       </section>
 
-      <!-- Compatibility -->
-      <section class="section" data-tab="you">
+      <!-- Compatibility (moved to Relationships tab) -->
+      <section class="section" data-tab="relationships">
         <div class="section-head" data-tip="compatibility">
-          <h3 class="en">Compatibility</h3>
+          <h3 class="en">Zodiac Compatibility</h3>
           <h3 class="zh hide">生肖相合</h3>
         </div>
         <div id="compat-wrap"></div>
@@ -928,12 +928,118 @@
         <div class="lucky-grid" id="lucky-grid"></div>
       </section>
 
+      <!-- Relationships: Profile -->
+      <section class="section" data-tab="relationships" id="res-rel-profile">
+        <div class="section-head">
+          <h3 class="en">Your Relationship Profile</h3>
+          <h3 class="zh hide">你的感情档案</h3>
+          <span class="section-sub"><span class="en">Based on your Day Pillar</span><span class="zh hide">基于日柱</span></span>
+        </div>
+        <div class="coming-soon-card">
+          <span class="coming-soon-icon">✦</span>
+          <p class="en">Your relationship archetype and emotional patterns — coming soon.</p>
+          <p class="zh hide">你的感情原型与情感模式 — 即将推出。</p>
+        </div>
+      </section>
+
+      <!-- Relationships: Compatibility Check -->
+      <section class="section" data-tab="relationships" id="res-rel-compat">
+        <div class="section-head">
+          <h3 class="en">Compatibility Check</h3>
+          <h3 class="zh hide">八字合婚</h3>
+          <span class="section-sub"><span class="en">Enter partner's birth date</span><span class="zh hide">输入伴侣生日</span></span>
+        </div>
+        <div class="compat-check-card">
+          <div class="compat-input-row">
+            <input type="number" class="date-part" id="partner-day" placeholder="DD" min="1" max="31" inputmode="numeric">
+            <span class="date-sep">/</span>
+            <input type="number" class="date-part" id="partner-month" placeholder="MM" min="1" max="12" inputmode="numeric">
+            <span class="date-sep">/</span>
+            <input type="number" class="date-part year" id="partner-year" placeholder="YYYY" min="1920" max="2025" inputmode="numeric">
+          </div>
+          <button class="btn-primary btn-full" onclick="haptic(10); checkCompatibility()" style="margin-top:16px">
+            <span class="en">Check Compatibility</span><span class="zh hide">查看合婚</span>
+          </button>
+          <div id="compat-result"></div>
+        </div>
+      </section>
+
+      <!-- Relationships: Soul Animals -->
+      <section class="section" data-tab="relationships" id="res-rel-soul">
+        <div class="section-head">
+          <h3 class="en">Soul Animals</h3>
+          <h3 class="zh hide">灵兽</h3>
+          <span class="section-sub"><span class="en">Your secret allies</span><span class="zh hide">你的秘密盟友</span></span>
+        </div>
+        <div class="coming-soon-card">
+          <span class="coming-soon-icon">✦</span>
+          <p class="en">Discover which zodiac animals are your soul allies and secret friends — coming soon.</p>
+          <p class="zh hide">发现哪些生肖是你的灵魂盟友和秘密朋友 — 即将推出。</p>
+        </div>
+      </section>
+
+      <!-- Relationships: Business Compatibility -->
+      <section class="section" data-tab="relationships" id="res-rel-business">
+        <div class="section-head">
+          <h3 class="en">Business Compatibility</h3>
+          <h3 class="zh hide">商业合作</h3>
+          <span class="section-sub"><span class="en">Partner &amp; team dynamics</span><span class="zh hide">合伙与团队动态</span></span>
+        </div>
+        <div class="coming-soon-card">
+          <span class="coming-soon-icon">✦</span>
+          <p class="en">Analyze business partnership potential using Five Element dynamics — coming soon.</p>
+          <p class="zh hide">使用五行动态分析商业合作潜力 — 即将推出。</p>
+        </div>
+      </section>
+
       <div class="results-footer">
+        <div class="footer-extras">
+          <button class="btn-about-icon footer-about" onclick="haptic(6); showAbout()">What is Bāzì?</button>
+          <button class="btn-lang footer-lang" onclick="toggleLang()">中文</button>
+        </div>
         <button class="btn-secondary" onclick="haptic(8); showScreen('input')">
           <span class="en">New Reading</span>
           <span class="zh hide">重新算命</span>
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- FLOATING ORACLE BUTTON -->
+  <button class="oracle-fab hide" id="oracle-fab" onclick="haptic(10); openOracleDrawer()">
+    <span class="oracle-fab-char">问</span>
+  </button>
+
+  <!-- ORACLE DRAWER -->
+  <div class="oracle-drawer-backdrop hide" id="oracle-drawer-backdrop" onclick="closeOracleDrawer()"></div>
+  <div class="oracle-drawer hide" id="oracle-drawer">
+    <div class="oracle-drawer-header">
+      <div class="oracle-drawer-handle"></div>
+      <span class="oracle-drawer-title"><span class="en">The Oracle</span><span class="zh hide">神谕</span></span>
+      <button class="oracle-drawer-close" onclick="haptic(6); closeOracleDrawer()">&times;</button>
+    </div>
+    <div class="oracle-drawer-ctx" id="oracle-drawer-ctx"></div>
+    <div class="oracle-drawer-scroll">
+      <div class="oracle-messages" id="oracle-drawer-messages">
+        <div class="oracle-welcome">
+          <span class="oracle-welcome-icon">✦</span>
+          <p class="en">I see your chart. Ask me anything about your destiny, timing, or path forward.</p>
+          <p class="zh hide">我已看到你的命盘。尽管问我关于命运、时机或前路的任何问题。</p>
+        </div>
+      </div>
+      <div class="oracle-chips" id="oracle-drawer-chips">
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Should I make a major move today?</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">What does my luck pillar say about 2026?</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Best timing this week to close a deal?</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Read my wealth stars</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Is this a good week to travel?</button>
+      </div>
+    </div>
+    <div class="oracle-drawer-input">
+      <textarea class="oracle-input" id="oracle-drawer-input" placeholder="Ask the Oracle..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOracleDrawerMessage()}"></textarea>
+      <button class="oracle-send-btn" id="oracle-drawer-send" onclick="sendOracleDrawerMessage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+      </button>
     </div>
   </div>
 
