@@ -3202,8 +3202,420 @@ function renderYouProfile(animal, yearPillar, elColor) {
     </div>`;
 }
 
+/* ═══════════════════════════════════════
+   ORACLE AI CHAT
+═══════════════════════════════════════ */
+let _oracleHistory = [];   // conversation history for context
+let _oracleSending = false;
+
+/* ── Calculate today's full day pillar ── */
+function calcTodayPillar() {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+  const ref = new Date(2000, 0, 7);
+  const diffDays = Math.round((new Date(y, m, d) - ref) / 86400000);
+  const cyclePos = ((diffDays % 60) + 60) % 60;
+  const stemIdx = cyclePos % 10;
+  const branchIdx = cyclePos % 12;
+  return {
+    stem: STEMS[stemIdx],
+    branch: BRANCHES[branchIdx],
+    animal: BRANCHES[branchIdx].animal,
+  };
+}
+
+/* ── Nobleman check: today's branch compatible with user animal ── */
+function isNoblemanDay(userAnimal, todayAnimal) {
+  const z = ZODIAC[userAnimal];
+  return z && z.compat.includes(todayAnimal);
+}
+
+/* ── Show Oracle screen ── */
+function showOracle() {
+  if (!_shareData || !_shareData.animal) {
+    alert('Complete your BaZi profile first to unlock the Oracle');
+    return;
+  }
+  showScreen('oracle-chat');
+  _oracleHistory = [];
+
+  // Populate context bar
+  const today = calcTodayPillar();
+  const userAnimal = _shareData.animal;
+  const zData = ZODIAC[userAnimal];
+  const isClash = zData.clash.includes(today.animal);
+  const isCompat = zData.compat.includes(today.animal);
+  const nobleman = isNoblemanDay(userAnimal, today.animal);
+
+  let score;
+  if (isCompat) score = 85 + Math.floor(Math.random() * 12);
+  else if (isClash) score = 38 + Math.floor(Math.random() * 18);
+  else score = 60 + Math.floor(Math.random() * 22);
+
+  const clashColor = isClash ? '#ef4444' : isCompat ? '#22c55e' : '#f0c040';
+  const clashLabel = isClash ? 'Clash' : isCompat ? 'Harmony' : 'Neutral';
+
+  document.getElementById('oracle-ctx-bar').innerHTML = `
+    <div class="oracle-ctx-pill">
+      <span class="ctx-dot" style="background:${EL_COLOR[today.stem.element]}"></span>
+      ${today.stem.char}${today.branch.char} ${today.animal} Day
+    </div>
+    <div class="oracle-ctx-pill">
+      <span class="ctx-dot" style="background:${clashColor}"></span>
+      ${clashLabel}
+    </div>
+    <div class="oracle-ctx-pill">
+      Force ${score}
+    </div>
+    <div class="oracle-ctx-pill" style="${nobleman ? 'color:var(--gold);border-color:rgba(240,192,64,0.3)' : ''}">
+      ${nobleman ? '✦ Nobleman' : 'No Nobleman'}
+    </div>
+  `;
+
+  // Store today data for API calls
+  _oracleTodayData = { stem: today.stem.char, branch: today.branch.char, animal: today.animal, isClash, isCompat, score, nobleman };
+
+  // Reset messages
+  document.getElementById('oracle-messages').innerHTML = `
+    <div class="oracle-welcome">
+      <span class="oracle-welcome-icon">✦</span>
+      <p class="en">I see your chart. Ask me anything about your destiny, timing, or path forward.</p>
+      <p class="zh hide">我已看到你的命盘。尽管问我关于命运、时机或前路的任何问题。</p>
+    </div>`;
+  document.getElementById('oracle-chips').classList.remove('hide');
+  document.getElementById('oracle-input').value = '';
+}
+
+let _oracleTodayData = null;
+
+/* ── Send chip question ── */
+function sendOracleChip(btn) {
+  const msg = btn.textContent.trim();
+  document.getElementById('oracle-input').value = msg;
+  sendOracleMessage();
+}
+
+/* ── Rate limit check (client-side) ── */
+function checkOracleRateLimit() {
+  const today = new Date().toISOString().slice(0, 10);
+  const stored = localStorage.getItem('wobazi_oracle_date');
+  if (stored !== today) {
+    localStorage.setItem('wobazi_oracle_date', today);
+    localStorage.setItem('wobazi_oracle_count', '0');
+  }
+  const count = parseInt(localStorage.getItem('wobazi_oracle_count') || '0', 10);
+  return count < 10;
+}
+
+function incrementOracleCount() {
+  const count = parseInt(localStorage.getItem('wobazi_oracle_count') || '0', 10);
+  localStorage.setItem('wobazi_oracle_count', String(count + 1));
+}
+
+/* ── Parse verdict + date tags from response ── */
+function parseOracleResponse(text) {
+  // Extract and replace verdict tags
+  let html = text;
+  html = html.replace(/\[VERDICT:favorable\]/gi,
+    '<div class="oracle-verdict-badge oracle-verdict-favorable">✦ Favorable conditions</div>');
+  html = html.replace(/\[VERDICT:defer\]/gi,
+    '<div class="oracle-verdict-badge oracle-verdict-defer">◇ Defer if possible</div>');
+  html = html.replace(/\[VERDICT:neutral\]/gi,
+    '<div class="oracle-verdict-badge oracle-verdict-neutral">— Neutral — timing is secondary</div>');
+
+  // Extract and replace date tags
+  html = html.replace(/\[DATE:(\d{4}-\d{2}-\d{2})\]/g, (_, dateStr) => {
+    const d = new Date(dateStr + 'T00:00:00');
+    const label = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    return `<span class="oracle-date-pill">${label}</span>`;
+  });
+
+  return html;
+}
+
+/* ── Send message ── */
+async function sendOracleMessage() {
+  if (_oracleSending) return;
+  const input = document.getElementById('oracle-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  // Rate limit
+  if (!checkOracleRateLimit()) {
+    const messagesEl = document.getElementById('oracle-messages');
+    messagesEl.insertAdjacentHTML('beforeend',
+      `<div class="oracle-limit-msg">You've reached your daily Oracle limit (10 questions). Return tomorrow for fresh guidance.</div>`);
+    messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    return;
+  }
+
+  _oracleSending = true;
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Hide chips after first message
+  document.getElementById('oracle-chips').classList.add('hide');
+
+  const messagesEl = document.getElementById('oracle-messages');
+
+  // Add user bubble
+  const userBubble = document.createElement('div');
+  userBubble.className = 'oracle-msg oracle-msg-user';
+  userBubble.textContent = msg;
+  messagesEl.appendChild(userBubble);
+
+  // Add typing indicator
+  const typingEl = document.createElement('div');
+  typingEl.className = 'oracle-typing';
+  typingEl.innerHTML = '<div class="oracle-typing-dot"></div><div class="oracle-typing-dot"></div><div class="oracle-typing-dot"></div>';
+  messagesEl.appendChild(typingEl);
+  typingEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+  // Build chart data for API
+  const chartData = {
+    animal: _shareData.animal,
+    element: _shareData.element,
+    polarity: _shareData.polarity,
+    dominantEl: _shareData.dominantEl,
+    fortune: _shareData.fortune,
+    pillars: null, // pillars aren't stored in _shareData in a serializable way, use recalc
+    today: _oracleTodayData,
+  };
+
+  try {
+    const response = await fetch('/api/oracle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: msg,
+        chartData,
+        conversationHistory: _oracleHistory,
+      }),
+    });
+
+    if (response.status === 429) {
+      typingEl.remove();
+      const data = await response.json();
+      messagesEl.insertAdjacentHTML('beforeend',
+        `<div class="oracle-limit-msg">${data.error}</div>`);
+      messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      _oracleSending = false;
+      return;
+    }
+
+    // Create oracle response bubble
+    const oracleBubble = document.createElement('div');
+    oracleBubble.className = 'oracle-msg oracle-msg-oracle';
+    oracleBubble.textContent = '';
+
+    let fullText = '';
+    let firstToken = true;
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // keep incomplete line
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const payload = line.slice(6);
+        if (payload === '[DONE]') continue;
+
+        try {
+          const data = JSON.parse(payload);
+          if (data.error) {
+            typingEl.remove();
+            messagesEl.insertAdjacentHTML('beforeend',
+              `<div class="oracle-error-msg">${data.error}</div>`);
+            messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            _oracleSending = false;
+            return;
+          }
+          if (data.token) {
+            if (firstToken) {
+              typingEl.remove();
+              messagesEl.appendChild(oracleBubble);
+              firstToken = false;
+            }
+            fullText += data.token;
+            oracleBubble.innerHTML = parseOracleResponse(fullText);
+            oracleBubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        } catch (e) { /* skip malformed JSON */ }
+      }
+    }
+
+    // If no tokens were received
+    if (firstToken) {
+      typingEl.remove();
+      messagesEl.insertAdjacentHTML('beforeend',
+        `<div class="oracle-error-msg">The Oracle is temporarily unavailable — try again in a moment.</div>`);
+      messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else {
+      // Store in history
+      _oracleHistory.push({ role: 'user', content: msg });
+      _oracleHistory.push({ role: 'assistant', content: fullText });
+      incrementOracleCount();
+    }
+  } catch (err) {
+    console.error('[Oracle fetch error]', err);
+    typingEl.remove();
+    messagesEl.insertAdjacentHTML('beforeend',
+      `<div class="oracle-error-msg">The Oracle is temporarily unavailable — try again in a moment.</div>`);
+    messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+
+  _oracleSending = false;
+}
+
+/* ═══════════════════════════════════════
+   GOOGLE AUTH & DATA PERSISTENCE
+═══════════════════════════════════════ */
+let _currentUser = null;
+let _savedReading = null;
+
+function loginWithGoogle() {
+  window.location.href = '/auth/google';
+}
+
+function logout() {
+  window.location.href = '/auth/logout';
+}
+
+async function checkAuth() {
+  try {
+    const res = await fetch('/api/me');
+    const data = await res.json();
+    if (data.user) {
+      _currentUser = data.user;
+      showAuthState();
+      await loadUserData();
+    }
+  } catch (e) { /* guest mode */ }
+}
+
+function showAuthState() {
+  if (!_currentUser) return;
+  // Switch splash to logged-in state
+  const guest = document.getElementById('splash-guest');
+  const authed = document.getElementById('splash-authed');
+  if (guest) guest.classList.add('hide');
+  if (authed) authed.classList.remove('hide');
+
+  // Set welcome message
+  const welcomeEl = document.getElementById('splash-welcome');
+  if (welcomeEl) {
+    const avatarHtml = _currentUser.avatar
+      ? `<img src="${_currentUser.avatar}" class="splash-welcome-avatar" referrerpolicy="no-referrer">`
+      : '';
+    welcomeEl.innerHTML = `${avatarHtml}<span class="en">Welcome back, ${_currentUser.name}</span><span class="zh hide">欢迎回来，${_currentUser.name}</span>`;
+  }
+}
+
+async function loadUserData() {
+  try {
+    const res = await fetch('/api/my-data');
+    const data = await res.json();
+    if (data.reading) {
+      _savedReading = data.reading;
+      // If no saved reading, show "Start Fresh" instead of "Continue"
+    }
+    if (!_savedReading) {
+      const btn = document.getElementById('btn-continue-reading');
+      if (btn) {
+        btn.querySelector('.en').textContent = 'Begin Your Reading';
+        btn.querySelector('.zh').textContent = '开始算命';
+        btn.onclick = function() { haptic(10); showScreen('input'); };
+      }
+    }
+    // Restore Oracle chat history if available
+    if (data.chat && data.chat.length > 0) {
+      _oracleHistory = data.chat;
+    }
+  } catch (e) { /* no saved data */ }
+}
+
+function loadSavedReading() {
+  if (!_savedReading) {
+    showScreen('input');
+    return;
+  }
+  const r = _savedReading;
+  // Pre-fill form and auto-submit
+  const nameEl = document.getElementById('name');
+  const dayEl = document.getElementById('birth-day');
+  const monthEl = document.getElementById('birth-month');
+  const yearEl = document.getElementById('birth-year');
+  const timeEl = document.getElementById('birthtime');
+  const placeEl = document.getElementById('birthplace');
+  const bloodEl = document.getElementById('blood-type');
+
+  if (nameEl) nameEl.value = r.name || '';
+  if (dayEl) dayEl.value = r.day || '';
+  if (monthEl) monthEl.value = r.month || '';
+  if (yearEl) yearEl.value = r.year || '';
+  if (timeEl && r.hour != null) timeEl.value = String(r.hour).padStart(2, '0') + ':00';
+  if (placeEl) placeEl.value = r.birthplace || '';
+  if (bloodEl) bloodEl.value = r.blood_type || '';
+  if (r.gender) {
+    const radio = document.querySelector(`input[name="gender"][value="${r.gender}"]`);
+    if (radio) radio.checked = true;
+  }
+
+  // Auto-submit
+  const hour = r.hour != null ? r.hour : null;
+  runLoader(() => renderResults(r.name || '', r.year, r.month - 1, r.day, hour, r.birthplace || '', r.blood_type || null, r.gender || null));
+}
+
+/* ── Save reading after form submit (if logged in) ── */
+const _origHandleSubmit = handleSubmit;
+handleSubmit = function(e) {
+  _origHandleSubmit(e);
+  if (_currentUser) {
+    const name = document.getElementById('name').value.trim();
+    const d = parseInt(document.getElementById('birth-day').value, 10);
+    const m = parseInt(document.getElementById('birth-month').value, 10);
+    const y = parseInt(document.getElementById('birth-year').value, 10);
+    const timeVal = document.getElementById('birthtime').value;
+    let hour = null;
+    if (timeVal) hour = parseInt(timeVal.split(':')[0], 10);
+    const birthplace = document.getElementById('birthplace').value.trim();
+    const bloodType = document.getElementById('blood-type').value || null;
+    const gender = document.querySelector('input[name="gender"]:checked')?.value || null;
+
+    fetch('/api/save-reading', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, year: y, month: m, day: d, hour, birthplace, bloodType, gender }),
+    }).catch(() => {});
+  }
+};
+
+/* ── Save Oracle chat when leaving oracle screen ── */
+const _origShowScreen = showScreen;
+showScreen = function(id) {
+  // If leaving oracle chat and logged in, save conversation
+  const wasOracle = document.querySelector('#oracle-chat.screen.active');
+  if (wasOracle && _currentUser && _oracleHistory.length > 0) {
+    fetch('/api/save-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: _oracleHistory }),
+    }).catch(() => {});
+  }
+  _origShowScreen(id);
+};
+
 /* ── Init ── */
 buildStars();
 initDateInputs();
 initTooltips();
+checkAuth();
 
