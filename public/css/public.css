@@ -1,0 +1,330 @@
+/* ═══════════════════════════════════════
+   WOBAZI — Public SEO Pages Styles
+   Supplements app/style.css (same :root vars)
+═══════════════════════════════════════ */
+
+/* ── Reset for SEO pages (override SPA fixed positioning) ── */
+html:has(body.seo-page),
+html:has(body.seo-page) body {
+  height: auto;
+  overflow: auto;
+}
+body.seo-page {
+  position: static;
+  overflow: auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body.seo-page .seo-main {
+  flex: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 80px 20px 40px;
+  width: 100%;
+}
+
+/* ═══════════════════════════════════════
+   NAV BAR
+═══════════════════════════════════════ */
+.seo-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  background: rgba(7, 7, 15, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(240, 192, 64, 0.08);
+}
+
+.seo-nav-logo img {
+  display: block;
+  height: 28px;
+}
+
+.seo-nav-links {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  justify-content: center;
+}
+
+.seo-nav-links a {
+  color: var(--muted, #888a9e);
+  text-decoration: none;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+
+.seo-nav-links a:hover {
+  color: var(--text, #f0f0ff);
+  background: rgba(240, 192, 64, 0.06);
+}
+
+.seo-nav-cta {
+  color: var(--bg, #07070f);
+  background: linear-gradient(135deg, #f0c040, #e8862e);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.seo-nav-cta:hover { opacity: 0.88; }
+
+.seo-nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text, #f0f0ff);
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Mobile nav */
+@media (max-width: 768px) {
+  .seo-nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: rgba(7, 7, 15, 0.96);
+    backdrop-filter: blur(16px);
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(240, 192, 64, 0.08);
+  }
+  .seo-nav-links.open { display: flex; }
+  .seo-nav-links a { padding: 10px 12px; font-size: 15px; }
+  .seo-nav-cta { display: none; }
+  .seo-nav-toggle { display: block; margin-left: auto; }
+}
+
+/* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+.seo-footer {
+  background: var(--bg-card, #0f0f1c);
+  border-top: 1px solid rgba(240, 192, 64, 0.08);
+  padding: 48px 24px 24px;
+  margin-top: 60px;
+}
+
+.seo-footer-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+}
+
+.seo-footer-brand img {
+  display: block;
+  height: 24px;
+  margin-bottom: 12px;
+}
+
+.seo-footer-brand p {
+  color: var(--muted, #888a9e);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.seo-footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.seo-footer-col h4 {
+  color: var(--gold, #f0c040);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.seo-footer-col a {
+  display: block;
+  color: var(--muted, #888a9e);
+  text-decoration: none;
+  font-size: 13px;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+.seo-footer-col a:hover { color: var(--text, #f0f0ff); }
+
+.seo-footer-bottom {
+  max-width: 720px;
+  margin: 32px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid rgba(240, 192, 64, 0.06);
+  text-align: center;
+}
+.seo-footer-bottom p {
+  color: var(--muted, #888a9e);
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+  .seo-footer-inner { grid-template-columns: 1fr; gap: 32px; }
+  .seo-footer-links { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ═══════════════════════════════════════
+   ABOUT-STYLE REUSE FOR SEO PAGES
+   These classes mirror the #about screen
+   patterns from style.css, scoped to .seo-main
+═══════════════════════════════════════ */
+
+/* Hero (same as .about-hero) */
+.seo-main .about-hero { position: static; padding: 20px 0 32px; text-align: center; }
+.seo-main .about-hanzi { font-size: 62px; font-family: 'Noto Sans SC', sans-serif; font-weight: 700; background: linear-gradient(135deg, var(--gold, #f0c040), #e8a020); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.2; margin-bottom: 12px; }
+.seo-main .about-hero h2 { color: var(--text, #f0f0ff); font-size: 22px; margin-bottom: 8px; }
+.seo-main .about-hero p { color: var(--muted, #888a9e); font-size: 14px; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+
+/* TOC chip bar */
+.seo-main .about-toc-bar {
+  position: sticky;
+  top: 56px;
+  z-index: 50;
+  background: rgba(7, 7, 15, 0.92);
+  backdrop-filter: blur(12px);
+  padding: 10px 0;
+  margin: 0 -20px 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.seo-main .about-toc-inner {
+  display: flex;
+  gap: 8px;
+  padding: 0 20px;
+  min-width: max-content;
+}
+.seo-main .about-toc-chip {
+  background: var(--bg-card, #0f0f1c);
+  color: var(--muted, #888a9e);
+  border: 1px solid rgba(240, 192, 64, 0.1);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.seo-main .about-toc-chip:hover,
+.seo-main .about-toc-chip.active {
+  background: rgba(240, 192, 64, 0.1);
+  color: var(--gold, #f0c040);
+  border-color: rgba(240, 192, 64, 0.3);
+}
+
+/* Section cards (same as .about-section) */
+.seo-main .about-section {
+  background: var(--bg-card, #0f0f1c);
+  border: 1px solid rgba(240, 192, 64, 0.06);
+  border-radius: 16px;
+  padding: 28px 24px;
+  margin-bottom: 20px;
+}
+.seo-main .about-section h3 {
+  color: var(--gold, #f0c040);
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+.seo-main .about-section p {
+  color: var(--muted, #888a9e);
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.seo-main .about-section p:last-child { margin-bottom: 0; }
+
+/* Callout box */
+.seo-main .about-callout {
+  background: rgba(240, 192, 64, 0.04);
+  border: 1px solid rgba(240, 192, 64, 0.12);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted, #888a9e);
+}
+.seo-main .about-callout strong { color: var(--gold, #f0c040); }
+
+/* CTA button */
+.seo-main .about-cta {
+  text-align: center;
+  margin: 32px 0 16px;
+}
+.seo-main .about-cta .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #f0c040, #e8862e);
+  color: var(--bg, #07070f);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 14px 32px;
+  border-radius: 14px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.seo-main .about-cta .btn-primary:hover { opacity: 0.88; }
+
+/* FAQ accordion */
+.seo-main .about-faq { margin-top: 8px; }
+.seo-main .about-faq-item {
+  border-bottom: 1px solid rgba(240, 192, 64, 0.06);
+  padding: 14px 0;
+}
+.seo-main .about-faq-q {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  color: var(--text, #f0f0ff);
+  font-size: 14px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+}
+.seo-main .about-faq-q::after {
+  content: '+';
+  color: var(--gold, #f0c040);
+  font-size: 18px;
+  font-weight: 300;
+  transition: transform 0.2s;
+}
+.seo-main .about-faq-item.open .about-faq-q::after {
+  content: '−';
+}
+.seo-main .about-faq-a {
+  display: none;
+  color: var(--muted, #888a9e);
+  font-size: 13px;
+  line-height: 1.7;
+  padding-top: 10px;
+}
+.seo-main .about-faq-item.open .about-faq-a { display: block; }
+
+/* Mini script for FAQ toggle + TOC scroll */

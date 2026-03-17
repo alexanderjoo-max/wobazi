@@ -11,6 +11,7 @@ const OpenAI = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const path = require('path');
 const crypto = require('crypto');
+const bazi = require('./bazi-engine');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -91,10 +92,51 @@ app.use(session({
 }));
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname), {
-  index: 'index.html',
-  extensions: ['html'],
-}));
+app.use(express.urlencoded({ extended: true }));
+
+/* ── EJS Templating ── */
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+/* ── Static Files ── */
+app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/app', express.static(path.join(__dirname, 'app')));
+// Serve logos and og-card from root for backward compat
+app.use('/Logos', express.static(path.join(__dirname, 'Logos')));
+app.use('/og-card.png', express.static(path.join(__dirname, 'og-card.png')));
+
+/* ── SEO: Sitemap & Robots ── */
+app.get('/sitemap.xml', (req, res) => {
+  const pages = [
+    { loc: '/', priority: '1.0', changefreq: 'weekly' },
+    { loc: '/what-is-bazi', priority: '0.9', changefreq: 'monthly' },
+    { loc: '/bazi-calculator', priority: '0.9', changefreq: 'monthly' },
+    { loc: '/four-pillars-of-destiny', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/chinese-astrology', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/day-master', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/bazi-compatibility', priority: '0.8', changefreq: 'monthly' },
+  ];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages.map(p => `  <url>
+    <loc>https://wobazi.com${p.loc}</loc>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+  res.type('application/xml').send(xml);
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(`User-agent: *
+Allow: /
+Disallow: /app/
+Disallow: /api/
+Disallow: /auth/
+
+Sitemap: https://wobazi.com/sitemap.xml
+`);
+});
 
 /* ── Rate Limiting (in-memory, IP-based) ── */
 const rateLimits = new Map();
@@ -113,6 +155,111 @@ function checkRateLimit(ip) {
   entry.count++;
   return { allowed: true, remaining: DAILY_LIMIT - entry.count };
 }
+
+/* ═══════════════════════════════════════
+   SEO PAGES
+═══════════════════════════════════════ */
+const seoBase = { baseUrl: 'https://wobazi.com' };
+
+app.get('/', (req, res) => {
+  res.render('pages/home', {
+    ...seoBase,
+    title: 'WoBazi | Chinese Astrology & Four Pillars of Destiny',
+    description: 'Discover your Chinese destiny with BaZi (Four Pillars of Destiny). Free birth chart calculator, daily readings, AI-powered fortune insights, and compatibility analysis.',
+    canonical: '/',
+  });
+});
+
+app.get('/what-is-bazi', (req, res) => {
+  res.render('pages/what-is-bazi', {
+    ...seoBase,
+    title: 'What is BaZi? Chinese Astrology & Four Pillars Explained | WoBazi',
+    description: 'Learn about BaZi (八字), the ancient Chinese astrology system based on your birth date and time. Understand the Four Pillars of Destiny, Heavenly Stems, Earthly Branches, and Five Elements.',
+    canonical: '/what-is-bazi',
+    bazi,
+  });
+});
+
+app.get('/bazi-calculator', (req, res) => {
+  res.render('pages/bazi-calculator', {
+    ...seoBase,
+    title: 'Free BaZi Calculator | Four Pillars of Destiny Chart | WoBazi',
+    description: 'Calculate your BaZi (Four Pillars of Destiny) chart for free. Enter your birth date to discover your Day Master, element balance, zodiac animal, and fortune scores.',
+    canonical: '/bazi-calculator',
+    bazi,
+    result: null,
+  });
+});
+
+app.post('/bazi-calculator', (req, res) => {
+  const { year, month, day, hour, gender } = req.body;
+  const y = parseInt(year), m = parseInt(month), d = parseInt(day);
+  const h = hour !== '' && hour !== undefined ? parseInt(hour) : null;
+
+  const pillars = bazi.calcBazi(y, m, d, h);
+  const elements = bazi.calcElements(pillars);
+  const animal = pillars[0].branch.animal;
+  const fortune = bazi.calcFortune(animal, elements);
+  const dominant = bazi.getDominant(elements);
+  const dayMaster = pillars[2].stem;
+
+  res.render('pages/bazi-calculator', {
+    ...seoBase,
+    title: 'Your BaZi Chart | Four Pillars of Destiny | WoBazi',
+    description: `Your BaZi chart: ${dayMaster.char} ${dayMaster.element} Day Master. Discover your Four Pillars, element balance, and fortune scores.`,
+    canonical: '/bazi-calculator',
+    bazi,
+    result: { pillars, elements, animal, fortune, dominant, dayMaster, year: y, month: m, day: d, hour: h, gender },
+  });
+});
+
+app.get('/four-pillars-of-destiny', (req, res) => {
+  res.render('pages/four-pillars', {
+    ...seoBase,
+    title: 'Four Pillars of Destiny | BaZi Chinese Astrology Guide | WoBazi',
+    description: 'Complete guide to the Four Pillars of Destiny (BaZi). Learn about Year, Month, Day, and Hour pillars, Heavenly Stems, Earthly Branches, and 10-Year Luck Pillars.',
+    canonical: '/four-pillars-of-destiny',
+    bazi,
+  });
+});
+
+app.get('/chinese-astrology', (req, res) => {
+  res.render('pages/chinese-astrology', {
+    ...seoBase,
+    title: 'Chinese Astrology | BaZi, Four Pillars & Chinese Zodiac | WoBazi',
+    description: 'Explore Chinese astrology systems: BaZi (Four Pillars), Chinese Zodiac, Zi Wei Dou Shu, and Five Elements. Compare Chinese vs Western astrology.',
+    canonical: '/chinese-astrology',
+    bazi,
+  });
+});
+
+app.get('/day-master', (req, res) => {
+  res.render('pages/day-master', {
+    ...seoBase,
+    title: 'BaZi Day Master | What is Your Day Master? | WoBazi',
+    description: 'Discover your BaZi Day Master. Learn about all 10 Day Masters from Jia Wood to Gui Water, and how your Day Master shapes your personality and destiny.',
+    canonical: '/day-master',
+    bazi,
+  });
+});
+
+app.get('/bazi-compatibility', (req, res) => {
+  res.render('pages/compatibility', {
+    ...seoBase,
+    title: 'BaZi Compatibility | Chinese Astrology Relationship Guide | WoBazi',
+    description: 'Explore BaZi compatibility and Chinese astrology relationship analysis. Learn about zodiac clashes, combinations, and how to assess romantic and business compatibility.',
+    canonical: '/bazi-compatibility',
+    bazi,
+  });
+});
+
+/* ── SPA App ── */
+app.get('/app', (req, res) => {
+  res.sendFile(path.join(__dirname, 'app', 'index.html'));
+});
+app.get('/app/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'app', 'index.html'));
+});
 
 /* ═══════════════════════════════════════
    GOOGLE OAUTH
@@ -137,7 +284,7 @@ app.get('/auth/google', (req, res) => {
 /* ── Step 2: Handle callback ── */
 app.get('/auth/google/callback', async (req, res) => {
   const { code } = req.query;
-  if (!code) return res.redirect('/?auth=error');
+  if (!code) return res.redirect('/app?auth=error');
 
   try {
     // Exchange code for tokens
@@ -176,17 +323,17 @@ app.get('/auth/google/callback', async (req, res) => {
       avatar: profile.picture,
     };
 
-    res.redirect('/?auth=success');
+    res.redirect('/app?auth=success');
   } catch (err) {
     console.error('[Google OAuth error]', err.message);
-    res.redirect('/?auth=error');
+    res.redirect('/app?auth=error');
   }
 });
 
 /* ── Logout ── */
 app.get('/auth/logout', (req, res) => {
   req.session.destroy();
-  res.redirect('/');
+  res.redirect('/app');
 });
 
 /* ── Current user ── */

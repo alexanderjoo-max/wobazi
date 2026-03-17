@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "WoBazi",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "Web",
+    "description": "Chinese astrology and BaZi (Four Pillars of Destiny) calculator with AI-powered readings.",
+    "url": "<%= baseUrl %>",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+</head>
+<body class="seo-page">
+  <%- include('../partials/nav') %>
+
+  <main class="seo-main">
+    <div class="about-hero">
+      <div class="about-hanzi">命运</div>
+      <h1 style="color:var(--text);font-size:26px;margin-bottom:10px;">Your Personal Chinese Astrology Guide</h1>
+      <p>Daily BaZi readings, Four Pillars analysis, and AI-powered fortune insights — all from your birth date.</p>
+    </div>
+
+    <div class="about-section" style="text-align:center;">
+      <h3>🔮 What is BaZi?</h3>
+      <p>BaZi (八字) — the Four Pillars of Destiny — is an ancient Chinese astrology system that decodes your fate from the exact moment of your birth. It reveals your personality, career potential, relationships, and life cycles through the interplay of Five Elements and celestial energies.</p>
+      <div class="about-cta">
+        <a href="/bazi-calculator" class="btn-primary">Calculate Your BaZi Free →</a>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+      <div class="about-section" style="text-align:center;padding:24px 16px;">
+        <div style="font-size:32px;margin-bottom:8px;">📊</div>
+        <h3 style="font-size:15px;margin-bottom:6px;">Daily Readings</h3>
+        <p style="font-size:12px;">Personalized BaZi chart with element balance, fortune scores, and auspicious timing.</p>
+      </div>
+      <div class="about-section" style="text-align:center;padding:24px 16px;">
+        <div style="font-size:32px;margin-bottom:8px;">🔮</div>
+        <h3 style="font-size:15px;margin-bottom:6px;">Ask the Oracle</h3>
+        <p style="font-size:12px;">AI-powered BaZi advisor that interprets your chart and answers life questions.</p>
+      </div>
+      <div class="about-section" style="text-align:center;padding:24px 16px;">
+        <div style="font-size:32px;margin-bottom:8px;">💑</div>
+        <h3 style="font-size:15px;margin-bottom:6px;">Compatibility</h3>
+        <p style="font-size:12px;">Analyze relationships through zodiac harmony, element clashes, and pillar alignment.</p>
+      </div>
+    </div>
+
+    <div class="about-callout">
+      <strong>Ancient wisdom meets modern technology.</strong> WoBazi combines 3,000 years of Chinese metaphysical tradition with AI to deliver personalized destiny insights — no prior knowledge required.
+    </div>
+
+    <div class="about-section">
+      <h3>📖 Learn More</h3>
+      <div style="display:grid;gap:10px;margin-top:12px;">
+        <a href="/what-is-bazi" style="display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;padding:10px 14px;background:rgba(240,192,64,0.04);border-radius:10px;border:1px solid rgba(240,192,64,0.08);transition:border-color 0.2s;font-size:14px;">
+          <span style="font-size:20px;">📜</span> What is BaZi? — Complete Beginner's Guide
+        </a>
+        <a href="/four-pillars-of-destiny" style="display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;padding:10px 14px;background:rgba(240,192,64,0.04);border-radius:10px;border:1px solid rgba(240,192,64,0.08);transition:border-color 0.2s;font-size:14px;">
+          <span style="font-size:20px;">🏛️</span> Four Pillars of Destiny — Deep Guide
+        </a>
+        <a href="/day-master" style="display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;padding:10px 14px;background:rgba(240,192,64,0.04);border-radius:10px;border:1px solid rgba(240,192,64,0.08);transition:border-color 0.2s;font-size:14px;">
+          <span style="font-size:20px;">🌟</span> Day Master — Your Core Identity
+        </a>
+        <a href="/chinese-astrology" style="display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;padding:10px 14px;background:rgba(240,192,64,0.04);border-radius:10px;border:1px solid rgba(240,192,64,0.08);transition:border-color 0.2s;font-size:14px;">
+          <span style="font-size:20px;">⭐</span> Chinese Astrology — Systems Overview
+        </a>
+        <a href="/bazi-compatibility" style="display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;padding:10px 14px;background:rgba(240,192,64,0.04);border-radius:10px;border:1px solid rgba(240,192,64,0.08);transition:border-color 0.2s;font-size:14px;">
+          <span style="font-size:20px;">💕</span> BaZi Compatibility — Relationship Guide
+        </a>
+      </div>
+    </div>
+
+    <div class="about-cta">
+      <a href="/app" class="btn-primary">Get Started Free →</a>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script>
+    // FAQ toggle
+    document.querySelectorAll('.about-faq-q').forEach(q => {
+      q.addEventListener('click', () => q.closest('.about-faq-item').classList.toggle('open'));
+    });
+  </script>
+</body>
+</html>

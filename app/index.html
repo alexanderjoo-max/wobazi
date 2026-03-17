@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Wobazi ✦ Your Chinese Destiny</title>
+
+  <!-- Primary meta -->
+  <meta name="description" content="Discover your Chinese destiny. Bāzì reading, zodiac fortune, lucky numbers, auspicious dates, and your Chinese destiny name — all from your birth date.">
+  <meta name="theme-color" content="#0f0f1c">
+
+  <!-- Open Graph (Facebook, iMessage, WhatsApp, etc.) -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://wobazi.com">
+  <meta property="og:title"       content="Wobazi ✦ Your Chinese Destiny">
+  <meta property="og:description" content="Discover your Bāzì chart, zodiac animal, Chinese destiny name, and fortune reading. What does your birth date reveal?">
+  <meta property="og:image"       content="https://wobazi.com/og-card.png">
+  <meta property="og:image:width"  content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:site"        content="@wobazi">
+  <meta name="twitter:title"       content="Wobazi ✦ Your Chinese Destiny">
+  <meta name="twitter:description" content="Discover your Bāzì chart, zodiac animal, Chinese destiny name, and fortune reading. What does your birth date reveal?">
+  <meta name="twitter:image"       content="https://wobazi.com/og-card.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=16">
+</head>
+<body>
+
+  <!-- SPLASH -->
+  <div id="splash" class="screen active">
+    <div class="stars" id="stars"></div>
+    <div class="splash-content">
+      <div class="logo-wrap">
+        <img src="Logos/SVG/rev-vert.svg" class="logo-vert" alt="Wobazi">
+        <p class="logo-sub"><span class="en">Chinese Destiny System</span><span class="zh hide">中国命运系统</span></p>
+      </div>
+      <p class="splash-tagline"><span class="en">Decode your fate through the ancient<br>art of the Four Pillars</span><span class="zh hide">通过八字古法<br>解码你的命运</span></p>
+      <button class="btn-lang splash-lang-btn" onclick="toggleLang()">中文</button>
+
+      <!-- Guest state (default) -->
+      <div id="splash-guest">
+        <button class="google-login-btn" onclick="haptic(10); loginWithGoogle()">
+          <svg class="google-logo" viewBox="0 0 24 24" width="20" height="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          <span class="en">Continue with Google</span><span class="zh hide">使用 Google 登录</span>
+        </button>
+        <p class="splash-google-hint"><span class="en">Sign in to save your reading &amp; chat history</span><span class="zh hide">登录以保存您的算命和聊天记录</span></p>
+        <div class="auth-divider"><span><span class="en">or</span><span class="zh hide">或</span></span></div>
+        <button class="btn-guest" onclick="haptic(10); showScreen('input')">
+          <span class="en">Continue as Guest</span><span class="zh hide">以游客身份继续</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <!-- Logged-in state (hidden by default) -->
+      <div id="splash-authed" class="hide">
+        <div class="splash-welcome" id="splash-welcome"></div>
+        <button class="btn-primary" id="btn-continue-reading" onclick="haptic(10); loadSavedReading()">
+          <span class="en">Continue Your Reading</span><span class="zh hide">继续您的算命</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <div class="auth-divider"><span><span class="en">or</span><span class="zh hide">或</span></span></div>
+        <button class="btn-secondary splash-new-btn" onclick="haptic(10); showScreen('input')">
+          <span class="en">Start Fresh Reading</span><span class="zh hide">重新开始算命</span>
+        </button>
+        <button class="btn-logout" id="btn-logout" onclick="haptic(6); logout()"><span class="en">Logout</span><span class="zh hide">退出</span></button>
+      </div>
+
+      <button class="btn-about-link" onclick="haptic(6); showAbout()"><span class="en">What is Bāzì? →</span><span class="zh hide">什么是八字？→</span></button>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div id="about" class="screen">
+    <div class="nav-bar">
+      <button class="btn-back" onclick="haptic(8); showScreen(_prevAboutFrom || 'splash')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <img src="Logos/SVG/rev-horiz.svg" class="nav-logo" alt="Wobazi">
+      <div style="width:40px"></div>
+    </div>
+
+    <!-- Sticky TOC chips -->
+    <div class="about-toc-bar">
+      <div class="about-toc-inner">
+        <button class="about-toc-chip" onclick="scrollAbout('ab-intro')">Intro</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-pillars')">4 Pillars</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-stems')">10 Stems</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-branches')">12 Branches</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-elements')">5 Elements</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-yinyang')">Yin &amp; Yang</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-cycle')">60-Year Cycle</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-zodiac')">12 Animals</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-daymaster')">Day Master</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-compat')">Compatibility</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-reading')">How it Works</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-philosophy')">Free Will</button>
+      </div>
+    </div>
+
+    <div class="about-scroll">
+
+      <!-- ① INTRO -->
+      <div class="about-hero" id="ab-intro">
+        <div class="about-hanzi">八字</div>
+        <h2>The Eight Characters</h2>
+        <p>An ancient Chinese destiny system — 2,000 years old, startlingly precise</p>
+      </div>
+
+      <div class="about-section">
+        <h3>What is Bāzì? (八字)</h3>
+        <p>Bāzì (八字) literally means "Eight Characters." It is one of the oldest forms of Chinese metaphysics, refined during the Tang dynasty (618–907 AD) and still practiced widely across East Asia today.</p>
+        <p>The system holds that your precise birth moment — year, month, day, and hour — encodes eight Chinese characters that reveal your nature, the elemental forces shaping your life, and the timing of your most important opportunities and challenges.</p>
+        <div class="about-callout">
+          <strong>The core idea:</strong> You are not separate from nature. Your birth moment places you in a specific position within the flowing cycle of natural forces — and that position shapes everything.
+        </div>
+      </div>
+
+      <!-- ② FOUR PILLARS -->
+      <div class="about-section" id="ab-pillars">
+        <h3>The Four Pillars (四柱 Sìzhù)</h3>
+        <p>Your birth data maps onto four "pillars." Each pillar has two characters — a <strong>Heavenly Stem</strong> (天干) on top and an <strong>Earthly Branch</strong> (地支) below. Four pillars × two characters = eight characters.</p>
+        <div class="about-pillars-visual">
+          <div class="about-pillar-col">
+            <div class="about-pillar-head">年柱</div>
+            <div class="about-pillar-stem" style="background:rgba(240,192,64,0.12)">Stem</div>
+            <div class="about-pillar-branch">Branch</div>
+            <div class="about-pillar-foot">Year</div>
+          </div>
+          <div class="about-pillar-col">
+            <div class="about-pillar-head">月柱</div>
+            <div class="about-pillar-stem" style="background:rgba(96,165,250,0.12)">Stem</div>
+            <div class="about-pillar-branch">Branch</div>
+            <div class="about-pillar-foot">Month</div>
+          </div>
+          <div class="about-pillar-col about-pillar-self">
+            <div class="about-pillar-head">日柱</div>
+            <div class="about-pillar-stem" style="background:rgba(192,132,252,0.22)">Stem ✦</div>
+            <div class="about-pillar-branch">Branch</div>
+            <div class="about-pillar-foot">Day</div>
+          </div>
+          <div class="about-pillar-col">
+            <div class="about-pillar-head">时柱</div>
+            <div class="about-pillar-stem" style="background:rgba(74,222,128,0.12)">Stem</div>
+            <div class="about-pillar-branch">Branch</div>
+            <div class="about-pillar-foot">Hour</div>
+          </div>
+        </div>
+        <div class="about-pillar-meanings">
+          <div class="about-pillar-meaning">
+            <div class="about-pm-head" style="color:var(--gold)">Year Pillar 年</div>
+            <p>Ancestry, early childhood, your generation's collective energy, how society sees you</p>
+          </div>
+          <div class="about-pillar-meaning">
+            <div class="about-pm-head" style="color:#60a5fa">Month Pillar 月</div>
+            <p>Career environment, ages 15–30, parents &amp; mentors, the world you operate in daily</p>
+          </div>
+          <div class="about-pillar-meaning">
+            <div class="about-pm-head" style="color:#c084fc">Day Pillar 日 ✦</div>
+            <p>Your core self — the Day Stem IS you. Your spouse/partner energy also lives here</p>
+          </div>
+          <div class="about-pillar-meaning">
+            <div class="about-pm-head" style="color:#4ade80">Hour Pillar 时</div>
+            <p>Inner world, children, career output, the life you build after 40</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ TEN HEAVENLY STEMS -->
+      <div class="about-section" id="ab-stems">
+        <h3>Ten Heavenly Stems (天干 Tiāngān)</h3>
+        <p>The Stems cycle through five elements in Yang then Yin form. Every year, month, day, and hour is assigned a Stem. The Day Stem is your <em>Day Master</em> — your elemental identity.</p>
+        <div class="about-stems-table">
+          <div class="ast-header">
+            <span>天干</span><span>Pinyin</span><span>Polarity</span><span>Element</span><span>Image</span><span>Keywords</span>
+          </div>
+          <div class="ast-row"><span class="ast-zh" style="color:#22c55e">甲</span><span>jiǎ</span><span class="ast-yang">Yang ☀</span><span style="color:#22c55e">Wood</span><span>Tall Tree</span><span>Leadership, growth, vision</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#22c55e">乙</span><span>yǐ</span><span class="ast-yin">Yin 🌙</span><span style="color:#22c55e">Wood</span><span>Vine / Flower</span><span>Adaptability, grace, intuition</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#ef4444">丙</span><span>bǐng</span><span class="ast-yang">Yang ☀</span><span style="color:#ef4444">Fire</span><span>The Sun</span><span>Charisma, warmth, generosity</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#ef4444">丁</span><span>dīng</span><span class="ast-yin">Yin 🌙</span><span style="color:#ef4444">Fire</span><span>Candle / Lamp</span><span>Insight, focus, inner light</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#f59e0b">戊</span><span>wù</span><span class="ast-yang">Yang ☀</span><span style="color:#f59e0b">Earth</span><span>Mountain</span><span>Steadiness, trust, protection</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#f59e0b">己</span><span>jǐ</span><span class="ast-yin">Yin 🌙</span><span style="color:#f59e0b">Earth</span><span>Fields / Garden</span><span>Nurturing, patience, receptivity</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#94a3b8">庚</span><span>gēng</span><span class="ast-yang">Yang ☀</span><span style="color:#94a3b8">Metal</span><span>Sword / Axe</span><span>Justice, courage, decisiveness</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#94a3b8">辛</span><span>xīn</span><span class="ast-yin">Yin 🌙</span><span style="color:#94a3b8">Metal</span><span>Jewel / Needle</span><span>Precision, refinement, sensitivity</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#3b82f6">壬</span><span>rén</span><span class="ast-yang">Yang ☀</span><span style="color:#3b82f6">Water</span><span>Ocean / River</span><span>Intelligence, ambition, flow</span></div>
+          <div class="ast-row"><span class="ast-zh" style="color:#3b82f6">癸</span><span>guǐ</span><span class="ast-yin">Yin 🌙</span><span style="color:#3b82f6">Water</span><span>Rain / Mist</span><span>Intuition, mystery, depth</span></div>
+        </div>
+      </div>
+
+      <!-- ④ TWELVE EARTHLY BRANCHES -->
+      <div class="about-section" id="ab-branches">
+        <h3>Twelve Earthly Branches (地支 Dìzhī)</h3>
+        <p>The Branches cycle in 12 steps. Each governs a zodiac animal, an element, a season, a month, and a two-hour window — linking the heavens to time itself.</p>
+        <div class="about-branches-table">
+          <div class="abt-header">
+            <span>地支</span><span>Animal</span><span>Element</span><span>Season</span><span>Hours</span>
+          </div>
+          <div class="abt-row"><span class="abt-zh">子</span><span>🐭 Rat</span><span style="color:#3b82f6">Water</span><span>Winter</span><span>23–01</span></div>
+          <div class="abt-row"><span class="abt-zh">丑</span><span>🐮 Ox</span><span style="color:#f59e0b">Earth</span><span>Winter</span><span>01–03</span></div>
+          <div class="abt-row"><span class="abt-zh">寅</span><span>🐯 Tiger</span><span style="color:#22c55e">Wood</span><span>Spring</span><span>03–05</span></div>
+          <div class="abt-row"><span class="abt-zh">卯</span><span>🐰 Rabbit</span><span style="color:#22c55e">Wood</span><span>Spring</span><span>05–07</span></div>
+          <div class="abt-row"><span class="abt-zh">辰</span><span>🐲 Dragon</span><span style="color:#f59e0b">Earth</span><span>Spring</span><span>07–09</span></div>
+          <div class="abt-row"><span class="abt-zh">巳</span><span>🐍 Snake</span><span style="color:#ef4444">Fire</span><span>Summer</span><span>09–11</span></div>
+          <div class="abt-row"><span class="abt-zh">午</span><span>🐴 Horse</span><span style="color:#ef4444">Fire</span><span>Summer</span><span>11–13</span></div>
+          <div class="abt-row"><span class="abt-zh">未</span><span>🐐 Goat</span><span style="color:#f59e0b">Earth</span><span>Summer</span><span>13–15</span></div>
+          <div class="abt-row"><span class="abt-zh">申</span><span>🐒 Monkey</span><span style="color:#94a3b8">Metal</span><span>Autumn</span><span>15–17</span></div>
+          <div class="abt-row"><span class="abt-zh">酉</span><span>🐓 Rooster</span><span style="color:#94a3b8">Metal</span><span>Autumn</span><span>17–19</span></div>
+          <div class="abt-row"><span class="abt-zh">戌</span><span>🐕 Dog</span><span style="color:#f59e0b">Earth</span><span>Autumn</span><span>19–21</span></div>
+          <div class="abt-row"><span class="abt-zh">亥</span><span>🐷 Pig</span><span style="color:#3b82f6">Water</span><span>Winter</span><span>21–23</span></div>
+        </div>
+      </div>
+
+      <!-- ⑤ FIVE ELEMENTS -->
+      <div class="about-section" id="ab-elements">
+        <h3>Five Elements (五行 Wǔxíng)</h3>
+        <p>Everything in the chart belongs to one of five dynamic forces. Balance — or the lack of it — defines your personality, health tendencies, and what you need most in life.</p>
+        <div class="about-elements-grid">
+          <div class="about-el-card" style="--ec:#22c55e">
+            <div class="aec-zh">木</div>
+            <div class="aec-name" style="color:#22c55e">Wood</div>
+            <div class="aec-traits">Growth · Vision · Benevolence</div>
+            <div class="aec-organs">Liver · Gallbladder</div>
+            <div class="aec-season">Spring 🌱</div>
+          </div>
+          <div class="about-el-card" style="--ec:#ef4444">
+            <div class="aec-zh">火</div>
+            <div class="aec-name" style="color:#ef4444">Fire</div>
+            <div class="aec-traits">Passion · Warmth · Joy</div>
+            <div class="aec-organs">Heart · Small Intestine</div>
+            <div class="aec-season">Summer 🔥</div>
+          </div>
+          <div class="about-el-card" style="--ec:#f59e0b">
+            <div class="aec-zh">土</div>
+            <div class="aec-name" style="color:#f59e0b">Earth</div>
+            <div class="aec-traits">Stability · Trust · Nurturing</div>
+            <div class="aec-organs">Spleen · Stomach</div>
+            <div class="aec-season">Transition 🌍</div>
+          </div>
+          <div class="about-el-card" style="--ec:#94a3b8">
+            <div class="aec-zh">金</div>
+            <div class="aec-name" style="color:#94a3b8">Metal</div>
+            <div class="aec-traits">Clarity · Justice · Precision</div>
+            <div class="aec-organs">Lungs · Large Intestine</div>
+            <div class="aec-season">Autumn 🍂</div>
+          </div>
+          <div class="about-el-card" style="--ec:#3b82f6">
+            <div class="aec-zh">水</div>
+            <div class="aec-name" style="color:#3b82f6">Water</div>
+            <div class="aec-traits">Wisdom · Flow · Depth</div>
+            <div class="aec-organs">Kidneys · Bladder</div>
+            <div class="aec-season">Winter 💧</div>
+          </div>
+        </div>
+        <div class="about-cycle-wrap">
+          <div class="about-cycle-label">Generating Cycle 相生 · each element nourishes the next →</div>
+          <div class="about-cycle-row">
+            <div class="about-cycle-node" style="color:#22c55e">Wood</div>
+            <div class="about-cycle-arrow">→</div>
+            <div class="about-cycle-node" style="color:#ef4444">Fire</div>
+            <div class="about-cycle-arrow">→</div>
+            <div class="about-cycle-node" style="color:#f59e0b">Earth</div>
+            <div class="about-cycle-arrow">→</div>
+            <div class="about-cycle-node" style="color:#94a3b8">Metal</div>
+            <div class="about-cycle-arrow">→</div>
+            <div class="about-cycle-node" style="color:#3b82f6">Water</div>
+            <div class="about-cycle-arrow">→</div>
+            <div class="about-cycle-node" style="color:#22c55e">Wood ↺</div>
+          </div>
+        </div>
+        <div class="about-cycle-wrap" style="margin-top:12px">
+          <div class="about-cycle-label">Controlling Cycle 相克 · each element restrains another ✕</div>
+          <div class="about-control-grid">
+            <div class="acg-row"><span style="color:#22c55e">Wood</span><span class="acg-arrow">✕</span><span style="color:#f59e0b">Earth</span></div>
+            <div class="acg-row"><span style="color:#ef4444">Fire</span><span class="acg-arrow">✕</span><span style="color:#94a3b8">Metal</span></div>
+            <div class="acg-row"><span style="color:#f59e0b">Earth</span><span class="acg-arrow">✕</span><span style="color:#3b82f6">Water</span></div>
+            <div class="acg-row"><span style="color:#94a3b8">Metal</span><span class="acg-arrow">✕</span><span style="color:#22c55e">Wood</span></div>
+            <div class="acg-row"><span style="color:#3b82f6">Water</span><span class="acg-arrow">✕</span><span style="color:#ef4444">Fire</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⑥ YIN & YANG -->
+      <div class="about-section" id="ab-yinyang">
+        <h3>Yin &amp; Yang (阴阳 Yīn Yáng)</h3>
+        <p>Every element has two faces — Yang (陽, active, outward) and Yin (陰, receptive, inward). Neither is better. Both are essential forces in the universe and in your chart.</p>
+        <div class="about-yy-grid">
+          <div class="about-yy-card" style="border-color:rgba(255,220,60,0.3)">
+            <div class="ayy-symbol">☀️</div>
+            <div class="ayy-name">Yang 陽</div>
+            <div class="ayy-traits">Active · Outward · Expanding<br>Decisive · Initiating · Giving</div>
+          </div>
+          <div class="about-yy-card" style="border-color:rgba(148,163,220,0.3)">
+            <div class="ayy-symbol">🌙</div>
+            <div class="ayy-name">Yin 陰</div>
+            <div class="ayy-traits">Receptive · Inward · Contracting<br>Reflective · Responding · Receiving</div>
+          </div>
+        </div>
+        <p style="margin-top:12px">In your chart, each of your 8 characters is either Yin or Yang. The balance shapes whether you tend to lead or support, initiate or complete, speak or listen.</p>
+      </div>
+
+      <!-- ⑦ 60-YEAR CYCLE -->
+      <div class="about-section" id="ab-cycle">
+        <h3>The 60-Year Cycle (六十甲子)</h3>
+        <p>Ten Stems × Twelve Branches interlock into exactly 60 unique pairs — the 六十甲子. After 60 years the pattern resets, which is why 60th birthdays are especially significant in Chinese culture.</p>
+        <div class="about-cycle60-grid">
+          <div class="ac60-header"><span>#</span><span>Pair</span><span>Name</span><span>Years (examples)</span></div>
+          <div class="ac60-row"><span>1</span><span class="ac60-zh">甲子</span><span>Yang Wood Rat</span><span>1924 · 1984 · 2044</span></div>
+          <div class="ac60-row"><span>2</span><span class="ac60-zh">乙丑</span><span>Yin Wood Ox</span><span>1925 · 1985 · 2045</span></div>
+          <div class="ac60-row"><span>3</span><span class="ac60-zh">丙寅</span><span>Yang Fire Tiger</span><span>1926 · 1986 · 2046</span></div>
+          <div class="ac60-row"><span>4</span><span class="ac60-zh">丁卯</span><span>Yin Fire Rabbit</span><span>1927 · 1987 · 2047</span></div>
+          <div class="ac60-row"><span>5</span><span class="ac60-zh">戊辰</span><span>Yang Earth Dragon</span><span>1928 · 1988 · 2048</span></div>
+          <div class="ac60-row"><span>6</span><span class="ac60-zh">己巳</span><span>Yin Earth Snake</span><span>1929 · 1989 · 2049</span></div>
+          <div class="ac60-row"><span>7</span><span class="ac60-zh">庚午</span><span>Yang Metal Horse</span><span>1930 · 1990 · 2050</span></div>
+          <div class="ac60-row"><span>8</span><span class="ac60-zh">辛未</span><span>Yin Metal Goat</span><span>1931 · 1991 · 2051</span></div>
+          <div class="ac60-row"><span>9</span><span class="ac60-zh">壬申</span><span>Yang Water Monkey</span><span>1932 · 1992 · 2052</span></div>
+          <div class="ac60-row"><span>10</span><span class="ac60-zh">癸酉</span><span>Yin Water Rooster</span><span>1933 · 1993 · 2053</span></div>
+          <div class="ac60-row"><span>11</span><span class="ac60-zh">甲戌</span><span>Yang Wood Dog</span><span>1934 · 1994 · 2054</span></div>
+          <div class="ac60-row"><span>12</span><span class="ac60-zh">乙亥</span><span>Yin Wood Pig</span><span>1935 · 1995 · 2055</span></div>
+        </div>
+        <p style="margin-top:10px">The remaining 48 pairs continue the same pattern through all Stem × Branch combinations until the cycle completes.</p>
+      </div>
+
+      <!-- ⑧ 12 ZODIAC ANIMALS -->
+      <div class="about-section" id="ab-zodiac">
+        <h3>The 12 Zodiac Animals (生肖 Shēngxiào)</h3>
+        <p>Each Branch corresponds to an animal. Your birth year gives your zodiac sign — but in Bāzì, your Day and Month branch animals are equally important for your full picture.</p>
+        <div class="about-zodiac-grid">
+          <div class="about-z-card"><div class="azc-emoji">🐭</div><div class="azc-name">Rat</div><div class="azc-years">1924 · 36 · 48 · 60 · 72 · 84 · 96 · 2008 · 20</div><div class="azc-trait" style="color:#3b82f6">Water · Clever</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐮</div><div class="azc-name">Ox</div><div class="azc-years">1925 · 37 · 49 · 61 · 73 · 85 · 97 · 2009 · 21</div><div class="azc-trait" style="color:#f59e0b">Earth · Patient</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐯</div><div class="azc-name">Tiger</div><div class="azc-years">1926 · 38 · 50 · 62 · 74 · 86 · 98 · 2010 · 22</div><div class="azc-trait" style="color:#22c55e">Wood · Brave</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐰</div><div class="azc-name">Rabbit</div><div class="azc-years">1927 · 39 · 51 · 63 · 75 · 87 · 99 · 2011 · 23</div><div class="azc-trait" style="color:#22c55e">Wood · Gentle</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐲</div><div class="azc-name">Dragon</div><div class="azc-years">1928 · 40 · 52 · 64 · 76 · 88 · 2000 · 12 · 24</div><div class="azc-trait" style="color:#f59e0b">Earth · Gifted</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐍</div><div class="azc-name">Snake</div><div class="azc-years">1929 · 41 · 53 · 65 · 77 · 89 · 2001 · 13 · 25</div><div class="azc-trait" style="color:#ef4444">Fire · Wise</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐴</div><div class="azc-name">Horse</div><div class="azc-years">1930 · 42 · 54 · 66 · 78 · 90 · 2002 · 14 · 26</div><div class="azc-trait" style="color:#ef4444">Fire · Free</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐐</div><div class="azc-name">Goat</div><div class="azc-years">1931 · 43 · 55 · 67 · 79 · 91 · 2003 · 15 · 27</div><div class="azc-trait" style="color:#f59e0b">Earth · Creative</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐒</div><div class="azc-name">Monkey</div><div class="azc-years">1932 · 44 · 56 · 68 · 80 · 92 · 2004 · 16 · 28</div><div class="azc-trait" style="color:#94a3b8">Metal · Witty</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐓</div><div class="azc-name">Rooster</div><div class="azc-years">1933 · 45 · 57 · 69 · 81 · 93 · 2005 · 17 · 29</div><div class="azc-trait" style="color:#94a3b8">Metal · Sharp</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐕</div><div class="azc-name">Dog</div><div class="azc-years">1934 · 46 · 58 · 70 · 82 · 94 · 2006 · 18 · 30</div><div class="azc-trait" style="color:#f59e0b">Earth · Loyal</div></div>
+          <div class="about-z-card"><div class="azc-emoji">🐷</div><div class="azc-name">Pig</div><div class="azc-years">1935 · 47 · 59 · 71 · 83 · 95 · 2007 · 19 · 31</div><div class="azc-trait" style="color:#3b82f6">Water · Generous</div></div>
+        </div>
+      </div>
+
+      <!-- ⑨ DAY MASTER -->
+      <div class="about-section" id="ab-daymaster">
+        <h3>The Day Master (日主 Rìzhǔ)</h3>
+        <p>The Day Stem is your <em>Day Master</em> — the elemental identity of your core self. It is the single most important character in your chart. Everything else is read relative to it.</p>
+        <div class="about-dm-table">
+          <div class="adm-header"><span>Day Master</span><span>Archetype</span><span>Core Strength</span><span>Blind Spot</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#22c55e">甲 Yang Wood</span><span>The Oak</span><span>Leadership, drive</span><span>Rigidity, control</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#22c55e">乙 Yin Wood</span><span>The Vine</span><span>Adaptability, tact</span><span>Over-reliance, drift</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#ef4444">丙 Yang Fire</span><span>The Sun</span><span>Charisma, generosity</span><span>Impulsiveness, scatter</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#ef4444">丁 Yin Fire</span><span>The Flame</span><span>Insight, focus</span><span>Perfectionism, anxiety</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#f59e0b">戊 Yang Earth</span><span>The Mountain</span><span>Steadiness, trust</span><span>Stubbornness, inertia</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#f59e0b">己 Yin Earth</span><span>The Valley</span><span>Nurturing, practical</span><span>Worry, self-doubt</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#94a3b8">庚 Yang Metal</span><span>The Sword</span><span>Decisive, principled</span><span>Harshness, inflexibility</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#94a3b8">辛 Yin Metal</span><span>The Gem</span><span>Refinement, precision</span><span>Sensitivity, vanity</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#3b82f6">壬 Yang Water</span><span>The Ocean</span><span>Intelligence, ambition</span><span>Overthinking, restless</span></div>
+          <div class="adm-row"><span class="adm-zh" style="color:#3b82f6">癸 Yin Water</span><span>The Rain</span><span>Intuition, depth</span><span>Secretiveness, fragility</span></div>
+        </div>
+      </div>
+
+      <!-- ⑩ COMPATIBILITY -->
+      <div class="about-section" id="ab-compat">
+        <h3>Compatibility &amp; Clashes (合冲 Hé Chōng)</h3>
+        <p>The Branches interact in predictable patterns — some harmonious, some tense. These relationships show up between pillars in your own chart and between your chart and other people's.</p>
+        <div class="about-compat-label">Six Harmonies 六合 — natural allies</div>
+        <div class="about-compat-grid">
+          <div class="about-compat-pair">🐭 Rat + 🐮 Ox</div>
+          <div class="about-compat-pair">🐯 Tiger + 🐷 Pig</div>
+          <div class="about-compat-pair">🐰 Rabbit + 🐕 Dog</div>
+          <div class="about-compat-pair">🐲 Dragon + 🐓 Rooster</div>
+          <div class="about-compat-pair">🐍 Snake + 🐒 Monkey</div>
+          <div class="about-compat-pair">🐴 Horse + 🐐 Goat</div>
+        </div>
+        <div class="about-compat-label" style="margin-top:16px">Six Conflicts 六冲 — opposing forces</div>
+        <div class="about-compat-grid">
+          <div class="about-compat-pair clash">🐭 Rat ✕ 🐴 Horse</div>
+          <div class="about-compat-pair clash">🐮 Ox ✕ 🐐 Goat</div>
+          <div class="about-compat-pair clash">🐯 Tiger ✕ 🐒 Monkey</div>
+          <div class="about-compat-pair clash">🐰 Rabbit ✕ 🐓 Rooster</div>
+          <div class="about-compat-pair clash">🐲 Dragon ✕ 🐕 Dog</div>
+          <div class="about-compat-pair clash">🐍 Snake ✕ 🐷 Pig</div>
+        </div>
+        <div class="about-compat-label" style="margin-top:16px">Three Harmony Trios 三合 — power combinations</div>
+        <div class="about-trio-grid">
+          <div class="about-trio"><span style="color:#3b82f6">💧 Water Trio</span><span>🐭 Rat · 🐲 Dragon · 🐒 Monkey</span></div>
+          <div class="about-trio"><span style="color:#22c55e">🌿 Wood Trio</span><span>🐰 Rabbit · 🐐 Goat · 🐷 Pig</span></div>
+          <div class="about-trio"><span style="color:#ef4444">🔥 Fire Trio</span><span>🐯 Tiger · 🐴 Horse · 🐕 Dog</span></div>
+          <div class="about-trio"><span style="color:#94a3b8">⚙️ Metal Trio</span><span>🐍 Snake · 🐓 Rooster · 🐮 Ox</span></div>
+        </div>
+      </div>
+
+      <!-- ⑪ HOW FORTUNE IS READ -->
+      <div class="about-section" id="ab-reading">
+        <h3>How Fortune is Read (六步推算)</h3>
+        <p>A reading works in layers — from your lifetime blueprint down to what's active right now. Each layer adds precision.</p>
+        <div class="about-reading-steps">
+          <div class="about-rs-step">
+            <div class="ars-num">1</div>
+            <div class="ars-body">
+              <div class="ars-title">Establish the Four Pillars</div>
+              <p>Convert birth date and time into Year, Month, Day, and Hour pillars using the traditional Chinese lunisolar calendar — not simply the Gregorian date.</p>
+            </div>
+          </div>
+          <div class="about-rs-step">
+            <div class="ars-num">2</div>
+            <div class="ars-body">
+              <div class="ars-title">Identify the Day Master</div>
+              <p>The Day Stem is you — your elemental core. Is your Day Master strong or weak? Supported by other characters or drained by them?</p>
+            </div>
+          </div>
+          <div class="about-rs-step">
+            <div class="ars-num">3</div>
+            <div class="ars-body">
+              <div class="ars-title">Map Element Balance</div>
+              <p>Count and weigh all 8 characters by element. Excess and deficiency reveal personality extremes, health tendencies, and the types of years that will challenge or support you.</p>
+            </div>
+          </div>
+          <div class="about-rs-step">
+            <div class="ars-num">4</div>
+            <div class="ars-body">
+              <div class="ars-title">Read the 10-Year Luck Pillars (大运)</div>
+              <p>Every 10 years your chart enters a new energetic environment. These Luck Pillars determine the major themes and opportunities of each decade of your life.</p>
+            </div>
+          </div>
+          <div class="about-rs-step">
+            <div class="ars-num">5</div>
+            <div class="ars-body">
+              <div class="ars-title">Overlay the Annual Pillar (流年)</div>
+              <p>Each year brings a new Stem+Branch pair that interacts with your natal chart and current Luck Pillar. This is why some years feel aligned and others feel grinding — it's measurable.</p>
+            </div>
+          </div>
+          <div class="about-rs-step">
+            <div class="ars-num">6</div>
+            <div class="ars-body">
+              <div class="ars-title">Synthesize into a Reading</div>
+              <p>All layers combine: your strengths, repeating patterns, best windows for major decisions, and how to work with — not against — your elemental nature.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⑫ FREE WILL -->
+      <div class="about-section" id="ab-philosophy">
+        <h3>Destiny &amp; Free Will (命运与自由意志)</h3>
+        <p>Bāzì doesn't predict a fixed future. It reveals the energetic terrain of your life — the hills and valleys, the seasons of growth and consolidation.</p>
+        <div class="about-callout">
+          <strong>The metaphor masters use:</strong> Bāzì is a weather forecast, not a prison sentence. A forecast tells you it will rain — you still choose whether to carry an umbrella, dance in it, or stay inside.
+        </div>
+        <p style="margin-top:12px">Understanding your chart doesn't limit you. It shows where your natural current flows strongest — so you can swim with it instead of exhausting yourself fighting against it.</p>
+        <p style="margin-top:8px">The Chinese tradition holds that <em>命 (fate)</em> sets the stage, but <em>运 (timing &amp; effort)</em> and <em>风水 (environment)</em> shape the outcome. Your chart is one-third of the story.</p>
+      </div>
+
+      <!-- CTA -->
+      <div class="about-cta">
+        <p>Ready to decode your chart?</p>
+        <button class="btn-primary" onclick="haptic(10); showScreen('input')">
+          <span class="en">Begin Your Reading</span><span class="zh hide">开始算命</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div id="input" class="screen">
+    <div class="nav-bar">
+      <button class="btn-back" onclick="haptic(8); showScreen('splash')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <img src="Logos/SVG/rev-horiz.svg" class="nav-logo" alt="Wobazi">
+      <div style="width:40px"></div>
+    </div>
+    <div class="input-body">
+      <div class="input-intro">
+        <div class="intro-icon">✦</div>
+        <p><span class="en">Enter your details to unlock your<br><strong>Four Pillars of Destiny</strong></span><span class="zh hide">输入出生信息，解锁<br><strong>四柱命盘</strong></span></p>
+      </div>
+      <form id="bazi-form" onsubmit="handleSubmit(event)">
+        <div class="field">
+          <label><span class="en">Name <span class="label-opt">optional</span></span><span class="zh hide">姓名 <span class="label-opt">可选</span></span></label>
+          <input type="text" id="name" placeholder="What do we call you?" autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="field field-row field-datetime">
+          <div class="field-col field-col-date">
+            <label><span class="en">Date of Birth <span class="label-req">*</span></span><span class="zh hide">出生日期 <span class="label-req">*</span></span></label>
+            <div class="date-trio">
+              <input type="number" id="birth-day"   class="date-part" placeholder="DD"   min="1"    max="31"   inputmode="numeric">
+              <span class="date-sep">/</span>
+              <input type="number" id="birth-month" class="date-part" placeholder="MM"   min="1"    max="12"   inputmode="numeric">
+              <span class="date-sep">/</span>
+              <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1920" max="2030" inputmode="numeric">
+            </div>
+          </div>
+          <div class="field-col field-col-time">
+            <label><span class="en">Time <span class="label-opt">optional</span></span><span class="zh hide">时间 <span class="label-opt">可选</span></span></label>
+            <input type="time" id="birthtime" class="time-input">
+          </div>
+        </div>
+
+        <div class="field field-row">
+          <div class="field-col">
+            <label><span class="en">Place of Birth <span class="label-opt">optional</span></span><span class="zh hide">出生地 <span class="label-opt">可选</span></span></label>
+            <input type="text" id="birthplace" placeholder="City or country" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="field-col">
+            <label><span class="en">Blood Type <span class="label-opt">optional</span></span><span class="zh hide">血型 <span class="label-opt">可选</span></span></label>
+            <select id="blood-type" class="select-input">
+              <option value="">Unknown</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="AB">AB</option>
+              <option value="O">O</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span class="en">Gender <span class="label-opt">optional — unlocks Feng Shui direction</span></span><span class="zh hide">性别 <span class="label-opt">可选 — 解锁风水方位</span></span></label>
+          <div class="gender-row">
+            <label class="gender-opt"><input type="radio" name="gender" value="M"> ♂ <span class="en">Male</span><span class="zh hide">男</span></label>
+            <label class="gender-opt"><input type="radio" name="gender" value="F"> ♀ <span class="en">Female</span><span class="zh hide">女</span></label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary btn-full">
+          <span class="en">Reveal My Destiny</span><span class="zh hide">揭示我的命运</span>
+          <span class="btn-char">龙</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading" class="screen">
+    <canvas id="loading-stars-canvas"></canvas>
+    <div class="loading-glow"></div>
+    <div class="loading-wrap">
+      <div class="loading-bagua">
+        <div class="bagua-ring bagua-outer"></div>
+        <div class="bagua-ring bagua-inner"></div>
+        <div class="taiji-wrap">
+          <div class="taiji">八字</div>
+          <div class="taiji-ring r1"></div>
+          <div class="taiji-ring r2"></div>
+          <div class="taiji-ring r3"></div>
+        </div>
+      </div>
+      <div class="loading-hanzi-float">
+        <span>天</span><span>地</span><span>金</span><span>木</span><span>水</span><span>火</span><span>土</span><span>命</span>
+      </div>
+      <p class="loading-msg" id="loading-msg">Aligning the heavenly stems…</p>
+      <div class="loading-track">
+        <div class="loading-fill" id="loading-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results" class="screen">
+    <div class="results-header">
+      <div class="header-left">
+        <img src="Logos/SVG/rev-horiz.svg" class="nav-logo" alt="Wobazi">
+        <div id="greeting" class="greeting"></div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-about-icon" onclick="haptic(6); showAbout()">What is Bāzì?</button>
+        <button class="btn-share-icon" id="share-btn" onclick="haptic(8); showShareCard()" title="Share">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+        <button class="btn-lang" id="lang-btn" onclick="toggleLang()">中文</button>
+      </div>
+    </div>
+
+    <div class="results-tab-bar">
+      <div class="tab-bar-inner">
+        <button class="tab-btn active" id="tab-btn-today" onclick="haptic(6); switchTab('today')"><span class="en">Today</span><span class="zh hide">今日</span></button>
+        <button class="tab-btn" id="tab-btn-you" onclick="haptic(6); switchTab('you')"><span class="en">You</span><span class="zh hide">你</span></button>
+        <button class="tab-btn" id="tab-btn-actions" onclick="haptic(6); switchTab('actions')"><span class="en">Actions</span><span class="zh hide">行动</span></button>
+        <button class="tab-btn" id="tab-btn-relationships" onclick="haptic(6); switchTab('relationships')"><span class="en">Relationships</span><span class="zh hide">关系</span></button>
+      </div>
+    </div>
+
+    <!-- Tab section chip bars -->
+    <div class="results-toc-bar" id="toc-today">
+      <div class="results-toc-inner">
+        <button class="results-toc-chip" onclick="scrollResults('res-daily')"><span class="en">Fortune</span><span class="zh hide">运势</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-life-areas')"><span class="en">Life Areas</span><span class="zh hide">领域</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-insights')"><span class="en">Insights</span><span class="zh hide">洞察</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-actions-preview')"><span class="en">Actions</span><span class="zh hide">行动</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-forecast')"><span class="en">Forecast</span><span class="zh hide">预测</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-work')"><span class="en">Work</span><span class="zh hide">事业</span></button>
+      </div>
+    </div>
+    <div class="results-toc-bar hide" id="toc-actions">
+      <div class="results-toc-inner">
+        <button class="results-toc-chip" onclick="scrollResults('today-actions-section')"><span class="en">Plan</span><span class="zh hide">计划</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-outfit')"><span class="en">Outfit</span><span class="zh hide">穿搭</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-foods')"><span class="en">Foods</span><span class="zh hide">食物</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-lucky-nums')"><span class="en">Numbers</span><span class="zh hide">数字</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-power-days')"><span class="en">Power Days</span><span class="zh hide">吉日</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-ritual')"><span class="en">Ritual</span><span class="zh hide">仪式</span></button>
+      </div>
+    </div>
+    <div class="results-toc-bar hide" id="toc-you">
+      <div class="results-toc-inner">
+        <button class="results-toc-chip" onclick="scrollResults('you-profile-section')"><span class="en">Profile</span><span class="zh hide">档案</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-pillars')"><span class="en">Pillars</span><span class="zh hide">四柱</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-elements')"><span class="en">Elements</span><span class="zh hide">五行</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-fortune')"><span class="en">Fortune</span><span class="zh hide">命运</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-career')"><span class="en">Career</span><span class="zh hide">职业</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-season')"><span class="en">Season</span><span class="zh hide">旺季</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-yinyang')"><span class="en">Yin Yang</span><span class="zh hide">阴阳</span></button>
+      </div>
+    </div>
+    <div class="results-toc-bar hide" id="toc-relationships">
+      <div class="results-toc-inner">
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-profile')"><span class="en">Profile</span><span class="zh hide">档案</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-compat')"><span class="en">Compatibility</span><span class="zh hide">相合</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-forecast')"><span class="en">Forecast</span><span class="zh hide">预测</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-soul')"><span class="en">Soul Animals</span><span class="zh hide">灵兽</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-business')"><span class="en">Business</span><span class="zh hide">商业</span></button>
+      </div>
+    </div>
+
+    <div class="scroll-body">
+
+      <!-- Today Summary (compact hero) -->
+      <section class="hero-compact" id="hero-card">
+        <div class="hero-bg" id="hero-bg"></div>
+        <div class="hc-inner">
+          <div class="hc-left">
+            <div class="hc-top-row">
+              <span class="hc-today-lbl" id="hero-today-label">TODAY</span>
+              <span class="hc-profile-chip" id="hero-profile-chip"></span>
+            </div>
+            <div class="hc-zodiac-big" id="hero-zodiac-title"></div>
+            <div class="hc-msg" id="hero-summary-msg"></div>
+            <div class="hc-bullets" id="hero-bullets"></div>
+          </div>
+          <div class="hc-med" id="hero-medallion"></div>
+        </div>
+        <!-- Kept for JS compatibility, not displayed -->
+        <h1 id="hero-name" style="display:none"></h1>
+        <div id="hero-chinese" style="display:none"></div>
+        <div id="hero-year-tag" style="display:none"></div>
+        <div id="hero-badges" style="display:none"></div>
+        <div id="trait-pills" style="display:none"></div>
+      </section>
+
+      <!-- You: Profile Header -->
+      <section class="section" data-tab="you" id="you-profile-section">
+        <div id="you-profile-header"></div>
+      </section>
+
+      <!-- Daily Fortune -->
+      <section class="section" data-tab="today" id="res-daily">
+        <div class="section-head" data-tip="daily-fortune">
+          <h3 class="en">Today's Fortune</h3>
+          <h3 class="zh hide">今日运势</h3>
+          <span class="section-sub" id="today-date-label"></span>
+        </div>
+        <div id="daily-card"></div>
+        <button class="oracle-cta-btn" onclick="haptic(10); showOracle()">
+          <div class="oracle-cta-inner">
+            <span class="oracle-cta-icon">✦</span>
+            <div class="oracle-cta-text">
+              <span class="oracle-cta-title"><span class="en">Ask the Oracle</span><span class="zh hide">问神谕</span></span>
+              <span class="oracle-cta-sub"><span class="en">AI-powered BaZi guidance</span><span class="zh hide">AI 八字指引</span></span>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+        </button>
+      </section>
+
+      <!-- Today: Life Areas -->
+      <section class="section" data-tab="today" id="res-life-areas">
+        <div class="section-head">
+          <h3 class="en">Life Areas</h3>
+          <h3 class="zh hide">生活领域</h3>
+          <span class="section-sub"><span class="en">Today's status</span><span class="zh hide">今日状态</span></span>
+        </div>
+        <div class="life-areas-grid" id="life-areas-grid"></div>
+      </section>
+
+      <!-- Today: Insights -->
+      <section class="section" data-tab="today" id="res-insights">
+        <div class="section-head">
+          <h3 class="en">Insights</h3>
+          <h3 class="zh hide">洞察</h3>
+        </div>
+        <div class="insight-cards" id="insight-cards"></div>
+      </section>
+
+      <!-- Today: Actions Preview -->
+      <section class="section" data-tab="today" id="res-actions-preview">
+        <div class="actions-preview-card">
+          <div class="actions-preview-top">
+            <div class="actions-preview-title"><span class="en">Top 3 Actions Today</span><span class="zh hide">今日3项行动</span></div>
+            <button class="btn-see-all" onclick="haptic(6); switchTab('actions')"><span class="en">Full plan →</span><span class="zh hide">完整计划 →</span></button>
+          </div>
+          <div id="actions-preview-list"></div>
+        </div>
+      </section>
+
+      <!-- 2026 Annual Forecast -->
+      <section class="section" data-tab="today" id="res-forecast">
+        <div class="section-head" data-tip="forecast-2026">
+          <h3 class="en">2026 Forecast</h3>
+          <h3 class="zh hide">2026年运势</h3>
+          <span class="section-sub">丙午 · Fire Horse</span>
+        </div>
+        <div id="forecast-card"></div>
+      </section>
+
+      <!-- Today's Action Plan (compact summary) -->
+      <section class="section" data-tab="actions" id="today-actions-section">
+        <div class="section-head">
+          <h3 class="en">Today's Action Plan</h3>
+          <h3 class="zh hide">今日行动计划</h3>
+          <span class="section-sub"><span class="en">3 things to do now</span><span class="zh hide">立即行动的3件事</span></span>
+        </div>
+        <div id="today-actions-card"></div>
+      </section>
+
+      <!-- Love & Relationships (moved to Relationships tab) -->
+      <section class="section" data-tab="relationships" id="res-rel-forecast">
+        <div class="section-head" data-tip="love-section">
+          <h3 class="en">Monthly Love Forecast</h3>
+          <h3 class="zh hide">每月爱情运势</h3>
+          <span class="section-sub">2026 · 情缘运势</span>
+        </div>
+        <div id="love-card"></div>
+      </section>
+
+      <!-- Work & Career -->
+      <section class="section" data-tab="today" id="res-work">
+        <div class="section-head" data-tip="work-section">
+          <h3 class="en">Work &amp; Career</h3>
+          <h3 class="zh hide">事业运势</h3>
+          <span class="section-sub">2026 · 职业运势</span>
+        </div>
+        <div id="work-card"></div>
+      </section>
+
+      <!-- Four Pillars -->
+      <section class="section" data-tab="you" id="res-pillars">
+        <div class="section-head" data-tip="four-pillars">
+          <h3 class="en">Four Pillars</h3>
+          <h3 class="zh hide">四柱</h3>
+          <span class="section-sub">八字 Bāzì</span>
+        </div>
+        <div class="pillars-row" id="pillars-row"></div>
+      </section>
+
+      <!-- Element Balance -->
+      <section class="section" data-tab="you" id="res-elements">
+        <div class="section-head" data-tip="element-balance">
+          <h3 class="en">Element Balance</h3>
+          <h3 class="zh hide">五行平衡</h3>
+          <span class="section-sub">五行 Wǔxíng</span>
+          <span class="tip-hint">ⓘ What is this?</span>
+        </div>
+        <div class="element-chart-wrap">
+          <svg id="radar-svg" viewBox="0 0 200 190" class="radar-svg"></svg>
+          <div class="element-legend" id="element-legend"></div>
+        </div>
+      </section>
+
+      <!-- Fortune -->
+      <section class="section" data-tab="you" id="res-fortune">
+        <div class="section-head" data-tip="fortune-cards">
+          <h3 class="en">Life Fortune</h3>
+          <h3 class="zh hide">命运</h3>
+          <span class="section-sub">命运 Mìngyùn</span>
+        </div>
+        <div class="fortune-grid" id="fortune-grid"></div>
+      </section>
+
+      <!-- Feng Shui Outfit Guide -->
+      <section class="section" data-tab="actions" data-tip="outfit" id="res-outfit">
+        <div class="section-head">
+          <h3 class="en">Feng Shui Outfit Guide</h3>
+          <h3 class="zh hide">风水穿搭指南</h3>
+          <span class="section-sub"><span class="en">2026 · Monthly Colors</span><span class="zh hide">2026 · 月度色彩</span></span>
+        </div>
+        <div id="outfit-card"></div>
+      </section>
+
+      <!-- Lucky Numbers -->
+      <section class="section" data-tab="actions" data-tip="lucky-nums" id="res-lucky-nums">
+        <div class="section-head">
+          <h3 class="en">Lucky Numbers</h3>
+          <h3 class="zh hide">幸运数字</h3>
+          <span class="section-sub">数字运势</span>
+        </div>
+        <div id="lucky-num-card"></div>
+      </section>
+
+      <!-- Auspicious Power Days -->
+      <section class="section" data-tab="actions" data-tip="power-days" id="res-power-days">
+        <div class="section-head">
+          <h3 class="en">Power Days</h3>
+          <span class="section-sub">2026 · 吉日</span>
+        </div>
+        <div id="power-days-card"></div>
+      </section>
+
+      <!-- Career Archetype -->
+      <section class="section" data-tab="you" id="res-career">
+        <div class="section-head" data-tip="career-archetype">
+          <h3 class="en">Career Archetype</h3>
+          <h3 class="zh hide">职业原型</h3>
+        </div>
+        <div id="career-card"></div>
+      </section>
+
+      <!-- Power Season -->
+      <section class="section" data-tab="you" id="res-season">
+        <div class="section-head" data-tip="power-season">
+          <h3 class="en">Power Season</h3>
+          <h3 class="zh hide">旺季</h3>
+        </div>
+        <div id="season-card"></div>
+      </section>
+
+      <!-- Yin Yang -->
+      <section class="section" data-tab="you" id="res-yinyang">
+        <div class="section-head" data-tip="yin-yang">
+          <h3 class="en">Yin · Yang Balance</h3>
+          <h3 class="zh hide">阴阳平衡</h3>
+          <span class="section-sub">阴阳 Yīn Yáng</span>
+        </div>
+        <div id="yinyang-card"></div>
+      </section>
+
+      <!-- Blood Type Profile -->
+      <section class="section data-hidden" id="blood-section" data-tab="you">
+        <div class="section-head" data-tip="blood-type">
+          <h3 class="en">Blood Type Profile</h3>
+          <h3 class="zh hide">血型个性</h3>
+        </div>
+        <div id="blood-card"></div>
+      </section>
+
+      <!-- Geographic Energy -->
+      <section class="section data-hidden" id="birthplace-section" data-tab="you">
+        <div class="section-head" data-tip="birthplace">
+          <h3 class="en">Geographic Energy</h3>
+          <h3 class="zh hide">地理能量</h3>
+        </div>
+        <div id="birthplace-card"></div>
+      </section>
+
+      <!-- Lucky Foods -->
+      <section class="section" data-tab="actions" data-tip="foods" id="res-foods">
+        <div class="section-head">
+          <h3 class="en">Lucky Foods</h3>
+          <h3 class="zh hide">幸运食物</h3>
+          <span class="section-sub"><span class="en">Element Nutrition</span><span class="zh hide">五行饮食</span></span>
+        </div>
+        <div id="foods-card"></div>
+      </section>
+
+      <!-- Morning Ritual (includes Crystals) -->
+      <section class="section" data-tab="actions" data-tip="ritual" id="res-ritual">
+        <div class="section-head">
+          <h3 class="en">Morning Ritual</h3>
+          <h3 class="zh hide">晨间仪式</h3>
+          <span class="section-sub">元素晨练</span>
+        </div>
+        <div id="ritual-card"></div>
+        <div class="ritual-crystals-sub" id="res-crystals">
+          <div class="section-head" style="margin-top:24px">
+            <h3 class="en">Crystals &amp; Gems</h3>
+            <h3 class="zh hide">水晶宝石</h3>
+            <span class="section-sub"><span class="en">Energy Stones</span><span class="zh hide">能量宝石</span></span>
+          </div>
+          <div id="crystals-card"></div>
+        </div>
+      </section>
+
+      <!-- Feng Shui Direction (Kua) — hidden if no gender -->
+      <section class="section data-hidden" id="kua-section" data-tab="actions" data-tip="kua">
+        <div class="section-head">
+          <h3 class="en">Sleep Direction</h3>
+          <h3 class="zh hide">睡眠方位</h3>
+          <span class="section-sub">卦数 · Feng Shui Kua</span>
+        </div>
+        <div id="kua-card"></div>
+      </section>
+
+      <!-- Life Decades 大运 -->
+      <section class="section" data-tab="you" data-tip="decades">
+        <div class="section-head">
+          <h3 class="en">Life Decades 大运</h3>
+          <h3 class="zh hide">人生大运</h3>
+          <span class="section-sub"><span class="en">Your 10-Year Cycles</span><span class="zh hide">十年大运周期</span></span>
+        </div>
+        <div id="decades-card"></div>
+      </section>
+
+      <!-- Reading -->
+      <section class="section" data-tab="you">
+        <div class="section-head" data-tip="zodiac">
+          <h3 class="en">Your Reading</h3>
+          <h3 class="zh hide">您的命理</h3>
+        </div>
+        <div class="reading-card">
+          <p class="en" id="reading-en"></p>
+          <p class="zh hide" id="reading-zh"></p>
+        </div>
+      </section>
+
+      <!-- Compatibility (moved to Relationships tab) -->
+      <section class="section" data-tab="relationships">
+        <div class="section-head" data-tip="compatibility">
+          <h3 class="en">Zodiac Compatibility</h3>
+          <h3 class="zh hide">生肖相合</h3>
+        </div>
+        <div id="compat-wrap"></div>
+      </section>
+
+      <!-- Lucky -->
+      <section class="section" data-tab="you">
+        <div class="section-head" data-tip="lucky-vibes">
+          <h3 class="en">Lucky Vibes</h3>
+          <h3 class="zh hide">吉祥元素</h3>
+        </div>
+        <div class="lucky-grid" id="lucky-grid"></div>
+      </section>
+
+      <!-- Relationships: Profile -->
+      <section class="section" data-tab="relationships" id="res-rel-profile">
+        <div class="section-head">
+          <h3 class="en">Your Relationship Profile</h3>
+          <h3 class="zh hide">你的感情档案</h3>
+          <span class="section-sub"><span class="en">Based on your Day Pillar</span><span class="zh hide">基于日柱</span></span>
+        </div>
+        <div class="coming-soon-card">
+          <span class="coming-soon-icon">✦</span>
+          <p class="en">Your relationship archetype and emotional patterns — coming soon.</p>
+          <p class="zh hide">你的感情原型与情感模式 — 即将推出。</p>
+        </div>
+      </section>
+
+      <!-- Relationships: Compatibility Check -->
+      <section class="section" data-tab="relationships" id="res-rel-compat">
+        <div class="section-head">
+          <h3 class="en">Compatibility Check</h3>
+          <h3 class="zh hide">八字合婚</h3>
+          <span class="section-sub"><span class="en">Enter partner's birth date</span><span class="zh hide">输入伴侣生日</span></span>
+        </div>
+        <div class="compat-check-card">
+          <div class="compat-input-row">
+            <input type="number" class="date-part" id="partner-day" placeholder="DD" min="1" max="31" inputmode="numeric">
+            <span class="date-sep">/</span>
+            <input type="number" class="date-part" id="partner-month" placeholder="MM" min="1" max="12" inputmode="numeric">
+            <span class="date-sep">/</span>
+            <input type="number" class="date-part year" id="partner-year" placeholder="YYYY" min="1920" max="2030" inputmode="numeric">
+          </div>
+          <button class="btn-primary btn-full" onclick="haptic(10); checkCompatibility()" style="margin-top:16px">
+            <span class="en">Check Compatibility</span><span class="zh hide">查看合婚</span>
+          </button>
+          <div id="compat-result"></div>
+        </div>
+      </section>
+
+      <!-- Relationships: Soul Animals -->
+      <section class="section" data-tab="relationships" id="res-rel-soul">
+        <div class="section-head">
+          <h3 class="en">Soul Animals</h3>
+          <h3 class="zh hide">灵兽</h3>
+          <span class="section-sub"><span class="en">Your secret allies</span><span class="zh hide">你的秘密盟友</span></span>
+        </div>
+        <div class="coming-soon-card">
+          <span class="coming-soon-icon">✦</span>
+          <p class="en">Discover which zodiac animals are your soul allies and secret friends — coming soon.</p>
+          <p class="zh hide">发现哪些生肖是你的灵魂盟友和秘密朋友 — 即将推出。</p>
+        </div>
+      </section>
+
+      <!-- Relationships: Business Compatibility -->
+      <section class="section" data-tab="relationships" id="res-rel-business">
+        <div class="section-head">
+          <h3 class="en">Business Compatibility</h3>
+          <h3 class="zh hide">商业合作</h3>
+          <span class="section-sub"><span class="en">Partner &amp; team dynamics</span><span class="zh hide">合伙与团队动态</span></span>
+        </div>
+        <div class="coming-soon-card">
+          <span class="coming-soon-icon">✦</span>
+          <p class="en">Analyze business partnership potential using Five Element dynamics — coming soon.</p>
+          <p class="zh hide">使用五行动态分析商业合作潜力 — 即将推出。</p>
+        </div>
+      </section>
+
+      <footer class="results-footer">
+        <div class="footer-actions">
+          <button class="footer-link" onclick="haptic(6); showAbout()">
+            <span class="en">What is Bāzì?</span><span class="zh hide">什么是八字？</span>
+          </button>
+          <span class="footer-dot">·</span>
+          <button class="footer-link" onclick="haptic(8); showScreen('input')">
+            <span class="en">New Reading</span><span class="zh hide">重新算命</span>
+          </button>
+          <span class="footer-dot">·</span>
+          <button class="footer-link" onclick="toggleLang()">
+            <span class="en">中文</span><span class="zh hide">English</span>
+          </button>
+        </div>
+        <div class="footer-brand">
+          <img src="Logos/SVG/rev-horiz.svg" class="footer-logo" alt="Wobazi">
+          <p class="footer-tagline"><span class="en">Ancient wisdom, modern clarity</span><span class="zh hide">古老智慧，现代洞见</span></p>
+        </div>
+        <p class="footer-copy">© 2026 Wobazi. <span class="en">All rights reserved.</span><span class="zh hide">保留所有权利。</span></p>
+        <p class="footer-disclaimer"><span class="en">For entertainment &amp; self-reflection purposes only. Not a substitute for professional advice.</span><span class="zh hide">仅供娱乐与自我反思。不能替代专业建议。</span></p>
+      </footer>
+    </div>
+  </div>
+
+  <!-- FLOATING ORACLE BUTTON -->
+  <button class="oracle-fab hide" id="oracle-fab" onclick="haptic(10); openOracleDrawer()">
+    <span class="oracle-fab-char">问</span>
+  </button>
+
+  <!-- ORACLE DRAWER -->
+  <div class="oracle-drawer-backdrop hide" id="oracle-drawer-backdrop" onclick="closeOracleDrawer()"></div>
+  <div class="oracle-drawer hide" id="oracle-drawer">
+    <div class="oracle-drawer-header">
+      <div class="oracle-drawer-handle"></div>
+      <span class="oracle-drawer-title"><span class="en">The Oracle</span><span class="zh hide">神谕</span></span>
+      <button class="oracle-drawer-close" onclick="haptic(6); closeOracleDrawer()">&times;</button>
+    </div>
+    <div class="oracle-drawer-ctx" id="oracle-drawer-ctx"></div>
+    <div class="oracle-drawer-scroll">
+      <div class="oracle-messages" id="oracle-drawer-messages">
+        <div class="oracle-welcome">
+          <span class="oracle-welcome-icon">✦</span>
+          <p class="en">I see your chart. Ask me anything about your destiny, timing, or path forward.</p>
+          <p class="zh hide">我已看到你的命盘。尽管问我关于命运、时机或前路的任何问题。</p>
+        </div>
+      </div>
+      <div class="oracle-chips" id="oracle-drawer-chips">
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Should I make a major move today?</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">What does my luck pillar say about 2026?</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Best timing this week to close a deal?</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Read my wealth stars</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Is this a good week to travel?</button>
+      </div>
+    </div>
+    <div class="oracle-drawer-input">
+      <textarea class="oracle-input" id="oracle-drawer-input" placeholder="Ask the Oracle..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOracleDrawerMessage()}"></textarea>
+      <button class="oracle-send-btn" id="oracle-drawer-send" onclick="sendOracleDrawerMessage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- SHARE OVERLAY -->
+  <div id="share-overlay" class="share-overlay hide">
+    <div class="share-backdrop" onclick="closeShare()"></div>
+    <div class="share-panel">
+      <div class="share-card-preview" id="share-card-preview"></div>
+      <div class="share-buttons">
+        <button class="btn-share-action primary-share" onclick="doShare()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span class="en">Share My Reading</span><span class="zh hide">分享我的命运</span>
+        </button>
+        <button class="btn-share-action secondary-share" onclick="closeShare()"><span class="en">Close</span><span class="zh hide">关闭</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIP OVERLAY -->
+  <div id="tip-overlay" class="tip-overlay">
+    <div class="tip-backdrop" onclick="closeTip()"></div>
+    <div class="tip-sheet">
+      <div class="tip-handle"></div>
+      <div class="tip-icon" id="tip-icon"></div>
+      <div class="tip-title-en" id="tip-title-en"></div>
+      <div class="tip-title-zh" id="tip-title-zh"></div>
+      <div class="tip-body-en" id="tip-body-en"></div>
+      <div class="tip-body-zh" id="tip-body-zh"></div>
+      <button class="tip-close" onclick="closeTip()"><span class="en">Got it ✓</span><span class="zh hide">知道了 ✓</span></button>
+    </div>
+  </div>
+
+  <!-- ORACLE CHAT -->
+  <div id="oracle-chat" class="screen">
+    <div class="nav-bar">
+      <button class="btn-back" onclick="haptic(8); showScreen('results')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="nav-title"><span class="en">The Oracle</span><span class="zh hide">神谕</span></span>
+      <div style="width:40px"></div>
+    </div>
+
+    <!-- Context bar -->
+    <div class="oracle-ctx-bar" id="oracle-ctx-bar"></div>
+
+    <!-- Messages -->
+    <div class="oracle-scroll">
+      <div class="oracle-messages" id="oracle-messages">
+        <div class="oracle-welcome">
+          <span class="oracle-welcome-icon">✦</span>
+          <p class="en">I see your chart. Ask me anything about your destiny, timing, or path forward.</p>
+          <p class="zh hide">我已看到你的命盘。尽管问我关于命运、时机或前路的任何问题。</p>
+        </div>
+      </div>
+
+      <!-- Suggested chips -->
+      <div class="oracle-chips" id="oracle-chips">
+        <button class="oracle-chip" onclick="sendOracleChip(this)">Should I make a major move today?</button>
+        <button class="oracle-chip" onclick="sendOracleChip(this)">What does my luck pillar say about 2026?</button>
+        <button class="oracle-chip" onclick="sendOracleChip(this)">Best timing this week to close a deal?</button>
+        <button class="oracle-chip" onclick="sendOracleChip(this)">Read my wealth stars</button>
+        <button class="oracle-chip" onclick="sendOracleChip(this)">Is this a good week to travel?</button>
+      </div>
+    </div>
+
+    <!-- Input bar -->
+    <div class="oracle-input-bar">
+      <textarea class="oracle-input" id="oracle-input" placeholder="Ask the Oracle..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOracleMessage()}"></textarea>
+      <button class="oracle-send-btn" id="oracle-send-btn" onclick="sendOracleMessage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script src="script.js?v=16"></script>
+</body>
+</html>

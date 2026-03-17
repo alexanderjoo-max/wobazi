@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What if I don't know my birth time?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Without a birth time, the Hour Pillar cannot be calculated. You will still have three of the four pillars (Year, Month, Day), which provide substantial insight into your personality, career potential, and relationships. The Hour Pillar adds detail about your inner self and later life, but a three-pillar reading remains highly valuable."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How accurate is BaZi?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "BaZi has been refined over thousands of years by Chinese metaphysical scholars. Its accuracy depends on precise birth data and the skill of interpretation. It excels at identifying personality patterns, elemental strengths and weaknesses, and the timing of major life themes through Luck Pillars. It is not a rigid prediction system but rather a framework for understanding cyclical energy patterns."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can BaZi predict the future?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "BaZi does not predict specific events. Instead, it maps the energetic landscape of your life — revealing which periods favor career growth, relationships, health, or caution. Think of it as a weather forecast for your personal energy: it tells you when conditions are favorable or challenging, but your choices still determine the outcome."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between BaZi and Chinese Zodiac?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Chinese Zodiac assigns one animal sign based on your birth year. BaZi is far more detailed — it uses four pillars (Year, Month, Day, Hour), each containing a Heavenly Stem and Earthly Branch, producing eight characters total. While the zodiac animal comes from the Year Branch alone, BaZi analyzes all eight characters and their elemental interactions for a complete personality and destiny profile."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="seo-page">
+  <%- include('../partials/nav') %>
+
+  <main class="seo-main">
+
+    <!-- ═══ Hero ═══ -->
+    <div class="about-hero">
+      <div class="about-hanzi">四柱</div>
+      <h1 style="color:var(--text);font-size:26px;margin-bottom:10px;">Four Pillars of Destiny</h1>
+      <p>The complete guide to BaZi — the ancient Chinese system that decodes your personality, relationships, career, and life cycles from eight characters derived from your birth date and time.</p>
+    </div>
+
+    <!-- ═══ Section 1: What Are the Four Pillars? ═══ -->
+    <div class="about-section">
+      <h3>🏛️ What Are the Four Pillars?</h3>
+      <p>The Four Pillars of Destiny, known as BaZi (八字) in Chinese, is one of the most sophisticated systems in Chinese metaphysics. Rooted in over 3,000 years of observation and refinement, it transforms the exact moment of your birth into a structured energetic blueprint composed of four pillars — Year, Month, Day, and Hour.</p>
+
+      <div class="about-callout">
+        <strong>八字 (BaZi) literally means "Eight Characters."</strong> Each of the four pillars contains two characters — a Heavenly Stem and an Earthly Branch — producing eight characters total. These eight characters encode the elemental forces that shape your destiny.
+      </div>
+
+      <p>Unlike Western astrology, which maps planets against constellations, BaZi is grounded in the Chinese calendar and the Five Elements (Wood, Fire, Earth, Metal, Water). Every element interacts through cycles of production and control, creating a dynamic portrait of strengths, weaknesses, and life timing.</p>
+    </div>
+
+    <!-- ═══ Section 2: The Four Pillars Explained ═══ -->
+    <div class="about-section">
+      <h3>📜 The Four Pillars Explained</h3>
+      <p>Each pillar governs a different domain of life and corresponds to a specific age range. Together, the four pillars create a complete map of your energetic inheritance, social role, core identity, and hidden potential.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;">
+        <!-- Year Pillar -->
+        <div style="background:rgba(240,192,64,0.03);border:1px solid rgba(240,192,64,0.15);border-radius:12px;padding:18px 14px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:6px;">🌳</div>
+          <div style="color:var(--gold,#f0c040);font-size:15px;font-weight:600;margin-bottom:6px;">Year Pillar</div>
+          <div style="color:var(--text,#f0f0ff);font-size:12px;font-weight:500;margin-bottom:4px;">Ancestors & Heritage</div>
+          <div style="color:var(--muted,#888a9e);font-size:11px;line-height:1.5;">Governs family background, social environment, and early influences. Reflects the energy you inherited.</div>
+          <div style="margin-top:8px;display:inline-block;background:rgba(240,192,64,0.08);color:var(--gold,#f0c040);font-size:10px;padding:3px 10px;border-radius:20px;">Ages 1–16</div>
+        </div>
+
+        <!-- Month Pillar -->
+        <div style="background:rgba(240,192,64,0.03);border:1px solid rgba(240,192,64,0.15);border-radius:12px;padding:18px 14px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:6px;">🏢</div>
+          <div style="color:var(--gold,#f0c040);font-size:15px;font-weight:600;margin-bottom:6px;">Month Pillar</div>
+          <div style="color:var(--text,#f0f0ff);font-size:12px;font-weight:500;margin-bottom:4px;">Career & Authority</div>
+          <div style="color:var(--muted,#888a9e);font-size:11px;line-height:1.5;">Governs parents, career path, and social standing. Often considered the strongest pillar for professional destiny.</div>
+          <div style="margin-top:8px;display:inline-block;background:rgba(240,192,64,0.08);color:var(--gold,#f0c040);font-size:10px;padding:3px 10px;border-radius:20px;">Ages 17–32</div>
+        </div>
+
+        <!-- Day Pillar -->
+        <div style="background:rgba(240,192,64,0.03);border:1px solid rgba(240,192,64,0.15);border-radius:12px;padding:18px 14px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:6px;">🪞</div>
+          <div style="color:var(--gold,#f0c040);font-size:15px;font-weight:600;margin-bottom:6px;">Day Pillar</div>
+          <div style="color:var(--text,#f0f0ff);font-size:12px;font-weight:500;margin-bottom:4px;">Self & Spouse</div>
+          <div style="color:var(--muted,#888a9e);font-size:11px;line-height:1.5;">The Day Stem is your Day Master — your true elemental identity. The Day Branch reveals your relationship with your spouse or partner.</div>
+          <div style="margin-top:8px;display:inline-block;background:rgba(240,192,64,0.08);color:var(--gold,#f0c040);font-size:10px;padding:3px 10px;border-radius:20px;">Ages 33–48</div>
+        </div>
+
+        <!-- Hour Pillar -->
+        <div style="background:rgba(240,192,64,0.03);border:1px solid rgba(240,192,64,0.15);border-radius:12px;padding:18px 14px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:6px;">🌙</div>
+          <div style="color:var(--gold,#f0c040);font-size:15px;font-weight:600;margin-bottom:6px;">Hour Pillar</div>
+          <div style="color:var(--text,#f0f0ff);font-size:12px;font-weight:500;margin-bottom:4px;">Children & Subconscious</div>
+          <div style="color:var(--muted,#888a9e);font-size:11px;line-height:1.5;">Governs your inner world, aspirations, children, and legacy. It reveals the deepest layer of your character and later life path.</div>
+          <div style="margin-top:8px;display:inline-block;background:rgba(240,192,64,0.08);color:var(--gold,#f0c040);font-size:10px;padding:3px 10px;border-radius:20px;">Ages 49+</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Section 3: Heavenly Stems (天干) ═══ -->
+    <div class="about-section">
+      <h3>☀️ The Ten Heavenly Stems (天干)</h3>
+      <p>The Heavenly Stems represent celestial energy flowing downward. There are ten stems — two for each of the Five Elements, one Yang (active, expansive) and one Yin (receptive, refined). Your Day Stem is your Day Master, the single most important character in your entire chart.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:16px;">
+        <% bazi.STEMS.forEach(function(s) { %>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(240,192,64,0.06);border-radius:10px;padding:12px 6px;text-align:center;">
+            <div style="font-size:26px;font-family:'Noto Sans SC',sans-serif;font-weight:700;color:<%= bazi.EL_COLOR[s.element] %>;margin-bottom:4px;"><%= s.char %></div>
+            <div style="color:var(--text,#f0f0ff);font-size:11px;font-weight:500;"><%= s.pinyin %></div>
+            <div style="color:<%= bazi.EL_COLOR[s.element] %>;font-size:10px;margin-top:2px;"><%= s.element %></div>
+            <div style="margin-top:4px;display:inline-block;background:<%= s.polarity === 'Yang' ? 'rgba(255,255,255,0.08)' : 'rgba(139,92,246,0.12)' %>;color:<%= s.polarity === 'Yang' ? '#f0f0ff' : '#a78bfa' %>;font-size:9px;padding:2px 8px;border-radius:10px;"><%= s.polarity %></div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- ═══ Section 4: Earthly Branches (地支) ═══ -->
+    <div class="about-section">
+      <h3>🌏 The Twelve Earthly Branches (地支)</h3>
+      <p>The Earthly Branches represent terrestrial energy rising upward. Each branch corresponds to one of the twelve Chinese zodiac animals and carries its own elemental charge. The interplay between Stems above and Branches below is the foundation of BaZi analysis.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;">
+        <% bazi.BRANCHES.forEach(function(b) { %>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(240,192,64,0.06);border-radius:10px;padding:12px 6px;text-align:center;">
+            <div style="font-size:22px;margin-bottom:2px;"><%= b.emoji %></div>
+            <div style="font-size:20px;font-family:'Noto Sans SC',sans-serif;font-weight:700;color:var(--text,#f0f0ff);margin-bottom:2px;"><%= b.char %></div>
+            <div style="color:var(--muted,#888a9e);font-size:10px;"><%= b.pinyin %></div>
+            <div style="color:var(--text,#f0f0ff);font-size:11px;font-weight:500;margin-top:2px;"><%= b.animal %></div>
+            <div style="color:<%= bazi.EL_COLOR[b.element] %>;font-size:10px;margin-top:2px;"><%= b.element %> <%= bazi.EL_ZH[b.element] %></div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- ═══ Section 5: How Pillars Interact ═══ -->
+    <div class="about-section">
+      <h3>🔄 How Pillars Interact</h3>
+      <p>A BaZi chart is far more than eight isolated characters. The stems and branches within and across pillars form dynamic relationships — combinations that enhance energy and clashes that create tension. Understanding these interactions is what separates a surface reading from a deep one.</p>
+
+      <div style="margin-top:16px;">
+        <div style="color:var(--gold,#f0c040);font-size:14px;font-weight:600;margin-bottom:8px;">⚡ Stem Combinations</div>
+        <p>Certain Heavenly Stem pairs merge to produce a new element when they appear together in a chart. These transformations can dramatically shift the elemental balance — a chart that looks Fire-heavy on the surface may actually be producing Earth through stem combination.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;">
+        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-family:'Noto Sans SC',sans-serif;font-size:18px;color:var(--text,#f0f0ff);">子午</div>
+          <div style="color:var(--muted,#888a9e);font-size:10px;margin-top:4px;">Rat-Horse</div>
+        </div>
+        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-family:'Noto Sans SC',sans-serif;font-size:18px;color:var(--text,#f0f0ff);">丑未</div>
+          <div style="color:var(--muted,#888a9e);font-size:10px;margin-top:4px;">Ox-Goat</div>
+        </div>
+        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-family:'Noto Sans SC',sans-serif;font-size:18px;color:var(--text,#f0f0ff);">寅申</div>
+          <div style="color:var(--muted,#888a9e);font-size:10px;margin-top:4px;">Tiger-Monkey</div>
+        </div>
+        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-family:'Noto Sans SC',sans-serif;font-size:18px;color:var(--text,#f0f0ff);">卯酉</div>
+          <div style="color:var(--muted,#888a9e);font-size:10px;margin-top:4px;">Rabbit-Rooster</div>
+        </div>
+        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-family:'Noto Sans SC',sans-serif;font-size:18px;color:var(--text,#f0f0ff);">辰戌</div>
+          <div style="color:var(--muted,#888a9e);font-size:10px;margin-top:4px;">Dragon-Dog</div>
+        </div>
+        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-family:'Noto Sans SC',sans-serif;font-size:18px;color:var(--text,#f0f0ff);">巳亥</div>
+          <div style="color:var(--muted,#888a9e);font-size:10px;margin-top:4px;">Snake-Pig</div>
+        </div>
+      </div>
+
+      <div style="color:var(--muted,#888a9e);font-size:11px;text-align:center;margin-top:8px;">The Six Clashes (六冲) — Branch pairs that create friction and disruption</div>
+
+      <div class="about-callout" style="margin-top:16px;">
+        <strong>Six Harmonies (六合) — Branch Combinations.</strong> When specific branch pairs appear together, they harmonize and may transform into a new element: 子丑 (Water), 寅亥 (Wood), 卯戌 (Fire), 辰酉 (Metal), 巳申 (Water), 午未 (Fire). These combinations strengthen chart flow and reveal hidden alliances between pillars.
+      </div>
+    </div>
+
+    <!-- ═══ Section 6: 10-Year Luck Pillars (大运) ═══ -->
+    <div class="about-section">
+      <h3>🔮 10-Year Luck Pillars (大运)</h3>
+      <p>Your natal chart is a snapshot of birth — but life is not static. The 10-Year Luck Pillars overlay a shifting energetic environment on top of your fixed chart, creating distinct decades with unique themes, opportunities, and challenges.</p>
+
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,0.02);border:1px solid rgba(240,192,64,0.06);border-radius:10px;padding:12px 14px;">
+          <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold,#f0c040);color:#0a0a14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">1</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold,#f0c040);margin-bottom:4px;">Starting Point</div>
+            <p style="font-size:12px;color:rgba(240,240,255,0.45);line-height:1.5;margin:0;">Your Luck Pillars begin from the Month Pillar of your natal chart. The starting age depends on your gender and the polarity (Yin or Yang) of your Year Stem — typically between ages 1 and 9.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,0.02);border:1px solid rgba(240,192,64,0.06);border-radius:10px;padding:12px 14px;">
+          <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold,#f0c040);color:#0a0a14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">2</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold,#f0c040);margin-bottom:4px;">Decade Themes</div>
+            <p style="font-size:12px;color:rgba(240,240,255,0.45);line-height:1.5;margin:0;">Each 10-year period carries a new Stem-Branch pair that interacts with your natal chart. A Luck Pillar that brings your favorable element can trigger career breakthroughs, strong relationships, or robust health.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,0.02);border:1px solid rgba(240,192,64,0.06);border-radius:10px;padding:12px 14px;">
+          <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold,#f0c040);color:#0a0a14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">3</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold,#f0c040);margin-bottom:4px;">Layered Timing</div>
+            <p style="font-size:12px;color:rgba(240,240,255,0.45);line-height:1.5;margin:0;">The Luck Pillar combines with the Annual Pillar (流年) of each year, creating a layered timing system. The best windows for major decisions happen when both the Luck Pillar and Annual Pillar align favorably with your natal chart.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,0.02);border:1px solid rgba(240,192,64,0.06);border-radius:10px;padding:12px 14px;">
+          <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold,#f0c040);color:#0a0a14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">4</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold,#f0c040);margin-bottom:4px;">Clashes & Transformations</div>
+            <p style="font-size:12px;color:rgba(240,240,255,0.45);line-height:1.5;margin:0;">When a Luck Pillar clashes with a natal pillar, it often triggers major life changes — relocations, career shifts, or relationship turning points. These are not inherently negative; they are catalysts for transformation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Section 7: Reading Your Chart ═══ -->
+    <div class="about-section">
+      <h3>📖 Reading Your Chart</h3>
+      <p>A complete BaZi reading follows a structured process — moving from raw data to deep interpretation. Here are the five essential steps practiced by BaZi consultants worldwide.</p>
+
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,0.02);border:1px solid rgba(240,192,64,0.06);border-radius:10px;padding:12px 14px;">
+          <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold,#f0c040);color:#0a0a14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">1</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold,#f0c040);margin-bottom:4px;">Calculate Your Four Pillars</div>
+            <p style="font-size:12px;color:rgba(240,240,255,0.45);line-height:1.5;margin:0;">Convert your birth year, month, day, and hour into the traditional Chinese calendar to derive four Stem-Branch pairs. Each pair maps to a specific energetic combination from the sixty Jiazi (甲子) cycle.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,0.02);border:1px solid rgba(240,192,64,0.06);border-radius:10px;padding:12px 14px;">
+          <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold,#f0c040);color:#0a0a14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">2</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold,#f0c040);margin-bottom:4px;">Identify Your Day Master</div>
+            <p style="font-size:12px;color:rgba(240,240,255,0.45);line-height:1.5;margin:0;">The Day Stem is your Day Master — the element that represents you. Determine whether your Day Master is strong (well-supported by surrounding elements) or weak (drained or controlled), as this shapes the entire interpretation.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,0.02);border:1px solid rgba(240,192,64,0.06);border-radius:10px;padding:12px 14px;">
+          <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold,#f0c040);color:#0a0a14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">3</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold,#f0c040);margin-bottom:4px;">Analyze Element Balance</div>
+            <p style="font-size:12px;color:rgba(240,240,255,0.45);line-height:1.5;margin:0;">Count the Five Elements across all eight characters. Identify which elements are in excess, which are deficient, and which are entirely absent. This balance reveals personality tendencies, health risks, and the types of environments where you thrive.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,0.02);border:1px solid rgba(240,192,64,0.06);border-radius:10px;padding:12px 14px;">
+          <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold,#f0c040);color:#0a0a14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">4</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold,#f0c040);margin-bottom:4px;">Check Pillar Interactions</div>
+            <p style="font-size:12px;color:rgba(240,240,255,0.45);line-height:1.5;margin:0;">Examine combinations, clashes, harms, and punishments between branches. Look for stem combinations that produce new elements. These interactions modify the raw element count and reveal hidden dynamics in relationships, career, and health.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,0.02);border:1px solid rgba(240,192,64,0.06);border-radius:10px;padding:12px 14px;">
+          <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold,#f0c040);color:#0a0a14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">5</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold,#f0c040);margin-bottom:4px;">Map Luck Pillars for Timing</div>
+            <p style="font-size:12px;color:rgba(240,240,255,0.45);line-height:1.5;margin:0;">Calculate your 10-Year Luck Pillars and overlay them against your natal chart. Identify which decades bring supportive energy and which bring challenges. Combine with Annual Pillars for year-by-year precision on major decisions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Five Elements Quick Reference ═══ -->
+    <div class="about-section" style="text-align:center;">
+      <h3>🌀 The Five Elements at a Glance</h3>
+      <p>Every character in a BaZi chart belongs to one of the Five Elements. These elements interact through the Production Cycle (generating) and the Control Cycle (restraining), creating the dynamic tension that defines your chart.</p>
+
+      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px;">
+        <% bazi.PRODUCTION_CYCLE.forEach(function(el) { %>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:<%= bazi.EL_COLOR[el] %>22;border:2px solid <%= bazi.EL_COLOR[el] %>;display:flex;align-items:center;justify-content:center;font-family:'Noto Sans SC',sans-serif;font-size:20px;font-weight:700;color:<%= bazi.EL_COLOR[el] %>;"><%= bazi.EL_ZH[el] %></div>
+            <div style="color:<%= bazi.EL_COLOR[el] %>;font-size:11px;font-weight:500;"><%= el %></div>
+          </div>
+        <% }); %>
+      </div>
+
+      <div style="color:var(--muted,#888a9e);font-size:11px;margin-top:12px;line-height:1.6;">
+        <strong style="color:var(--text,#f0f0ff);">Production:</strong> Wood feeds Fire, Fire creates Earth, Earth bears Metal, Metal collects Water, Water nourishes Wood<br>
+        <strong style="color:var(--text,#f0f0ff);">Control:</strong> Wood parts Earth, Earth dams Water, Water quenches Fire, Fire melts Metal, Metal chops Wood
+      </div>
+    </div>
+
+    <!-- ═══ FAQ ═══ -->
+    <div class="about-section">
+      <h3>❓ Frequently Asked Questions</h3>
+      <div class="about-faq" style="margin-top:12px;">
+        <div class="about-faq-item">
+          <div class="about-faq-q">What if I don't know my birth time?</div>
+          <div class="about-faq-a">Without a birth time, the Hour Pillar cannot be calculated. You will still have three of the four pillars (Year, Month, Day), which provide substantial insight into your personality, career potential, and relationships. The Hour Pillar adds detail about your inner self and later life, but a three-pillar reading remains highly valuable. Many professional BaZi readers work with clients who lack an exact birth time.</div>
+        </div>
+        <div class="about-faq-item">
+          <div class="about-faq-q">How accurate is BaZi?</div>
+          <div class="about-faq-a">BaZi has been refined over thousands of years by Chinese metaphysical scholars. Its accuracy depends on precise birth data and the skill of interpretation. It excels at identifying personality patterns, elemental strengths and weaknesses, and the timing of major life themes through Luck Pillars. It is not a rigid prediction system but rather a framework for understanding cyclical energy patterns that influence your life trajectory.</div>
+        </div>
+        <div class="about-faq-item">
+          <div class="about-faq-q">Can BaZi predict the future?</div>
+          <div class="about-faq-a">BaZi does not predict specific events. Instead, it maps the energetic landscape of your life — revealing which periods favor career growth, relationships, health, or caution. Think of it as a weather forecast for your personal energy: it tells you when conditions are favorable or challenging, but your choices still determine the outcome. The system highlights windows of opportunity, not fixed fates.</div>
+        </div>
+        <div class="about-faq-item">
+          <div class="about-faq-q">What is the difference between BaZi and Chinese Zodiac?</div>
+          <div class="about-faq-a">The Chinese Zodiac assigns one animal sign based on your birth year. BaZi is far more detailed — it uses four pillars (Year, Month, Day, Hour), each containing a Heavenly Stem and Earthly Branch, producing eight characters total. While the zodiac animal comes from the Year Branch alone, BaZi analyzes all eight characters and their elemental interactions for a complete personality and destiny profile. It is the difference between knowing your sun sign and having a full natal chart.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CTA ═══ -->
+    <div class="about-callout" style="text-align:center;">
+      <strong>Ready to discover your Four Pillars?</strong> Calculate your complete BaZi chart in seconds — Day Master, element balance, fortune scores, and zodiac insights, all from your birth date.
+    </div>
+
+    <div class="about-cta">
+      <a href="/bazi-calculator" class="btn-primary">Calculate Your BaZi Free →</a>
+    </div>
+
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script>
+    document.querySelectorAll('.about-faq-q').forEach(q => {
+      q.addEventListener('click', () => q.closest('.about-faq-item').classList.toggle('open'));
+    });
+  </script>
+</body>
+</html>

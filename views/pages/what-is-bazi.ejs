@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does BaZi mean?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "BaZi (八字) literally translates to 'Eight Characters' in Chinese. It refers to the eight Chinese characters — two for each of the Four Pillars (Year, Month, Day, Hour) — derived from your exact date and time of birth. Together, these characters form a cosmic blueprint of your personality, strengths, challenges, and life path."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is a BaZi chart calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A BaZi chart is calculated by converting your birth date and time into the traditional Chinese calendar system. Each of the Four Pillars (Year, Month, Day, Hour) is expressed as a pair of characters: one Heavenly Stem and one Earthly Branch. The Heavenly Stems cycle through ten characters linked to the Five Elements and Yin/Yang polarity, while the Earthly Branches cycle through twelve characters associated with the Chinese zodiac animals."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the Five Elements in BaZi?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Five Elements (五行 Wǔxíng) are Wood, Fire, Earth, Metal, and Water. They form two key cycles: the Production Cycle, where each element nourishes the next (Wood feeds Fire, Fire creates Earth, Earth bears Metal, Metal collects Water, Water nourishes Wood), and the Control Cycle, where each element restrains another (Wood parts Earth, Earth dams Water, Water extinguishes Fire, Fire melts Metal, Metal chops Wood). The balance or imbalance of these elements in your chart reveals core aspects of your personality and fortune."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a Day Master in BaZi?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Day Master (日主 Rìzhǔ) is the Heavenly Stem of your Day Pillar. It is considered the most important single character in your entire BaZi chart because it represents your core self — your innate personality, temperament, and how you relate to the world. All other elements in the chart are interpreted in relation to your Day Master."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can BaZi predict compatibility between two people?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. BaZi compatibility analysis compares the charts of two individuals by examining how their elements interact. Complementary elemental balances often indicate harmony — for example, if one person has an excess of Wood and the other needs Wood, they naturally support each other. The Chinese zodiac animals in each chart also carry traditional compatibility and clash relationships that provide further insight into relationship dynamics."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body class="seo-page">
+  <%- include('../partials/nav') %>
+
+  <main class="seo-main" style="max-width:800px;margin:0 auto;padding:0 16px 64px;">
+
+    <!-- ─── HERO ─── -->
+    <div class="about-hero">
+      <div class="about-hanzi">八字</div>
+      <h1 style="color:var(--text,#f0f0ff);font-size:28px;margin-bottom:8px;">What is BaZi?</h1>
+      <p>The ancient Chinese system of Four Pillars astrology that decodes your destiny from the moment you were born.</p>
+    </div>
+
+    <!-- ─── TOC CHIP BAR ─── -->
+    <div class="about-toc-bar">
+      <div class="about-toc-inner">
+        <button class="about-toc-chip" onclick="scrollToSection('overview')">Overview</button>
+        <button class="about-toc-chip" onclick="scrollToSection('four-pillars')">Four Pillars</button>
+        <button class="about-toc-chip" onclick="scrollToSection('five-elements')">Five Elements</button>
+        <button class="about-toc-chip" onclick="scrollToSection('yin-yang')">Yin &amp; Yang</button>
+        <button class="about-toc-chip" onclick="scrollToSection('zodiac')">Zodiac</button>
+        <button class="about-toc-chip" onclick="scrollToSection('day-master')">Day Master</button>
+        <button class="about-toc-chip" onclick="scrollToSection('compatibility')">Compatibility</button>
+        <button class="about-toc-chip" onclick="scrollToSection('how-it-works')">How It Works</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         § 1  OVERVIEW
+         ═══════════════════════════════════════════ -->
+    <div class="about-section" id="overview">
+      <h3>BaZi: The Eight Characters</h3>
+      <p>BaZi (八字) literally means <strong>"Eight Characters"</strong> in Chinese. It is one of the oldest and most respected systems of Chinese metaphysics, with roots stretching back over a thousand years to the Tang and Song dynasties. At its core, BaZi converts your exact birth date and time into a chart of eight Chinese characters that together form a cosmic blueprint of who you are.</p>
+      <p>These eight characters are arranged across <strong>Four Pillars</strong> — Year, Month, Day, and Hour — each consisting of a <em>Heavenly Stem</em> on top and an <em>Earthly Branch</em> below. Every character carries elemental energy (Wood, Fire, Earth, Metal, or Water) and a Yin or Yang polarity. The interplay between these elements reveals your innate personality, strengths, challenges, career aptitudes, relationship dynamics, and the timing of major life events.</p>
+      <p>Unlike Western astrology, which is primarily based on the position of the Sun relative to constellations, BaZi is a <strong>calendar-based system</strong> rooted in the cycles of the Chinese lunisolar calendar. It does not rely on planetary observation but rather on the deep cyclical patterns of time itself — patterns that the ancient Chinese meticulously recorded and interpreted over millennia.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         § 2  FOUR PILLARS
+         ═══════════════════════════════════════════ -->
+    <div class="about-section" id="four-pillars">
+      <h3>The Four Pillars (四柱 Sìzhù)</h3>
+      <p>Your birth data maps onto four "pillars." Each pillar has two characters — a <strong>Heavenly Stem</strong> (天干) on top and an <strong>Earthly Branch</strong> (地支) below. Four pillars &times; two characters = eight characters.</p>
+
+      <div class="about-pillars-visual">
+        <div class="about-pillar-col">
+          <div class="about-pillar-head">年柱</div>
+          <div class="about-pillar-stem" style="background:rgba(240,192,64,0.12)">Stem</div>
+          <div class="about-pillar-branch">Branch</div>
+          <div class="about-pillar-foot">Year</div>
+        </div>
+        <div class="about-pillar-col">
+          <div class="about-pillar-head">月柱</div>
+          <div class="about-pillar-stem" style="background:rgba(96,165,250,0.12)">Stem</div>
+          <div class="about-pillar-branch">Branch</div>
+          <div class="about-pillar-foot">Month</div>
+        </div>
+        <div class="about-pillar-col about-pillar-self">
+          <div class="about-pillar-head">日柱</div>
+          <div class="about-pillar-stem" style="background:rgba(192,132,252,0.22)">Stem ✦</div>
+          <div class="about-pillar-branch">Branch</div>
+          <div class="about-pillar-foot">Day</div>
+        </div>
+        <div class="about-pillar-col">
+          <div class="about-pillar-head">时柱</div>
+          <div class="about-pillar-stem" style="background:rgba(74,222,128,0.12)">Stem</div>
+          <div class="about-pillar-branch">Branch</div>
+          <div class="about-pillar-foot">Hour</div>
+        </div>
+      </div>
+
+      <p>The <strong>Year Pillar</strong> reflects your social identity, ancestral heritage, and the broad generational energy you carry. The <strong>Month Pillar</strong> represents your career, your parents' influence, and the primary elemental climate of your birth season. The <strong>Day Pillar</strong> is the most personal — the Heavenly Stem of this pillar is your <em>Day Master</em>, the single character that represents your core self. The <strong>Hour Pillar</strong> relates to your inner thoughts, aspirations, and the energy that shapes your later years and legacy.</p>
+
+      <!-- Heavenly Stems table -->
+      <h4 style="color:var(--gold,#f0c040);margin:24px 0 12px;font-size:16px;">The 10 Heavenly Stems (天干 Tiāngān)</h4>
+      <p>The ten Heavenly Stems cycle through the Five Elements in Yin-Yang pairs. Each Stem carries a distinct elemental quality and polarity that colors the pillar it occupies.</p>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+              <th style="padding:8px 6px;text-align:left;color:var(--muted,#888a9e);">#</th>
+              <th style="padding:8px 6px;text-align:left;color:var(--muted,#888a9e);">Character</th>
+              <th style="padding:8px 6px;text-align:left;color:var(--muted,#888a9e);">Pinyin</th>
+              <th style="padding:8px 6px;text-align:left;color:var(--muted,#888a9e);">Element</th>
+              <th style="padding:8px 6px;text-align:left;color:var(--muted,#888a9e);">Polarity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% bazi.STEMS.forEach((s, i) => { %>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <td style="padding:8px 6px;color:var(--muted,#888a9e);"><%= i + 1 %></td>
+              <td style="padding:8px 6px;font-size:18px;color:<%= bazi.EL_COLOR[s.element] %>;font-family:'Noto Sans SC',sans-serif;"><%= s.char %></td>
+              <td style="padding:8px 6px;color:var(--text,#f0f0ff);"><%= s.pinyin %></td>
+              <td style="padding:8px 6px;color:<%= bazi.EL_COLOR[s.element] %>;font-weight:600;"><%= bazi.EL_ZH[s.element] %> <%= s.element %></td>
+              <td style="padding:8px 6px;color:var(--text,#f0f0ff);"><%= s.polarity %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Earthly Branches table -->
+      <h4 style="color:var(--gold,#f0c040);margin:24px 0 12px;font-size:16px;">The 12 Earthly Branches (地支 Dìzhī)</h4>
+      <p>The twelve Earthly Branches correspond to the twelve Chinese zodiac animals. Each Branch occupies a two-hour window within the day and a specific month within the year.</p>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+              <th style="padding:8px 6px;text-align:left;color:var(--muted,#888a9e);">#</th>
+              <th style="padding:8px 6px;text-align:left;color:var(--muted,#888a9e);">Character</th>
+              <th style="padding:8px 6px;text-align:left;color:var(--muted,#888a9e);">Pinyin</th>
+              <th style="padding:8px 6px;text-align:left;color:var(--muted,#888a9e);">Animal</th>
+              <th style="padding:8px 6px;text-align:left;color:var(--muted,#888a9e);">Element</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% bazi.BRANCHES.forEach((b, i) => { %>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <td style="padding:8px 6px;color:var(--muted,#888a9e);"><%= i + 1 %></td>
+              <td style="padding:8px 6px;font-size:18px;color:<%= bazi.EL_COLOR[b.element] %>;font-family:'Noto Sans SC',sans-serif;"><%= b.char %></td>
+              <td style="padding:8px 6px;color:var(--text,#f0f0ff);"><%= b.pinyin %></td>
+              <td style="padding:8px 6px;color:var(--text,#f0f0ff);"><%= b.emoji %> <%= b.animal %></td>
+              <td style="padding:8px 6px;color:<%= bazi.EL_COLOR[b.element] %>;font-weight:600;"><%= bazi.EL_ZH[b.element] %> <%= b.element %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         § 3  FIVE ELEMENTS
+         ═══════════════════════════════════════════ -->
+    <div class="about-section" id="five-elements">
+      <h3>The Five Elements (五行 Wǔxíng)</h3>
+      <p>The Five Elements are the energetic building blocks of the BaZi system. Every character in your chart belongs to one of five elemental families, and the way these elements interact with each other reveals the fundamental dynamics of your personality and life trajectory.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:20px 0;">
+        <% ['Wood','Fire','Earth','Metal','Water'].forEach(el => { %>
+        <div style="text-align:center;padding:14px 6px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid <%= bazi.EL_COLOR[el] %>33;">
+          <div style="font-size:28px;font-family:'Noto Sans SC',sans-serif;color:<%= bazi.EL_COLOR[el] %>;font-weight:700;"><%= bazi.EL_ZH[el] %></div>
+          <div style="font-size:12px;color:<%= bazi.EL_COLOR[el] %>;font-weight:600;margin-top:4px;"><%= el %></div>
+        </div>
+        <% }) %>
+      </div>
+
+      <h4 style="color:var(--gold,#f0c040);margin:20px 0 10px;font-size:15px;">Production Cycle (相生 Xiāngshēng)</h4>
+      <p>In the Production Cycle, each element nurtures and gives rise to the next in a continuous loop of creation:</p>
+      <div class="about-callout">
+        <strong style="color:<%= bazi.EL_COLOR['Wood'] %>">Wood</strong> feeds
+        <strong style="color:<%= bazi.EL_COLOR['Fire'] %>">Fire</strong> &rarr;
+        <strong style="color:<%= bazi.EL_COLOR['Fire'] %>">Fire</strong> creates
+        <strong style="color:<%= bazi.EL_COLOR['Earth'] %>">Earth</strong> (ash) &rarr;
+        <strong style="color:<%= bazi.EL_COLOR['Earth'] %>">Earth</strong> bears
+        <strong style="color:<%= bazi.EL_COLOR['Metal'] %>">Metal</strong> (ore) &rarr;
+        <strong style="color:<%= bazi.EL_COLOR['Metal'] %>">Metal</strong> collects
+        <strong style="color:<%= bazi.EL_COLOR['Water'] %>">Water</strong> (condensation) &rarr;
+        <strong style="color:<%= bazi.EL_COLOR['Water'] %>">Water</strong> nourishes
+        <strong style="color:<%= bazi.EL_COLOR['Wood'] %>">Wood</strong>
+      </div>
+      <p>When an element in your chart is supported by its "mother" element (the one that produces it), that area of life tends to flourish naturally. A strong Production flow indicates talents that develop effortlessly.</p>
+
+      <h4 style="color:var(--gold,#f0c040);margin:20px 0 10px;font-size:15px;">Control Cycle (相克 Xiāngkè)</h4>
+      <p>The Control Cycle represents restraint and discipline — each element keeps another in check:</p>
+      <div class="about-callout">
+        <strong style="color:<%= bazi.EL_COLOR['Wood'] %>">Wood</strong> parts
+        <strong style="color:<%= bazi.EL_COLOR['Earth'] %>">Earth</strong> &rarr;
+        <strong style="color:<%= bazi.EL_COLOR['Earth'] %>">Earth</strong> dams
+        <strong style="color:<%= bazi.EL_COLOR['Water'] %>">Water</strong> &rarr;
+        <strong style="color:<%= bazi.EL_COLOR['Water'] %>">Water</strong> extinguishes
+        <strong style="color:<%= bazi.EL_COLOR['Fire'] %>">Fire</strong> &rarr;
+        <strong style="color:<%= bazi.EL_COLOR['Fire'] %>">Fire</strong> melts
+        <strong style="color:<%= bazi.EL_COLOR['Metal'] %>">Metal</strong> &rarr;
+        <strong style="color:<%= bazi.EL_COLOR['Metal'] %>">Metal</strong> chops
+        <strong style="color:<%= bazi.EL_COLOR['Wood'] %>">Wood</strong>
+      </div>
+      <p>Control is not inherently negative — it provides necessary structure and balance. A chart with healthy control relationships shows a person who can handle challenges with discipline. However, excessive control on a weak element can indicate areas of struggle or blockage.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         § 4  YIN & YANG
+         ═══════════════════════════════════════════ -->
+    <div class="about-section" id="yin-yang">
+      <h3>Yin &amp; Yang (阴阳 Yīnyáng)</h3>
+      <p>Every element in BaZi appears in two polarities — <strong>Yang</strong> (阳) and <strong>Yin</strong> (阴). Yang energy is outward, active, and expansive; Yin energy is inward, receptive, and subtle. The same element expresses itself very differently depending on its polarity.</p>
+      <p>For example, <strong>Yang Wood</strong> (甲 Jiǎ) is like a towering oak tree — strong, upright, and unyielding. <strong>Yin Wood</strong> (乙 Yǐ) is like a climbing vine — flexible, adaptive, and graceful. Both are Wood, but their character is fundamentally different.</p>
+      <p>This Yin-Yang distinction doubles the nuance of the Five Elements, giving BaZi ten distinct Day Master archetypes rather than just five. The balance of Yin and Yang across your chart also reveals whether you tend toward assertive action or reflective strategy — and where you may need to cultivate the opposite quality for greater harmony.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
+        <div style="text-align:center;padding:16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+          <div style="font-size:32px;margin-bottom:6px;">&#9728;&#65039;</div>
+          <div style="font-size:15px;font-weight:600;color:var(--text,#f0f0ff);">Yang (阳)</div>
+          <div style="font-size:12px;color:var(--muted,#888a9e);margin-top:4px;line-height:1.5;">Active, Expansive, Outward<br>Bold, Direct, Initiating</div>
+        </div>
+        <div style="text-align:center;padding:16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+          <div style="font-size:32px;margin-bottom:6px;">&#9789;&#65039;</div>
+          <div style="font-size:15px;font-weight:600;color:var(--text,#f0f0ff);">Yin (阴)</div>
+          <div style="font-size:12px;color:var(--muted,#888a9e);margin-top:4px;line-height:1.5;">Receptive, Subtle, Inward<br>Flexible, Reflective, Nurturing</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         § 5  CHINESE ZODIAC
+         ═══════════════════════════════════════════ -->
+    <div class="about-section" id="zodiac">
+      <h3>The Chinese Zodiac (十二生肖 Shí'èr Shēngxiào)</h3>
+      <p>The twelve Chinese zodiac animals correspond directly to the twelve Earthly Branches. Your zodiac animal is determined by your Year Branch, though animals also appear in your Month, Day, and Hour pillars — giving each person up to four animal energies in their chart.</p>
+      <p>Each animal carries distinct personality traits, compatibility patterns, and lucky attributes. The twelve-year cycle means each animal returns every twelve years, but the elemental overlay (Wood Rat vs. Fire Rat, for example) creates a full sixty-year grand cycle before any combination repeats.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;">
+        <% const zodiacOrder = ['Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat','Monkey','Rooster','Dog','Pig']; %>
+        <% zodiacOrder.forEach((animal, idx) => { %>
+        <% const z = bazi.ZODIAC[animal]; %>
+        <% const branch = bazi.BRANCHES[idx]; %>
+        <div style="padding:14px 10px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);text-align:center;">
+          <div style="font-size:28px;"><%= branch.emoji %></div>
+          <div style="font-size:14px;font-weight:600;color:var(--text,#f0f0ff);margin-top:4px;"><%= animal %></div>
+          <div style="font-size:11px;color:<%= bazi.EL_COLOR[branch.element] %>;margin-top:2px;"><%= branch.char %> &middot; <%= branch.element %></div>
+          <div style="font-size:11px;color:var(--muted,#888a9e);margin-top:4px;line-height:1.4;"><%= z.traits.join(', ') %></div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         § 6  DAY MASTER
+         ═══════════════════════════════════════════ -->
+    <div class="about-section" id="day-master">
+      <h3>The Day Master (日主 Rìzhǔ)</h3>
+      <p>Of the eight characters in your BaZi chart, the single most important one is the <strong>Heavenly Stem of your Day Pillar</strong> — known as the Day Master. This character is considered the essence of who you are. It determines your elemental identity and serves as the reference point for interpreting every other character in the chart.</p>
+      <p>There are ten possible Day Masters, one for each Heavenly Stem. Each carries its own archetype:</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0;">
+        <% bazi.STEMS.forEach(s => { %>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid <%= bazi.EL_COLOR[s.element] %>22;">
+          <span style="font-size:22px;font-family:'Noto Sans SC',sans-serif;color:<%= bazi.EL_COLOR[s.element] %>;font-weight:700;min-width:28px;text-align:center;"><%= s.char %></span>
+          <div>
+            <div style="font-size:13px;color:var(--text,#f0f0ff);font-weight:600;"><%= s.pinyin %></div>
+            <div style="font-size:11px;color:<%= bazi.EL_COLOR[s.element] %>;"><%= s.polarity %> <%= s.element %></div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+
+      <p>Your Day Master's strength — whether it is well-supported or depleted by surrounding elements — determines the overall strategy for interpreting your chart. A strong Day Master benefits from elements that challenge and channel its energy, while a weak Day Master thrives when it receives support and nourishment from allies.</p>
+      <p><a href="/day-master" style="color:var(--gold,#f0c040);">Explore the full Day Master guide &rarr;</a></p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         § 7  COMPATIBILITY
+         ═══════════════════════════════════════════ -->
+    <div class="about-section" id="compatibility">
+      <h3>BaZi Compatibility (合婚 Héhūn)</h3>
+      <p>BaZi compatibility analysis has been used for centuries to evaluate the harmony between two individuals — whether for romantic relationships, business partnerships, or friendships. Rather than simply matching zodiac animals, a thorough compatibility reading compares the <em>full elemental profiles</em> of both charts.</p>
+      <p>Key factors in compatibility analysis include:</p>
+      <ul style="color:var(--text,#f0f0ff);font-size:14px;line-height:1.8;padding-left:20px;">
+        <li><strong>Elemental balance:</strong> Do the two charts complement each other's elemental excesses and deficiencies?</li>
+        <li><strong>Day Master interaction:</strong> How do the two Day Masters relate — do they support, control, or clash?</li>
+        <li><strong>Zodiac harmony:</strong> Traditional animal compatibility and clash relationships (e.g., Rat and Ox are allies; Rat and Horse clash).</li>
+        <li><strong>Branch combinations:</strong> Certain Branch pairings create powerful elemental bonds known as "Six Harmonies" or "Three Harmonies."</li>
+      </ul>
+      <p><a href="/bazi-compatibility" style="color:var(--gold,#f0c040);">Check your compatibility &rarr;</a></p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         § 8  HOW IT WORKS
+         ═══════════════════════════════════════════ -->
+    <div class="about-section" id="how-it-works">
+      <h3>How a BaZi Reading Works</h3>
+      <p>Whether you consult a traditional BaZi master or use a modern calculator, the process follows the same fundamental steps:</p>
+
+      <div style="margin-top:16px;">
+        <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;">
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--gold,#f0c040);color:#0f0f1c;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">1</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text,#f0f0ff);">Enter Your Birth Data</div>
+            <div style="font-size:13px;color:var(--muted,#888a9e);margin-top:4px;line-height:1.5;">Provide your exact date of birth (year, month, day) and, if known, your birth hour. The more precise the data, the more accurate the reading — especially the Hour Pillar.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;">
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--gold,#f0c040);color:#0f0f1c;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">2</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text,#f0f0ff);">Chart Calculation</div>
+            <div style="font-size:13px;color:var(--muted,#888a9e);margin-top:4px;line-height:1.5;">Your birth data is converted into the Chinese calendar system. The Heavenly Stems and Earthly Branches for each of the Four Pillars are determined using traditional astronomical algorithms.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;">
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--gold,#f0c040);color:#0f0f1c;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">3</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text,#f0f0ff);">Identify Your Day Master</div>
+            <div style="font-size:13px;color:var(--muted,#888a9e);margin-top:4px;line-height:1.5;">The Heavenly Stem of your Day Pillar becomes the anchor of the entire reading. Its element and polarity define your core archetype.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;">
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--gold,#f0c040);color:#0f0f1c;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">4</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text,#f0f0ff);">Elemental Analysis</div>
+            <div style="font-size:13px;color:var(--muted,#888a9e);margin-top:4px;line-height:1.5;">Count and weigh the distribution of the Five Elements across all eight characters. Identify which elements dominate, which are missing, and how the production and control cycles flow through the chart.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--gold,#f0c040);color:#0f0f1c;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">5</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text,#f0f0ff);">Interpretation &amp; Guidance</div>
+            <div style="font-size:13px;color:var(--muted,#888a9e);margin-top:4px;line-height:1.5;">Synthesize the elemental interactions into actionable insights about personality, relationships, career direction, health tendencies, and the timing of opportunities and challenges through Luck Pillars and annual cycles.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         § 9  FAQ
+         ═══════════════════════════════════════════ -->
+    <div class="about-section" id="faq">
+      <h3>Frequently Asked Questions</h3>
+      <div class="about-faq">
+
+        <div class="about-faq-item">
+          <div class="about-faq-q">What does BaZi mean?</div>
+          <div class="about-faq-a">BaZi (八字) literally translates to "Eight Characters" in Chinese. It refers to the eight Chinese characters — two for each of the Four Pillars (Year, Month, Day, Hour) — derived from your exact date and time of birth. Together, these characters form a cosmic blueprint of your personality, strengths, challenges, and life path.</div>
+        </div>
+
+        <div class="about-faq-item">
+          <div class="about-faq-q">How is a BaZi chart calculated?</div>
+          <div class="about-faq-a">A BaZi chart is calculated by converting your birth date and time into the traditional Chinese calendar system. Each of the Four Pillars (Year, Month, Day, Hour) is expressed as a pair of characters: one Heavenly Stem and one Earthly Branch. The Heavenly Stems cycle through ten characters linked to the Five Elements and Yin/Yang polarity, while the Earthly Branches cycle through twelve characters associated with the Chinese zodiac animals.</div>
+        </div>
+
+        <div class="about-faq-item">
+          <div class="about-faq-q">What are the Five Elements in BaZi?</div>
+          <div class="about-faq-a">The Five Elements (五行 Wuxing) are Wood, Fire, Earth, Metal, and Water. They form two key cycles: the Production Cycle, where each element nourishes the next (Wood feeds Fire, Fire creates Earth, Earth bears Metal, Metal collects Water, Water nourishes Wood), and the Control Cycle, where each element restrains another. The balance or imbalance of these elements in your chart reveals core aspects of your personality and fortune.</div>
+        </div>
+
+        <div class="about-faq-item">
+          <div class="about-faq-q">What is a Day Master in BaZi?</div>
+          <div class="about-faq-a">The Day Master (日主 Rizhu) is the Heavenly Stem of your Day Pillar. It is considered the most important single character in your entire BaZi chart because it represents your core self — your innate personality, temperament, and how you relate to the world. All other elements in the chart are interpreted in relation to your Day Master.</div>
+        </div>
+
+        <div class="about-faq-item">
+          <div class="about-faq-q">Can BaZi predict compatibility between two people?</div>
+          <div class="about-faq-a">Yes. BaZi compatibility analysis compares the charts of two individuals by examining how their elements interact. Complementary elemental balances often indicate harmony — for example, if one person has an excess of Wood and the other needs Wood, they naturally support each other. The Chinese zodiac animals in each chart also carry traditional compatibility and clash relationships that provide further insight into relationship dynamics.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ─── CTA ─── -->
+    <div class="about-cta" style="text-align:center;margin-top:32px;">
+      <a href="/bazi-calculator" class="btn-primary">Calculate Your BaZi Chart Free</a>
+    </div>
+
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script>
+    document.querySelectorAll('.about-faq-q').forEach(q => {
+      q.addEventListener('click', () => q.closest('.about-faq-item').classList.toggle('open'));
+    });
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  </script>
+</body>
+</html>

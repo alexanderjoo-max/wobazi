@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "WoBazi Free BaZi Calculator",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "Web",
+    "description": "Calculate your BaZi (Four Pillars of Destiny) chart for free. Discover your Day Master, element balance, zodiac animal, and fortune scores.",
+    "url": "<%= baseUrl %>/bazi-calculator",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+</head>
+<body class="seo-page">
+  <%- include('../partials/nav') %>
+
+  <main class="seo-main">
+    <!-- Hero -->
+    <div class="about-hero">
+      <div class="about-hanzi">算命</div>
+      <h1 style="color:var(--text);font-size:26px;margin-bottom:10px;">Free BaZi Calculator</h1>
+      <p>Enter your birth date and time to calculate your Four Pillars of Destiny, Day Master, element balance, and fortune scores.</p>
+    </div>
+
+    <!-- Calculator Form -->
+    <div class="about-section">
+      <h3>Enter Your Birth Details</h3>
+      <form method="POST" action="/bazi-calculator" style="display:grid;gap:16px;margin-top:16px;">
+
+        <!-- Year -->
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="color:var(--muted,#888a9e);font-size:12px;">Birth Year</label>
+          <input type="number" name="year" min="1920" max="2030" required
+            placeholder="e.g. 1990"
+            value="<%= result ? result.year : '' %>"
+            style="background:rgba(255,255,255,0.05);border:1px solid rgba(240,192,64,0.15);color:var(--text);border-radius:10px;padding:10px 14px;font-size:14px;outline:none;">
+        </div>
+
+        <!-- Month -->
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="color:var(--muted,#888a9e);font-size:12px;">Birth Month</label>
+          <select name="month" required
+            style="background:rgba(255,255,255,0.05);border:1px solid rgba(240,192,64,0.15);color:var(--text);border-radius:10px;padding:10px 14px;font-size:14px;outline:none;appearance:auto;">
+            <% var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December']; %>
+            <% for (var mi = 0; mi < 12; mi++) { %>
+              <option value="<%= mi %>" <%= (result && result.month === mi) ? 'selected' : '' %>><%= monthNames[mi] %></option>
+            <% } %>
+          </select>
+        </div>
+
+        <!-- Day -->
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="color:var(--muted,#888a9e);font-size:12px;">Birth Day</label>
+          <input type="number" name="day" min="1" max="31" required
+            placeholder="e.g. 15"
+            value="<%= result ? result.day : '' %>"
+            style="background:rgba(255,255,255,0.05);border:1px solid rgba(240,192,64,0.15);color:var(--text);border-radius:10px;padding:10px 14px;font-size:14px;outline:none;">
+        </div>
+
+        <!-- Hour -->
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="color:var(--muted,#888a9e);font-size:12px;">Birth Hour</label>
+          <select name="hour"
+            style="background:rgba(255,255,255,0.05);border:1px solid rgba(240,192,64,0.15);color:var(--text);border-radius:10px;padding:10px 14px;font-size:14px;outline:none;appearance:auto;">
+            <% var hourLabels = [
+              "I don't know", "23:00-01:00 (子 Rat)", "01:00-03:00 (丑 Ox)", "03:00-05:00 (寅 Tiger)",
+              "05:00-07:00 (卯 Rabbit)", "07:00-09:00 (辰 Dragon)", "09:00-11:00 (巳 Snake)",
+              "11:00-13:00 (午 Horse)", "13:00-15:00 (未 Goat)", "15:00-17:00 (申 Monkey)",
+              "17:00-19:00 (酉 Rooster)", "19:00-21:00 (戌 Dog)", "21:00-23:00 (亥 Pig)"
+            ]; %>
+            <% var hourValues = ['', '0', '2', '4', '6', '8', '10', '12', '14', '16', '18', '20', '22']; %>
+            <% for (var hi = 0; hi < hourLabels.length; hi++) { %>
+              <option value="<%= hourValues[hi] %>"
+                <%= (result && result.hour !== null && String(result.hour) === hourValues[hi]) ? 'selected' : ((!result || result.hour === null) && hi === 0) ? 'selected' : '' %>
+              ><%= hourLabels[hi] %></option>
+            <% } %>
+          </select>
+        </div>
+
+        <!-- Gender -->
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="color:var(--muted,#888a9e);font-size:12px;">Gender</label>
+          <select name="gender" required
+            style="background:rgba(255,255,255,0.05);border:1px solid rgba(240,192,64,0.15);color:var(--text);border-radius:10px;padding:10px 14px;font-size:14px;outline:none;appearance:auto;">
+            <option value="male" <%= (result && result.gender === 'male') ? 'selected' : '' %>>Male</option>
+            <option value="female" <%= (result && result.gender === 'female') ? 'selected' : '' %>>Female</option>
+            <option value="other" <%= (result && result.gender === 'other') ? 'selected' : '' %>>Other</option>
+          </select>
+        </div>
+
+        <!-- Submit -->
+        <div style="text-align:center;margin-top:8px;">
+          <button type="submit" class="btn-primary"
+            style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#f0c040,#e8862e);color:var(--bg,#07070f);font-weight:600;font-size:15px;padding:14px 32px;border-radius:14px;border:none;cursor:pointer;transition:opacity 0.2s;">
+            Calculate My BaZi
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <% if (result) { %>
+    <!-- ═══════════════════════════════════════
+         RESULTS
+    ═══════════════════════════════════════ -->
+
+    <!-- Your Four Pillars -->
+    <div class="about-section">
+      <h3>Your Four Pillars (四柱)</h3>
+      <p>Your BaZi chart based on your birth data. The Day Pillar represents your core self.</p>
+      <div class="about-pillars-visual" style="margin-top:16px;">
+        <% result.pillars.forEach(function(p) { %>
+          <div class="about-pillar-col<%= p.label === 'Day' ? ' about-pillar-self' : '' %>">
+            <div class="about-pillar-head"><%= p.label %></div>
+            <% if (p.known && p.stem) { %>
+              <div class="about-pillar-stem"
+                style="background:rgba(255,255,255,0.04);border:1px solid <%= bazi.EL_COLOR[p.stem.element] %>33;">
+                <span style="font-family:'Noto Sans SC',sans-serif;font-size:22px;font-weight:700;color:<%= bazi.EL_COLOR[p.stem.element] %>;">
+                  <%= p.stem.char %>
+                </span>
+                <br>
+                <span style="font-size:10px;color:var(--muted);"><%= p.stem.element %> (<%= p.stem.polarity %>)</span>
+              </div>
+              <div class="about-pillar-branch" style="background:rgba(255,255,255,0.03);">
+                <span style="font-family:'Noto Sans SC',sans-serif;font-size:18px;color:var(--text);">
+                  <%= p.branch.char %>
+                </span>
+                <span style="font-size:16px;"><%= p.branch.emoji %></span>
+                <br>
+                <span style="font-size:10px;color:var(--muted);"><%= p.branch.animal %></span>
+              </div>
+            <% } else { %>
+              <div class="about-pillar-stem" style="background:rgba(255,255,255,0.03);">
+                <span style="font-size:20px;color:var(--muted);">?</span>
+              </div>
+              <div class="about-pillar-branch" style="background:rgba(255,255,255,0.02);">
+                <span style="font-size:10px;color:var(--muted);">Unknown</span>
+              </div>
+            <% } %>
+            <div class="about-pillar-foot"><%= p.label.toUpperCase() %></div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Day Master -->
+    <div class="about-section" style="text-align:center;">
+      <h3>Your Day Master (日主)</h3>
+      <div style="margin:20px 0;">
+        <span style="font-family:'Noto Sans SC',sans-serif;font-size:64px;font-weight:700;color:<%= bazi.EL_COLOR[result.dayMaster.element] %>;line-height:1;">
+          <%= result.dayMaster.char %>
+        </span>
+      </div>
+      <p style="font-size:16px;color:var(--text);margin-bottom:4px;">
+        <strong><%= result.dayMaster.polarity %> <%= result.dayMaster.element %></strong>
+        (<%= bazi.EL_ZH[result.dayMaster.element] %>)
+      </p>
+      <p style="font-size:13px;">
+        <%= result.dayMaster.pinyin %> &mdash; Your core identity element is <strong style="color:<%= bazi.EL_COLOR[result.dayMaster.element] %>;"><%= result.dayMaster.element %></strong>, expressing <%= result.dayMaster.polarity %> energy.
+      </p>
+    </div>
+
+    <!-- Element Balance -->
+    <div class="about-section">
+      <h3>Element Balance (五行)</h3>
+      <p>Distribution of the Five Elements in your chart. Your dominant element is <strong style="color:<%= bazi.EL_COLOR[result.dominant] %>;"><%= result.dominant %></strong>.</p>
+      <div style="display:grid;gap:10px;margin-top:16px;">
+        <% var elNames = ['Wood','Fire','Earth','Metal','Water'];
+           var maxEl = Math.max.apply(null, elNames.map(function(e){ return result.elements[e]; }));
+           elNames.forEach(function(el) {
+             var count = result.elements[el];
+             var pct = maxEl > 0 ? (count / maxEl) * 100 : 0;
+        %>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-family:'Noto Sans SC',sans-serif;font-size:18px;color:<%= bazi.EL_COLOR[el] %>;width:24px;text-align:center;"><%= bazi.EL_ZH[el] %></span>
+            <span style="font-size:12px;color:var(--muted);width:44px;"><%= el %></span>
+            <div style="flex:1;height:20px;background:rgba(255,255,255,0.04);border-radius:6px;overflow:hidden;">
+              <div style="height:100%;width:<%= pct %>%;background:<%= bazi.EL_COLOR[el] %>;border-radius:6px;transition:width 0.4s;min-width:<%= count > 0 ? '8px' : '0' %>;"></div>
+            </div>
+            <span style="font-size:13px;color:var(--text);width:20px;text-align:right;font-weight:600;"><%= count %></span>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Fortune Scores -->
+    <div class="about-section">
+      <h3>Fortune Scores</h3>
+      <p>Baseline fortune indicators derived from your zodiac animal (<strong><%= result.animal %></strong>) and element balance.</p>
+      <div style="display:grid;gap:12px;margin-top:16px;">
+        <% var fortuneKeys = [
+          { key:'love', label:'Love', icon:'heart' },
+          { key:'career', label:'Career', icon:'briefcase' },
+          { key:'health', label:'Health', icon:'activity' },
+          { key:'wealth', label:'Wealth', icon:'dollar-sign' }
+        ];
+        fortuneKeys.forEach(function(f) {
+          var val = result.fortune[f.key];
+        %>
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span style="font-size:13px;color:var(--text);font-weight:500;"><%= f.label %></span>
+              <span style="font-size:13px;color:var(--gold,#f0c040);font-weight:600;"><%= val %>%</span>
+            </div>
+            <div style="height:8px;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden;">
+              <div style="height:100%;width:<%= val %>%;background:linear-gradient(90deg,var(--gold,#f0c040),#e8a020);border-radius:4px;transition:width 0.4s;"></div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="about-cta">
+      <a href="/app" class="btn-primary">Get Your Full Reading with AI Oracle Insights</a>
+    </div>
+
+    <!-- Callout -->
+    <div class="about-callout">
+      <strong>This is a simplified reading.</strong> For complete analysis including 10-Year Luck Pillars, daily guidance, and AI Oracle consultation, try the <a href="/app" style="color:var(--gold,#f0c040);text-decoration:underline;">full app</a>.
+    </div>
+
+    <% } %>
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script>
+    // FAQ toggle (shared across SEO pages)
+    document.querySelectorAll('.about-faq-q').forEach(function(q) {
+      q.addEventListener('click', function() { q.closest('.about-faq-item').classList.toggle('open'); });
+    });
+  </script>
+</body>
+</html>

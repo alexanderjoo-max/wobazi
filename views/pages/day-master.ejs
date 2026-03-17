@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I find my Day Master?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "To find your Day Master, you need your exact birth date. Use a BaZi calculator to determine your Day Pillar — the Heavenly Stem of the Day Pillar is your Day Master. Each Day Master is one of the 10 Heavenly Stems, representing a specific element and polarity."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What does my Day Master mean?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Your Day Master represents your core identity in BaZi. It reveals your fundamental personality traits, natural strengths, and how you interact with the world. Each of the 10 Day Masters carries unique characteristics based on its element (Wood, Fire, Earth, Metal, or Water) and polarity (Yin or Yang)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can my Day Master change?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, your Day Master never changes. It is fixed at the moment of your birth and remains constant throughout your life. While Luck Pillars and annual influences shift over time, your Day Master — the Heavenly Stem of your Day Pillar — is permanent."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the strongest Day Master?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "There is no single strongest Day Master. Strength depends on the season of birth, supporting elements in the chart, and overall balance. A Day Master is considered strong when it receives support from the Month Branch and other pillars. Both strong and weak Day Masters have advantages depending on the chart's configuration."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="seo-page">
+  <%- include('../partials/nav') %>
+
+  <main class="seo-main">
+    <!-- Hero -->
+    <div class="about-hero">
+      <div class="about-hanzi">日主</div>
+      <h1 style="color:var(--text);font-size:26px;margin-bottom:10px;">BaZi Day Master Guide</h1>
+      <p>Your Day Master is the heart of your BaZi chart. Learn what it reveals about your core identity, personality, and destiny.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         Section 1: What is a Day Master?
+    ═══════════════════════════════════════ -->
+    <div class="about-section">
+      <h3>&#x2728; What Is a Day Master?</h3>
+      <p>The Day Master (<span style="font-family:'Noto Sans SC',sans-serif;color:var(--gold,#f0c040);">日主</span>) is the Heavenly Stem of your Day Pillar in a BaZi chart. Of the four pillars that make up your chart, the Day Pillar is the one that represents <em>you</em>.</p>
+
+      <div class="about-callout">
+        <strong>&#x1F4A1; Key insight:</strong> Your Day Master is the single most important element in your entire BaZi chart. It defines your core identity, personality traits, and how you naturally approach life.
+      </div>
+
+      <p>There are 10 possible Day Masters — one for each of the 10 Heavenly Stems. Each carries a unique combination of element (Wood, Fire, Earth, Metal, or Water) and polarity (Yin or Yang).</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         Section 2: Pillar Diagram
+    ═══════════════════════════════════════ -->
+    <div class="about-section">
+      <h3>&#x1F3DB;&#xFE0F; Where Is the Day Master?</h3>
+      <p>Your BaZi chart has four pillars. The Day Master sits at the top of the Day Pillar — highlighted below in gold.</p>
+
+      <div class="about-pillars-visual" style="margin-top:16px;">
+        <%
+          var demoPillars = [
+            { label:'Year',  stemChar:'甲', stemEl:'Wood',  stemPol:'Yang', branchChar:'子', branchAnimal:'Rat',    branchEmoji:'🐀', highlight:false },
+            { label:'Month', stemChar:'丁', stemEl:'Fire',  stemPol:'Yin',  branchChar:'卯', branchAnimal:'Rabbit', branchEmoji:'🐇', highlight:false },
+            { label:'Day',   stemChar:'壬', stemEl:'Water', stemPol:'Yang', branchChar:'午', branchAnimal:'Horse',  branchEmoji:'🐴', highlight:true  },
+            { label:'Hour',  stemChar:'己', stemEl:'Earth', stemPol:'Yin',  branchChar:'酉', branchAnimal:'Rooster',branchEmoji:'🐓', highlight:false }
+          ];
+          demoPillars.forEach(function(p) {
+        %>
+          <div class="about-pillar-col">
+            <div class="about-pillar-head"><%= p.label %></div>
+            <div class="about-pillar-stem"
+              style="background:rgba(255,255,255,0.04);border:1px solid <%= p.highlight ? 'rgba(240,192,64,0.6)' : bazi.EL_COLOR[p.stemEl] + '33' %>;<%= p.highlight ? 'box-shadow:0 0 12px rgba(240,192,64,0.25);' : '' %>">
+              <span style="font-family:'Noto Sans SC',sans-serif;font-size:22px;font-weight:700;color:<%= p.highlight ? 'var(--gold,#f0c040)' : bazi.EL_COLOR[p.stemEl] %>;">
+                <%= p.stemChar %>
+              </span>
+              <br>
+              <span style="font-size:10px;color:var(--muted);"><%= p.stemEl %> (<%= p.stemPol %>)</span>
+            </div>
+            <div class="about-pillar-branch" style="background:rgba(255,255,255,0.03);">
+              <span style="font-family:'Noto Sans SC',sans-serif;font-size:18px;color:var(--text);">
+                <%= p.branchChar %>
+              </span>
+              <span style="font-size:16px;"><%= p.branchEmoji %></span>
+              <br>
+              <span style="font-size:10px;color:var(--muted);"><%= p.branchAnimal %></span>
+            </div>
+            <div class="about-pillar-foot"><%= p.label.toUpperCase() %></div>
+          </div>
+        <% }); %>
+      </div>
+
+      <div class="about-callout">
+        <strong>&#x1F451; Day Master:</strong> In this example, the Day Master is <span style="font-family:'Noto Sans SC',sans-serif;color:var(--gold,#f0c040);">壬</span> (R&eacute;n) — Yang Water. It sits at the Heavenly Stem position of the Day Pillar.
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         Section 3: The 10 Day Masters
+    ═══════════════════════════════════════ -->
+    <div class="about-section">
+      <h3>&#x1F30A; The 10 Day Masters</h3>
+      <p>Each Day Master has a distinct personality archetype. Find yours below.</p>
+
+      <%
+        var dmDescriptions = [
+          "The mighty tree. Leadership, growth, ambition. Stands tall and grows upward relentlessly.",
+          "The graceful vine. Flexible, diplomatic, resilient. Bends without breaking.",
+          "The blazing sun. Generous, warm, radiant. Illuminates everything around them.",
+          "The candle flame. Thoughtful, passionate, precise. Gentle light that guides.",
+          "The mountain. Stable, trustworthy, immovable. A foundation others build upon.",
+          "The fertile soil. Nurturing, adaptable, resourceful. Grows abundance from within.",
+          "The sword. Decisive, brave, righteous. Cuts through problems with clarity.",
+          "The jewel. Refined, elegant, sensitive. Shines with inner beauty.",
+          "The ocean. Wise, powerful, adventurous. Flows with unstoppable force.",
+          "The morning dew. Intuitive, gentle, perceptive. Nourishes silently."
+        ];
+        var dmEmojis = ['🌳','🌿','☀️','🕯️','⛰️','🌱','⚔️','💎','🌊','💧'];
+      %>
+
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;">
+        <% for (var i = 0; i < 10; i++) {
+          var stem = bazi.STEMS[i];
+          var elColor = bazi.EL_COLOR[stem.element];
+        %>
+          <div style="background:var(--bg-card,#0f0f1c);border:1px solid rgba(240,192,64,0.06);border-left:3px solid <%= elColor %>;border-radius:12px;padding:16px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+              <span style="font-family:'Noto Sans SC',sans-serif;font-size:32px;font-weight:700;color:<%= elColor %>;line-height:1;">
+                <%= stem.char %>
+              </span>
+              <div>
+                <div style="font-size:14px;color:var(--text);font-weight:600;"><%= stem.pinyin %></div>
+                <span style="display:inline-block;background:<%= elColor %>18;color:<%= elColor %>;border:1px solid <%= elColor %>33;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:500;margin-top:2px;">
+                  <%= stem.polarity %> <%= stem.element %>
+                </span>
+              </div>
+            </div>
+            <p style="color:var(--muted,#888a9e);font-size:13px;line-height:1.6;margin:0;">
+              <%= dmEmojis[i] %> <%= dmDescriptions[i] %>
+            </p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         Section 4: How to Find Your Day Master
+    ═══════════════════════════════════════ -->
+    <div class="about-section">
+      <h3>&#x1F50D; How to Find Your Day Master</h3>
+      <p>Follow these three simple steps to discover your Day Master.</p>
+
+      <div style="display:grid;gap:14px;margin-top:16px;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <span style="display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;background:rgba(240,192,64,0.1);color:var(--gold,#f0c040);border-radius:50%;font-size:14px;font-weight:700;">1</span>
+          <div>
+            <div style="color:var(--text);font-size:14px;font-weight:600;">Know your exact birth date</div>
+            <div style="color:var(--muted,#888a9e);font-size:13px;margin-top:2px;">You need the year, month, and day. Birth time improves accuracy but is not required for the Day Master.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <span style="display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;background:rgba(240,192,64,0.1);color:var(--gold,#f0c040);border-radius:50%;font-size:14px;font-weight:700;">2</span>
+          <div>
+            <div style="color:var(--text);font-size:14px;font-weight:600;">Calculate or look up the Day Pillar</div>
+            <div style="color:var(--muted,#888a9e);font-size:13px;margin-top:2px;">Use a BaZi calculator to convert your birth date into the Four Pillars. The Day Pillar contains two characters: a Heavenly Stem and an Earthly Branch.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <span style="display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;background:rgba(240,192,64,0.1);color:var(--gold,#f0c040);border-radius:50%;font-size:14px;font-weight:700;">3</span>
+          <div>
+            <div style="color:var(--text);font-size:14px;font-weight:600;">Identify the Heavenly Stem</div>
+            <div style="color:var(--muted,#888a9e);font-size:13px;margin-top:2px;">The top character of the Day Pillar is your Day Master. It will be one of the 10 Heavenly Stems listed above.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-cta" style="margin-top:24px;margin-bottom:0;">
+        <a href="/bazi-calculator" class="btn-primary">Calculate Your Day Master Now &#x2192;</a>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         Section 5: Day Master Relationships
+    ═══════════════════════════════════════ -->
+    <div class="about-section">
+      <h3>&#x1F91D; Day Master Relationships</h3>
+      <p>Your Day Master does not exist in isolation. It constantly interacts with the other elements in your chart through five key relationships.</p>
+
+      <div style="display:grid;gap:10px;margin-top:16px;">
+        <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border-radius:10px;padding:12px 14px;">
+          <span style="font-size:20px;">&#x1F331;</span>
+          <div>
+            <div style="color:var(--text);font-size:13px;font-weight:600;">Resource <span style="color:var(--muted);font-weight:400;">&#x2014; produces you</span></div>
+            <div style="color:var(--muted,#888a9e);font-size:12px;margin-top:2px;">The element that generates your Day Master. Represents support, knowledge, and nurturing energy.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border-radius:10px;padding:12px 14px;">
+          <span style="font-size:20px;">&#x2728;</span>
+          <div>
+            <div style="color:var(--text);font-size:13px;font-weight:600;">Output <span style="color:var(--muted);font-weight:400;">&#x2014; you produce</span></div>
+            <div style="color:var(--muted,#888a9e);font-size:12px;margin-top:2px;">The element your Day Master creates. Represents expression, talent, and creativity.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border-radius:10px;padding:12px 14px;">
+          <span style="font-size:20px;">&#x1F4B0;</span>
+          <div>
+            <div style="color:var(--text);font-size:13px;font-weight:600;">Wealth <span style="color:var(--muted);font-weight:400;">&#x2014; you control</span></div>
+            <div style="color:var(--muted,#888a9e);font-size:12px;margin-top:2px;">The element your Day Master overcomes. Represents material gain, ambition, and drive.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border-radius:10px;padding:12px 14px;">
+          <span style="font-size:20px;">&#x1F3AF;</span>
+          <div>
+            <div style="color:var(--text);font-size:13px;font-weight:600;">Power <span style="color:var(--muted);font-weight:400;">&#x2014; controls you</span></div>
+            <div style="color:var(--muted,#888a9e);font-size:12px;margin-top:2px;">The element that overcomes your Day Master. Represents authority, discipline, and pressure.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border-radius:10px;padding:12px 14px;">
+          <span style="font-size:20px;">&#x1F465;</span>
+          <div>
+            <div style="color:var(--text);font-size:13px;font-weight:600;">Companion <span style="color:var(--muted);font-weight:400;">&#x2014; same element</span></div>
+            <div style="color:var(--muted,#888a9e);font-size:12px;margin-top:2px;">Elements matching your Day Master. Represents peers, competition, and self-confidence.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-callout">
+        <strong>&#x2696;&#xFE0F; Balance is everything.</strong> A well-balanced chart has a healthy mix of all five relationships. Too much of any one relationship creates imbalance — too much Power overwhelms, too much Wealth exhausts, and too many Companions create rivalry.
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         FAQ
+    ═══════════════════════════════════════ -->
+    <div class="about-section">
+      <h3>&#x2753; Frequently Asked Questions</h3>
+      <div class="about-faq">
+
+        <div class="about-faq-item">
+          <button class="about-faq-q">How do I find my Day Master?</button>
+          <div class="about-faq-a">
+            You need your exact birth date (year, month, day). Enter it into a BaZi calculator, which converts the date into the Four Pillars using the Chinese Sexagenary Cycle. The Heavenly Stem of your Day Pillar is your Day Master. You can use our <a href="/bazi-calculator" style="color:var(--gold,#f0c040);text-decoration:underline;">free BaZi calculator</a> to find yours instantly.
+          </div>
+        </div>
+
+        <div class="about-faq-item">
+          <button class="about-faq-q">What does my Day Master mean?</button>
+          <div class="about-faq-a">
+            Your Day Master reveals your fundamental nature — your personality, strengths, and how you engage with the world. For example, a Yang Wood (Jia) Day Master suggests a leadership-oriented person who grows steadily, while a Yin Water (Gui) Day Master indicates someone intuitive and perceptive. The Day Master also determines how every other element in your chart relates to you.
+          </div>
+        </div>
+
+        <div class="about-faq-item">
+          <button class="about-faq-q">Can my Day Master change?</button>
+          <div class="about-faq-a">
+            No. Your Day Master is permanently fixed at the moment of your birth. While 10-Year Luck Pillars and annual cycles bring changing influences throughout your life, your Day Master — the Heavenly Stem of the Day Pillar — never changes. It is the one constant in your entire BaZi chart.
+          </div>
+        </div>
+
+        <div class="about-faq-item">
+          <button class="about-faq-q">What is the strongest Day Master?</button>
+          <div class="about-faq-a">
+            No single Day Master is inherently the strongest. Strength depends on contextual factors: the season of birth, support from other pillars, and overall element balance. A Day Master born in a season that matches its element is naturally stronger. However, in BaZi, strength alone is not always desirable — a weaker Day Master in a well-balanced chart can be more favorable than an overly strong one.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         Final CTA
+    ═══════════════════════════════════════ -->
+    <div class="about-cta">
+      <a href="/bazi-calculator" class="btn-primary">Discover Your Day Master &#x2192;</a>
+    </div>
+
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script>
+    document.querySelectorAll('.about-faq-q').forEach(q => {
+      q.addEventListener('click', () => q.closest('.about-faq-item').classList.toggle('open'));
+    });
+  </script>
+</body>
+</html>
