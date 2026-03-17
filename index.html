@@ -29,7 +29,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=15">
 </head>
 <body>
 
@@ -496,7 +496,7 @@
             <span class="date-sep">/</span>
             <input type="number" id="birth-month" class="date-part" placeholder="MM"   min="1"    max="12"   inputmode="numeric">
             <span class="date-sep">/</span>
-            <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1920" max="2025" inputmode="numeric">
+            <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1920" max="2030" inputmode="numeric">
           </div>
         </div>
 
@@ -540,12 +540,21 @@
 
   <!-- LOADING -->
   <div id="loading" class="screen">
+    <canvas id="loading-stars-canvas"></canvas>
+    <div class="loading-glow"></div>
     <div class="loading-wrap">
-      <div class="taiji-wrap">
-        <div class="taiji">☯</div>
-        <div class="taiji-ring r1"></div>
-        <div class="taiji-ring r2"></div>
-        <div class="taiji-ring r3"></div>
+      <div class="loading-bagua">
+        <div class="bagua-ring bagua-outer"></div>
+        <div class="bagua-ring bagua-inner"></div>
+        <div class="taiji-wrap">
+          <div class="taiji">☯</div>
+          <div class="taiji-ring r1"></div>
+          <div class="taiji-ring r2"></div>
+          <div class="taiji-ring r3"></div>
+        </div>
+      </div>
+      <div class="loading-hanzi-float">
+        <span>天</span><span>地</span><span>金</span><span>木</span><span>水</span><span>火</span><span>土</span><span>命</span>
       </div>
       <p class="loading-msg" id="loading-msg">Aligning the heavenly stems…</p>
       <div class="loading-track">
@@ -955,7 +964,7 @@
             <span class="date-sep">/</span>
             <input type="number" class="date-part" id="partner-month" placeholder="MM" min="1" max="12" inputmode="numeric">
             <span class="date-sep">/</span>
-            <input type="number" class="date-part year" id="partner-year" placeholder="YYYY" min="1920" max="2025" inputmode="numeric">
+            <input type="number" class="date-part year" id="partner-year" placeholder="YYYY" min="1920" max="2030" inputmode="numeric">
           </div>
           <button class="btn-primary btn-full" onclick="haptic(10); checkCompatibility()" style="margin-top:16px">
             <span class="en">Check Compatibility</span><span class="zh hide">查看合婚</span>
@@ -1114,6 +1123,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=14"></script>
+  <script src="script.js?v=15"></script>
 </body>
 </html>

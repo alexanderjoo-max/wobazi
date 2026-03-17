@@ -180,7 +180,7 @@ input  { font-family: inherit; }
 /* ────────────────────────
    INPUT SCREEN
 ──────────────────────── */
-#input { background: var(--bg); overflow-y: auto; }
+#input { background: var(--bg); overflow-y: auto; overflow-x: hidden; }
 
 .nav-bar {
   display: flex;
@@ -260,11 +260,66 @@ input  { font-family: inherit; }
 ──────────────────────── */
 #loading {
   align-items: center;
+  overflow: hidden;
   justify-content: center;
   background: var(--bg);
 }
 
-.loading-wrap { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+/* Stars canvas */
+#loading-stars-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0;
+}
+
+/* Central glow pulse */
+.loading-glow {
+  position: absolute;
+  top: 38%; left: 50%; transform: translate(-50%, -50%);
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240,192,64,0.18) 0%, rgba(201,168,76,0.06) 40%, transparent 70%);
+  animation: glow-pulse 2.5s ease-in-out infinite;
+  z-index: 0;
+}
+@keyframes glow-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+  50% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+}
+
+.loading-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 28px;
+  position: relative; z-index: 1;
+}
+
+/* Bagua rings around the taiji */
+.loading-bagua {
+  position: relative;
+  width: 160px; height: 160px;
+  display: flex; align-items: center; justify-content: center;
+}
+.bagua-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px dashed rgba(240,192,64,0.2);
+}
+.bagua-outer {
+  inset: 0;
+  animation: bagua-spin 20s linear infinite;
+}
+.bagua-inner {
+  inset: 18px;
+  border-color: rgba(255,107,107,0.15);
+  animation: bagua-spin 14s linear infinite reverse;
+}
+@keyframes bagua-spin { to { transform: rotate(360deg); } }
+
+/* Bagua trigram marks on the outer ring */
+.bagua-outer::before {
+  content: '☰ ☱ ☲ ☳ ☴ ☵ ☶ ☷';
+  position: absolute; inset: -22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; letter-spacing: 6px;
+  color: rgba(240,192,64,0.25);
+  animation: bagua-spin 20s linear infinite reverse;
+}
 
 .taiji-wrap { position: relative; width: 100px; height: 100px; }
 
@@ -280,6 +335,7 @@ input  { font-family: inherit; }
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(240,192,64,0.4));
 }
 @keyframes taiji-spin { to { transform: rotate(360deg); } }
 
@@ -295,20 +351,58 @@ input  { font-family: inherit; }
 .taiji-ring.r3 { inset: -20px; border-bottom-color: rgba(100,100,255,0.3); animation-duration: 3s; }
 @keyframes ring-spin { to { transform: rotate(360deg); } }
 
-.loading-msg { font-size: 14px; color: var(--muted); letter-spacing: 0.5px; min-height: 1.5em; }
+/* Floating Chinese characters */
+.loading-hanzi-float {
+  display: flex; gap: 12px; justify-content: center;
+  margin-top: -8px;
+}
+.loading-hanzi-float span {
+  font-size: 13px;
+  color: rgba(240,192,64,0.15);
+  animation: hanzi-drift 3s ease-in-out infinite;
+}
+.loading-hanzi-float span:nth-child(1) { animation-delay: 0s; }
+.loading-hanzi-float span:nth-child(2) { animation-delay: 0.25s; }
+.loading-hanzi-float span:nth-child(3) { animation-delay: 0.5s; }
+.loading-hanzi-float span:nth-child(4) { animation-delay: 0.75s; }
+.loading-hanzi-float span:nth-child(5) { animation-delay: 1s; }
+.loading-hanzi-float span:nth-child(6) { animation-delay: 1.25s; }
+.loading-hanzi-float span:nth-child(7) { animation-delay: 1.5s; }
+.loading-hanzi-float span:nth-child(8) { animation-delay: 1.75s; }
+@keyframes hanzi-drift {
+  0%, 100% { transform: translateY(0); opacity: 0.15; }
+  50% { transform: translateY(-6px); opacity: 0.45; }
+}
+
+.loading-msg {
+  font-size: 14px; color: var(--gold); letter-spacing: 0.5px; min-height: 1.5em;
+  text-shadow: 0 0 20px rgba(240,192,64,0.3);
+  animation: msg-fade 0.38s ease-in-out;
+}
+@keyframes msg-fade {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
 
 .loading-track {
   width: 200px; height: 3px;
   background: rgba(255,255,255,0.08);
   border-radius: 100px;
   overflow: hidden;
+  box-shadow: 0 0 12px rgba(240,192,64,0.1);
 }
 .loading-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #f0c040, #ff6b6b);
+  background: linear-gradient(90deg, #f0c040, #ff6b6b, #f0c040);
+  background-size: 200% 100%;
   border-radius: 100px;
   transition: width 0.3s ease;
+  animation: fill-shimmer 2s linear infinite;
+}
+@keyframes fill-shimmer {
+  0% { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
 }
 
 /* ────────────────────────
@@ -357,6 +451,21 @@ input  { font-family: inherit; }
     gap: 16px;
     margin-bottom: 12px;
   }
+
+  /* ── Input screen mobile fix ── */
+  #input .nav-bar { padding: 44px 16px 10px; }
+  .input-body { padding: 4px 18px 32px; gap: 20px; }
+  .input-intro { gap: 6px; }
+  .intro-icon { font-size: 22px; }
+  .input-intro p { font-size: 13px; line-height: 1.5; }
+  #bazi-form { gap: 14px; }
+  .field label { font-size: 12px; }
+  .field input, .select-input { padding: 13px 14px; font-size: 16px; }
+  .date-part { padding: 13px 0 13px 12px; font-size: 16px; width: 46px; }
+  .date-part.year { width: 66px; }
+  .field-row { gap: 8px; }
+  .gender-opt { padding: 10px 14px; font-size: 14px; }
+  .btn-primary.btn-full { padding: 14px; font-size: 15px; }
 }
 .greeting-zodiac {
   font-size: 22px;

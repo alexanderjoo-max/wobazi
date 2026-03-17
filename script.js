@@ -471,8 +471,65 @@ const LOADING_MSGS_ZH = [
   '即将完成…',
 ];
 
+let _loadingAnimId = null;
+function initLoadingStars() {
+  const canvas = document.getElementById('loading-stars-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  function resize() {
+    canvas.width = canvas.offsetWidth * dpr;
+    canvas.height = canvas.offsetHeight * dpr;
+    ctx.scale(dpr, dpr);
+  }
+  resize();
+  const W = () => canvas.offsetWidth;
+  const H = () => canvas.offsetHeight;
+  const stars = Array.from({ length: 60 }, () => ({
+    x: Math.random() * W(),
+    y: Math.random() * H(),
+    r: Math.random() * 1.5 + 0.3,
+    a: Math.random(),
+    s: Math.random() * 0.008 + 0.003,
+    d: Math.random() > 0.5 ? 1 : -1,
+  }));
+  function draw() {
+    ctx.clearRect(0, 0, W(), H());
+    stars.forEach(st => {
+      st.a += st.s * st.d;
+      if (st.a >= 1 || st.a <= 0.1) st.d *= -1;
+      ctx.beginPath();
+      ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(240,192,64,${st.a * 0.5})`;
+      ctx.fill();
+    });
+    // Draw faint constellation lines between nearby stars
+    ctx.strokeStyle = 'rgba(240,192,64,0.06)';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i < stars.length; i++) {
+      for (let j = i + 1; j < stars.length; j++) {
+        const dx = stars[i].x - stars[j].x;
+        const dy = stars[i].y - stars[j].y;
+        if (dx * dx + dy * dy < 6000) {
+          ctx.beginPath();
+          ctx.moveTo(stars[i].x, stars[i].y);
+          ctx.lineTo(stars[j].x, stars[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    _loadingAnimId = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function stopLoadingStars() {
+  if (_loadingAnimId) { cancelAnimationFrame(_loadingAnimId); _loadingAnimId = null; }
+}
+
 function runLoader(callback) {
   showScreen('loading');
+  initLoadingStars();
   const msgEl  = document.getElementById('loading-msg');
   const fillEl = document.getElementById('loading-fill');
   let step = 0;
@@ -483,7 +540,7 @@ function runLoader(callback) {
     step++;
     if (step >= total) {
       clearInterval(iv);
-      setTimeout(callback, 400);
+      setTimeout(() => { stopLoadingStars(); callback(); }, 400);
     }
   }, 380);
 }
@@ -498,7 +555,7 @@ function handleSubmit(e) {
   const d     = parseInt(document.getElementById('birth-day').value,   10);
   const m     = parseInt(document.getElementById('birth-month').value, 10);
   const y     = parseInt(document.getElementById('birth-year').value,  10);
-  if (!d || !m || !y || y < 1900 || y > 2025) return;
+  if (!d || !m || !y || y < 1900 || y > new Date().getFullYear()) return;
 
   const timeVal = document.getElementById('birthtime').value;
   let hour = null;
@@ -508,7 +565,15 @@ function handleSubmit(e) {
   const bloodType  = document.getElementById('blood-type').value || null;
   const gender     = document.querySelector('input[name="gender"]:checked')?.value || null;
 
-  runLoader(() => renderResults(name, y, m - 1, d, hour, birthplace, bloodType, gender));
+  runLoader(() => {
+    try {
+      renderResults(name, y, m - 1, d, hour, birthplace, bloodType, gender);
+    } catch (err) {
+      console.error('[renderResults error]', err);
+      showScreen('input');
+      alert('Something went wrong generating your reading. Please try again.');
+    }
+  });
 }
 
 /* ═══════════════════════════════════════
@@ -2060,7 +2125,9 @@ function renderOracleTab(animal, elements, fortune, pillars, forecast2026, domin
   const introTextEn = ORACLE_ANIMAL_INTRO[animal] || `Your chart holds more than most people see. 2026 will show whether you're ready to act on it.`;
   const introTextZh = `你的命盘蕴含的，远比大多数人所见的更多。2026年将揭示你是否准备好付诸行动。`;
 
-  document.getElementById('oracle-card').innerHTML = `
+  const oracleCardEl = document.getElementById('oracle-card');
+  if (!oracleCardEl) return; // Oracle section moved to drawer
+  oracleCardEl.innerHTML = `
     <div class="orc-intro-card" style="border-color:${elColor}35;background:linear-gradient(160deg,${elColor}09,transparent 60%)">
       <div class="orc-intro-eyebrow">${_t("The Oracle's Read · 2026",'神谕解读 · 2026')}</div>
       <p class="orc-intro-text">${_t(introTextEn, introTextZh)}</p>
@@ -3503,8 +3570,19 @@ async function checkAuth() {
       _currentUser = data.user;
       showAuthState();
       await loadUserData();
+
+      // Auto-load saved reading for returning users (skip splash)
+      const onSplash = document.querySelector('#splash.screen.active');
+      if (onSplash && _savedReading) {
+        loadSavedReading();
+      }
+      // Clean up auth param from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('auth')) {
+        window.history.replaceState({}, '', window.location.pathname);
+      }
     }
-  } catch (e) { /* guest mode */ }
+  } catch (e) { /* guest mode — file:// or server down, continue as guest */ }
 }
 
 function showAuthState() {
@@ -3577,7 +3655,15 @@ function loadSavedReading() {
 
   // Auto-submit
   const hour = r.hour != null ? r.hour : null;
-  runLoader(() => renderResults(r.name || '', r.year, r.month - 1, r.day, hour, r.birthplace || '', r.blood_type || null, r.gender || null));
+  runLoader(() => {
+    try {
+      renderResults(r.name || '', r.year, r.month - 1, r.day, hour, r.birthplace || '', r.blood_type || null, r.gender || null);
+    } catch (err) {
+      console.error('[loadSavedReading error]', err);
+      showScreen('input');
+      alert('Something went wrong loading your reading. Please try again.');
+    }
+  });
 }
 
 /* ── Save reading after form submit (if logged in) ── */
