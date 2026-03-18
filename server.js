@@ -454,6 +454,159 @@ async function streamGemini(systemPrompt, messages, res) {
   res.end();
 }
 
+/* ── Daily Guidance (AI-generated DO/AVOID/WATCH) ── */
+const guidanceCache = new Map(); // key: `${dayMasterEl}-${todayStem}-${todayBranch}` → { ts, data }
+
+function calcTenGod(dayMasterEl, dayMasterPolarity, targetEl, targetPolarity) {
+  const same = dayMasterEl === targetEl;
+  const sameP = dayMasterPolarity === targetPolarity;
+  const prod = bazi.PRODUCTION_CYCLE;
+  const ctrl = bazi.CONTROL_CYCLE;
+  const iIdx = prod.indexOf(dayMasterEl);
+  const tIdx = prod.indexOf(targetEl);
+  // What I produce
+  if (prod[(iIdx + 1) % 5] === targetEl) return sameP ? '食神 Eating God' : '傷官 Hurting Officer';
+  // What produces me
+  if (prod[(tIdx + 1) % 5] === dayMasterEl) return sameP ? '偏印 Indirect Resource' : '正印 Direct Resource';
+  // What I control
+  if (ctrl[dayMasterEl] === targetEl) return sameP ? '偏財 Indirect Wealth' : '正財 Direct Wealth';
+  // What controls me
+  if (ctrl[targetEl] === dayMasterEl) return sameP ? '七殺 Seven Killings' : '正官 Direct Officer';
+  // Same element
+  if (same) return sameP ? '比肩 Friend' : '劫財 Rob Wealth';
+  return 'unknown';
+}
+
+function buildGuidancePrompt(chartData) {
+  const { pillars, today, animal, dominantEl } = chartData;
+
+  // Day Master details
+  const dayPillar = pillars.find(p => p.label === 'Day');
+  const dmEl = dayPillar?.stem?.element || 'Wood';
+  const dmPol = dayPillar?.stem?.polarity || 'Yang';
+  const dmChar = dayPillar?.stem?.char || '甲';
+
+  // Today's Ten God relationship
+  const todayTenGod = calcTenGod(dmEl, dmPol, today.stemElement, today.stemPolarity);
+
+  // Branch interactions
+  const dayBranch = dayPillar?.branch?.animal || 'Rat';
+  const clashPairs = {Rat:'Horse',Horse:'Rat',Ox:'Goat',Goat:'Ox',Tiger:'Monkey',Monkey:'Tiger',Rabbit:'Rooster',Rooster:'Rabbit',Dragon:'Dog',Dog:'Dragon',Snake:'Pig',Pig:'Snake'};
+  const todayClash = clashPairs[today.animal] || '';
+  const branchClashes = [];
+  for (const p of pillars) {
+    if (p.known && p.branch && clashPairs[p.branch.animal] === today.animal) {
+      branchClashes.push(`${p.label} ${p.branch.animal}`);
+    }
+  }
+
+  // Nobleman (貴人) check — today's branch is in user's compatible animals
+  const nobStr = today.nobleman ? 'ACTIVE today' : 'inactive';
+
+  return `You are a BaZi (Four Pillars of Destiny) master generating today's DO / AVOID / WATCH for one specific person.
+
+USER'S CHART:
+Day Master: ${dmChar} ${dmEl} ${dmPol} (日主)
+Year Pillar: ${pillars[0]?.stem?.char || '?'}${pillars[0]?.branch?.char || '?'} (${pillars[0]?.stem?.element || '?'} ${pillars[0]?.branch?.animal || '?'})
+Month Pillar: ${pillars[1]?.stem?.char || '?'}${pillars[1]?.branch?.char || '?'} (${pillars[1]?.stem?.element || '?'} ${pillars[1]?.branch?.animal || '?'})
+Day Pillar: ${dayPillar?.stem?.char || '?'}${dayPillar?.branch?.char || '?'} (${dmEl} ${dayBranch})
+Hour Pillar: ${pillars[3]?.known ? pillars[3].stem.char + pillars[3].branch.char + ' (' + pillars[3].stem.element + ' ' + pillars[3].branch.animal + ')' : 'Unknown'}
+Dominant Element: ${dominantEl}
+Zodiac Animal: ${animal}
+
+TODAY'S DAY PILLAR: ${today.stem}${today.branch} (${today.stemElement} ${today.animal})
+Ten God of Today's Stem vs Day Master: ${todayTenGod}
+Branch clashes with user's pillars: ${branchClashes.length ? branchClashes.join(', ') : 'None'}
+Nobleman (貴人) star: ${nobStr}
+Day Force Score: ${today.score}/100
+
+RULES — you MUST follow ALL of these:
+1. Return EXACTLY this JSON format, nothing else:
+{"do":{"en":"...","zh":"..."},"avoid":{"en":"...","zh":"..."},"watch":{"en":"...","zh":"..."}}
+
+2. Each item MUST reference a specific BaZi mechanism by name (e.g. "your ${todayTenGod} star", "the ${today.animal}-${dayBranch} ${branchClashes.length ? 'clash' : 'relationship'}", "your 貴人 Nobleman star", "your Day Master's ${dmEl} energy").
+
+3. Each item MUST include a specific time window where relevant (e.g. "before noon", "during ${today.animal} hour", "this morning", "after 3pm").
+
+4. Each item must be IMPOSSIBLE to apply to a different person's chart. If it could appear on anyone's ${dmEl} day reading, rewrite it.
+
+5. NEVER output generic wellness advice (grounding, hydration, sugar, meditation). NEVER output vague action items ("opportunities aligned with goals").
+
+6. The "do" should be a specific actionable task tied to the Ten God activation or Nobleman star.
+7. The "avoid" should warn about a specific risk created by today's pillar interaction with their chart.
+8. The "watch" should flag a specific energy shift or timing window based on branch interactions.
+
+9. Chinese translations must be natural, not machine-translated.
+10. Keep each item to 1-2 sentences max.`;
+}
+
+app.post('/api/daily-guidance', async (req, res) => {
+  try {
+    const { chartData } = req.body;
+    if (!chartData?.pillars || !chartData?.today) {
+      return res.status(400).json({ error: 'Missing chart data' });
+    }
+
+    // Cache key: unique per day master + today's pillar + full chart
+    const dayPillar = chartData.pillars.find(p => p.label === 'Day');
+    const cacheKey = `${dayPillar?.stem?.char}-${chartData.today.stem}-${chartData.today.branch}-${chartData.animal}`;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const cached = guidanceCache.get(cacheKey);
+    if (cached && cached.date === todayStr) {
+      return res.json(cached.data);
+    }
+
+    // Enrich today data with element info for the prompt
+    const todayStemObj = bazi.STEMS.find(s => s.char === chartData.today.stem);
+    chartData.today.stemElement = todayStemObj?.element || 'Wood';
+    chartData.today.stemPolarity = todayStemObj?.polarity || 'Yang';
+
+    const prompt = buildGuidancePrompt(chartData);
+
+    let result;
+    try {
+      const completion = await deepseek.chat.completions.create({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: prompt },
+          { role: 'user', content: 'Generate today\'s DO/AVOID/WATCH for this chart.' },
+        ],
+        max_tokens: 300,
+        temperature: 0.7,
+      });
+      result = completion.choices?.[0]?.message?.content?.trim();
+    } catch (e) {
+      // Fallback to Gemini
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-2.5-flash',
+        systemInstruction: prompt,
+      });
+      const gemResult = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: 'Generate today\'s DO/AVOID/WATCH for this chart.' }] }],
+        generationConfig: { maxOutputTokens: 300, temperature: 0.7, thinkingBudget: 0 },
+      });
+      result = gemResult.response.text().trim();
+    }
+
+    // Parse JSON from response (handle markdown code blocks)
+    let parsed;
+    try {
+      const jsonStr = result.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+      parsed = JSON.parse(jsonStr);
+    } catch (e) {
+      return res.status(500).json({ error: 'Failed to parse guidance' });
+    }
+
+    // Cache it
+    guidanceCache.set(cacheKey, { date: todayStr, data: parsed });
+
+    res.json(parsed);
+  } catch (err) {
+    console.error('Daily guidance error:', err.message);
+    res.status(500).json({ error: 'Guidance generation failed' });
+  }
+});
+
 /* ── Oracle Endpoint ── */
 app.post('/api/oracle', async (req, res) => {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;

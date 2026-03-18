@@ -646,13 +646,14 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     : heroIsClash
     ? `今日${ANIMAL_ZH[heroTodayAnimal]}日与命盘有冲，放缓节奏。`
     : `今日${ANIMAL_ZH[heroTodayAnimal]}日平稳，坚持一致，相信过程。`;
-  const heroDo    = MORNING_RITUAL[dominantEl][0];
-  const heroAvoidEn = LUCKY_FOODS[dominantEl].avoid[0];
-  const heroAvoidZh = LUCKY_FOODS[dominantEl].avoid_zh[0];
-  const heroWatchEn = heroIsCompat ? 'Opportunities aligned with your long-term goals'
+  // Static fallbacks for DO/AVOID/WATCH (used while AI loads or on failure)
+  const fallbackDo    = MORNING_RITUAL[dominantEl][0];
+  const fallbackAvoidEn = LUCKY_FOODS[dominantEl].avoid[0];
+  const fallbackAvoidZh = LUCKY_FOODS[dominantEl].avoid_zh[0];
+  const fallbackWatchEn = heroIsCompat ? 'Opportunities aligned with your long-term goals'
                     : heroIsClash  ? 'Impulsive decisions — pause before acting'
                     : 'Distraction — keep focus on one thing today';
-  const heroWatchZh = heroIsCompat ? '与长期目标相符的机遇'
+  const fallbackWatchZh = heroIsCompat ? '与长期目标相符的机遇'
                     : heroIsClash  ? '冲动决定——行动前先暂停'
                     : '分心——今天专注一件事';
   const heroEmoji = BRANCHES.find(b => b.animal === animal)?.emoji || '';
@@ -661,15 +662,65 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     `${heroEmoji} ${_t(`${yearPillar.stem.element} ${animal}`, `${EL_ZH[yearPillar.stem.element]}${ANIMAL_ZH[animal]}`)}`;
   document.getElementById('hero-profile-chip').innerHTML = '';
   document.getElementById('hero-summary-msg').innerHTML = _t(heroMsgEn, heroMsgZh);
+
+  // Show loading shimmer for DO/AVOID/WATCH, then fetch AI guidance
   document.getElementById('hero-bullets').innerHTML = `
-    <div class="hc-bullet"><span class="hc-bullet-key">${_t('DO','做')}</span><span>${_t(heroDo.title, heroDo.title_zh)}</span></div>
-    <div class="hc-bullet"><span class="hc-bullet-key">${_t('AVOID','避')}</span><span>${_t(heroAvoidEn, heroAvoidZh)}</span></div>
-    <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span>${_t(heroWatchEn, heroWatchZh)}</span></div>`;
+    <div class="hc-bullet"><span class="hc-bullet-key">${_t('DO','做')}</span><span class="guidance-loading">✦ Reading your chart…</span></div>
+    <div class="hc-bullet"><span class="hc-bullet-key">${_t('AVOID','避')}</span><span class="guidance-loading">✦</span></div>
+    <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span class="guidance-loading">✦</span></div>`;
 
   // Today / You tab new sections
   renderLifeAreas(fortune, heroIsCompat, heroIsClash);
   renderInsightCards(_t(heroMsgEn, heroMsgZh), fortune, dominantEl);
-  renderActionsPreview(heroDo, heroAvoidEn, heroAvoidZh, heroWatchEn, heroWatchZh);
+  renderActionsPreview({ title: 'Loading…', title_zh: '加载中…' }, 'Loading…', '加载中…', 'Loading…', '加载中…');
+
+  // Fetch AI-generated daily guidance
+  (async () => {
+    try {
+      const todayPillar = calcTodayPillar();
+      const guidanceChart = {
+        animal,
+        dominantEl,
+        pillars: pillars.map(p => ({
+          label: p.label,
+          known: p.known,
+          stem: p.known ? { char: p.stem.char, element: p.stem.element, polarity: p.stem.polarity } : null,
+          branch: p.known ? { char: p.branch.char, animal: p.branch.animal, element: p.branch.element } : null,
+        })),
+        today: {
+          stem: todayPillar.stem.char,
+          branch: todayPillar.branch.char,
+          animal: todayPillar.animal,
+          nobleman: isNoblemanDay(animal, todayPillar.animal),
+          isClash: heroIsClash,
+          isCompat: heroIsCompat,
+          score: Math.round(50 + (heroIsCompat ? 25 : heroIsClash ? -20 : 0)),
+        },
+      };
+      const resp = await fetch('/api/daily-guidance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chartData: guidanceChart }),
+      });
+      if (!resp.ok) throw new Error('API error');
+      const g = await resp.json();
+      // Update hero bullets with AI guidance
+      document.getElementById('hero-bullets').innerHTML = `
+        <div class="hc-bullet"><span class="hc-bullet-key">${_t('DO','做')}</span><span>${_t(g.do.en, g.do.zh)}</span></div>
+        <div class="hc-bullet"><span class="hc-bullet-key">${_t('AVOID','避')}</span><span>${_t(g.avoid.en, g.avoid.zh)}</span></div>
+        <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span>${_t(g.watch.en, g.watch.zh)}</span></div>`;
+      // Update actions preview card
+      renderActionsPreview({ title: g.do.en, title_zh: g.do.zh }, g.avoid.en, g.avoid.zh, g.watch.en, g.watch.zh);
+    } catch (err) {
+      console.warn('Daily guidance fallback:', err.message);
+      // Fall back to static guidance
+      document.getElementById('hero-bullets').innerHTML = `
+        <div class="hc-bullet"><span class="hc-bullet-key">${_t('DO','做')}</span><span>${_t(fallbackDo.title, fallbackDo.title_zh)}</span></div>
+        <div class="hc-bullet"><span class="hc-bullet-key">${_t('AVOID','避')}</span><span>${_t(fallbackAvoidEn, fallbackAvoidZh)}</span></div>
+        <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span>${_t(fallbackWatchEn, fallbackWatchZh)}</span></div>`;
+      renderActionsPreview(fallbackDo, fallbackAvoidEn, fallbackAvoidZh, fallbackWatchEn, fallbackWatchZh);
+    }
+  })();
   renderYouProfile(animal, yearPillar, elColor);
 
   // Daily fortune
