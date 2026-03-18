@@ -428,6 +428,11 @@ function switchTab(tab) {
   document.querySelectorAll('#results .section[data-tab]').forEach(el => {
     el.classList.toggle('hide', el.dataset.tab !== tab || el.classList.contains('data-hidden'));
   });
+  // Toggle banner: full hero on Actions, compact strip on others
+  const heroCard = document.getElementById('hero-card');
+  const ctxStrip = document.getElementById('context-strip');
+  if (heroCard) heroCard.classList.toggle('hide', tab !== 'actions');
+  if (ctxStrip) ctxStrip.classList.toggle('hide', tab === 'actions');
   document.querySelector('#results .scroll-body').scrollTop = 0;
   history.replaceState(null, '', location.pathname + '#' + tab);
 }
@@ -611,8 +616,8 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   // Hero card
   document.getElementById('hero-bg').style.background =
     `linear-gradient(135deg, ${elColor}28, ${elColor}55, #0f0f1c)`;
-  document.getElementById('hero-medallion').innerHTML =
-    makeMedallion(animal, elColor, 'hero-med');
+  const _heroMed = document.getElementById('hero-medallion');
+  if (_heroMed) _heroMed.innerHTML = makeMedallion(animal, elColor, 'hero-med');
   document.getElementById('hero-year-tag').innerHTML =
     _t(`Year of the ${animal} · ${year}`, `${ANIMAL_ZH[animal]}年 · ${year}`);
   document.getElementById('hero-name').innerHTML = _t(animal, ANIMAL_ZH[animal]);
@@ -662,6 +667,23 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     `${heroEmoji} ${_t(`${yearPillar.stem.element} ${animal}`, `${EL_ZH[yearPillar.stem.element]}${ANIMAL_ZH[animal]}`)}`;
   document.getElementById('hero-profile-chip').innerHTML = '';
   document.getElementById('hero-summary-msg').innerHTML = _t(heroMsgEn, heroMsgZh);
+
+  // Compact context strip (Today, You, Relationships tabs)
+  const csTodayPillar = calcTodayPillar();
+  const csTodayEmoji = BRANCHES.find(b => b.animal === csTodayPillar.animal)?.emoji || '';
+  const csScore = Math.round(50 + (heroIsCompat ? 25 : heroIsClash ? -20 : 0));
+  const csVerdictEn = heroIsCompat ? 'AUSPICIOUS' : heroIsClash ? 'CAUTION' : 'BALANCED';
+  const csVerdictZh = heroIsCompat ? '吉' : heroIsClash ? '慎' : '平';
+  document.getElementById('cs-date').textContent = heroDateStr;
+  document.getElementById('cs-pillar').innerHTML =
+    `${csTodayEmoji} ${_t(`${csTodayPillar.stem.element} ${csTodayPillar.animal}`, `${EL_ZH[csTodayPillar.stem.element]}${ANIMAL_ZH[csTodayPillar.animal]}`)}`;
+  document.getElementById('cs-chinese').textContent = `${csTodayPillar.stem.char}${csTodayPillar.branch.char}`;
+  document.getElementById('cs-score').textContent = csScore;
+  document.getElementById('cs-verdict').innerHTML = _t(csVerdictEn, csVerdictZh);
+  document.getElementById('cs-hero-text').innerHTML = _t(heroMsgEn, heroMsgZh);
+  // Default: show strip (Today tab is default), hide hero card
+  document.getElementById('hero-card').classList.add('hide');
+  document.getElementById('context-strip').classList.remove('hide');
 
   // Show loading shimmer for DO/AVOID/WATCH, then fetch AI guidance
   document.getElementById('hero-bullets').innerHTML = `

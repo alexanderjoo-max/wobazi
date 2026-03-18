@@ -85,3 +85,10 @@ When mounted, runs at midnight server time daily via node-cron. Configure schedu
 - Auth check: `if (!req.session.user)` → 401
 - Responses: `{ ok: true }`, `{ error: "..." }`, or data objects
 - No API versioning
+
+## UI: Tab Banner System (updated 2026-03-18)
+- **Today, You, Relationships tabs**: Show a compact context strip (`#context-strip`) — single row with date, day pillar emoji+name+Chinese, overall score, and verdict. Tapping expands to show hero_text summary.
+- **Actions tab**: Shows the full hero banner (`#hero-card`) with date, title, hero_text, and DO/AVOID/WATCH items.
+- The rabbit circle medallion (`hc-med`) was removed from all tabs.
+- `switchTab()` toggles visibility between `#context-strip` and `#hero-card` based on active tab.
+- Context strip data is populated in `renderResults()` using `calcTodayPillar()`.

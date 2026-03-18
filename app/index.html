@@ -634,7 +634,26 @@
 
     <div class="scroll-body">
 
-      <!-- Today Summary (compact hero) -->
+      <!-- Compact Context Strip (Today, You, Relationships tabs) -->
+      <section class="context-strip hide" id="context-strip" onclick="document.getElementById('cs-expand').classList.toggle('hide')">
+        <div class="cs-row">
+          <div class="cs-left">
+            <span class="cs-date" id="cs-date"></span>
+            <span class="cs-divider">·</span>
+            <span class="cs-pillar" id="cs-pillar"></span>
+            <span class="cs-chinese" id="cs-chinese"></span>
+          </div>
+          <div class="cs-right">
+            <span class="cs-score" id="cs-score"></span>
+            <span class="cs-verdict" id="cs-verdict"></span>
+          </div>
+        </div>
+        <div class="cs-expand hide" id="cs-expand">
+          <p class="cs-hero-text" id="cs-hero-text"></p>
+        </div>
+      </section>
+
+      <!-- Full Banner (Actions tab ONLY) -->
       <section class="hero-compact" id="hero-card">
         <div class="hero-bg" id="hero-bg"></div>
         <div class="hc-inner">
@@ -647,7 +666,6 @@
             <div class="hc-msg" id="hero-summary-msg"></div>
             <div class="hc-bullets" id="hero-bullets"></div>
           </div>
-          <div class="hc-med" id="hero-medallion"></div>
         </div>
         <!-- Kept for JS compatibility, not displayed -->
         <h1 id="hero-name" style="display:none"></h1>
