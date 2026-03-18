@@ -674,6 +674,8 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   const csScore = Math.round(50 + (heroIsCompat ? 25 : heroIsClash ? -20 : 0));
   const csVerdictEn = heroIsCompat ? 'AUSPICIOUS' : heroIsClash ? 'CAUTION' : 'BALANCED';
   const csVerdictZh = heroIsCompat ? '吉' : heroIsClash ? '慎' : '平';
+  document.getElementById('cs-bg').style.background =
+    `linear-gradient(135deg, ${elColor}28, ${elColor}55, #0f0f1c)`;
   document.getElementById('cs-date').textContent = heroDateStr;
   document.getElementById('cs-pillar').innerHTML =
     `${csTodayEmoji} ${_t(`${csTodayPillar.stem.element} ${csTodayPillar.animal}`, `${EL_ZH[csTodayPillar.stem.element]}${ANIMAL_ZH[csTodayPillar.animal]}`)}`;

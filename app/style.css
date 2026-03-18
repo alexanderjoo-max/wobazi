@@ -784,17 +784,24 @@ input  { font-family: inherit; }
 
 /* ── Compact Context Strip (Today, You, Relationships tabs) ── */
 .context-strip {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
   margin-bottom: 20px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: opacity 0.2s;
+}
+.context-strip .cs-bg {
+  position: absolute;
+  inset: 0;
+  animation: hero-shift 8s ease-in-out infinite alternate;
 }
 .context-strip:active {
-  background: rgba(255,255,255,0.04);
+  opacity: 0.85;
 }
 .cs-row {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -853,6 +860,8 @@ input  { font-family: inherit; }
   color: var(--muted);
 }
 .cs-expand {
+  position: relative;
+  z-index: 1;
   padding: 0 18px 14px;
 }
 .cs-hero-text {
@@ -1220,10 +1229,12 @@ input  { font-family: inherit; }
   border: 1.5px solid var(--border);
   border-radius: var(--radius-md);
   color: var(--text);
-  padding: 16px 10px;
+  padding: 14px 10px;
   font-size: 16px;
+  font-weight: 600;
   font-family: inherit;
   width: 100%;
+  height: 100%;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   color-scheme: dark;
