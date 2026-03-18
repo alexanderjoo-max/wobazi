@@ -787,6 +787,7 @@ input  { font-family: inherit; }
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
+  margin-top: 8px;
   margin-bottom: 20px;
   cursor: pointer;
   transition: opacity 0.2s;
