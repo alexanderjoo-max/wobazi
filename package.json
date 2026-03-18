@@ -13,6 +13,7 @@
     "ejs": "^5.0.1",
     "express": "^4.21.0",
     "express-session": "^1.18.1",
+    "node-cron": "^4.2.1",
     "openai": "^4.73.0"
   }
 }
