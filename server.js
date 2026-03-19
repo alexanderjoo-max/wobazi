@@ -5,7 +5,7 @@
 
 require('dotenv').config({ path: '.env.local' });
 const express = require('express');
-const session = require('express-session');
+const cookieSession = require('cookie-session');
 const Database = require('better-sqlite3');
 const OpenAI = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -43,63 +43,17 @@ db.exec(`
   );
 `);
 
-/* ── SQLite Session Store (survives server restarts) ── */
-db.exec(`
-  CREATE TABLE IF NOT EXISTS sessions (
-    sid TEXT PRIMARY KEY,
-    sess TEXT NOT NULL,
-    expired INTEGER NOT NULL
-  );
-  CREATE INDEX IF NOT EXISTS idx_sessions_expired ON sessions(expired);
-`);
-
-class SqliteStore extends session.Store {
-  constructor() { super(); this._cleanup(); }
-  _cleanup() {
-    db.prepare('DELETE FROM sessions WHERE expired < ?').run(Date.now());
-    setTimeout(() => this._cleanup(), 15 * 60 * 1000); // every 15 min
-  }
-  get(sid, cb) {
-    try {
-      const row = db.prepare('SELECT sess FROM sessions WHERE sid = ? AND expired > ?').get(sid, Date.now());
-      cb(null, row ? JSON.parse(row.sess) : null);
-    } catch (e) { cb(e); }
-  }
-  set(sid, sess, cb) {
-    try {
-      const maxAge = sess.cookie?.maxAge || 30 * 24 * 60 * 60 * 1000;
-      const expired = Date.now() + maxAge;
-      db.prepare('INSERT OR REPLACE INTO sessions (sid, sess, expired) VALUES (?, ?, ?)').run(sid, JSON.stringify(sess), expired);
-      cb?.(null);
-    } catch (e) { cb?.(e); }
-  }
-  destroy(sid, cb) {
-    try {
-      db.prepare('DELETE FROM sessions WHERE sid = ?').run(sid);
-      cb?.(null);
-    } catch (e) { cb?.(e); }
-  }
-  touch(sid, sess, cb) { this.set(sid, sess, cb); }
-}
-
-/* ── Session ── */
+/* ── Cookie-based Session (survives Render deploys — no server-side store needed) ── */
 const isProduction = process.env.NODE_ENV === 'production' || (process.env.BASE_URL || '').startsWith('https');
 if (isProduction) app.set('trust proxy', 1); // trust first proxy (Render, Railway, etc.)
 
-app.use(session({
-  store: new SqliteStore(),
-  name: 'wobazi.sid',
-  secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
-  resave: false,
-  saveUninitialized: false,
-  rolling: true, // extend cookie on every request
-  cookie: {
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    path: '/',
-    sameSite: 'lax',
-    httpOnly: true,
-    secure: isProduction, // true on HTTPS (production)
-  },
+app.use(cookieSession({
+  name: 'wobazi.session',
+  keys: [process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex')],
+  maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  sameSite: 'lax',
+  httpOnly: true,
+  secure: isProduction,
 }));
 
 app.use(express.json());
@@ -299,11 +253,8 @@ app.get('/auth/google/callback', async (req, res) => {
       avatar: profile.picture,
     };
 
-    req.session.save((err) => {
-      if (err) console.error('[session save error]', err);
-      console.log(`[auth] Session saved for ${profile.name} (sid: ${req.sessionID})`);
-      res.redirect('/app?auth=success');
-    });
+    console.log(`[auth] Session set for ${profile.name}`);
+    res.redirect('/app?auth=success');
   } catch (err) {
     console.error('[Google OAuth error]', err.message);
     res.redirect('/app?auth=error');
@@ -312,18 +263,15 @@ app.get('/auth/google/callback', async (req, res) => {
 
 /* ── Logout ── */
 app.get('/auth/logout', (req, res) => {
-  req.session.destroy();
+  req.session = null; // cookie-session: clear by setting to null
   res.redirect('/app');
 });
 
 /* ── Current user ── */
 app.get('/api/me', (req, res) => {
-  if (req.session.user) {
+  if (req.session && req.session.user) {
     return res.json({ user: req.session.user });
   }
-  // Debug: log when no session found
-  const hasCookie = !!req.headers.cookie;
-  if (hasCookie) console.log(`[auth] /api/me: cookie sent but no session (sid: ${req.sessionID})`);
   res.json({ user: null });
 });
 
@@ -333,7 +281,7 @@ app.get('/api/me', (req, res) => {
 
 /* ── Save reading ── */
 app.post('/api/save-reading', (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  if (!req.session || !req.session.user) return res.status(401).json({ error: 'Not logged in' });
   const { name, year, month, day, hour, birthplace, bloodType, gender } = req.body;
   db.prepare(`
     INSERT INTO readings (google_id, name, year, month, day, hour, birthplace, blood_type, gender, updated_at)
@@ -348,7 +296,7 @@ app.post('/api/save-reading', (req, res) => {
 
 /* ── Save Oracle chat ── */
 app.post('/api/save-chat', (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  if (!req.session || !req.session.user) return res.status(401).json({ error: 'Not logged in' });
   const { messages } = req.body;
   db.prepare(`
     INSERT INTO oracle_chats (google_id, messages, updated_at)
@@ -360,7 +308,7 @@ app.post('/api/save-chat', (req, res) => {
 
 /* ── Get saved data ── */
 app.get('/api/my-data', (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  if (!req.session || !req.session.user) return res.status(401).json({ error: 'Not logged in' });
   const gid = req.session.user.googleId;
   const reading = db.prepare('SELECT * FROM readings WHERE google_id = ?').get(gid);
   const chat = db.prepare('SELECT messages FROM oracle_chats WHERE google_id = ?').get(gid);

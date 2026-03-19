@@ -10,6 +10,7 @@
     "@google/generative-ai": "^0.21.0",
     "@resvg/resvg-js": "^2.6.2",
     "better-sqlite3": "^11.6.0",
+    "cookie-session": "^2.1.1",
     "dotenv": "^16.4.5",
     "ejs": "^5.0.1",
     "express": "^4.21.0",
