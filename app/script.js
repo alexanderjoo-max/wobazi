@@ -1549,18 +1549,10 @@ function showShareCard() {
   const cnPin    = [cn.surname.pinyin, cn.elChar.pinyin, cn.anChar.pinyin].join(' ');
   const cnMean   = `${cn.surname.meaning} · ${cn.elChar.meaning} · ${cn.anChar.meaning}`;
   const polLabel = o.polarity === 'Yang' ? 'Yang' : 'Yin';
+  const todayStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
   const card = document.getElementById('share-card-preview');
   card.style.cssText = `background:linear-gradient(160deg,#1a0a3d,#07030f 45%,#0d0520);border:1px solid rgba(240,192,64,0.25);`;
-
-  const barHtml = (label, value, color) => {
-    const pct = Math.min(100, Math.max(0, value));
-    return `<div class="share-bar-row">
-      <span class="share-bar-label">${label}</span>
-      <div class="share-bar-track"><div class="share-bar-fill" style="width:${pct}%;background:${color}"></div></div>
-      <span class="share-bar-val">${value}</span>
-    </div>`;
-  };
 
   card.innerHTML = `
     <div class="share-header-line">${(o.name || 'YOUR').toUpperCase()}'S DESTINY</div>
@@ -1571,22 +1563,34 @@ function showShareCard() {
     <div class="share-archetype-title">${archetype}</div>
     <div class="share-element-tag">${o.element} ${o.animal} (${polLabel})</div>
     <div class="share-oracle-box">
-      <div class="share-section-label" style="margin-bottom:6px">ORACLE</div>
       <div class="share-oracle-text">"${verdict}"</div>
     </div>
-    <div class="share-fortune-bars">
-      ${barHtml('Love', o.fortune.love, '#f43f5e')}
-      ${barHtml('Career', o.fortune.career, '#8b5cf6')}
-      ${barHtml('Health', o.fortune.health, '#22c55e')}
-      ${barHtml('Wealth', o.fortune.wealth, '#f59e0b')}
+    <div class="share-fortune-section">
+      <div class="share-section-label">TODAY'S FORTUNE · ${todayStr.toUpperCase()}</div>
+      <div class="share-fortune-grid">
+        <div class="share-fortune-cell"><span class="share-fortune-emoji">❤️</span><span class="share-fortune-num" style="color:#f43f5e">${o.fortune.love}</span><span class="share-fortune-lbl">Love</span></div>
+        <div class="share-fortune-cell"><span class="share-fortune-emoji">💼</span><span class="share-fortune-num" style="color:#8b5cf6">${o.fortune.career}</span><span class="share-fortune-lbl">Career</span></div>
+        <div class="share-fortune-cell"><span class="share-fortune-emoji">🌿</span><span class="share-fortune-num" style="color:#22c55e">${o.fortune.health}</span><span class="share-fortune-lbl">Health</span></div>
+        <div class="share-fortune-cell"><span class="share-fortune-emoji">💰</span><span class="share-fortune-num" style="color:#f59e0b">${o.fortune.wealth}</span><span class="share-fortune-lbl">Wealth</span></div>
+      </div>
     </div>
-    <div class="share-footer-line">wobazi.com</div>`;
+    <div class="share-footer-logo">
+      <img src="/Logos/SVG/rev-horiz.svg" class="share-logo-img" alt="WoBazi">
+      <span class="share-footer-dot">.com</span>
+    </div>`;
 
+  // Hide oracle bottom bar, show overlay
+  const fab = document.getElementById('oracle-fab');
+  if (fab) fab.classList.add('hide');
   document.getElementById('share-overlay').classList.remove('hide');
 }
 
 function closeShare() {
   document.getElementById('share-overlay').classList.add('hide');
+  // Restore oracle bottom bar if on results screen
+  const onResults = document.querySelector('#results.screen.active');
+  const fab = document.getElementById('oracle-fab');
+  if (onResults && fab) fab.classList.remove('hide');
 }
 
 async function doShare() {

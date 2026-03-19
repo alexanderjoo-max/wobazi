@@ -1496,9 +1496,11 @@ input  { font-family: inherit; }
    SHARE OVERLAY
 ──────────────────────── */
 .share-overlay {
-  position: fixed; inset: 0; z-index: 100;
+  position: fixed; inset: 0; z-index: 1000;
   display: flex; flex-direction: column;
   align-items: center; justify-content: flex-end;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .share-backdrop {
   position: absolute; inset: 0;
@@ -1518,8 +1520,8 @@ input  { font-family: inherit; }
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: linear-gradient(145deg, #1a0a3d, #0f0a2a);
-  padding: 28px 20px 22px;
-  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 20px 18px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
   text-align: center;
   border: 1.5px solid rgba(240,192,64,0.3);
   position: relative;
@@ -1573,42 +1575,39 @@ input  { font-family: inherit; }
 }
 .share-oracle-box {
   width: 100%;
-  background: rgba(240,192,64,0.06);
-  border: 1px solid rgba(240,192,64,0.18);
-  border-radius: 14px; padding: 12px 16px;
+  background: rgba(240,192,64,0.12);
+  border: 1px solid rgba(240,192,64,0.28);
+  border-radius: 14px; padding: 14px 16px;
   text-align: center;
 }
 .share-oracle-text {
-  font-size: 12px; font-style: italic; font-weight: 400;
-  line-height: 1.6; color: rgba(240,240,255,0.7);
+  font-size: 13px; font-weight: 500;
+  line-height: 1.6; color: rgba(240,240,255,0.88);
 }
-.share-fortune-bars {
-  width: 100%; display: flex; flex-direction: column; gap: 6px;
-  margin-top: 4px;
+.share-fortune-section {
+  width: 100%; margin-top: 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
-.share-bar-row {
-  display: flex; align-items: center; gap: 8px;
+.share-fortune-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; width: 100%;
 }
-.share-bar-label {
-  font-size: 10px; font-weight: 600; color: var(--muted);
-  width: 44px; text-align: right; letter-spacing: 0.3px;
+.share-fortune-cell {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px; padding: 8px 12px;
 }
-.share-bar-track {
-  flex: 1; height: 8px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 99px; overflow: hidden;
+.share-fortune-emoji { font-size: 16px; }
+.share-fortune-num { font-size: 18px; font-weight: 700; }
+.share-fortune-lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.3px; }
+.share-footer-logo {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin-top: 8px;
 }
-.share-bar-fill {
-  height: 100%; border-radius: 99px;
-  transition: width 0.3s ease;
-}
-.share-bar-val {
-  font-size: 13px; font-weight: 700; color: var(--text);
-  width: 28px;
-}
-.share-footer-line {
-  font-size: 12px; font-weight: 700; color: var(--gold);
-  letter-spacing: 2px; margin-top: 6px;
+.share-logo-img { height: 18px; width: auto; }
+.share-footer-dot {
+  font-size: 14px; font-weight: 700; color: var(--gold);
+  margin-left: 1px;
 }
 
 .share-buttons { display: flex; flex-direction: column; gap: 10px; }
