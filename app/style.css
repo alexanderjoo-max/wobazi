@@ -421,7 +421,7 @@ input  { font-family: inherit; }
   padding: 12px 20px;
   padding-top: max(12px, env(safe-area-inset-top));
   flex-shrink: 0;
-  background: rgba(7,7,15,0.92);
+  background: linear-gradient(180deg, rgba(18,16,30,0.97) 0%, rgba(12,11,22,0.95) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
@@ -510,7 +510,7 @@ input  { font-family: inherit; }
 
 /* ── Results Tab Bar ── */
 .results-tab-bar {
-  background: rgba(7,7,15,0.92);
+  background: linear-gradient(180deg, rgba(12,11,22,0.95) 0%, rgba(10,9,18,0.94) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
@@ -2357,7 +2357,7 @@ input  { font-family: inherit; }
   padding: 10px 16px;
   cursor: pointer;
   font-family: inherit;
-  margin-top: 2px;
+  margin-top: 14px;
   transition: background 0.2s;
 }
 .tap-actions-link:active { background: rgba(240,192,64,0.2); transform: scale(0.98); }
@@ -3533,7 +3533,7 @@ input  { font-family: inherit; }
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  background: linear-gradient(180deg, rgba(10,9,18,0.94) 0%, rgba(7,7,15,0.92) 100%);
 }
 .results-toc-bar::-webkit-scrollbar { display: none; }
 .results-toc-inner {
