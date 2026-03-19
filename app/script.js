@@ -3690,8 +3690,11 @@ async function loadUserData() {
     if (!_savedReading) {
       const btn = document.getElementById('btn-continue-reading');
       if (btn) {
-        btn.querySelector('.en').textContent = 'Begin Your Reading';
-        btn.querySelector('.zh').textContent = '开始算命';
+        const enSpan = btn.querySelector('.en');
+        if (enSpan) enSpan.textContent = 'Begin Your Reading';
+        else btn.childNodes.forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) n.textContent = 'Begin Your Reading '; });
+        const zhSpan = btn.querySelector('.zh');
+        if (zhSpan) zhSpan.textContent = '开始算命';
         btn.onclick = function() { haptic(10); showScreen('input'); };
       }
     }
@@ -3702,7 +3705,11 @@ async function loadUserData() {
   } catch (e) { /* no saved data */ }
 }
 
-function loadSavedReading() {
+async function loadSavedReading() {
+  // If data hasn't loaded yet (race with checkAuth), wait for it
+  if (!_savedReading && _currentUser) {
+    await loadUserData();
+  }
   if (!_savedReading) {
     showScreen('input');
     return;
