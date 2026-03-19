@@ -88,11 +88,14 @@ if (isProduction) app.set('trust proxy', 1); // trust first proxy (Render, Railw
 
 app.use(session({
   store: new SqliteStore(),
+  name: 'wobazi.sid',
   secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
   resave: false,
   saveUninitialized: false,
+  rolling: true, // extend cookie on every request
   cookie: {
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    path: '/',
     sameSite: 'lax',
     httpOnly: true,
     secure: isProduction, // true on HTTPS (production)
@@ -298,6 +301,7 @@ app.get('/auth/google/callback', async (req, res) => {
 
     req.session.save((err) => {
       if (err) console.error('[session save error]', err);
+      console.log(`[auth] Session saved for ${profile.name} (sid: ${req.sessionID})`);
       res.redirect('/app?auth=success');
     });
   } catch (err) {
@@ -317,6 +321,9 @@ app.get('/api/me', (req, res) => {
   if (req.session.user) {
     return res.json({ user: req.session.user });
   }
+  // Debug: log when no session found
+  const hasCookie = !!req.headers.cookie;
+  if (hasCookie) console.log(`[auth] /api/me: cookie sent but no session (sid: ${req.sessionID})`);
   res.json({ user: null });
 });
 
