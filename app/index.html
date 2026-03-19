@@ -42,7 +42,7 @@
         <img src="/Logos/SVG/rev-vert.svg" class="logo-vert" alt="Wobazi">
         <p class="logo-sub">Chinese Destiny System</p>
       </div>
-      <p class="splash-tagline">Decode your fate through the ancient<br>art of the Four Pillars</p>
+      <p class="splash-tagline">Decode your fate through the ancient<br>art of the Four Pillars of Chinese Astrology</p>
 
       <!-- Guest state (default) -->
       <div id="splash-guest">
@@ -485,13 +485,13 @@
       </div>
       <form id="bazi-form" onsubmit="handleSubmit(event)">
         <div class="field">
-          <label><span class="en">Name <span class="label-opt">optional</span></span><span class="zh hide">姓名 <span class="label-opt">可选</span></span></label>
+          <label><span class="en">Name <span class="label-opt">personalize your reading</span></span><span class="zh hide">姓名 <span class="label-opt">个性化你的命理</span></span></label>
           <input type="text" id="name" placeholder="What do we call you?" autocomplete="off" spellcheck="false">
         </div>
 
         <div class="field field-row field-datetime">
           <div class="field-col field-col-date">
-            <label><span class="en">Date of Birth <span class="label-req">*</span></span><span class="zh hide">出生日期 <span class="label-req">*</span></span></label>
+            <label><span class="en">Date of Birth <span class="label-req">your Four Pillars</span></span><span class="zh hide">出生日期 <span class="label-req">四柱命盘</span></span></label>
             <div class="date-trio">
               <input type="number" id="birth-day"   class="date-part" placeholder="DD"   min="1"    max="31"   inputmode="numeric">
               <span class="date-sep">/</span>
@@ -501,18 +501,18 @@
             </div>
           </div>
           <div class="field-col field-col-time">
-            <label><span class="en">Time <span class="label-opt">optional</span></span><span class="zh hide">时间 <span class="label-opt">可选</span></span></label>
+            <label><span class="en">Time <span class="label-opt">Hour Pillar</span></span><span class="zh hide">时间 <span class="label-opt">时柱</span></span></label>
             <input type="time" id="birthtime" class="time-input">
           </div>
         </div>
 
         <div class="field field-row">
           <div class="field-col">
-            <label><span class="en">Place of Birth <span class="label-opt">optional</span></span><span class="zh hide">出生地 <span class="label-opt">可选</span></span></label>
-            <input type="text" id="birthplace" placeholder="City or country" autocomplete="address-level2" spellcheck="false">
+            <label><span class="en">Birth City <span class="label-opt">geographic energy</span></span><span class="zh hide">出生城市 <span class="label-opt">地理能量</span></span></label>
+            <input type="text" id="birthplace" placeholder="Start typing a city..." autocomplete="address-level2" spellcheck="false">
           </div>
           <div class="field-col">
-            <label><span class="en">Blood Type <span class="label-opt">optional</span></span><span class="zh hide">血型 <span class="label-opt">可选</span></span></label>
+            <label><span class="en">Blood Type <span class="label-opt">personality traits</span></span><span class="zh hide">血型 <span class="label-opt">性格特征</span></span></label>
             <select id="blood-type" class="select-input">
               <option value="">Unknown</option>
               <option value="A">A</option>
@@ -524,7 +524,7 @@
         </div>
 
         <div class="field">
-          <label><span class="en">Gender <span class="label-opt">optional — unlocks Feng Shui direction</span></span><span class="zh hide">性别 <span class="label-opt">可选 — 解锁风水方位</span></span></label>
+          <label><span class="en">Gender <span class="label-opt">Feng Shui</span></span><span class="zh hide">性别 <span class="label-opt">风水</span></span></label>
           <div class="gender-row">
             <label class="gender-opt"><input type="radio" name="gender" value="M"> ♂ <span class="en">Male</span><span class="zh hide">男</span></label>
             <label class="gender-opt"><input type="radio" name="gender" value="F"> ♀ <span class="en">Female</span><span class="zh hide">女</span></label>
