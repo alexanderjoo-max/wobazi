@@ -997,12 +997,15 @@ function animateFortune(fortune) {
 /* ── Compatibility ── */
 function renderCompat(animal, zData) {
   const wrap = document.getElementById('compat-wrap');
-  const goodRow = zData.compat.map(a => {
-    return `<span class="compat-chip good">${BRANCHES.find(b=>b.animal===a)?.emoji} ${_t(a, ANIMAL_ZH[a])}</span>`;
-  }).join('');
-  const badRow = zData.clash.map(a => {
-    return `<span class="compat-chip bad">${BRANCHES.find(b=>b.animal===a)?.emoji} ${_t(a, ANIMAL_ZH[a])}</span>`;
-  }).join('');
+  const chipWithYears = (a, cls) => {
+    const yrs = getAnimalYears(a).slice(-4).join(' · ');
+    return `<div class="compat-chip-wrap ${cls}">
+      <span class="compat-chip ${cls}">${BRANCHES.find(b=>b.animal===a)?.emoji} ${_t(a, ANIMAL_ZH[a])}</span>
+      <span class="compat-chip-years">${yrs}</span>
+    </div>`;
+  };
+  const goodRow = zData.compat.map(a => chipWithYears(a, 'good')).join('');
+  const badRow = zData.clash.map(a => chipWithYears(a, 'bad')).join('');
   wrap.innerHTML = `
     <div class="compat-group">
       <div class="compat-group-label">${_t('Best matches ✦','最佳配对 ✦')}</div>
@@ -4159,6 +4162,8 @@ function renderSoulAnimals(animal) {
     }
   }
 
+  const yrsStr = (a) => getAnimalYears(a).slice(-5).join(' · ');
+
   const trioCards = trioMembers.map(a => {
     const emoji = BRANCHES.find(b => b.animal === a)?.emoji || '';
     const aEl = BRANCHES.find(b => b.animal === a)?.element || '';
@@ -4166,6 +4171,7 @@ function renderSoulAnimals(animal) {
       <span class="soul-emoji">${emoji}</span>
       <div class="soul-info">
         <span class="soul-name">${_t(a, ANIMAL_ZH[a])}<span class="soul-tag" style="color:${EL_COLOR[aEl]}">${_t(aEl, EL_ZH[aEl])}</span></span>
+        <div class="soul-years">${yrsStr(a)}</div>
         <div class="soul-note">${_t(`${trioElement} Trio ally — amplifies your ${trioElement.toLowerCase()} energy when together`, `${EL_ZH[trioElement]}三合 — 与你在一起时增强${EL_ZH[trioElement]}能量`)}</div>
       </div>
     </div>`;
@@ -4176,6 +4182,7 @@ function renderSoulAnimals(animal) {
       <span class="soul-emoji">${sfEmoji}</span>
       <div class="soul-info">
         <span class="soul-name">${_t(secretFriend, ANIMAL_ZH[secretFriend])}<span class="soul-tag" style="color:var(--gold)">${_t('SECRET FRIEND', '暗合')}</span></span>
+        <div class="soul-years">${yrsStr(secretFriend)}</div>
         <div class="soul-note">${_t(`Your hidden ally — a deep, intuitive bond. ${animal} and ${secretFriend} form one of the Six Harmonies.`, `你的隐秘盟友 — 深层直觉联系。${ANIMAL_ZH[animal]}与${ANIMAL_ZH[secretFriend]}组成六合之一。`)}</div>
       </div>
     </div>

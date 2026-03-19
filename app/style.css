@@ -1100,6 +1100,8 @@ input  { font-family: inherit; }
 }
 .compat-chip.good { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
 .compat-chip.bad  { background: rgba(239,68,68,0.10); border: 1px solid rgba(239,68,68,0.25); color: #f87171; }
+.compat-chip-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.compat-chip-years { font-size: 9px; color: var(--muted); letter-spacing: 0.3px; }
 
 /* ── Lucky Grid ── */
 .lucky-grid {
@@ -4014,6 +4016,7 @@ input  { font-family: inherit; }
 .soul-info { flex: 1; min-width: 0; }
 .soul-name { font-size: 14px; font-weight: 700; color: var(--text); }
 .soul-tag { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-left: 6px; }
+.soul-years { font-size: 10px; color: var(--muted); opacity: 0.7; letter-spacing: 0.3px; }
 .soul-note { font-size: 12px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
 
 /* ── Business Compatibility ── */
