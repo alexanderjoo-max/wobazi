@@ -83,12 +83,20 @@ class SqliteStore extends session.Store {
 }
 
 /* ── Session ── */
+const isProduction = process.env.NODE_ENV === 'production' || (process.env.BASE_URL || '').startsWith('https');
+if (isProduction) app.set('trust proxy', 1); // trust first proxy (Render, Railway, etc.)
+
 app.use(session({
   store: new SqliteStore(),
   secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000, sameSite: 'lax' },
+  cookie: {
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    sameSite: 'lax',
+    httpOnly: true,
+    secure: isProduction, // true on HTTPS (production)
+  },
 }));
 
 app.use(express.json());
@@ -280,7 +288,7 @@ app.get('/auth/google/callback', async (req, res) => {
       ON CONFLICT(google_id) DO UPDATE SET name=excluded.name, email=excluded.email, avatar=excluded.avatar
     `).run(profile.id, profile.name, profile.email, profile.picture);
 
-    // Set session
+    // Set session and wait for it to persist before redirecting
     req.session.user = {
       googleId: profile.id,
       name: profile.name,
@@ -288,7 +296,10 @@ app.get('/auth/google/callback', async (req, res) => {
       avatar: profile.picture,
     };
 
-    res.redirect('/app?auth=success');
+    req.session.save((err) => {
+      if (err) console.error('[session save error]', err);
+      res.redirect('/app?auth=success');
+    });
   } catch (err) {
     console.error('[Google OAuth error]', err.message);
     res.redirect('/app?auth=error');
