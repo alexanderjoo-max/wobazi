@@ -15,7 +15,10 @@ const router = Router();
  * Parse and validate query params shared by both endpoints.
  */
 function parseShareParams(query) {
-  const { name, date, archetype, love, career, health, wealth, oracle } = query;
+  const {
+    name, date, chineseNameCharacters, pinyinName, englishMeaning,
+    archetype, elementAnimal, oracle, love, career, health, wealth,
+  } = query;
 
   if (!archetype) {
     return { error: 'Missing required param: archetype' };
@@ -25,12 +28,16 @@ function parseShareParams(query) {
     data: {
       name: (name || '').slice(0, 50),
       date: (date || '').slice(0, 40),
+      chineseNameCharacters: (chineseNameCharacters || '').slice(0, 10),
+      pinyinName: (pinyinName || '').slice(0, 60),
+      englishMeaning: (englishMeaning || '').slice(0, 80),
       archetype: (archetype || '').slice(0, 60),
+      elementAnimal: (elementAnimal || '').slice(0, 40),
+      oracle: (oracle || '').slice(0, 200),
       love: Math.min(99, Math.max(0, parseInt(love, 10) || 50)),
       career: Math.min(99, Math.max(0, parseInt(career, 10) || 50)),
       health: Math.min(99, Math.max(0, parseInt(health, 10) || 50)),
       wealth: Math.min(99, Math.max(0, parseInt(wealth, 10) || 50)),
-      oracle: (oracle || '').slice(0, 200),
     },
   };
 }

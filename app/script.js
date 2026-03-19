@@ -1545,46 +1545,42 @@ function showShareCard() {
   const archetype = arcList[arcIdx];
   const vIdx     = (o.year * 7 + BRANCHES.findIndex(b => b.animal === o.animal) * 3) % SHARE_VERDICTS.length;
   const verdict  = SHARE_VERDICTS[vIdx];
+  const cnChars  = cn.surname.char + cn.elChar.char + cn.anChar.char;
+  const cnPin    = [cn.surname.pinyin, cn.elChar.pinyin, cn.anChar.pinyin].join(' ');
+  const cnMean   = `${cn.surname.meaning} · ${cn.elChar.meaning} · ${cn.anChar.meaning}`;
+  const polLabel = o.polarity === 'Yang' ? 'Yang' : 'Yin';
 
   const card = document.getElementById('share-card-preview');
-  card.style.cssText = `background:linear-gradient(145deg,${elColor}22,#1a0a3d 45%,#0c0820);border:1px solid ${elColor}44;`;
+  card.style.cssText = `background:linear-gradient(160deg,#1a0a3d,#07030f 45%,#0d0520);border:1px solid rgba(240,192,64,0.25);`;
+
+  const barHtml = (label, value, color) => {
+    const pct = Math.min(100, Math.max(0, value));
+    return `<div class="share-bar-row">
+      <span class="share-bar-label">${label}</span>
+      <div class="share-bar-track"><div class="share-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <span class="share-bar-val">${value}</span>
+    </div>`;
+  };
 
   card.innerHTML = `
-    <div class="share-wobazi-logo">✦ WOBAZI ✦</div>
-    <div class="share-animal-wrap">
-      <div class="share-animal-glow" style="background:${elColor}"></div>
-      <svg viewBox="0 0 100 100" width="96" height="96"
-           style="color:${elColor};filter:drop-shadow(0 0 18px ${elColor}cc);position:relative;z-index:1">
-        ${ANIMAL_SVGS[o.animal]||''}
-      </svg>
+    <div class="share-header-line">${(o.name || 'YOUR').toUpperCase()}'S DESTINY</div>
+    <div class="share-cn-big" style="color:${elColor}">${cnChars}</div>
+    <div class="share-cn-sub">${cnPin}</div>
+    <div class="share-cn-meaning">${cnMean}</div>
+    <div class="share-section-label">DESTINY ARCHETYPE</div>
+    <div class="share-archetype-title">${archetype}</div>
+    <div class="share-element-tag">${o.element} ${o.animal} (${polLabel})</div>
+    <div class="share-oracle-box">
+      <div class="share-section-label" style="margin-bottom:6px">ORACLE</div>
+      <div class="share-oracle-text">"${verdict}"</div>
     </div>
-    <div class="share-archetype-badge">${archetype}</div>
-
-    <div class="share-cn-name-section">
-      <div class="share-cn-label">${_t('✦ Your Chinese Destiny Name','✦ 你的命运汉名')}</div>
-      <div class="share-cn-chars">
-        ${[cn.surname, cn.elChar, cn.anChar].map(c => `
-          <div class="share-cn-char-block">
-            <div class="share-cn-han" style="color:${elColor}">${c.char}</div>
-            <div class="share-cn-pin">${c.pinyin}</div>
-            <div class="share-cn-mn">${c.meaning}</div>
-          </div>`).join('')}
-      </div>
+    <div class="share-fortune-bars">
+      ${barHtml('Love', o.fortune.love, '#f43f5e')}
+      ${barHtml('Career', o.fortune.career, '#8b5cf6')}
+      ${barHtml('Health', o.fortune.health, '#22c55e')}
+      ${barHtml('Wealth', o.fortune.wealth, '#f59e0b')}
     </div>
-
-    <div class="share-verdict">"${verdict}"</div>
-
-    <div class="share-fortune-row">
-      ${[['❤️','Love',o.fortune.love,'#f43f5e'],['💼','Career',o.fortune.career,'#8b5cf6'],
-         ['🌿','Health',o.fortune.health,'#22c55e'],['💰','Wealth',o.fortune.wealth,'#f59e0b']]
-        .map(([ic,lb,sc,cl])=>`<div class="share-fortune-item">
-          <div class="share-fortune-icon">${ic}</div>
-          <div class="share-fortune-score" style="color:${cl}">${sc}</div>
-          <div class="share-fortune-lbl">${lb}</div>
-        </div>`).join('')}
-    </div>
-    <div class="share-cta-line">✦ Discover your destiny ✦</div>
-    <div class="share-url">wobazi.com</div>`;
+    <div class="share-footer-line">wobazi.com</div>`;
 
   document.getElementById('share-overlay').classList.remove('hide');
 }
@@ -1643,15 +1639,24 @@ async function generateShareImage(o, archetype, verdict) {
   try {
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const cn = genChineseName(o.name, o.animal, o.dominantEl);
+    const cnChars = cn.surname.char + cn.elChar.char + cn.anChar.char;
+    const cnPin = [cn.surname.pinyin, cn.elChar.pinyin, cn.anChar.pinyin].join(' ');
+    const cnMean = `${cn.surname.meaning} · ${cn.elChar.meaning} · ${cn.anChar.meaning}`;
+    const polLabel = o.polarity === 'Yang' ? 'Yang' : 'Yin';
     const params = new URLSearchParams({
       name: o.name || '',
       date: dateStr,
+      chineseNameCharacters: cnChars,
+      pinyinName: cnPin,
+      englishMeaning: cnMean,
       archetype: archetype || '',
+      elementAnimal: `${o.element} ${o.animal} (${polLabel})`,
+      oracle: verdict || '',
       love: String(o.fortune?.love || 50),
       career: String(o.fortune?.career || 50),
       health: String(o.fortune?.health || 50),
       wealth: String(o.fortune?.wealth || 50),
-      oracle: verdict || '',
     });
     const res = await fetch(`/api/share-image?${params}`);
     if (!res.ok) return null;
