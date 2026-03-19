@@ -1623,12 +1623,13 @@ async function doShare() {
   const imageFile = await generateShareImage(o, archetype, verdict);
 
   if (navigator.share) {
-    const shareData = { title: 'My WoBazi Destiny', text, url: 'https://wobazi.com' };
-    // Attach image if supported
+    // When sharing with an image, omit the URL to prevent apps from
+    // fetching and displaying the static OG image alongside our custom PNG
     if (imageFile && navigator.canShare && navigator.canShare({ files: [imageFile] })) {
-      shareData.files = [imageFile];
+      try { await navigator.share({ title: 'My WoBazi Destiny', text, files: [imageFile] }); } catch (_) {}
+    } else {
+      try { await navigator.share({ title: 'My WoBazi Destiny', text, url: 'https://wobazi.com' }); } catch (_) {}
     }
-    try { await navigator.share(shareData); } catch (_) {}
   } else if (navigator.clipboard) {
     await navigator.clipboard.writeText(text + '\nhttps://wobazi.com');
     alert('Copied to clipboard! ✦');
