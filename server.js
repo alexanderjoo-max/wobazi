@@ -652,6 +652,9 @@ app.post('/api/oracle', async (req, res) => {
   }
 });
 
+// ── Share image generation ──
+require('./share').mount(app);
+
 app.listen(PORT, () => {
   console.log(`Wobazi server running on ${BASE_URL}`);
 });

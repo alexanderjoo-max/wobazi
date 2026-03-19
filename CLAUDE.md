@@ -41,6 +41,12 @@ batch/                 Daily reading batch generation system
   bazi-helpers.js      Advanced BaZi calculations (stars, clashes, etc.)
   routes.js            API routes (batch trigger + read endpoint)
   cron.js              node-cron scheduler (midnight daily)
+share/                 Dynamic share image generation (Satori + Resvg)
+  index.js             Entry point — mount(app) wires routes
+  layout.js            Satori layout definitions (square + story)
+  render.js            PNG generation (font loading, Satori → SVG → PNG)
+  routes.js            API routes (/api/share-image, /api/share-story)
+  fonts/               TTF fonts (Space Grotesk, Noto Sans SC)
 app/                   Frontend SPA
 views/                 EJS SEO pages
 public/                Static assets for SEO pages
@@ -79,6 +85,24 @@ node batch-worker.js   # For Render cron jobs or manual runs
 
 ### Cron
 When mounted, runs at midnight server time daily via node-cron. Configure schedule via `mount(app, db, { cronSchedule: '0 0 * * *' })`.
+
+## Share Image System (added 2026-03-19)
+
+### What it does
+Generates dynamic 1080×1080 (square) and 1080×1920 (story) PNG share images using Satori + @resvg/resvg-js. Dark purple gradient with gold card layout showing archetype, fortune scores, and oracle message.
+
+### How to integrate
+Add one line to `server.js` before `app.listen()`:
+```js
+require('./share').mount(app);
+```
+
+### API Endpoints (share system)
+- `GET /api/share-image?name=...&date=...&archetype=...&love=...&career=...&health=...&wealth=...&oracle=...` — 1080×1080 PNG
+- `GET /api/share-story?...` (same params) — 1080×1920 PNG
+
+### Frontend integration
+`doShare()` in `script.js` calls `generateShareImage()` which fetches the PNG, creates a File object, and passes it to `navigator.share({ files: [...] })` for native image sharing on mobile.
 
 ## API Conventions
 - Routes: kebab-case (`/api/daily-reading`)

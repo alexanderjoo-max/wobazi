@@ -8,12 +8,14 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "@resvg/resvg-js": "^2.6.2",
     "better-sqlite3": "^11.6.0",
     "dotenv": "^16.4.5",
     "ejs": "^5.0.1",
     "express": "^4.21.0",
     "express-session": "^1.18.1",
     "node-cron": "^4.2.1",
-    "openai": "^4.73.0"
+    "openai": "^4.73.0",
+    "satori": "^0.25.0"
   }
 }

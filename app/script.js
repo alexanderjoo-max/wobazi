@@ -1606,7 +1606,7 @@ async function doShare() {
   const vIdx    = (o.year * 7 + BRANCHES.findIndex(b => b.animal === o.animal) * 3) % SHARE_VERDICTS.length;
   const verdict = SHARE_VERDICTS[vIdx];
 
-  const lines = [
+  const text = [
     `✦ My Chinese destiny name is ${cnFull}`,
     `(${cnPin} — "${cnMean}")`,
     ``,
@@ -1617,14 +1617,49 @@ async function doShare() {
     `Love ${o.fortune.love} · Career ${o.fortune.career} · Health ${o.fortune.health} · Wealth ${o.fortune.wealth}`,
     ``,
     `→ Discover your Chinese destiny at wobazi.com`,
-  ];
-  const text = lines.join('\n');
+  ].join('\n');
+
+  // Try generating + sharing image
+  const imageFile = await generateShareImage(o, archetype, verdict);
 
   if (navigator.share) {
-    try { await navigator.share({ title: 'My Wobazi Destiny', text, url: 'https://wobazi.com' }); } catch (_) {}
+    const shareData = { title: 'My WoBazi Destiny', text, url: 'https://wobazi.com' };
+    // Attach image if supported
+    if (imageFile && navigator.canShare && navigator.canShare({ files: [imageFile] })) {
+      shareData.files = [imageFile];
+    }
+    try { await navigator.share(shareData); } catch (_) {}
   } else if (navigator.clipboard) {
     await navigator.clipboard.writeText(text + '\nhttps://wobazi.com');
     alert('Copied to clipboard! ✦');
+  }
+}
+
+/**
+ * Generate a share image from the current reading data.
+ * Returns a File object or null if generation fails.
+ */
+async function generateShareImage(o, archetype, verdict) {
+  try {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const params = new URLSearchParams({
+      name: o.name || '',
+      date: dateStr,
+      archetype: archetype || '',
+      love: String(o.fortune?.love || 50),
+      career: String(o.fortune?.career || 50),
+      health: String(o.fortune?.health || 50),
+      wealth: String(o.fortune?.wealth || 50),
+      oracle: verdict || '',
+    });
+    const res = await fetch(`/api/share-image?${params}`);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return new File([blob], 'wobazi-destiny.png', { type: 'image/png' });
+  } catch (err) {
+    console.warn('[share] Image generation failed, sharing text only:', err);
+    return null;
   }
 }
 
