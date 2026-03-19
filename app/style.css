@@ -558,7 +558,7 @@ input  { font-family: inherit; }
 .scroll-body {
   flex: 1;
   overflow-y: auto;
-  padding: 0 16px 80px;
+  padding: 0 16px 100px;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -787,7 +787,7 @@ input  { font-family: inherit; }
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  margin-top: 8px;
+  margin-top: 16px;
   margin-bottom: 20px;
   cursor: pointer;
   transition: opacity 0.2s;
@@ -1222,8 +1222,8 @@ input  { font-family: inherit; }
 
 /* Date + Time row */
 .field-datetime { align-items: flex-start; }
-.field-datetime .field-col-date { flex: 1 1 50%; min-width: 0; }
-.field-datetime .field-col-time { flex: 1 1 50%; min-width: 0; }
+.field-datetime .field-col-date { flex: 1 1 0; min-width: 0; }
+.field-datetime .field-col-time { flex: 1 1 0; min-width: 0; }
 .date-trio { width: 100%; }
 .time-input {
   background: rgba(255,255,255,0.05);
@@ -3795,44 +3795,39 @@ input  { font-family: inherit; }
 }
 
 /* ────────────────────────
-   FLOATING ORACLE BUTTON
+   ORACLE BOTTOM BAR
 ──────────────────────── */
-.oracle-fab {
+.oracle-bottom-bar {
   position: fixed;
-  bottom: 88px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f0c040, #d4a017, #f0c040);
-  background-size: 200% 200%;
-  animation: fab-shimmer 3s ease infinite, fab-pulse 2s ease-in-out infinite;
-  color: #1a0a00;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 24px rgba(240,192,64,0.5), 0 0 40px rgba(240,192,64,0.2), 0 2px 8px rgba(0,0,0,0.3);
+  gap: 10px;
+  padding: 16px 24px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  background: linear-gradient(135deg, #f0c040, #d4a017);
+  color: #1a0a00;
   z-index: 900;
-  transition: transform 0.2s ease;
   cursor: pointer;
-  border: 2px solid rgba(255,255,255,0.25);
+  transition: opacity 0.2s;
+  box-shadow: 0 -4px 24px rgba(240,192,64,0.3);
 }
-@keyframes fab-shimmer {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.oracle-bottom-bar:active { opacity: 0.85; }
+.oracle-bar-icon {
+  font-size: 18px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
 }
-@keyframes fab-pulse {
-  0%, 100% { box-shadow: 0 4px 24px rgba(240,192,64,0.5), 0 0 40px rgba(240,192,64,0.2), 0 2px 8px rgba(0,0,0,0.3); }
-  50% { box-shadow: 0 4px 30px rgba(240,192,64,0.7), 0 0 60px rgba(240,192,64,0.35), 0 2px 8px rgba(0,0,0,0.3); }
+.oracle-bar-text {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
-.oracle-fab:active { transform: scale(0.92); animation: none; }
-.oracle-fab-char {
-  font-family: 'Noto Sans SC', sans-serif;
-  font-size: 24px;
-  font-weight: 900;
-  line-height: 1;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+.oracle-bar-arrow {
+  opacity: 0.6;
+  flex-shrink: 0;
 }
 
 /* ────────────────────────

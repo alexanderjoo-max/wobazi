@@ -603,8 +603,8 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   }
 
   // Greeting — simple name
-  const greetEn = name ? `Hello, ${name} ✦` : '';
-  const greetZh = name ? `你好，${name} ✦` : '';
+  const greetEn = name ? `Hello, ${name} ✦` : 'Your Destiny ✦';
+  const greetZh = name ? `你好，${name} ✦` : '你的命运 ✦';
   document.getElementById('greeting').innerHTML = _t(greetEn, greetZh);
 
   const elColor = EL_COLOR[yearPillar.stem.element];
