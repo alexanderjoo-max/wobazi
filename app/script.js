@@ -611,7 +611,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   const dominantEl = Object.entries(elements).sort((a,b)=>b[1]-a[1])[0][0];
 
   // Store share data
-  _shareData = { name, animal, element: yearPillar.stem.element, polarity: yearPillar.stem.polarity, year, fortune, dominantEl };
+  _shareData = { name, animal, element: yearPillar.stem.element, polarity: yearPillar.stem.polarity, year, fortune, dominantEl, bloodType };
 
   // Hero card
   document.getElementById('hero-bg').style.background =
@@ -780,6 +780,11 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
 
   // Compatibility
   renderCompat(animal, zData);
+
+  // Relationships tab sections
+  renderRelProfile(animal, yearPillar, pillars[2], dominantEl);
+  renderSoulAnimals(animal);
+  renderBusinessCompat(animal, dominantEl, elements);
 
   // Lucky
   renderLucky(zData.lucky);
@@ -4039,48 +4044,246 @@ async function sendOracleDrawerMessage() {
 /* ═══════════════════════════════════════
    COMPATIBILITY CHECK (Relationships tab)
 ═══════════════════════════════════════ */
+/* ── Relationship Profile Data (10 Day Stems) ── */
+const REL_PROFILE = {
+  'Wood_Yang':  { title: 'The Protector', title_zh: '守护者', emoji: '🌳', traits: ['Loyal','Direct','Principled'], traits_zh: ['忠诚','直接','有原则'], love: 'Acts of service — shows love through doing', love_zh: '以行动表达爱', blind: 'Can be controlling or rigid about how things should be', blind_zh: '可能过于控制或固执' },
+  'Wood_Yin':   { title: 'The Diplomat', title_zh: '外交家', emoji: '🌿', traits: ['Gentle','Adaptable','Intuitive'], traits_zh: ['温柔','适应力强','直觉敏锐'], love: 'Quality time — thrives on presence and attention', love_zh: '以陪伴表达爱', blind: 'Avoids conflict to a fault, may suppress real feelings', blind_zh: '回避冲突，可能压抑真实感受' },
+  'Fire_Yang':  { title: 'The Spark', title_zh: '火花', emoji: '☀️', traits: ['Passionate','Generous','Magnetic'], traits_zh: ['热情','慷慨','有魅力'], love: 'Grand gestures — loves visibly and openly', love_zh: '以大方式表达爱', blind: 'Burns bright then fades — can lose interest quickly', blind_zh: '热情来得快去得也快' },
+  'Fire_Yin':   { title: 'The Candle', title_zh: '烛光', emoji: '🕯️', traits: ['Intense','Focused','Deeply romantic'], traits_zh: ['深沉','专注','极致浪漫'], love: 'Words of affirmation — articulate and emotionally present', love_zh: '以言语表达爱', blind: 'Perfectionism in relationships — impossible standards', blind_zh: '对感情追求完美，标准过高' },
+  'Earth_Yang': { title: 'The Foundation', title_zh: '基石', emoji: '⛰️', traits: ['Steady','Reliable','Patient'], traits_zh: ['稳重','可靠','耐心'], love: 'Physical comfort — creates safety and stability', love_zh: '以稳定和安全感表达爱', blind: 'Slow to open up — partner may feel shut out', blind_zh: '不轻易敞开心扉' },
+  'Earth_Yin':  { title: 'The Nurturer', title_zh: '养育者', emoji: '🌾', traits: ['Caring','Selfless','Grounded'], traits_zh: ['关爱','无私','踏实'], love: 'Caretaking — anticipates needs before being asked', love_zh: '以照顾表达爱', blind: 'Self-sacrificing to the point of resentment', blind_zh: '过度牺牲自我' },
+  'Metal_Yang': { title: 'The Knight', title_zh: '骑士', emoji: '⚔️', traits: ['Principled','Protective','Decisive'], traits_zh: ['有原则','保护欲强','果断'], love: 'Protection — fiercely loyal and dependable', love_zh: '以守护表达爱', blind: 'Emotionally guarded — struggles with vulnerability', blind_zh: '情感上设有防线' },
+  'Metal_Yin':  { title: 'The Jewel', title_zh: '珠宝', emoji: '💎', traits: ['Refined','Sensitive','Discerning'], traits_zh: ['精致','敏感','有品味'], love: 'Gifts and beauty — shows love through elegance', love_zh: '以美好事物表达爱', blind: 'High standards can make partners feel inadequate', blind_zh: '高标准可能让伴侣感到不足' },
+  'Water_Yang': { title: 'The Explorer', title_zh: '探索者', emoji: '🌊', traits: ['Free-spirited','Exciting','Ambitious'], traits_zh: ['自由','刺激','有抱负'], love: 'Adventure — bonds through shared experiences', love_zh: '以共同冒险表达爱', blind: 'Commitment-wary — freedom feels more important than settling', blind_zh: '对承诺犹豫不决' },
+  'Water_Yin':  { title: 'The Mystic', title_zh: '神秘者', emoji: '🌙', traits: ['Intuitive','Deep','Emotionally complex'], traits_zh: ['直觉强','深沉','情感复杂'], love: 'Emotional depth — craves soul-level connection', love_zh: '以灵魂深处的连接表达爱', blind: 'Secretive — partner may never fully know them', blind_zh: '神秘感强，伴侣难以完全了解' },
+};
+
+/* ── Secret Friends (Six Harmonies 六合) ── */
+const SECRET_FRIENDS = {
+  Rat: 'Ox', Ox: 'Rat', Tiger: 'Pig', Pig: 'Tiger',
+  Rabbit: 'Dog', Dog: 'Rabbit', Dragon: 'Rooster', Rooster: 'Dragon',
+  Snake: 'Monkey', Monkey: 'Snake', Horse: 'Goat', Goat: 'Horse',
+};
+
+/* ── Three Harmony Trios (三合) ── */
+const HARMONY_TRIOS = {
+  Water: ['Rat', 'Dragon', 'Monkey'],
+  Wood:  ['Rabbit', 'Goat', 'Pig'],
+  Fire:  ['Tiger', 'Horse', 'Dog'],
+  Metal: ['Snake', 'Rooster', 'Ox'],
+};
+
+/* ── Five Element Business Dynamics ── */
+const ELEMENT_PRODUCES = { Wood: 'Fire', Fire: 'Earth', Earth: 'Metal', Metal: 'Water', Water: 'Wood' };
+const ELEMENT_PRODUCED_BY = { Fire: 'Wood', Earth: 'Fire', Metal: 'Earth', Water: 'Metal', Wood: 'Water' };
+const ELEMENT_CONTROLS = { Wood: 'Earth', Fire: 'Metal', Earth: 'Water', Metal: 'Wood', Water: 'Fire' };
+const ELEMENT_CONTROLLED_BY = { Earth: 'Wood', Metal: 'Fire', Water: 'Earth', Wood: 'Metal', Fire: 'Water' };
+
+const BIZ_ADVICE = {
+  Wood: { icon: '🌿', role: 'The Strategist', role_zh: '战略家', note: 'Vision, growth, expansion', note_zh: '远见、成长、扩展' },
+  Fire: { icon: '🔥', role: 'The Motivator', role_zh: '推动者', note: 'Marketing, leadership, energy', note_zh: '营销、领导力、能量' },
+  Earth: { icon: '🏔️', role: 'The Stabilizer', role_zh: '稳定者', note: 'Operations, trust, systems', note_zh: '运营、信任、系统' },
+  Metal: { icon: '⚙️', role: 'The Executor', role_zh: '执行者', note: 'Precision, quality, structure', note_zh: '精确、质量、结构' },
+  Water: { icon: '💧', role: 'The Networker', role_zh: '连接者', note: 'Sales, adaptability, flow', note_zh: '销售、适应力、流通' },
+};
+
+/* ── Render Relationship Profile ── */
+function renderRelProfile(animal, yearPillar, dayPillar, dominantEl) {
+  const el = document.getElementById('rel-profile-card');
+  if (!el || !dayPillar?.known) return;
+  const key = `${dayPillar.stem.element}_${dayPillar.stem.polarity}`;
+  const p = REL_PROFILE[key];
+  if (!p) return;
+  const elColor = EL_COLOR[dayPillar.stem.element];
+
+  el.innerHTML = `
+    <div class="rel-profile-wrap" style="border-left:3px solid ${elColor}">
+      <div class="rel-profile-top">
+        <span class="rel-profile-emoji">${p.emoji}</span>
+        <div>
+          <div class="rel-profile-title">${_t(p.title, p.title_zh)}</div>
+          <div class="rel-profile-sub">${dayPillar.stem.char} ${dayPillar.stem.polarity} ${dayPillar.stem.element} · ${_t('Day Stem', '日主')}</div>
+        </div>
+      </div>
+      <div class="rel-profile-traits">
+        ${p.traits.map((t, i) => `<span class="rel-profile-trait">${_t(t, p.traits_zh[i])}</span>`).join('')}
+      </div>
+      <div class="rel-profile-section">
+        <div class="rel-profile-label">${_t('LOVE LANGUAGE', '爱的语言')}</div>
+        <div class="rel-profile-text">${_t(p.love, p.love_zh)}</div>
+      </div>
+      <div class="rel-profile-section">
+        <div class="rel-profile-label">${_t('BLIND SPOT', '盲点')}</div>
+        <div class="rel-profile-text">${_t(p.blind, p.blind_zh)}</div>
+      </div>
+    </div>`;
+}
+
+/* ── Render Soul Animals ── */
+function renderSoulAnimals(animal) {
+  const el = document.getElementById('soul-animals-card');
+  if (!el) return;
+
+  const secretFriend = SECRET_FRIENDS[animal];
+  const sfEmoji = BRANCHES.find(b => b.animal === secretFriend)?.emoji || '';
+  const sfElement = BRANCHES.find(b => b.animal === secretFriend)?.element || '';
+
+  // Find which trio the user belongs to
+  let trioElement = null, trioMembers = [];
+  for (const [elName, members] of Object.entries(HARMONY_TRIOS)) {
+    if (members.includes(animal)) {
+      trioElement = elName;
+      trioMembers = members.filter(a => a !== animal);
+      break;
+    }
+  }
+
+  const trioCards = trioMembers.map(a => {
+    const emoji = BRANCHES.find(b => b.animal === a)?.emoji || '';
+    const aEl = BRANCHES.find(b => b.animal === a)?.element || '';
+    return `<div class="soul-card">
+      <span class="soul-emoji">${emoji}</span>
+      <div class="soul-info">
+        <span class="soul-name">${_t(a, ANIMAL_ZH[a])}<span class="soul-tag" style="color:${EL_COLOR[aEl]}">${_t(aEl, EL_ZH[aEl])}</span></span>
+        <div class="soul-note">${_t(`${trioElement} Trio ally — amplifies your ${trioElement.toLowerCase()} energy when together`, `${EL_ZH[trioElement]}三合 — 与你在一起时增强${EL_ZH[trioElement]}能量`)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="soul-grid">
+    <div class="soul-card" style="border-color:${EL_COLOR[sfElement]}44">
+      <span class="soul-emoji">${sfEmoji}</span>
+      <div class="soul-info">
+        <span class="soul-name">${_t(secretFriend, ANIMAL_ZH[secretFriend])}<span class="soul-tag" style="color:var(--gold)">${_t('SECRET FRIEND', '暗合')}</span></span>
+        <div class="soul-note">${_t(`Your hidden ally — a deep, intuitive bond. ${animal} and ${secretFriend} form one of the Six Harmonies.`, `你的隐秘盟友 — 深层直觉联系。${ANIMAL_ZH[animal]}与${ANIMAL_ZH[secretFriend]}组成六合之一。`)}</div>
+      </div>
+    </div>
+    ${trioCards}
+  </div>`;
+}
+
+/* ── Render Business Compatibility ── */
+function renderBusinessCompat(animal, dominantEl, elements) {
+  const el = document.getElementById('business-compat-card');
+  if (!el) return;
+
+  const produces = ELEMENT_PRODUCES[dominantEl];
+  const producedBy = ELEMENT_PRODUCED_BY[dominantEl];
+  const controls = ELEMENT_CONTROLS[dominantEl];
+  const controlledBy = ELEMENT_CONTROLLED_BY[dominantEl];
+
+  const bizCard = (elName, relationship, relZh) => {
+    const b = BIZ_ADVICE[elName];
+    return `<div class="biz-card">
+      <div class="biz-el-icon" style="color:${EL_COLOR[elName]}">${b.icon} ${_t(EL_ZH[elName], EL_ZH[elName])}</div>
+      <div class="biz-el-name">${_t(b.role, b.role_zh)}</div>
+      <div class="biz-el-note">${_t(relationship, relZh)}</div>
+    </div>`;
+  };
+
+  el.innerHTML = `<div class="biz-compat-wrap">
+    <div class="biz-section-label">${_t('PRODUCTIVE PARTNERSHIPS', '生产合作')}</div>
+    <div class="biz-grid">
+      ${bizCard(producedBy, `Fuels your ${dominantEl} — they support your growth`, `为你的${EL_ZH[dominantEl]}提供能量`)}
+      ${bizCard(produces, `You inspire their ${produces} — natural mentorship`, `你激发他们的${EL_ZH[produces]} — 天然导师`)}
+    </div>
+    <div class="biz-section-label">${_t('CHALLENGING DYNAMICS', '挑战关系')}</div>
+    <div class="biz-grid">
+      ${bizCard(controlledBy, `Challenges your ${dominantEl} — pushes you to evolve`, `挑战你的${EL_ZH[dominantEl]} — 推动你进化`)}
+      ${bizCard(controls, `You overpower their ${controls} — be mindful of dominance`, `你压制他们的${EL_ZH[controls]} — 注意平衡`)}
+    </div>
+  </div>`;
+}
+
 function checkCompatibility() {
   const day = parseInt(document.getElementById('partner-day').value);
   const month = parseInt(document.getElementById('partner-month').value);
   const year = parseInt(document.getElementById('partner-year').value);
+  const timeVal = document.getElementById('partner-time')?.value || '';
+  const bloodVal = document.getElementById('partner-blood')?.value || '';
   const resultEl = document.getElementById('compat-result');
 
-  if (!day || !month || !year || year < 1920 || year > 2025) {
+  if (!day || !month || !year || year < 1920 || year > 2030) {
     resultEl.innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:16px;font-size:13px">Please enter a valid birth date.</p>';
     return;
   }
 
-  // Calculate partner's zodiac animal
-  const animals = ['Monkey','Rooster','Dog','Pig','Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat'];
-  const partnerAnimal = animals[year % 12];
   const userAnimal = _shareData ? _shareData.animal : null;
-
   if (!userAnimal) {
     resultEl.innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:16px;font-size:13px">Complete your reading first.</p>';
     return;
   }
 
+  // Calculate partner's full BaZi
+  let partnerHour = null;
+  if (timeVal) partnerHour = parseInt(timeVal.split(':')[0], 10);
+  const partnerPillars = calcBazi(year, month - 1, day, partnerHour);
+  const partnerAnimal = partnerPillars[0].branch.animal;
+  const partnerElements = calcElements(partnerPillars);
+  const partnerDominant = getDominant(partnerElements);
+  const partnerDayKnown = partnerPillars[2]?.known;
+
   const zData = ZODIAC[userAnimal];
   const isCompat = zData.compat.includes(partnerAnimal);
   const isClash = zData.clash.includes(partnerAnimal);
+  const isSecretFriend = SECRET_FRIENDS[userAnimal] === partnerAnimal;
 
-  let verdict, color, desc;
-  if (isCompat) {
-    verdict = 'Harmonious Match'; color = '#22c55e';
-    desc = `Your ${userAnimal} and their ${partnerAnimal} form a natural alliance. This pairing supports mutual growth, trust, and ease.`;
+  // Element interaction
+  const userEl = _shareData.dominantEl;
+  const pEl = partnerDominant;
+  const elProduces = ELEMENT_PRODUCES[userEl] === pEl;
+  const elSupports = ELEMENT_PRODUCED_BY[userEl] === pEl;
+  const elClash = ELEMENT_CONTROLS[userEl] === pEl || ELEMENT_CONTROLLED_BY[userEl] === pEl;
+
+  let verdict, color, details = [];
+  if (isCompat || isSecretFriend) {
+    verdict = isSecretFriend ? 'Secret Friend Bond' : 'Harmonious Match';
+    color = '#22c55e';
+    details.push(_t(
+      `Your ${userAnimal} and their ${partnerAnimal} form a natural alliance.`,
+      `你的${ANIMAL_ZH[userAnimal]}与${ANIMAL_ZH[partnerAnimal]}形成天然联盟。`
+    ));
   } else if (isClash) {
     verdict = 'Challenging Dynamic'; color = '#ef4444';
-    desc = `Your ${userAnimal} and their ${partnerAnimal} sit in opposition. This creates tension but also powerful chemistry — awareness is key.`;
+    details.push(_t(
+      `Your ${userAnimal} and their ${partnerAnimal} sit in opposition — tension but chemistry.`,
+      `你的${ANIMAL_ZH[userAnimal]}与${ANIMAL_ZH[partnerAnimal]}对冲 — 有张力但也有吸引力。`
+    ));
   } else {
     verdict = 'Neutral Energy'; color = '#f0c040';
-    desc = `Your ${userAnimal} and their ${partnerAnimal} have a neutral connection. The relationship dynamics depend more on your monthly and daily pillars.`;
+    details.push(_t(
+      `Your ${userAnimal} and their ${partnerAnimal} have neutral energy.`,
+      `你的${ANIMAL_ZH[userAnimal]}与${ANIMAL_ZH[partnerAnimal]}能量中性。`
+    ));
   }
 
+  // Element analysis
+  if (elProduces) details.push(_t(`Your ${userEl} produces their ${pEl} — you naturally support them.`, `你的${EL_ZH[userEl]}生他们的${EL_ZH[pEl]} — 你天然支持他们。`));
+  else if (elSupports) details.push(_t(`Their ${pEl} fuels your ${userEl} — they energize you.`, `他们的${EL_ZH[pEl]}生你的${EL_ZH[userEl]} — 他们为你注入能量。`));
+  else if (elClash) details.push(_t(`${userEl} and ${pEl} have a controlling dynamic — requires balance.`, `${EL_ZH[userEl]}与${EL_ZH[pEl]}存在克制关系 — 需要平衡。`));
+
+  // Day stem analysis
+  if (partnerDayKnown) {
+    const pKey = `${partnerPillars[2].stem.element}_${partnerPillars[2].stem.polarity}`;
+    const pProfile = REL_PROFILE[pKey];
+    if (pProfile) details.push(_t(`Their relationship style: ${pProfile.title}`, `对方感情风格：${pProfile.title_zh}`));
+  }
+
+  // Blood type note
+  if (bloodVal && _shareData.bloodType) {
+    const goodBT = { A: ['O','AB'], B: ['O','AB'], O: ['A','B'], AB: ['A','B'] };
+    const isBTGood = goodBT[_shareData.bloodType]?.includes(bloodVal);
+    if (isBTGood) details.push(_t(`Blood type ${_shareData.bloodType} + ${bloodVal}: complementary temperaments.`, `血型 ${_shareData.bloodType} + ${bloodVal}：互补气质。`));
+  }
+
+  const pEmoji = BRANCHES.find(b => b.animal === partnerAnimal)?.emoji || '';
+  const uEmoji = BRANCHES.find(b => b.animal === userAnimal)?.emoji || '';
+
   resultEl.innerHTML = `
-    <div style="margin-top:20px;padding:16px;background:rgba(255,255,255,0.03);border:1px solid ${color}33;border-radius:var(--radius-md);text-align:center">
-      <div style="font-size:24px;margin-bottom:8px">${ZODIAC[userAnimal]?.emoji || ''} + ${ZODIAC[partnerAnimal]?.emoji || ''}</div>
-      <div style="font-size:15px;font-weight:700;color:${color};margin-bottom:8px">${verdict}</div>
-      <p style="font-size:13px;color:var(--muted);line-height:1.6">${desc}</p>
+    <div style="margin-top:16px;padding:16px;background:rgba(255,255,255,0.03);border:1px solid ${color}33;border-radius:var(--radius-md);text-align:center">
+      <div style="font-size:24px;margin-bottom:8px">${uEmoji} + ${pEmoji}</div>
+      <div style="font-size:15px;font-weight:700;color:${color};margin-bottom:10px">${_t(verdict, verdict)}</div>
+      ${details.map(d => `<p style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px">${d}</p>`).join('')}
     </div>
   `;
 }

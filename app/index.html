@@ -967,11 +967,7 @@
           <h3 class="zh hide">你的感情档案</h3>
           <span class="section-sub"><span class="en">Based on your Day Pillar</span><span class="zh hide">基于日柱</span></span>
         </div>
-        <div class="coming-soon-card">
-          <span class="coming-soon-icon">✦</span>
-          <p class="en">Your relationship archetype and emotional patterns — coming soon.</p>
-          <p class="zh hide">你的感情原型与情感模式 — 即将推出。</p>
-        </div>
+        <div id="rel-profile-card"></div>
       </section>
 
       <!-- Relationships: Compatibility Check -->
@@ -979,7 +975,7 @@
         <div class="section-head">
           <h3 class="en">Compatibility Check</h3>
           <h3 class="zh hide">八字合婚</h3>
-          <span class="section-sub"><span class="en">Enter partner's birth date</span><span class="zh hide">输入伴侣生日</span></span>
+          <span class="section-sub"><span class="en">Enter partner's details</span><span class="zh hide">输入伴侣信息</span></span>
         </div>
         <div class="compat-check-card">
           <div class="compat-input-row">
@@ -989,7 +985,17 @@
             <span class="date-sep">/</span>
             <input type="number" class="date-part year" id="partner-year" placeholder="YYYY" min="1920" max="2030" inputmode="numeric">
           </div>
-          <button class="btn-primary btn-full" onclick="haptic(10); checkCompatibility()" style="margin-top:16px">
+          <div class="compat-extras-row">
+            <input type="time" id="partner-time" class="time-input compat-time" placeholder="Time">
+            <select id="partner-blood" class="select-input compat-blood">
+              <option value="">Blood</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="AB">AB</option>
+              <option value="O">O</option>
+            </select>
+          </div>
+          <button class="btn-primary btn-full" onclick="haptic(10); checkCompatibility()" style="margin-top:12px">
             <span class="en">Check Compatibility</span><span class="zh hide">查看合婚</span>
           </button>
           <div id="compat-result"></div>
@@ -1003,11 +1009,7 @@
           <h3 class="zh hide">灵兽</h3>
           <span class="section-sub"><span class="en">Your secret allies</span><span class="zh hide">你的秘密盟友</span></span>
         </div>
-        <div class="coming-soon-card">
-          <span class="coming-soon-icon">✦</span>
-          <p class="en">Discover which zodiac animals are your soul allies and secret friends — coming soon.</p>
-          <p class="zh hide">发现哪些生肖是你的灵魂盟友和秘密朋友 — 即将推出。</p>
-        </div>
+        <div id="soul-animals-card"></div>
       </section>
 
       <!-- Relationships: Business Compatibility -->
@@ -1017,11 +1019,7 @@
           <h3 class="zh hide">商业合作</h3>
           <span class="section-sub"><span class="en">Partner &amp; team dynamics</span><span class="zh hide">合伙与团队动态</span></span>
         </div>
-        <div class="coming-soon-card">
-          <span class="coming-soon-icon">✦</span>
-          <p class="en">Analyze business partnership potential using Five Element dynamics — coming soon.</p>
-          <p class="zh hide">使用五行动态分析商业合作潜力 — 即将推出。</p>
-        </div>
+        <div id="business-compat-card"></div>
       </section>
 
       <footer class="results-footer">

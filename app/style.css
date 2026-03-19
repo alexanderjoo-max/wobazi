@@ -3944,7 +3944,7 @@ input  { font-family: inherit; }
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 20px;
+  padding: 16px;
 }
 .compat-input-row {
   display: flex;
@@ -3959,3 +3959,51 @@ input  { font-family: inherit; }
 .compat-input-row .date-part.year {
   width: 80px;
 }
+.compat-extras-row {
+  display: flex; gap: 8px; margin-top: 8px;
+}
+.compat-time { flex: 1; }
+.compat-blood { flex: 0 0 80px; }
+
+/* ── Relationship Profile ── */
+.rel-profile-wrap {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; gap: 12px;
+}
+.rel-profile-top { display: flex; align-items: center; gap: 14px; }
+.rel-profile-emoji { font-size: 32px; }
+.rel-profile-title { font-size: 18px; font-weight: 700; color: var(--text); }
+.rel-profile-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.rel-profile-traits { display: flex; flex-wrap: wrap; gap: 6px; }
+.rel-profile-trait {
+  font-size: 11px; font-weight: 600; padding: 4px 10px;
+  background: rgba(255,255,255,0.06); border-radius: 100px; color: var(--text);
+}
+.rel-profile-section { margin-top: 4px; }
+.rel-profile-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+.rel-profile-text { font-size: 13px; color: rgba(240,240,255,0.7); line-height: 1.5; }
+
+/* ── Soul Animals ── */
+.soul-grid { display: flex; flex-direction: column; gap: 10px; }
+.soul-card {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 14px 16px;
+}
+.soul-emoji { font-size: 28px; flex-shrink: 0; }
+.soul-info { flex: 1; min-width: 0; }
+.soul-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.soul-tag { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-left: 6px; }
+.soul-note { font-size: 12px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+
+/* ── Business Compatibility ── */
+.biz-compat-wrap { display: flex; flex-direction: column; gap: 14px; }
+.biz-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+.biz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.biz-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 12px; text-align: center;
+}
+.biz-el-icon { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+.biz-el-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.biz-el-note { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
