@@ -2894,9 +2894,6 @@ function renderTodayActionsCard(dominantEl, nowMonth) {
   document.getElementById('today-actions-card').innerHTML = `
     <div class="today-actions-card" style="border-left-color:${elColor}">
       ${itemsHTML}
-      <button class="tap-actions-link" onclick="haptic(6); switchTab('actions')">
-        ${_t('See full Action Plan — outfit, foods, rituals, lucky numbers →', '查看完整行动计划——穿搭、饮食、仪式、幸运数字 →')}
-      </button>
     </div>
   `;
 }
