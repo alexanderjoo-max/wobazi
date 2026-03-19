@@ -131,16 +131,16 @@ function buildSquareLayout(data) {
       background: 'rgba(255,255,255,0.015)',
       gap: '18px',
     },
+      // Date at top
+      el('span', {
+        fontSize: 14, color: COLORS.muted, letterSpacing: '0.15em', textTransform: 'uppercase',
+      }, date || ''),
+
       // Header
-      el('div', { flexDirection: 'column', alignItems: 'center', gap: '4px' },
-        el('span', {
-          fontSize: 22, fontWeight: 700, color: COLORS.gold,
-          letterSpacing: '0.12em', textTransform: 'uppercase',
-        }, `${name || 'YOUR'}'S DESTINY`),
-        el('span', {
-          fontSize: 14, color: COLORS.muted, letterSpacing: '0.15em', textTransform: 'uppercase',
-        }, date || ''),
-      ),
+      el('span', {
+        fontSize: 22, fontWeight: 700, color: COLORS.gold,
+        letterSpacing: '0.12em', textTransform: 'uppercase',
+      }, `${name || 'YOUR'}'S DESTINY`),
 
       divider(false),
 
@@ -189,8 +189,8 @@ function buildSquareLayout(data) {
       },
         sectionLabel('ORACLE', false),
         el('span', {
-          fontSize: 17, fontWeight: 400, color: 'rgba(240,240,255,0.7)',
-          textAlign: 'center', lineHeight: '1.5', fontStyle: 'italic',
+          fontSize: 17, fontWeight: 500, color: 'rgba(240,240,255,0.85)',
+          textAlign: 'center', lineHeight: '1.5',
         }, `"${oracle}"`),
       ) : null,
 
@@ -251,16 +251,16 @@ function buildStoryLayout(data) {
       background: 'rgba(255,255,255,0.015)',
       gap: '32px',
     },
+      // Date at top
+      el('span', {
+        fontSize: 18, color: COLORS.muted, letterSpacing: '0.15em', textTransform: 'uppercase',
+      }, date || ''),
+
       // Header
-      el('div', { flexDirection: 'column', alignItems: 'center', gap: '8px' },
-        el('span', {
-          fontSize: 28, fontWeight: 700, color: COLORS.gold,
-          letterSpacing: '0.12em', textTransform: 'uppercase',
-        }, `${name || 'YOUR'}'S DESTINY`),
-        el('span', {
-          fontSize: 18, color: COLORS.muted, letterSpacing: '0.15em', textTransform: 'uppercase',
-        }, date || ''),
-      ),
+      el('span', {
+        fontSize: 28, fontWeight: 700, color: COLORS.gold,
+        letterSpacing: '0.12em', textTransform: 'uppercase',
+      }, `${name || 'YOUR'}'S DESTINY`),
 
       divider(true),
 
@@ -309,8 +309,8 @@ function buildStoryLayout(data) {
       },
         sectionLabel('ORACLE MESSAGE', true),
         el('span', {
-          fontSize: 24, fontWeight: 400, color: 'rgba(240,240,255,0.7)',
-          textAlign: 'center', lineHeight: '1.6', fontStyle: 'italic',
+          fontSize: 24, fontWeight: 500, color: 'rgba(240,240,255,0.85)',
+          textAlign: 'center', lineHeight: '1.6',
         }, `"${oracle}"`),
       ) : null,
 

@@ -1584,6 +1584,7 @@ function showShareCard() {
   card.style.cssText = `background:linear-gradient(160deg,#1a0a3d,#07030f 45%,#0d0520);border:1px solid rgba(240,192,64,0.25);`;
 
   card.innerHTML = `
+    <div class="share-date-top">${todayStr.toUpperCase()}</div>
     <div class="share-header-line">${(o.name || 'YOUR').toUpperCase()}'S DESTINY</div>
     <div class="share-cn-big" style="color:${elColor}">${cnChars}</div>
     <div class="share-cn-sub">${cnPin}</div>
@@ -1592,10 +1593,11 @@ function showShareCard() {
     <div class="share-archetype-title">${archetype}</div>
     <div class="share-element-tag">${o.element} ${o.animal} (${polLabel})</div>
     <div class="share-oracle-box">
+      <div class="share-oracle-label">ORACLE</div>
       <div class="share-oracle-text">"${verdict}"</div>
     </div>
     <div class="share-fortune-section">
-      <div class="share-section-label">TODAY'S FORTUNE · ${todayStr.toUpperCase()}</div>
+      <div class="share-section-label">TODAY'S FORTUNE</div>
       <div class="share-fortune-grid">
         <div class="share-fortune-cell"><span class="share-fortune-emoji">❤️</span><span class="share-fortune-num" style="color:#f43f5e">${o.fortune.love}</span><span class="share-fortune-lbl">Love</span></div>
         <div class="share-fortune-cell"><span class="share-fortune-emoji">💼</span><span class="share-fortune-num" style="color:#8b5cf6">${o.fortune.career}</span><span class="share-fortune-lbl">Career</span></div>
