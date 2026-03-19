@@ -19,6 +19,16 @@ const COLORS = {
   mutedLight: 'rgba(240,240,255,0.3)',
   oracleBox: 'rgba(240,192,64,0.06)',
   oracleBorder: 'rgba(240,192,64,0.18)',
+  cellBg: 'rgba(255,255,255,0.04)',
+  cellBorder: 'rgba(255,255,255,0.08)',
+};
+
+// Fortune score colors
+const FORTUNE_COLORS = {
+  love: '#f43f5e',
+  career: '#8b5cf6',
+  health: '#22c55e',
+  wealth: '#f59e0b',
 };
 
 // ── Satori element helper ──
@@ -36,8 +46,8 @@ function el(type, style, ...children) {
 // ── Section label ──
 function sectionLabel(text, s) {
   return el('span', {
-    fontSize: s ? 15 : 12,
-    fontWeight: 600,
+    fontSize: s ? 16 : 13,
+    fontWeight: 700,
     color: COLORS.gold,
     letterSpacing: '0.25em',
     textTransform: 'uppercase',
@@ -55,48 +65,72 @@ function divider(s) {
   });
 }
 
-// ── Fortune bar with visual indicator ──
-function fortuneBar(label, value, color, s) {
-  const barW = s ? 320 : 240;
-  const filled = Math.round((value / 100) * barW);
-  const fs = s ? 18 : 15;
-  const valFs = s ? 22 : 18;
-
+// ── Fortune cell (2x2 grid item) ──
+function fortuneCell(emoji, value, label, color, s) {
   return el('div', {
     alignItems: 'center',
-    gap: s ? '16px' : '12px',
-    width: '100%',
+    gap: s ? '12px' : '8px',
+    padding: s ? '18px 24px' : '12px 16px',
+    background: COLORS.cellBg,
+    border: `1px solid ${COLORS.cellBorder}`,
+    borderRadius: s ? '16px' : '12px',
+    flex: '1',
   },
-    // Label
+    el('span', { fontSize: s ? 28 : 22 }, emoji),
     el('span', {
-      fontSize: fs,
-      fontWeight: 600,
-      color: COLORS.muted,
-      width: s ? '80px' : '64px',
-      textAlign: 'right',
-    }, label),
-    // Bar track
-    el('div', {
-      width: barW + 'px',
-      height: s ? '14px' : '10px',
-      background: 'rgba(255,255,255,0.06)',
-      borderRadius: '99px',
-      overflow: 'hidden',
-    },
-      el('div', {
-        width: filled + 'px',
-        height: '100%',
-        background: color,
-        borderRadius: '99px',
-      }),
-    ),
-    // Value
-    el('span', {
-      fontSize: valFs,
-      fontWeight: 700,
-      color: COLORS.white,
-      width: s ? '44px' : '36px',
+      fontSize: s ? 32 : 26,
+      fontWeight: 800,
+      color: color,
     }, String(value)),
+    el('span', {
+      fontSize: s ? 16 : 13,
+      fontWeight: 500,
+      color: COLORS.muted,
+    }, label),
+  );
+}
+
+// ── 2x2 Fortune grid ──
+function fortuneGrid(love, career, health, wealth, s) {
+  const gap = s ? '16px' : '10px';
+  return el('div', {
+    flexDirection: 'column', gap, width: '100%', maxWidth: s ? '700px' : '560px',
+  },
+    el('div', { gap, width: '100%' },
+      fortuneCell('❤️', love, 'Love', FORTUNE_COLORS.love, s),
+      fortuneCell('💼', career, 'Career', FORTUNE_COLORS.career, s),
+    ),
+    el('div', { gap, width: '100%' },
+      fortuneCell('🌿', health, 'Health', FORTUNE_COLORS.health, s),
+      fortuneCell('💰', wealth, 'Wealth', FORTUNE_COLORS.wealth, s),
+    ),
+  );
+}
+
+// ── WoBazi logo footer (text-based since we can't embed SVG easily in Satori) ──
+function logoFooter(s) {
+  return el('div', { alignItems: 'baseline', gap: s ? '6px' : '4px', marginTop: s ? '8px' : '4px' },
+    // 八字 characters
+    el('span', {
+      fontSize: s ? 26 : 20,
+      fontWeight: 700,
+      color: '#e8753a', // orange like the logo
+      fontFamily: '"Noto Sans SC", sans-serif',
+    }, '八字'),
+    // WoBaZi text
+    el('span', {
+      fontSize: s ? 26 : 20,
+      fontWeight: 800,
+      color: COLORS.white,
+      letterSpacing: '0.02em',
+    }, 'WoBaZi'),
+    // .com
+    el('span', {
+      fontSize: s ? 22 : 17,
+      fontWeight: 600,
+      color: COLORS.gold,
+      marginLeft: s ? '4px' : '2px',
+    }, '.com'),
   );
 }
 
@@ -127,95 +161,79 @@ function buildSquareLayout(data) {
       height: '100%',
       border: `1px solid ${COLORS.goldBorder}`,
       borderRadius: '28px',
-      padding: '36px 40px',
+      padding: '32px 40px',
       background: 'rgba(255,255,255,0.015)',
-      gap: '18px',
+      gap: '14px',
     },
       // Date at top
       el('span', {
-        fontSize: 14, color: COLORS.muted, letterSpacing: '0.15em', textTransform: 'uppercase',
+        fontSize: 13, color: COLORS.muted, letterSpacing: '0.15em', textTransform: 'uppercase',
       }, date || ''),
 
       // Header
       el('span', {
-        fontSize: 22, fontWeight: 700, color: COLORS.gold,
+        fontSize: 20, fontWeight: 700, color: COLORS.gold,
         letterSpacing: '0.12em', textTransform: 'uppercase',
       }, `${name || 'YOUR'}'S DESTINY`),
 
-      divider(false),
-
       // Chinese Name (prominent)
       chineseNameCharacters ? el('div', {
-        flexDirection: 'column', alignItems: 'center', gap: '6px',
+        flexDirection: 'column', alignItems: 'center', gap: '4px',
       },
         el('span', {
-          fontSize: 64, fontWeight: 700, color: COLORS.goldBright,
+          fontSize: 58, fontWeight: 700, color: COLORS.goldBright,
           letterSpacing: '0.15em',
           fontFamily: '"Noto Sans SC", sans-serif',
         }, chineseNameCharacters),
         pinyinName ? el('span', {
-          fontSize: 16, fontWeight: 500, color: COLORS.muted,
+          fontSize: 15, fontWeight: 500, color: COLORS.muted,
           letterSpacing: '0.08em',
         }, pinyinName) : null,
         englishMeaning ? el('span', {
-          fontSize: 13, color: COLORS.mutedLight, letterSpacing: '0.06em',
+          fontSize: 12, color: COLORS.mutedLight, letterSpacing: '0.06em',
         }, englishMeaning) : null,
       ) : null,
 
-      divider(false),
-
-      // Archetype (largest text)
-      el('div', { flexDirection: 'column', alignItems: 'center', gap: '6px' },
+      // Archetype
+      el('div', { flexDirection: 'column', alignItems: 'center', gap: '4px' },
         sectionLabel('DESTINY ARCHETYPE', false),
         el('span', {
-          fontSize: 40, fontWeight: 700, color: COLORS.white,
+          fontSize: 36, fontWeight: 700, color: COLORS.white,
           textAlign: 'center', letterSpacing: '0.04em',
         }, archetype || ''),
         elementAnimal ? el('span', {
-          fontSize: 15, color: COLORS.muted, letterSpacing: '0.08em',
+          fontSize: 14, color: COLORS.muted, letterSpacing: '0.08em',
         }, elementAnimal) : null,
       ),
 
-      divider(false),
-
       // Oracle message box
       oracle ? el('div', {
-        flexDirection: 'column', alignItems: 'center', gap: '8px',
-        padding: '16px 28px',
+        flexDirection: 'column', alignItems: 'center', gap: '6px',
+        padding: '14px 24px',
         background: COLORS.oracleBox,
         border: `1px solid ${COLORS.oracleBorder}`,
-        borderRadius: '16px',
+        borderRadius: '14px',
         maxWidth: '700px',
+        width: '100%',
       },
         sectionLabel('ORACLE', false),
         el('span', {
-          fontSize: 17, fontWeight: 500, color: 'rgba(240,240,255,0.85)',
+          fontSize: 16, fontWeight: 500, color: 'rgba(240,240,255,0.85)',
           textAlign: 'center', lineHeight: '1.5',
-        }, `"${oracle}"`),
+        }, `\u201C${oracle}\u201D`),
       ) : null,
 
-      // Fortune bars
+      // Fortune grid (2x2 with emojis)
       el('div', {
-        flexDirection: 'column', gap: '8px', width: '100%',
-        alignItems: 'center', maxWidth: '500px',
+        flexDirection: 'column', gap: '6px', width: '100%', alignItems: 'center',
       },
         sectionLabel("TODAY'S FORTUNE", false),
-        el('div', { height: '6px' }),
-        fortuneBar('Love', love, '#f43f5e', false),
-        fortuneBar('Career', career, '#8b5cf6', false),
-        fortuneBar('Health', health, '#22c55e', false),
-        fortuneBar('Wealth', wealth, '#f59e0b', false),
+        el('div', { height: '2px' }),
+        fortuneGrid(love, career, health, wealth, false),
       ),
 
-      // Footer
-      el('div', { flexDirection: 'column', alignItems: 'center', gap: '3px', marginTop: '4px' },
-        el('span', {
-          fontSize: 14, color: COLORS.gold, letterSpacing: '0.15em',
-          textTransform: 'uppercase', fontWeight: 600,
-        }, 'Discover Your Chinese Destiny'),
-        el('span', { fontSize: 18, fontWeight: 700, color: COLORS.gold }, 'wobazi.com'),
-        el('span', { fontSize: 11, color: COLORS.mutedLight }, 'Generated by WoBazi'),
-      ),
+      // Footer logo
+      logoFooter(false),
     ),
   );
 }
@@ -249,7 +267,7 @@ function buildStoryLayout(data) {
       borderRadius: '36px',
       padding: '56px 48px',
       background: 'rgba(255,255,255,0.015)',
-      gap: '32px',
+      gap: '28px',
     },
       // Date at top
       el('span', {
@@ -300,42 +318,32 @@ function buildStoryLayout(data) {
 
       // Oracle box
       oracle ? el('div', {
-        flexDirection: 'column', alignItems: 'center', gap: '12px',
+        flexDirection: 'column', alignItems: 'center', gap: '10px',
         padding: '24px 36px',
         background: COLORS.oracleBox,
         border: `1px solid ${COLORS.oracleBorder}`,
         borderRadius: '20px',
         maxWidth: '840px',
+        width: '100%',
       },
-        sectionLabel('ORACLE MESSAGE', true),
+        sectionLabel('ORACLE', true),
         el('span', {
           fontSize: 24, fontWeight: 500, color: 'rgba(240,240,255,0.85)',
           textAlign: 'center', lineHeight: '1.6',
-        }, `"${oracle}"`),
+        }, `\u201C${oracle}\u201D`),
       ) : null,
 
-      // Fortune bars
+      // Fortune grid (2x2 with emojis)
       el('div', {
-        flexDirection: 'column', gap: '12px', width: '100%',
-        alignItems: 'center', maxWidth: '620px',
+        flexDirection: 'column', gap: '10px', width: '100%', alignItems: 'center',
       },
         sectionLabel("TODAY'S FORTUNE", true),
         el('div', { height: '4px' }),
-        fortuneBar('Love', love, '#f43f5e', true),
-        fortuneBar('Career', career, '#8b5cf6', true),
-        fortuneBar('Health', health, '#22c55e', true),
-        fortuneBar('Wealth', wealth, '#f59e0b', true),
+        fortuneGrid(love, career, health, wealth, true),
       ),
 
-      // Footer
-      el('div', { flexDirection: 'column', alignItems: 'center', gap: '6px', marginTop: '8px' },
-        el('span', {
-          fontSize: 17, color: COLORS.gold, letterSpacing: '0.15em',
-          textTransform: 'uppercase', fontWeight: 600,
-        }, 'Discover Your Chinese Destiny'),
-        el('span', { fontSize: 24, fontWeight: 700, color: COLORS.gold }, 'wobazi.com'),
-        el('span', { fontSize: 13, color: COLORS.mutedLight }, 'Generated by WoBazi'),
-      ),
+      // Footer logo
+      logoFooter(true),
     ),
   );
 }
