@@ -4220,7 +4220,7 @@ function checkCompatibility() {
   const partnerPillars = calcBazi(year, month - 1, day, partnerHour);
   const partnerAnimal = partnerPillars[0].branch.animal;
   const partnerElements = calcElements(partnerPillars);
-  const partnerDominant = getDominant(partnerElements);
+  const partnerDominant = Object.entries(partnerElements).sort((a,b) => b[1]-a[1])[0][0];
   const partnerDayKnown = partnerPillars[2]?.known;
 
   const zData = ZODIAC[userAnimal];
