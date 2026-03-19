@@ -1123,10 +1123,30 @@ input  { font-family: inherit; }
 .lucky-val { font-size: 12px; font-weight: 600; color: var(--text); }
 
 /* ── Footer ── */
+/* ── Tab Navigation (prev/next) ── */
+.tab-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 4px;
+  margin-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.tab-nav-btn {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  color: var(--gold); background: none; border: none;
+  cursor: pointer; padding: 8px 14px;
+  border-radius: 100px;
+  background: rgba(240,192,64,0.08);
+  border: 1px solid rgba(240,192,64,0.15);
+  transition: background 0.2s;
+}
+.tab-nav-btn:active { background: rgba(240,192,64,0.18); }
+.tab-nav-btn svg { flex-shrink: 0; color: var(--gold); }
+
 .results-footer {
   display: flex; flex-direction: column; align-items: center;
   padding: 32px 20px 40px;
-  margin-top: 20px;
+  margin-top: 0;
   border-top: 1px solid var(--border);
   gap: 16px;
   text-align: center;

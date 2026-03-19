@@ -435,6 +435,27 @@ function switchTab(tab) {
   if (ctxStrip) ctxStrip.classList.toggle('hide', tab === 'actions');
   document.querySelector('#results .scroll-body').scrollTop = 0;
   history.replaceState(null, '', location.pathname + '#' + tab);
+
+  // Render prev/next tab navigation
+  const TAB_ORDER = ['today', 'you', 'actions', 'relationships'];
+  const TAB_LABELS = { today: 'Today', you: 'You', actions: 'Actions', relationships: 'Relationships' };
+  const TAB_LABELS_ZH = { today: '今日', you: '你', actions: '行动', relationships: '关系' };
+  const idx = TAB_ORDER.indexOf(tab);
+  const prev = idx > 0 ? TAB_ORDER[idx - 1] : null;
+  const next = idx < TAB_ORDER.length - 1 ? TAB_ORDER[idx + 1] : null;
+  const navEl = document.getElementById('tab-nav');
+  if (navEl) {
+    navEl.innerHTML = `
+      ${prev ? `<button class="tab-nav-btn tab-nav-prev" onclick="haptic(6); switchTab('${prev}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        ${_t(TAB_LABELS[prev], TAB_LABELS_ZH[prev])}
+      </button>` : '<div></div>'}
+      ${next ? `<button class="tab-nav-btn tab-nav-next" onclick="haptic(6); switchTab('${next}')">
+        ${_t(TAB_LABELS[next], TAB_LABELS_ZH[next])}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>` : '<div></div>'}
+    `;
+  }
 }
 
 /* ── Stars (splash background) ── */
