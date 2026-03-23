@@ -1244,10 +1244,10 @@ input  { font-family: inherit; }
 }
 
 /* Date + Time row */
-.field-datetime { align-items: flex-start; }
-.field-datetime .field-col-date { flex: 1.2 1 0; min-width: 0; }
-.field-datetime .field-col-time { flex: 0.8 1 0; min-width: 100px; }
-.date-trio { width: 100%; }
+.field-datetime { align-items: stretch; }
+.field-datetime .field-col-date { flex: 1.2 1 0; min-width: 0; display: flex; flex-direction: column; }
+.field-datetime .field-col-time { flex: 0.8 1 0; min-width: 100px; display: flex; flex-direction: column; }
+.date-trio { width: 100%; flex: 1; }
 .time-input {
   background: rgba(255,255,255,0.05);
   border: 1.5px solid var(--border);
@@ -1264,6 +1264,7 @@ input  { font-family: inherit; }
   color-scheme: dark;
   box-sizing: border-box;
   -webkit-appearance: none;
+  flex: 1;
 }
 .time-input:focus {
   border-color: var(--gold);
