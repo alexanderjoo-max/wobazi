@@ -4318,9 +4318,25 @@ function checkCompatibility() {
   `;
 }
 
+/* ── Light mode ── */
+function applyLightMode(on) {
+  document.body.classList.toggle('light-mode', on);
+  const label = document.getElementById('light-mode-toggle-label');
+  if (label) label.textContent = on ? 'Dark Mode' : 'Light Mode';
+}
+function toggleLightMode() {
+  const on = !document.body.classList.contains('light-mode');
+  applyLightMode(on);
+  localStorage.setItem('lightMode', on ? '1' : '0');
+}
+function initLightMode() {
+  applyLightMode(localStorage.getItem('lightMode') === '1');
+}
+
 /* ── Init ── */
 buildStars();
 initDateInputs();
 initTooltips();
+initLightMode();
 checkAuth();
 
