@@ -43,49 +43,140 @@
 </head>
 <body>
 
-  <!-- SPLASH -->
-  <div id="splash" class="screen active">
-    <button class="light-mode-toggle" id="light-mode-toggle" onclick="haptic(8); toggleLightMode()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-      <span id="light-mode-toggle-label">Light Mode</span>
-    </button>
+  <!-- SPLASH / HOME -->
+  <div id="splash" class="screen active" style="align-items:stretch; justify-content:flex-start; overflow-y:auto; -webkit-overflow-scrolling:touch;">
     <div class="stars" id="stars"></div>
-    <div class="splash-content">
-      <div class="logo-wrap">
-        <img src="/Logos/SVG/rev-vert.svg" class="logo-vert" alt="Wobazi">
-        <p class="logo-sub">Chinese Destiny System</p>
-      </div>
-      <p class="splash-tagline">Decode your fate through the ancient<br>art of the Four Pillars of Chinese Astrology</p>
 
-      <!-- Guest state (default) -->
-      <div id="splash-guest">
-        <button class="google-login-btn" onclick="haptic(10); loginWithGoogle()">
-          <svg class="google-logo" viewBox="0 0 24 24" width="20" height="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-          Continue with Google
+    <!-- Top navigation -->
+    <div style="position:relative; z-index:3; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; max-width:820px; width:100%; margin:0 auto;">
+      <img src="/Logos/SVG/rev-horiz.svg" class="nav-logo" alt="Wobazi">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <button class="light-mode-toggle" id="light-mode-toggle" onclick="haptic(8); toggleLightMode()" style="position:static; top:auto; right:auto;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <span id="light-mode-toggle-label">Light Mode</span>
         </button>
-        <p class="splash-google-hint">Sign in to save your reading &amp; chat history</p>
-        <div class="auth-divider"><span>or</span></div>
-        <button class="btn-guest" onclick="haptic(10); showScreen('input')">
-          Continue as Guest
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <!-- Guest: subtle sign-in (hidden once logged in) -->
+        <div id="splash-guest">
+          <button class="btn-guest" onclick="haptic(10); loginWithGoogle()" style="padding:8px 6px;">Sign In</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Home content -->
+    <div style="position:relative; z-index:1; max-width:760px; width:100%; margin:0 auto; padding:0 20px 56px;">
+
+      <!-- Hero -->
+      <div style="text-align:center; padding:24px 0 8px;">
+        <div class="logo-wrap" style="margin-bottom:18px;">
+          <img src="/Logos/SVG/rev-vert.svg" class="logo-vert" alt="Wobazi">
+          <p class="logo-sub">Chinese Destiny System</p>
+        </div>
+        <p class="splash-tagline" style="max-width:440px; margin:0 auto 24px;">Decode your fate through the ancient art of the Four Pillars of Chinese Astrology — a 2,000-year-old system, startlingly precise.</p>
+        <button class="btn-primary" onclick="haptic(12); showScreen('input')">
+          Begin Your Reading
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
+        <p class="splash-google-hint" style="margin-top:12px;">Free · No account needed · Sign in to save your chart &amp; history</p>
       </div>
 
-      <!-- Logged-in state (hidden by default) -->
-      <div id="splash-authed" class="hide">
-        <div class="splash-welcome" id="splash-welcome"></div>
+      <!-- Returning user (authed only) -->
+      <div id="splash-authed" class="hide about-section" style="text-align:center; margin-top:20px;">
+        <div class="splash-welcome" id="splash-welcome" style="justify-content:center; margin-bottom:14px;"></div>
         <button class="btn-primary" id="btn-continue-reading" onclick="haptic(10); loadSavedReading()">
           Continue Your Reading
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
-        <div class="auth-divider"><span>or</span></div>
-        <button class="btn-secondary splash-new-btn" onclick="haptic(10); showScreen('input')">
-          Start Fresh Reading
-        </button>
-        <button class="btn-logout" id="btn-logout" onclick="haptic(6); logout()">Logout</button>
+        <div style="margin-top:12px;">
+          <button class="btn-logout" id="btn-logout" onclick="haptic(6); logout()">Logout</button>
+        </div>
       </div>
 
-      <a href="/what-is-bazi" class="btn-about-link">What is Bāzì? →</a>
+      <!-- What is BaZi -->
+      <div class="about-section" style="margin-top:24px;">
+        <h3>What is Bāzì? (八字)</h3>
+        <p>Bāzì (八字) means <strong style="color:var(--text)">"Eight Characters."</strong> It is one of the oldest forms of Chinese metaphysics — refined during the Tang dynasty and still practiced widely across East Asia today.</p>
+        <p>Your precise birth moment — year, month, day, and hour — encodes eight Chinese characters that reveal your nature, the elemental forces shaping your life, and the timing of your most important opportunities and challenges.</p>
+        <div class="about-callout"><strong style="color:var(--gold)">The core idea:</strong> You are not separate from nature. Your birth moment places you within the flowing cycle of natural forces — and that position shapes everything.</div>
+      </div>
+
+      <!-- Four Pillars -->
+      <div class="about-section">
+        <h3>The Four Pillars</h3>
+        <p>Your birth data maps onto four pillars — each a window into a different dimension of who you are.</p>
+        <div class="about-pillars-grid">
+          <div class="about-pillar"><span class="about-pillar-zh">年</span><span class="about-pillar-en">Year · Identity</span></div>
+          <div class="about-pillar"><span class="about-pillar-zh">月</span><span class="about-pillar-en">Month · Career</span></div>
+          <div class="about-pillar"><span class="about-pillar-zh">日</span><span class="about-pillar-en">Day · Self ✦</span></div>
+          <div class="about-pillar"><span class="about-pillar-zh">时</span><span class="about-pillar-en">Hour · Legacy</span></div>
+        </div>
+      </div>
+
+      <!-- Five Elements -->
+      <div class="about-section">
+        <h3>The Five Elements</h3>
+        <p>Every character carries one of five elemental energies. The way they create and control one another reveals the fundamental dynamics of your personality and fortune.</p>
+        <div class="about-elements-row">
+          <div class="about-element-chip" style="color:var(--el-wood)"><span class="zh">木</span>Wood</div>
+          <div class="about-element-chip" style="color:var(--el-fire)"><span class="zh">火</span>Fire</div>
+          <div class="about-element-chip" style="color:var(--el-earth)"><span class="zh">土</span>Earth</div>
+          <div class="about-element-chip" style="color:var(--el-metal)"><span class="zh">金</span>Metal</div>
+          <div class="about-element-chip" style="color:var(--el-water)"><span class="zh">水</span>Water</div>
+        </div>
+      </div>
+
+      <!-- What your chart reveals -->
+      <div class="about-section">
+        <h3>What Your Chart Reveals</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;">
+          <div style="padding:12px 14px; border-radius:var(--radius-md); background:var(--w04); border:1px solid var(--border);">
+            <div style="font-size:20px; margin-bottom:4px;">🧭</div>
+            <div style="font-size:13px; font-weight:700; color:var(--text);">Personality &amp; Character</div>
+            <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-top:2px;">Your Day Master — the essence of who you are.</div>
+          </div>
+          <div style="padding:12px 14px; border-radius:var(--radius-md); background:var(--w04); border:1px solid var(--border);">
+            <div style="font-size:20px; margin-bottom:4px;">💼</div>
+            <div style="font-size:13px; font-weight:700; color:var(--text);">Career &amp; Wealth</div>
+            <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-top:2px;">Where your talents flow and fortune gathers.</div>
+          </div>
+          <div style="padding:12px 14px; border-radius:var(--radius-md); background:var(--w04); border:1px solid var(--border);">
+            <div style="font-size:20px; margin-bottom:4px;">❤️</div>
+            <div style="font-size:13px; font-weight:700; color:var(--text);">Love &amp; Compatibility</div>
+            <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-top:2px;">How your elements harmonize with others.</div>
+          </div>
+          <div style="padding:12px 14px; border-radius:var(--radius-md); background:var(--w04); border:1px solid var(--border);">
+            <div style="font-size:20px; margin-bottom:4px;">⏳</div>
+            <div style="font-size:13px; font-weight:700; color:var(--text);">Timing &amp; Fortune</div>
+            <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-top:2px;">The years that reward your boldest moves.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How it works -->
+      <div class="about-section">
+        <h3>How It Works</h3>
+        <div style="display:flex; gap:12px; align-items:flex-start; margin-top:6px;">
+          <div style="min-width:26px; height:26px; border-radius:50%; background:var(--gold); color:#1a0a00; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">1</div>
+          <p style="margin:2px 0;">Enter your birth date and time — the more precise, the deeper the reading.</p>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start; margin-top:12px;">
+          <div style="min-width:26px; height:26px; border-radius:50%; background:var(--gold); color:#1a0a00; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">2</div>
+          <p style="margin:2px 0;">We calculate your Four Pillars chart using traditional astronomical algorithms.</p>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start; margin-top:12px;">
+          <div style="min-width:26px; height:26px; border-radius:50%; background:var(--gold); color:#1a0a00; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">3</div>
+          <p style="margin:2px 0;">Receive your personalized reading — and ask the Oracle anything about your destiny.</p>
+        </div>
+      </div>
+
+      <!-- Final CTA -->
+      <div class="about-cta" style="padding-top:20px;">
+        <button class="btn-primary" onclick="haptic(12); showScreen('input')">
+          Begin Your Reading
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <p style="margin-top:14px;"><a href="/what-is-bazi" class="btn-about-link">Explore the full guide to Bāzì →</a></p>
+      </div>
+
     </div>
   </div>
 
