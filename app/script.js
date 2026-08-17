@@ -461,20 +461,68 @@ function switchTab(tab) {
 /* ── Stars (splash background) ── */
 function buildStars() {
   const container = document.getElementById('stars');
-  if (!container) return;
-  for (let i = 0; i < 120; i++) {
+  if (!container || container.dataset.built) return;
+  container.dataset.built = '1';
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const count = reduce ? 40 : 110;
+  for (let i = 0; i < count; i++) {
     const s = document.createElement('div');
-    s.className = 'star';
-    const size = Math.random() * 2.5 + 0.5;
+    const isDust = !reduce && i < 14;
+    s.className = isDust ? 'star star-dust' : (!reduce && i % 5 === 0 ? 'star star-drift' : 'star');
+    const hues = ['#ff8ad8', '#7ce7ff', '#c4a2ff', '#ffb4a2'];
+    const dust = hues[i % hues.length];
+    const size = isDust ? Math.random() * 2 + 1.2 : Math.random() * 2.5 + 0.5;
+    const dx = ((Math.random() * 18) - 6).toFixed(1);
+    const dy = ((Math.random() * -22) - 4).toFixed(1);
     s.style.cssText = `
       left:${Math.random()*100}%;
       top:${Math.random()*100}%;
       width:${size}px; height:${size}px;
       --dur:${2 + Math.random() * 3}s;
+      --drift:${14 + Math.random() * 16}s;
+      --dx:${dx}px; --dy:${dy}px;
       animation-delay:${Math.random() * 4}s;
+      ${isDust ? `background:${dust}; box-shadow:0 0 7px ${dust};` : ''}
     `;
     container.appendChild(s);
   }
+}
+
+function initSplashExperience() {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const revealEls = document.querySelectorAll('.feat-card, .splash-bazi');
+  if (reduce) {
+    revealEls.forEach(el => el.classList.add('is-in'));
+  } else if (revealEls.length && 'IntersectionObserver' in window) {
+    const root = document.getElementById('splash');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-in');
+        io.unobserve(entry.target);
+      });
+    }, { root, threshold: 0.16, rootMargin: '0px 0px -16px 0px' });
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('is-in'));
+  }
+
+  const sigil = document.getElementById('hero-sigil');
+  const splash = document.getElementById('splash');
+  if (!sigil || !splash || reduce) return;
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+  let raf = 0;
+  let tx = 0, ty = 0;
+  splash.addEventListener('pointermove', (e) => {
+    const r = splash.getBoundingClientRect();
+    tx = ((e.clientX - r.left) / r.width - 0.5) * 12;
+    ty = ((e.clientY - r.top) / r.height - 0.5) * 10;
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      sigil.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0)`;
+      raf = 0;
+    });
+  });
 }
 
 /* ═══════════════════════════════════════
@@ -4330,11 +4378,12 @@ function toggleLightMode() {
   localStorage.setItem('lightMode', on ? '1' : '0');
 }
 function initLightMode() {
-  applyLightMode(localStorage.getItem('lightMode') === '1');
+  document.body.classList.remove('light-mode');
 }
 
 /* ── Init ── */
 buildStars();
+initSplashExperience();
 initDateInputs();
 initTooltips();
 initLightMode();

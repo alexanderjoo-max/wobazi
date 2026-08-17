@@ -38,128 +38,164 @@
   <meta name="twitter:image"       content="https://wobazi.com/og-card.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=18">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=22">
 </head>
 <body>
 
+  <div class="site-galaxy" aria-hidden="true">
+    <div class="site-galaxy-img"></div>
+  </div>
+
   <!-- SPLASH / HOME -->
-  <div id="splash" class="screen active" style="align-items:stretch; justify-content:flex-start; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+  <div id="splash" class="screen active">
     <div class="stars" id="stars"></div>
+    <div class="splash-aurora" aria-hidden="true"></div>
 
     <!-- Top navigation -->
-    <div style="position:relative; z-index:3; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; max-width:820px; width:100%; margin:0 auto;">
+    <header class="splash-nav">
       <img src="/Logos/SVG/rev-horiz.svg" class="nav-logo" alt="Wobazi">
-      <div style="display:flex; align-items:center; gap:16px;">
-        <button class="light-mode-toggle" id="light-mode-toggle" onclick="haptic(8); toggleLightMode()" style="position:static; top:auto; right:auto; padding:9px;" aria-label="Toggle light mode">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          <span id="light-mode-toggle-label" style="display:none;">Light Mode</span>
-        </button>
+      <div class="splash-nav-actions">
         <!-- Guest: official Google sign-in (hidden once logged in) -->
         <div id="splash-guest">
-          <button class="google-login-btn" onclick="haptic(10); loginWithGoogle()" style="width:auto; max-width:none; padding:8px 16px; font-size:13px; box-shadow:none; white-space:nowrap; flex-shrink:0;">
+          <button class="google-login-btn splash-signin" onclick="haptic(10); loginWithGoogle()">
             <svg class="google-logo" viewBox="0 0 24 24" width="16" height="16"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
             Sign in
           </button>
         </div>
       </div>
-    </div>
+    </header>
 
     <!-- Home content -->
-    <div style="position:relative; z-index:1; max-width:760px; width:100%; margin:0 auto; padding:0 20px 56px;">
+    <div class="splash-inner">
 
       <!-- Hero -->
-      <div style="text-align:center; padding:24px 0 8px;">
-        <div class="logo-wrap" style="margin-bottom:18px;">
-          <img src="/Logos/SVG/rev-vert.svg" class="logo-vert" alt="Wobazi">
-          <p class="logo-sub">Chinese Destiny System</p>
+      <section class="splash-hero">
+        <div class="hero-sigil" id="hero-sigil" aria-hidden="true">
+          <div class="hero-glow"></div>
+          <span class="hero-mote m1"></span>
+          <span class="hero-mote m2"></span>
+          <span class="hero-mote m3"></span>
+          <div class="hero-hanzi">八字</div>
         </div>
-        <p class="splash-tagline" style="max-width:420px; margin:0 auto 24px;">Decode your fate through the ancient art of the Four Pillars of Chinese Astrology — a 2,000-year-old system, startlingly precise.</p>
-        <button class="btn-primary" onclick="haptic(12); showScreen('input')">
+        <h1 class="hero-wordmark">WoBaZi</h1>
+        <p class="logo-sub">Chinese Destiny System</p>
+        <p class="splash-tagline">The moment you were born left eight characters in the heavens — a two-thousand-year-old art, still startlingly precise.</p>
+        <button class="btn-primary splash-cta" onclick="haptic(12); showScreen('input')">
           Begin Your Reading
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
-        <p class="splash-google-hint" style="margin-top:12px;">Free · No account needed · Sign in to save your chart &amp; history</p>
-      </div>
+        <p class="splash-google-hint">Free · No account needed · Sign in to save your chart &amp; history</p>
+      </section>
 
       <!-- Returning user (authed only) -->
-      <div id="splash-authed" class="hide about-section" style="text-align:center; margin-top:20px;">
-        <div class="splash-welcome" id="splash-welcome" style="justify-content:center; margin-bottom:14px;"></div>
-        <button class="btn-primary" id="btn-continue-reading" onclick="haptic(10); loadSavedReading()">
+      <div id="splash-authed" class="hide splash-authed">
+        <div class="splash-welcome" id="splash-welcome"></div>
+        <button class="btn-primary splash-cta" id="btn-continue-reading" onclick="haptic(10); loadSavedReading()">
           Continue Your Reading
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
-        <div style="margin-top:12px;">
+        <div>
           <button class="btn-logout" id="btn-logout" onclick="haptic(6); logout()">Logout</button>
         </div>
       </div>
 
-      <!-- Why WoBazi — benefit blocks with visuals -->
-      <div style="padding:52px 0 0;">
+      <!-- Why WoBazi -->
+      <section class="splash-features">
 
-        <!-- 1: Self / Day Master -->
-        <div style="display:flex; align-items:center; gap:26px; flex-wrap:wrap; justify-content:center; padding:26px 0;">
-          <div style="flex:0 0 auto; width:132px; height:132px; border-radius:26px; background:var(--w04); border:1px solid var(--border); display:flex; align-items:center; justify-content:center;">
-            <svg width="86" height="86" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="46" fill="#1a0a3d"/>
-              <path d="M50,4 a46,46 0 0,1 0,92 a23,23 0 0,1 0,-46 a23,23 0 0,0 0,-46 z" fill="#f0c040"/>
-              <circle cx="50" cy="27" r="6.5" fill="#1a0a3d"/>
-              <circle cx="50" cy="73" r="6.5" fill="#f0c040"/>
-              <circle cx="50" cy="50" r="47" fill="none" stroke="rgba(240,192,64,0.45)" stroke-width="1.5"/>
+        <article class="feat-card">
+          <div class="sigil sigil-self" aria-hidden="true">
+            <svg viewBox="0 0 96 96">
+              <defs>
+                <radialGradient id="sg-self" cx="40%" cy="35%" r="65%">
+                  <stop offset="0%" stop-color="#fff6ff"/>
+                  <stop offset="45%" stop-color="#d56bff"/>
+                  <stop offset="100%" stop-color="#3a1a6a"/>
+                </radialGradient>
+                <filter id="sg-blur"><feGaussianBlur stdDeviation="1.4"/></filter>
+              </defs>
+              <ellipse class="sigil-halo" cx="48" cy="48" rx="38" ry="38" fill="none" stroke="rgba(213,107,255,0.35)"/>
+              <path class="sigil-swirl" d="M48 16 C 72 16, 80 40, 48 48 C 16 56, 24 80, 48 80 C 70 80, 74 62, 58 54" fill="none" stroke="url(#sg-self)" stroke-width="3.2" stroke-linecap="round"/>
+              <circle class="sigil-core" cx="48" cy="48" r="6.5" fill="#fff" filter="url(#sg-blur)"/>
+              <circle cx="48" cy="48" r="3.2" fill="#f6e6ff"/>
+              <circle class="sigil-mote a" cx="48" cy="16" r="2.2" fill="#ff8ad8"/>
+              <circle class="sigil-mote b" cx="76" cy="60" r="1.8" fill="#7ce7ff"/>
+              <circle class="sigil-mote c" cx="22" cy="58" r="1.6" fill="#c4a2ff"/>
             </svg>
           </div>
-          <div style="flex:1 1 300px; min-width:240px;">
-            <h2 style="font-size:24px; font-weight:700; letter-spacing:-0.3px; color:var(--text); line-height:1.25;">Know who you truly are.</h2>
-            <p style="font-size:15px; color:var(--muted); margin-top:10px; line-height:1.6;">Your nature, your strengths, your blind spots — read from the moment you were born.</p>
+          <div class="feat-copy">
+            <h2>Know who you truly are.</h2>
+            <p>Your nature, your strengths, your blind spots — read from the moment you were born.</p>
           </div>
-        </div>
+        </article>
 
-        <!-- 2: Timing / Fortune -->
-        <div style="display:flex; align-items:center; gap:26px; flex-wrap:wrap; justify-content:center; padding:26px 0;">
-          <div style="flex:0 0 auto; width:132px; height:132px; border-radius:26px; background:var(--w04); border:1px solid var(--border); display:flex; align-items:center; justify-content:center;">
-            <svg width="94" height="72" viewBox="0 0 100 78">
-              <defs><linearGradient id="wz-gauge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3b82f6"/><stop offset="0.5" stop-color="#f0c040"/><stop offset="1" stop-color="#ef4444"/></linearGradient></defs>
-              <path d="M12,62 A40,40 0 0,1 88,62" fill="none" stroke="url(#wz-gauge)" stroke-width="9" stroke-linecap="round"/>
-              <line x1="50" y1="62" x2="72" y2="33" stroke="#f0c040" stroke-width="4" stroke-linecap="round"/>
-              <circle cx="50" cy="62" r="6" fill="#f0c040"/>
+        <article class="feat-card">
+          <div class="sigil sigil-time" aria-hidden="true">
+            <svg viewBox="0 0 96 96">
+              <ellipse class="sigil-orbit" cx="48" cy="48" rx="30" ry="18" fill="none" stroke="rgba(124,231,255,0.4)" stroke-width="1.2"/>
+              <ellipse class="sigil-orbit alt" cx="48" cy="48" rx="18" ry="30" fill="none" stroke="rgba(196,162,255,0.35)" stroke-width="1"/>
+              <circle class="sigil-core" cx="48" cy="48" r="5" fill="#7ce7ff"/>
+              <circle class="sigil-node n1" cx="48" cy="18" r="3.4" fill="#ff8ad8"/>
+              <circle class="sigil-node n2" cx="78" cy="48" r="3" fill="#7ce7ff"/>
+              <circle class="sigil-node n3" cx="48" cy="78" r="3.4" fill="#c4a2ff"/>
+              <circle class="sigil-node n4" cx="18" cy="48" r="3" fill="#ffb4a2"/>
+              <path class="sigil-comet" d="M18 30 C 30 22, 40 28, 46 40" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>
             </svg>
           </div>
-          <div style="flex:1 1 300px; min-width:240px;">
-            <h2 style="font-size:24px; font-weight:700; letter-spacing:-0.3px; color:var(--text); line-height:1.25;">Move when the time is right.</h2>
-            <p style="font-size:15px; color:var(--muted); margin-top:10px; line-height:1.6;">See the years that reward your boldest decisions.</p>
+          <div class="feat-copy">
+            <h2>Move when the time is right.</h2>
+            <p>See the years that reward your boldest decisions.</p>
           </div>
-        </div>
+        </article>
 
-        <!-- 3: Compatibility -->
-        <div style="display:flex; align-items:center; gap:26px; flex-wrap:wrap; justify-content:center; padding:26px 0;">
-          <div style="flex:0 0 auto; width:132px; height:132px; border-radius:26px; background:var(--w04); border:1px solid var(--border); display:flex; align-items:center; justify-content:center;">
-            <svg width="98" height="76" viewBox="0 0 108 84">
-              <circle cx="42" cy="42" r="28" fill="rgba(34,197,94,0.14)" stroke="#22c55e" stroke-width="3.5"/>
-              <circle cx="66" cy="42" r="28" fill="rgba(59,130,246,0.14)" stroke="#3b82f6" stroke-width="3.5"/>
-              <circle cx="54" cy="42" r="7" fill="#f0c040"/>
+        <article class="feat-card">
+          <div class="sigil sigil-bond" aria-hidden="true">
+            <svg viewBox="0 0 96 96">
+              <path class="sigil-thread" d="M22 58 C 36 20, 60 76, 74 38" fill="none" stroke="#c4a2ff" stroke-width="1.6" stroke-linecap="round"/>
+              <circle class="sigil-soul s-a" cx="30" cy="50" r="13" fill="rgba(255,138,216,0.22)" stroke="#ff8ad8" stroke-width="1.2"/>
+              <circle class="sigil-soul s-b" cx="66" cy="46" r="13" fill="rgba(124,231,255,0.2)" stroke="#7ce7ff" stroke-width="1.2"/>
+              <circle class="sigil-core" cx="48" cy="48" r="3.4" fill="#fff"/>
             </svg>
           </div>
-          <div style="flex:1 1 300px; min-width:240px;">
-            <h2 style="font-size:24px; font-weight:700; letter-spacing:-0.3px; color:var(--text); line-height:1.25;">Find the people you belong with.</h2>
-            <p style="font-size:15px; color:var(--muted); margin-top:10px; line-height:1.6;">Discover whose energy harmonizes with yours.</p>
+          <div class="feat-copy">
+            <h2>Find the people you belong with.</h2>
+            <p>Discover whose energy harmonizes with yours.</p>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- What is Bazi -->
+      <section class="splash-bazi">
+        <div class="splash-divider" aria-hidden="true"><span>✦</span></div>
+        <h2>What is Bāzì?</h2>
+        <p class="bazi-lead">BaZi (八字) literally means <strong>Eight Characters</strong>. It converts your exact birth date and time into a chart of eight Chinese characters — a cosmic blueprint of who you are, refined over a thousand years of Chinese metaphysics.</p>
+        <p class="bazi-lead">Those characters sit across four pillars. Each has a Heavenly Stem above and an Earthly Branch below. The Day Stem is your <strong>Day Master</strong> — the essence of your core self.</p>
+
+        <div class="bazi-pillar-meanings">
+          <div class="bazi-mean">
+            <span class="zh">年</span>
+            <strong>Year</strong>
+            <p>Ancestry, social identity, the generational energy you carry</p>
+          </div>
+          <div class="bazi-mean">
+            <span class="zh">月</span>
+            <strong>Month</strong>
+            <p>Career climate, parents, the season that shaped you</p>
+          </div>
+          <div class="bazi-mean">
+            <span class="zh">日</span>
+            <strong>Day</strong>
+            <p>Your Day Master — the single character that is you</p>
+          </div>
+          <div class="bazi-mean">
+            <span class="zh">时</span>
+            <strong>Hour</strong>
+            <p>Inner world, later years, the life you build after 40</p>
           </div>
         </div>
 
-      </div>
-
-      <!-- What is Bazi — succinct components -->
-      <div style="padding:44px 0 8px; text-align:center; border-top:1px solid var(--border); margin-top:36px;">
-        <h2 style="font-size:24px; font-weight:700; color:var(--text); letter-spacing:-0.3px;">What is Bāzì?</h2>
-        <p style="font-size:15px; color:var(--muted); max-width:450px; margin:12px auto 0; line-height:1.6;">Your birth date and time become <strong style="color:var(--text)">eight characters</strong> across four pillars — each carrying one of five elemental energies.</p>
-
-        <div class="about-pillars-grid" style="grid-template-columns:repeat(4,1fr); max-width:440px; margin:24px auto 0;">
-          <div class="about-pillar"><span class="about-pillar-zh">年</span><span class="about-pillar-en">Year</span></div>
-          <div class="about-pillar"><span class="about-pillar-zh">月</span><span class="about-pillar-en">Month</span></div>
-          <div class="about-pillar"><span class="about-pillar-zh">日</span><span class="about-pillar-en">Day</span></div>
-          <div class="about-pillar"><span class="about-pillar-zh">时</span><span class="about-pillar-en">Hour</span></div>
-        </div>
-
-        <div class="about-elements-row" style="max-width:440px; margin:12px auto 0;">
+        <div class="about-elements-row splash-elements">
           <div class="about-element-chip" style="color:var(--el-wood)"><span class="zh">木</span>Wood</div>
           <div class="about-element-chip" style="color:var(--el-fire)"><span class="zh">火</span>Fire</div>
           <div class="about-element-chip" style="color:var(--el-earth)"><span class="zh">土</span>Earth</div>
@@ -167,12 +203,14 @@
           <div class="about-element-chip" style="color:var(--el-water)"><span class="zh">水</span>Water</div>
         </div>
 
-        <p style="margin-top:22px;"><a href="/what-is-bazi" class="btn-about-link">Learn how it works →</a></p>
-      </div>
+        <blockquote class="bazi-callout">BaZi is a weather forecast, not a prison sentence. The chart shows the terrain — you still choose how to walk it.</blockquote>
+
+        <p class="splash-learn"><a href="/what-is-bazi" class="btn-about-link">Read the full guide →</a></p>
+      </section>
 
       <!-- Final CTA -->
-      <div class="about-cta" style="padding-top:44px;">
-        <button class="btn-primary" onclick="haptic(12); showScreen('input')">
+      <div class="about-cta splash-final-cta">
+        <button class="btn-primary splash-cta" onclick="haptic(12); showScreen('input')">
           Begin Your Reading
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
@@ -1265,6 +1303,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=16"></script>
+  <script src="script.js?v=19"></script>
 </body>
 </html>
