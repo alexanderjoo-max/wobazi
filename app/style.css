@@ -312,7 +312,12 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 
 .logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .logo-vert { width: 130px; height: auto; }
-.nav-logo { height: 22px; width: auto; display: block; flex-shrink: 0; }
+.nav-logo { height: 40px; width: auto; display: block; flex-shrink: 0; }
+.footer-logo { height: 44px; width: auto; display: block; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
 .header-left { display: flex; align-items: center; gap: 12px; }
 
 .logo-chinese {
@@ -675,7 +680,7 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 }
 /* Mobile: hide about/lang from header, shrink logo */
 @media (max-width: 480px) {
-  .results-header .nav-logo { height: 16px; }
+  .results-header .nav-logo { height: 28px; }
   .results-header .btn-about-icon,
   .results-header .btn-lang { display: none; }
 
@@ -4384,12 +4389,21 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 
 .hero-sigil {
   position: relative;
-  width: min(248px, 78vw);
-  height: min(248px, 78vw);
+  width: min(300px, 78vw);
+  height: auto;
+  aspect-ratio: 688 / 535;
   margin: 0 auto 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.hero-logo {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 10px 28px rgba(7,7,15,0.5));
 }
 .hero-glow {
   position: absolute;
@@ -4785,7 +4799,7 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 
 @media (min-width: 720px) {
   .splash-hero { padding: 20px 0 4px; }
-  .hero-sigil { width: 252px; height: 252px; }
+  .hero-sigil { width: 320px; }
   .splash-features {
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
@@ -4805,7 +4819,7 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 @media (max-width: 479px) {
   .splash-inner { padding: 0 16px 56px; }
   .splash-hero { padding: 12px 0 4px; }
-  .hero-sigil { width: min(236px, 82vw); height: min(236px, 82vw); }
+  .hero-sigil { width: min(260px, 82vw); }
   .whim, .sigil { width: 76px; height: 76px; }
   .feat-copy h2 { font-size: 18px; }
   .feat-copy p { font-size: 13px; }
