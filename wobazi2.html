@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What is BaZi? Eight Characters, Four Pillars | WoBazi</title>
+<meta name="description" content="BaZi (八字) is the Chinese calendar of destiny. Four pillars from the hour you were born — Heavenly Stems, Earthly Branches, Five Elements, and the Day Master that is you.">
+<link rel="canonical" href="https://wobazi.com/wobazi2">
+<meta property="og:title" content="What is BaZi? Eight Characters, Four Pillars">
+<meta property="og:description" content="A living explainer of the Four Pillars of Destiny — then read your own chart, free.">
+<meta property="og:image" content="https://wobazi.com/og-card.png">
+<link rel="icon" href="/Logos/SVG/vert.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>document.documentElement.className += " js";</script>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"What does BaZi mean?","acceptedAnswer":{"@type":"Answer","text":"BaZi (八字) literally translates to Eight Characters. It is the eight Chinese characters — two for each of the Four Pillars of Year, Month, Day and Hour — derived from your exact date and time of birth."}},
+    {"@type":"Question","name":"How is a BaZi chart calculated?","acceptedAnswer":{"@type":"Answer","text":"Your birth date and time are converted into the Chinese lunisolar calendar. Each of the Four Pillars is a Heavenly Stem paired with an Earthly Branch."}},
+    {"@type":"Question","name":"What are the Five Elements in BaZi?","acceptedAnswer":{"@type":"Answer","text":"Wood, Fire, Earth, Metal and Water. They nourish one another in the Production Cycle and restrain one another in the Control Cycle."}},
+    {"@type":"Question","name":"What is a Day Master in BaZi?","acceptedAnswer":{"@type":"Answer","text":"The Day Master is the Heavenly Stem of your Day Pillar — the single character treated as your core self. Every other character is read in relation to it."}},
+    {"@type":"Question","name":"Can BaZi predict compatibility?","acceptedAnswer":{"@type":"Answer","text":"Yes. A full reading compares elemental balance, Day Master interaction, zodiac harmony, and branch combinations — not just the year animal."}}
+  ]
+}
+</script>
+<style>
+  :root{
+    --u: calc(100vw / 1600);
+    --ink:#fff;
+    --ink-soft:rgba(255,255,255,.62);
+    --ink-faint:rgba(255,255,255,.44);
+    --rule:rgba(255,255,255,.055);
+    --card:#f3eee4;
+    --card-ink:#241c16;
+    --card-label:#8a7f72;
+    --field:#3c352f;
+    --field-deep:#2a241f;
+    --gold:#d4a05a;
+    --cinnabar:#c4543a;
+    --wood:#6ea36a;
+    --fire:#d2654a;
+    --earth:#c9a36a;
+    --metal:#c5c0b4;
+    --water:#6d8ea8;
+    --ease:cubic-bezier(.22,.61,.36,1);
+    --ease-out:cubic-bezier(.16,1,.3,1);
+    --paper:#f3eee4;
+    --paper-ink:#241c16;
+  }
+  @media (min-width:1900px){ :root{ --u: calc(1900px / 1600); } }
+
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  html{ background:var(--field-deep); scroll-behavior:smooth; }
+  body{
+    font-family:'Outfit',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-weight:300;
+    color:var(--ink);
+    background:var(--field-deep);
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{ max-width:100%; display:block; }
+  button,a{ font-family:inherit; }
+
+  /* ── hero ─────────────────────────────────────────────── */
+  .hero{
+    position:relative;
+    width:100%;
+    height:100svh;
+    min-height:calc(880 * var(--u));
+    overflow:hidden;
+    isolation:isolate;
+    background:
+      radial-gradient(64% 52% at 27% 84%, rgba(232,214,176,.10) 0%, rgba(232,214,176,0) 72%),
+      radial-gradient(70% 60% at 92% 8%, rgba(24,18,14,.18) 0%, rgba(24,18,14,0) 68%),
+      var(--field);
+  }
+  .hero::after{
+    content:'';
+    position:absolute; inset:0;
+    background:
+      radial-gradient(72% 44% at 50% 117%, rgba(238,226,198,.48) 0%, rgba(238,226,198,.18) 42%, rgba(238,226,198,.04) 72%, transparent 88%),
+      linear-gradient(180deg, transparent 54%, rgba(238,226,198,.03) 78%, rgba(238,226,198,.08) 100%);
+    pointer-events:none; z-index:0;
+  }
+  .stage{
+    position:absolute; left:50%; top:50%;
+    margin-left:calc(-800 * var(--u));
+    margin-top:calc(-440 * var(--u));
+    width:calc(1600 * var(--u));
+    height:calc(880 * var(--u));
+  }
+  .guides{ position:absolute; inset:calc(-40 * var(--u)) 0; z-index:1; pointer-events:none; }
+  .guides i{
+    position:absolute; top:0; bottom:0; width:1px;
+    background:linear-gradient(180deg, transparent, var(--rule) 12%, var(--rule) 78%, transparent);
+  }
+  .ghost{
+    position:absolute; z-index:1;
+    left:calc(4 * var(--u)); bottom:calc(-18 * var(--u));
+    font-size:calc(248 * var(--u));
+    line-height:.78;
+    font-weight:400;
+    letter-spacing:calc(18 * var(--u));
+    color:rgba(255,255,255,.05);
+    white-space:nowrap; user-select:none; pointer-events:none;
+  }
+  #scene{
+    position:absolute; inset:0; z-index:3;
+    width:100%; height:100%;
+    pointer-events:none;
+    opacity:0; transition:opacity .7s var(--ease);
+  }
+  .is-ready #scene{ opacity:1; }
+
+  /* ── dock ─────────────────────────────────────────────── */
+  .dock-wrap{
+    position:absolute; z-index:5;
+    top:calc(38 * var(--u)); left:0; right:0;
+    display:flex; justify-content:center;
+    pointer-events:none;
+  }
+  .dock{
+    pointer-events:auto;
+    display:flex; align-items:flex-start; gap:calc(3 * var(--u));
+    height:calc(46 * var(--u));
+    padding:calc(5 * var(--u));
+    border-radius:calc(14 * var(--u));
+    border:1px solid rgba(255,255,255,.11);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,0) 42%),
+      rgba(34,28,22,.74);
+    box-shadow:0 calc(8 * var(--u)) calc(22 * var(--u)) rgba(10,8,6,.30),
+               inset 0 1px rgba(255,255,255,.06);
+    isolation:isolate;
+  }
+  .dock-item{
+    position:relative; z-index:6;
+    display:inline-flex; align-items:center; justify-content:center;
+    flex:none;
+    height:calc(36 * var(--u));
+    gap:calc(8 * var(--u));
+    padding:0 calc(13 * var(--u));
+    transform-origin:50% 0;
+    border:1px solid transparent;
+    border-radius:calc(10 * var(--u));
+    background:rgba(255,255,255,.04);
+    color:var(--ink-faint);
+    text-decoration:none; cursor:pointer;
+    font-size:calc(11 * var(--u)); font-weight:500;
+    letter-spacing:calc(1.5 * var(--u)); text-transform:uppercase;
+    white-space:nowrap;
+    transition:color .18s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+  }
+  .dock-item[data-near="true"]{
+    z-index:7; color:var(--ink);
+    border-color:rgba(255,255,255,.19);
+    background:rgba(36,30,24,.94);
+    box-shadow:0 calc(7 * var(--u)) calc(16 * var(--u)) rgba(10,8,6,.30);
+  }
+  .dock-item .glyph{
+    width:calc(14 * var(--u)); height:calc(14 * var(--u)); flex:none;
+    opacity:.66; transition:opacity .18s var(--ease);
+  }
+  .dock-item .glyph svg{ display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.25; stroke-linecap:round; stroke-linejoin:round; }
+  .dock-item[data-near="true"] .glyph{ opacity:1; }
+  .dock-mark{
+    width:calc(36 * var(--u)); padding:0;
+    background:#efe6d4; border-color:#efe6d4; color:#241c16;
+    overflow:hidden; font-family:'Noto Serif SC',serif; font-size:calc(15 * var(--u)); font-weight:700;
+  }
+  .dock-mark[data-near="true"]{ background:#fff; border-color:#fff; color:#1b1612; }
+  .dock-item.is-active{
+    background:var(--card); border-color:var(--card); color:var(--card-ink);
+    box-shadow:0 calc(6 * var(--u)) calc(16 * var(--u)) rgba(12,9,6,.24);
+  }
+  .dock-item.is-active .glyph{ opacity:.8; }
+  .dock-item--enter{ color:var(--ink); background:rgba(255,255,255,.075); }
+
+  [data-spec]{ --spec-angle:2.4rad; --spec-bright:0; }
+  [data-spec]::after{
+    content:''; position:absolute; inset:-1px; z-index:5;
+    padding:1px; border-radius:inherit; pointer-events:none;
+    opacity:var(--spec-bright);
+    background:conic-gradient(from var(--spec-angle) at 50% 50%,
+      rgba(240,226,196,0) 0deg, rgba(240,226,196,.08) 14deg, rgba(240,226,196,.95) 28deg,
+      rgba(240,226,196,.16) 46deg, rgba(240,226,196,0) 68deg, rgba(240,226,196,0) 180deg,
+      rgba(240,226,196,.08) 194deg, rgba(240,226,196,.95) 208deg, rgba(240,226,196,.16) 226deg,
+      rgba(240,226,196,0) 248deg, rgba(240,226,196,0) 360deg);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+  }
+  .dock{ position:relative; }
+
+  /* ── hero type ────────────────────────────────────────── */
+  .headline{
+    position:absolute; z-index:4;
+    left:calc(46 * var(--u)); top:calc(198 * var(--u));
+    font-size:calc(62 * var(--u)); line-height:calc(66 * var(--u));
+    font-weight:300; letter-spacing:calc(-0.4 * var(--u));
+  }
+  .headline span{ display:block; padding-bottom:.04em; }
+  .headline span i{ display:inline-block; font-style:normal; }
+  .lede{
+    position:absolute; z-index:4;
+    left:calc(520 * var(--u)); top:calc(196 * var(--u));
+    width:calc(228 * var(--u));
+    font-size:calc(16 * var(--u)); line-height:calc(22 * var(--u));
+    font-weight:300; color:var(--ink-soft);
+  }
+
+  .cta{
+    position:absolute; z-index:4;
+    left:calc(520 * var(--u)); top:calc(372 * var(--u));
+    display:inline-flex; align-items:center; justify-content:center;
+    height:calc(54 * var(--u));
+    padding:0 calc(26 * var(--u));
+    border:0; border-radius:999px;
+    text-decoration:none;
+    color:#2a2016;
+    font-size:calc(15 * var(--u)); font-weight:500;
+    letter-spacing:.01em;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0) 42%),
+      linear-gradient(135deg, #f0e0b8 0%, #d4a05a 42%, #9a6a32 100%);
+    box-shadow:
+      0 calc(10 * var(--u)) calc(24 * var(--u)) rgba(12,8,4,.28),
+      inset 0 1px rgba(255,255,255,.55);
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .cta::before{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(105deg, transparent 35%, rgba(255,255,255,.45) 50%, transparent 65%);
+    transform:translateX(-120%);
+    animation:shine 4.6s var(--ease) 1.4s infinite;
+  }
+  @keyframes shine{
+    0%, 62%{ transform:translateX(-120%); }
+    82%, 100%{ transform:translateX(120%); }
+  }
+  .cta span{ position:relative; z-index:1; }
+
+  .begin-wrap{
+    position:absolute; z-index:4;
+    left:calc(187 * var(--u)); top:calc(431 * var(--u));
+    width:calc(170 * var(--u)); height:calc(170 * var(--u));
+  }
+  .begin{
+    position:absolute; left:50%; top:50%;
+    width:calc(72 * var(--u)); height:calc(72 * var(--u));
+    margin:calc(-36 * var(--u)) 0 0 calc(-36 * var(--u));
+    border:0; border-radius:50%;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.42), transparent 46%),
+      linear-gradient(145deg, #efe0b8, #c4543a 70%);
+    color:#2a1610;
+    font-family:'Noto Serif SC',serif;
+    font-size:calc(22 * var(--u)); font-weight:700;
+    cursor:pointer;
+    box-shadow:0 calc(10 * var(--u)) calc(22 * var(--u)) rgba(12,8,4,.28);
+    display:grid; place-items:center;
+    text-decoration:none;
+  }
+  .begin-ring{
+    position:absolute; inset:0; pointer-events:none;
+    border:1px solid rgba(255,255,255,.17); border-radius:50%;
+  }
+  .begin-ring::after{
+    content:''; position:absolute; inset:calc(-1 * var(--u));
+    border:1px solid rgba(255,255,255,.32); border-radius:50%;
+    opacity:0; transform:scale(.86);
+    transition:opacity .7s var(--ease), transform .9s var(--ease-out);
+  }
+  .begin-wrap:hover .begin-ring::after,
+  .begin-wrap:focus-within .begin-ring::after{ opacity:1; transform:scale(1.06); }
+
+  .stat{ position:absolute; z-index:4; display:flex; align-items:flex-start; gap:calc(9 * var(--u)); }
+  .stat--a{ left:calc(1250 * var(--u)); top:calc(216 * var(--u)); }
+  .stat--b{ left:calc(1346 * var(--u)); top:calc(326 * var(--u)); }
+  .stat .mark{ width:calc(32 * var(--u)); height:calc(32 * var(--u)); flex:none; margin-top:calc(2 * var(--u)); color:rgba(255,255,255,.34); }
+  .stat .mark svg{ width:100%; height:100%; display:block; filter:drop-shadow(0 calc(2 * var(--u)) calc(10 * var(--u)) rgba(10,8,6,.6)); }
+  .stat dt{ font-size:calc(13.5 * var(--u)); font-weight:300; color:var(--ink-soft); line-height:calc(19 * var(--u)); }
+  .stat dd{ font-size:calc(13.5 * var(--u)); font-weight:600; color:var(--ink); line-height:calc(21 * var(--u)); }
+  .stat dt, .stat dd{ text-shadow:0 calc(2 * var(--u)) calc(16 * var(--u)) rgba(10,8,6,.6); }
+
+  .card{
+    position:absolute;
+    background:var(--card); border-radius:calc(46 * var(--u));
+    box-shadow:0 calc(30 * var(--u)) calc(70 * var(--u)) rgba(16,12,8,.30);
+    transition:box-shadow .8s var(--ease);
+    color:var(--card-ink);
+    text-decoration:none;
+  }
+  .card--about{
+    z-index:4;
+    left:calc(890 * var(--u)); top:calc(200 * var(--u));
+    width:calc(330 * var(--u)); height:calc(305 * var(--u));
+  }
+  .card--note{
+    z-index:4;
+    left:calc(1237 * var(--u)); top:calc(482 * var(--u));
+    width:calc(328 * var(--u)); height:calc(310 * var(--u));
+  }
+  .card .label{
+    position:absolute; left:calc(38 * var(--u));
+    font-size:calc(15 * var(--u)); font-weight:300; color:var(--card-label);
+  }
+  .card h2{
+    position:absolute; left:calc(38 * var(--u));
+    font-size:calc(25 * var(--u)); line-height:calc(28 * var(--u));
+    font-weight:400; letter-spacing:calc(-0.4 * var(--u));
+  }
+  .card--about .label{ top:calc(152 * var(--u)); }
+  .card--about h2{ top:calc(176 * var(--u)); width:calc(200 * var(--u)); }
+  .card--note .label{ top:calc(42 * var(--u)); }
+  .card--note h2{ top:calc(66 * var(--u)); width:calc(220 * var(--u)); }
+  .card figure{
+    position:absolute; left:calc(14 * var(--u)); right:calc(14 * var(--u));
+    border-radius:calc(34 * var(--u)); overflow:hidden;
+    isolation:isolate; background:#2a241f;
+  }
+  .card--note figure{ bottom:calc(14 * var(--u)); height:calc(158 * var(--u)); }
+  .card--about figure{ top:calc(14 * var(--u)); height:calc(122 * var(--u)); }
+  .portal-media{
+    position:absolute; inset:calc(-9 * var(--u)); z-index:1; display:block;
+    transform:
+      perspective(900px)
+      translate3d(calc(var(--px,0) * -11px), calc(var(--py,0) * -7px), 0)
+      rotateY(calc(var(--px,0) * -1.4deg))
+      rotateX(calc(var(--py,0) * .9deg));
+  }
+  .portal-media img{
+    width:100%; height:100%; object-fit:cover;
+    transform:scale(1.08);
+    filter:saturate(.92) contrast(1.04);
+    transition:transform 1.25s var(--ease-out), filter .8s var(--ease);
+  }
+  .card:hover .portal-media img{ transform:scale(1.13); filter:saturate(1.05) contrast(1.05); }
+  .card figure::after{
+    content:''; position:absolute; z-index:2;
+    filter:blur(calc(2 * var(--u))); opacity:0; pointer-events:none;
+    top:0; bottom:0; width:26%; left:calc(-13% - 9 * var(--u));
+    background:linear-gradient(90deg,transparent,rgba(244,226,180,.2) 42%,rgba(255,246,220,.72) 54%,transparent);
+  }
+  .pixel-reveal{
+    position:absolute; inset:0; z-index:3; width:100%; height:100%;
+    pointer-events:none; opacity:0; mix-blend-mode:screen;
+  }
+  .knob-float{
+    position:absolute; z-index:4;
+    left:calc(1142 * var(--u)); top:calc(427 * var(--u));
+    width:calc(58 * var(--u)); height:calc(58 * var(--u));
+  }
+  .knob{
+    width:calc(58 * var(--u)); height:calc(58 * var(--u));
+    border:0; border-radius:50%; cursor:pointer;
+    background:#fbf8f2; display:grid; place-items:center;
+    box-shadow:0 calc(6 * var(--u)) calc(16 * var(--u)) rgba(16,12,8,.18);
+    color:#3f352c;
+    text-decoration:none;
+    transition:transform .5s var(--ease-out), background .4s var(--ease);
+  }
+  .knob svg{ width:calc(18 * var(--u)); height:calc(18 * var(--u)); display:block; }
+  .knob:hover{ transform:scale(1.1) rotate(8deg); background:#fff; }
+  .card--note .knob{
+    position:absolute; z-index:4;
+    right:calc(26 * var(--u)); bottom:calc(26 * var(--u));
+    width:calc(54 * var(--u)); height:calc(54 * var(--u));
+  }
+  .card:hover{ box-shadow:0 calc(38 * var(--u)) calc(84 * var(--u)) rgba(16,12,8,.36); }
+
+  .scroll{
+    position:absolute; z-index:4;
+    left:calc(846 * var(--u)); top:calc(690 * var(--u));
+    display:flex; align-items:center; gap:calc(12 * var(--u));
+    writing-mode:vertical-rl;
+    font-size:calc(11 * var(--u)); font-weight:400;
+    letter-spacing:calc(4.4 * var(--u));
+    color:rgba(255,255,255,.5);
+    text-transform:uppercase; text-decoration:none;
+  }
+  .scroll .track{ position:relative; width:1px; height:calc(56 * var(--u)); background:rgba(255,255,255,.18); overflow:hidden; }
+  .scroll .track::after{
+    content:''; position:absolute; inset:0 0 auto; height:40%;
+    background:rgba(255,255,255,.75);
+    animation:trickle 2.6s var(--ease) infinite;
+  }
+  @keyframes trickle{
+    0%{ transform:translateY(-105%); opacity:0; }
+    22%{ opacity:1; }
+    78%{ opacity:1; }
+    100%{ transform:translateY(255%); opacity:0; }
+  }
+
+  /* ── entrance ─────────────────────────────────────────── */
+  .js .mask{ clip-path:inset(100% 0 0 0 round var(--mr,0px)); }
+  .is-ready .mask{
+    clip-path:inset(0 0 0 0 round var(--mr,0px));
+    transition:clip-path 1.05s var(--ease-out) var(--d,0ms);
+  }
+  .js .mask-circle{ clip-path:circle(0% at 50% 50%); }
+  .is-ready .mask-circle{
+    clip-path:circle(76% at 50% 50%);
+    transition:clip-path 1.1s var(--ease-out) var(--d,0ms);
+  }
+  .js .fade{ opacity:0; }
+  .is-ready .fade{ opacity:1; transition:opacity 1.3s var(--ease) var(--d,0ms); }
+  .intro-done .mask, .intro-done .mask-circle{ clip-path:none; transition:none; }
+  .card{ --mr:calc(46 * var(--u)); }
+  .js .dock{ opacity:0; }
+  .is-ready .dock{ opacity:1; transition:opacity .8s var(--ease) 80ms; }
+  .js .dock-item{ clip-path:inset(0 0 105% 0); }
+  .is-ready .dock-item{
+    clip-path:inset(0 0 -30% 0);
+    transition:clip-path .9s var(--ease-out) var(--d,0ms),
+               color .18s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+  }
+  .intro-done .dock-item{ clip-path:none; }
+  .js .headline span i{ opacity:0; transform:translateY(calc(16 * var(--u))); }
+  .is-ready .headline span i{
+    opacity:1; transform:none;
+    transition:opacity 1.05s var(--ease) var(--d,0ms),
+               transform 1.25s var(--ease-out) var(--d,0ms);
+  }
+  .js .portal-media{ clip-path:inset(0 100% 0 0 round calc(25 * var(--u))); }
+  .is-ready .card--about .portal-media{ animation:portal-cut 1.45s steps(12,end) .92s both; }
+  .is-ready .card--note .portal-media{ animation:portal-cut 1.45s steps(12,end) 1.08s both; }
+  .is-ready .card--about figure::after{ animation:portal-scan 1.45s steps(12,end) .92s both; }
+  .is-ready .card--note figure::after{ animation:portal-scan 1.45s steps(12,end) 1.08s both; }
+  .intro-done .portal-media,
+  .intro-done .card--about .portal-media,
+  .intro-done .card--note .portal-media{
+    clip-path:none !important; animation:none !important;
+  }
+  .portal-media img{ width:100%; height:100%; }
+  @keyframes portal-cut{
+    from{ clip-path:inset(0 100% 0 0 round calc(25 * var(--u))); }
+    to{ clip-path:inset(0 0 0 0 round calc(25 * var(--u))); }
+  }
+  @keyframes portal-scan{
+    0%{ left:calc(-13% - 9 * var(--u)); opacity:0; }
+    10%{ opacity:.75; }
+    88%{ opacity:.55; }
+    100%{ left:calc(87% + 9 * var(--u)); opacity:0; }
+  }
+
+  .par{
+    transform:
+      perspective(1400px)
+      translate3d(calc(var(--px,0) * var(--pd,0) * -1px),
+                  calc(var(--py,0) * var(--pd,0) * -0.62px), 0)
+      rotateY(calc(var(--px,0) * var(--pr,0) * 1deg))
+      rotateX(calc(var(--py,0) * var(--pr,0) * -0.7deg));
+  }
+  .knob-float{ transform-origin:calc(-87 * var(--u)) calc(-74.5 * var(--u)); }
+
+  a:focus-visible, button:focus-visible{
+    outline:2px solid rgba(255,255,255,.85);
+    outline-offset:calc(4 * var(--u));
+    border-radius:calc(6 * var(--u));
+  }
+  .knob:focus-visible, .begin:focus-visible{ outline-color:rgba(28,22,16,.9); }
+
+  @media (prefers-reduced-motion:reduce){
+    .mask,.mask-circle,.fade,#scene,.dock,.dock-item,.headline span i{
+      opacity:1 !important; clip-path:none !important; transform:none !important; transition:none !important;
+    }
+    .par{ transform:none !important; }
+    .portal-media{ clip-path:none !important; animation:none !important; transform:none !important; }
+    .pixel-reveal,.card figure::after{ display:none !important; }
+    .cta::before,.scroll .track::after{ animation:none; }
+  }
+
+  @media (max-width:900px){
+    :root{ --u: calc(100vw / 760); }
+    .hero{ height:auto; min-height:100svh; }
+    .stage{
+      position:relative; left:auto; top:auto; margin:0;
+      width:100%; height:calc(1625 * var(--u));
+    }
+    .guides i:nth-child(3){ display:none; }
+    .guides i:nth-child(1){ left:calc(253 * var(--u)) !important; }
+    .guides i:nth-child(2){ left:calc(506 * var(--u)) !important; }
+    .dock-wrap{ top:calc(30 * var(--u)); }
+    .dock{
+      height:max(56px, calc(58 * var(--u)));
+      padding:max(6px, calc(6 * var(--u)));
+      gap:max(4px, calc(4 * var(--u)));
+      border-radius:max(17px, calc(18 * var(--u)));
+    }
+    .dock-item{
+      height:max(44px, calc(46 * var(--u)));
+      width:max(44px, calc(46 * var(--u)));
+      padding:0; border-radius:max(12px, calc(13 * var(--u)));
+    }
+    .dock-item span:not(.glyph){ display:none; }
+    .dock-item .glyph{ width:max(19px, calc(20 * var(--u))); height:max(19px, calc(20 * var(--u))); }
+    .headline{ left:calc(34 * var(--u)); top:calc(128 * var(--u)); font-size:calc(56 * var(--u)); line-height:calc(60 * var(--u)); }
+    .lede{ left:calc(34 * var(--u)); top:calc(268 * var(--u)); width:calc(500 * var(--u)); font-size:calc(18 * var(--u)); line-height:calc(26 * var(--u)); }
+    .cta{ left:calc(34 * var(--u)); top:calc(400 * var(--u)); }
+    .begin-wrap{ display:none; }
+    .stat--a{ left:calc(34 * var(--u)); top:calc(500 * var(--u)); }
+    .stat--b{ left:calc(396 * var(--u)); top:calc(500 * var(--u)); }
+    .card{ border-radius:calc(40 * var(--u)); }
+    .card--about{ left:calc(34 * var(--u)); top:calc(1050 * var(--u)); width:calc(692 * var(--u)); height:calc(250 * var(--u)); }
+    .card--about .label{ top:calc(96 * var(--u)); }
+    .card--about h2{ top:calc(124 * var(--u)); width:calc(380 * var(--u)); font-size:calc(30 * var(--u)); line-height:calc(34 * var(--u)); }
+    .card--note{ left:calc(34 * var(--u)); top:calc(1324 * var(--u)); width:calc(692 * var(--u)); height:calc(268 * var(--u)); }
+    .card--note h2{ font-size:calc(30 * var(--u)); }
+    .card--note figure{ left:auto; right:calc(16 * var(--u)); bottom:calc(16 * var(--u)); width:calc(300 * var(--u)); height:calc(150 * var(--u)); }
+    .card--about figure{ left:auto; right:calc(16 * var(--u)); top:calc(16 * var(--u)); width:calc(224 * var(--u)); height:calc(218 * var(--u)); }
+    .knob-float{ left:calc(644 * var(--u)); top:calc(1218 * var(--u)); transform-origin:calc(-264 * var(--u)) calc(-43 * var(--u)); }
+    .scroll{ left:calc(702 * var(--u)); top:calc(470 * var(--u)); }
+    .ghost{ font-size:calc(148 * var(--u)); letter-spacing:calc(10 * var(--u)); bottom:calc(660 * var(--u)); left:calc(-8 * var(--u)); }
+  }
+
+  /* ── explainer ────────────────────────────────────────── */
+  .explainer{
+    position:relative;
+    background:
+      radial-gradient(80% 40% at 50% 0%, rgba(238,226,198,.06), transparent 60%),
+      var(--field-deep);
+    color:var(--ink);
+    padding:0 0 120px;
+  }
+  .exp-wrap{ max-width:1080px; margin:0 auto; padding:0 28px; }
+  .chapter{
+    padding:88px 0 8px;
+    border-top:1px solid rgba(255,255,255,.06);
+  }
+  .chapter:first-child{ border-top:0; padding-top:72px; }
+  .eyebrow{
+    font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--gold); font-weight:500; margin-bottom:14px;
+  }
+  .chapter h2{
+    font-size:clamp(32px, 4vw, 48px);
+    font-weight:300; letter-spacing:-.03em; line-height:1.1;
+    margin-bottom:18px;
+  }
+  .chapter h2 em{ font-style:normal; font-family:'Noto Serif SC',serif; font-weight:500; color:var(--gold); }
+  .chapter > p, .prose p{
+    font-size:17px; line-height:1.7; color:rgba(255,255,255,.68);
+    max-width:68ch; margin-bottom:16px;
+  }
+  .chapter strong{ color:#fff; font-weight:500; }
+
+  .pillar-row{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:14px;
+    margin:36px 0 28px;
+  }
+  .pillar{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:22px;
+    padding:18px 14px 16px;
+    text-align:center;
+    min-height:196px;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .pillar.is-self{ background:rgba(212,160,90,.10); border-color:rgba(212,160,90,.28); }
+  .pillar .zh{ font-family:'Noto Serif SC',serif; font-size:15px; color:rgba(255,255,255,.45); }
+  .pillar .stem{
+    margin-top:14px; width:72px; height:64px; border-radius:12px;
+    display:grid; place-items:center;
+    font-family:'Noto Serif SC',serif; font-size:28px; font-weight:700;
+  }
+  .pillar .branch{
+    width:72px; height:52px; border-radius:0 0 12px 12px;
+    display:grid; place-items:center;
+    background:rgba(0,0,0,.22);
+    font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.55);
+  }
+  .pillar .en{ margin-top:auto; padding-top:14px; font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.5); }
+  .pillar p{ font-size:13px; line-height:1.45; color:rgba(255,255,255,.48); margin:10px 0 0; }
+
+  .table-wrap{ overflow-x:auto; margin:20px 0 28px; }
+  table{ width:100%; border-collapse:collapse; font-size:14px; }
+  th{ text-align:left; font-weight:500; color:rgba(255,255,255,.4); font-size:12px; letter-spacing:.12em; text-transform:uppercase; padding:10px 8px; border-bottom:1px solid rgba(255,255,255,.08); }
+  td{ padding:10px 8px; border-bottom:1px solid rgba(255,255,255,.045); color:rgba(255,255,255,.78); }
+  td.han{ font-family:'Noto Serif SC',serif; font-size:20px; font-weight:700; }
+
+  .el-row{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:28px 0; }
+  .el{
+    text-align:center; padding:22px 8px; border-radius:18px;
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+  }
+  .el b{ display:block; font-family:'Noto Serif SC',serif; font-size:32px; line-height:1; margin-bottom:8px; }
+  .el span{ font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+
+  .cycle{
+    display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:20px 0 8px;
+  }
+  .cycle article{
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:20px; padding:22px 22px 18px;
+  }
+  .cycle h3{ font-size:16px; font-weight:500; margin-bottom:10px; }
+  .cycle p{ font-size:14px; line-height:1.6; color:rgba(255,255,255,.62); margin:0; }
+
+  .yy{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:24px; }
+  .yy article{
+    border-radius:20px; padding:26px 22px; text-align:center;
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+  }
+  .yy .mark{ font-family:'Noto Serif SC',serif; font-size:40px; margin-bottom:8px; }
+  .yy h3{ font-size:18px; font-weight:400; margin-bottom:6px; }
+  .yy p{ font-size:14px; color:rgba(255,255,255,.55); margin:0; }
+
+  .zodiac{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:24px; }
+  .z{
+    padding:16px 12px; border-radius:16px; text-align:center;
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+  }
+  .z .e{ font-size:26px; line-height:1; }
+  .z b{ display:block; margin-top:6px; font-weight:500; font-size:14px; }
+  .z i{ display:block; font-style:normal; font-size:12px; margin-top:3px; }
+  .z small{ display:block; margin-top:6px; color:rgba(255,255,255,.45); font-size:12px; line-height:1.35; }
+
+  .masters{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:24px 0; }
+  .m{
+    display:flex; align-items:center; gap:10px;
+    padding:12px 12px; border-radius:14px;
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+  }
+  .m b{ font-family:'Noto Serif SC',serif; font-size:24px; min-width:28px; text-align:center; }
+  .m span{ display:block; font-size:13px; font-weight:500; }
+  .m small{ display:block; font-size:11px; opacity:.75; }
+
+  .facts{ display:grid; gap:10px; margin:20px 0; padding:0; list-style:none; }
+  .facts li{
+    padding:14px 16px; border-radius:14px;
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+    font-size:15px; line-height:1.55; color:rgba(255,255,255,.7);
+  }
+  .facts strong{ color:#fff; }
+
+  .steps{ display:grid; gap:0; margin-top:20px; }
+  .step{
+    display:grid; grid-template-columns:56px 1fr; gap:16px;
+    padding:18px 0; border-top:1px solid rgba(255,255,255,.06);
+  }
+  .step:first-child{ border-top:0; }
+  .num{
+    width:40px; height:40px; border-radius:50%;
+    display:grid; place-items:center;
+    background:linear-gradient(145deg,#efe0b8,#d4a05a);
+    color:#2a2016; font-weight:600; font-size:15px;
+  }
+  .step h3{ font-size:16px; font-weight:500; margin-bottom:4px; }
+  .step p{ font-size:14px; color:rgba(255,255,255,.58); margin:0; line-height:1.55; }
+
+  .faq details{
+    border-top:1px solid rgba(255,255,255,.07);
+    padding:4px 0;
+  }
+  .faq summary{
+    cursor:pointer; list-style:none;
+    padding:18px 0; font-size:17px; font-weight:400;
+  }
+  .faq summary::-webkit-details-marker{ display:none; }
+  .faq summary::after{
+    content:'+'; float:right; color:var(--gold); font-weight:300; font-size:22px; line-height:1;
+  }
+  .faq details[open] summary::after{ content:'–'; }
+  .faq details p{ font-size:15px; line-height:1.65; color:rgba(255,255,255,.62); padding:0 0 18px; max-width:70ch; }
+
+  .close{
+    margin-top:72px; text-align:center;
+    padding:64px 24px;
+    border-radius:32px;
+    background:
+      radial-gradient(70% 80% at 50% 0%, rgba(212,160,90,.16), transparent 60%),
+      rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.07);
+  }
+  .close .han{ font-family:'Noto Serif SC',serif; font-size:56px; color:var(--gold); line-height:1; margin-bottom:12px; }
+  .close h2{ font-size:clamp(28px, 4vw, 42px); font-weight:300; margin-bottom:12px; }
+  .close p{ color:rgba(255,255,255,.62); max-width:42ch; margin:0 auto 24px; font-size:16px; line-height:1.6; }
+  .close .cta{ position:static; display:inline-flex; }
+
+  .site-foot{
+    max-width:1080px; margin:0 auto; padding:28px;
+    display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    font-size:13px; color:rgba(255,255,255,.38);
+  }
+  .site-foot a{ color:rgba(255,255,255,.55); text-decoration:none; }
+  .site-foot a:hover{ color:#fff; }
+
+  @media (max-width:800px){
+    .pillar-row,.el-row,.masters,.zodiac,.cycle,.yy{ grid-template-columns:1fr 1fr; }
+    .masters{ grid-template-columns:1fr 1fr; }
+    .zodiac{ grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width:520px){
+    .pillar-row,.el-row{ grid-template-columns:1fr 1fr; }
+    .exp-wrap{ padding:0 18px; }
+    .chapter{ padding:64px 0 4px; }
+  }
+</style>
+</head>
+<body>
+<main class="hero" id="hero">
+  <canvas id="scene" aria-hidden="true"></canvas>
+
+  <div class="dock-wrap">
+    <nav class="dock" style="--pd:5" data-spec aria-label="Primary">
+      <a class="dock-item dock-mark" data-dock data-spec href="#hero" style="--d:120ms" aria-label="WoBazi home">八</a>
+      <a class="dock-item is-active" data-dock data-spec href="#pillars" style="--d:180ms">
+        <span class="glyph" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 14V4h2v10M7 14V6h2v8M11 14V3h2v11"/></svg></span>
+        <span>Pillars</span>
+      </a>
+      <a class="dock-item" data-dock data-spec href="#elements" style="--d:230ms">
+        <span class="glyph" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 2.4 13.2 6 11.2 13H4.8L2.8 6z"/></svg></span>
+        <span>Elements</span>
+      </a>
+      <a class="dock-item" data-dock data-spec href="#day-master" style="--d:280ms">
+        <span class="glyph" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3"/><path d="M8 2.2v2M8 11.8v2M2.2 8h2M11.8 8h2"/></svg></span>
+        <span>Master</span>
+      </a>
+      <a class="dock-item dock-item--enter" data-dock data-spec href="/app" style="--d:330ms">
+        <span class="glyph" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M6.6 2.5h5.1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6.6"/><path d="M2.6 8h6.6"/><path d="m7 5.6 2.4 2.4L7 10.4"/></svg></span>
+        <span>Enter</span>
+      </a>
+    </nav>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="guides fade" style="--d:900ms" aria-hidden="true">
+      <i style="left:calc(405 * var(--u))"></i>
+      <i style="left:calc(748 * var(--u))"></i>
+      <i style="left:calc(1091 * var(--u))"></i>
+    </div>
+    <div class="ghost fade" style="--d:1150ms" aria-hidden="true">WOBAZI</div>
+
+    <a class="card card--about mask" href="#pillars" style="--d:760ms; --pd:10; --pr:2.2">
+      <figure class="portal" data-delay="920">
+        <span class="portal-media"><img src="/wobazi2-assets/card-pillars.jpg" alt="Four stone pillars standing in dusk mist" width="800" height="450"></span>
+        <canvas class="pixel-reveal" aria-hidden="true"></canvas>
+      </figure>
+      <p class="label">The Chart</p>
+      <h2>Four pillars. Eight characters.</h2>
+    </a>
+
+    <span class="knob-float" style="--pd:10; --pr:2.2">
+      <a class="knob mask-circle" style="--d:1100ms" href="#pillars" aria-label="Read about the Four Pillars">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </a>
+    </span>
+
+    <h1 class="headline" style="--pd:18; --pr:1.2">
+      <span><i style="--d:260ms">Eight characters.</i></span>
+      <span><i style="--d:360ms">One living chart.</i></span>
+    </h1>
+
+    <p class="lede mask" style="--d:480ms; --pd:14; --pr:1">BaZi turns the hour you were born into four pillars of time — a calendar of who you are, and when life moves.</p>
+
+    <a class="cta mask" style="--d:600ms; --pd:15; --pr:1.4" href="/app"><span>Read your chart</span></a>
+
+    <div class="begin-wrap" style="--pd:20">
+      <a class="begin mask-circle" style="--d:900ms" href="#overview" aria-label="Begin the explainer">字</a>
+      <span class="begin-ring mask-circle" style="--d:840ms" aria-hidden="true"></span>
+    </div>
+
+    <dl class="stat stat--a mask" style="--d:700ms; --pd:12">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="5" y="6" width="4.2" height="18" rx="1"/><rect x="13" y="4" width="4.2" height="20" rx="1"/>
+          <rect x="21" y="8" width="4.2" height="16" rx="1"/>
+        </svg>
+      </span>
+      <div><dt>Heavenly Stems</dt><dd>10 archetypes</dd></div>
+    </dl>
+    <dl class="stat stat--b mask" style="--d:770ms; --pd:13">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.2">
+          <circle cx="15" cy="15" r="10.2"/><path d="M15 6.2v8.8l6 3.4"/>
+        </svg>
+      </span>
+      <div><dt>Grand cycle</dt><dd>60 years</dd></div>
+    </dl>
+
+    <a class="card card--note mask" href="#day-master" style="--d:880ms; --pd:22; --pr:2.4">
+      <p class="label">Day Master</p>
+      <h2>The stem of the day is you.</h2>
+      <figure class="portal" data-delay="1080">
+        <span class="portal-media"><img src="/wobazi2-assets/card-chart.jpg" alt="An aged BaZi chart with a cinnabar seal" width="800" height="450"></span>
+        <canvas class="pixel-reveal" aria-hidden="true"></canvas>
+      </figure>
+      <span class="knob" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </span>
+    </a>
+
+    <a class="scroll mask" style="--d:1040ms; --pd:9" href="#overview">Discover<span class="track"></span></a>
+  </div>
+</main>
+
+<section class="explainer" id="overview">
+  <div class="exp-wrap">
+
+    <article class="chapter">
+      <p class="eyebrow">Overview · 八字</p>
+      <h2>BaZi is eight characters.</h2>
+      <div class="prose">
+        <p>BaZi (八字) literally means <strong>“Eight Characters”</strong>. It is one of the oldest systems of Chinese metaphysics, with roots in the Tang and Song dynasties. It converts your exact birth date and time into a chart of eight Chinese characters — a cosmic blueprint of who you are.</p>
+        <p>Those eight characters sit across <strong>Four Pillars</strong> — Year, Month, Day, and Hour. Each pillar has a <em>Heavenly Stem</em> on top and an <em>Earthly Branch</em> below. Every character carries an element — Wood, Fire, Earth, Metal, or Water — and a Yin or Yang polarity. The interplay is what a reading actually reads: personality, strengths, career climate, relationships, and the timing of major turns.</p>
+        <p>Unlike Western astrology, BaZi is a <strong>calendar</strong>, not a sky map. It does not watch planets against constellations. It watches the cycles of the Chinese lunisolar calendar — patterns of time that were recorded, refined, and interpreted for more than a thousand years.</p>
+      </div>
+    </article>
+
+    <article class="chapter" id="pillars">
+      <p class="eyebrow">四柱 · Sìzhù</p>
+      <h2>Four pillars. <em>年 月 日 时</em></h2>
+      <p>Your birth maps onto four pillars. Each has two characters. Four × two = eight. The Day pillar is the most personal — its Heavenly Stem is your Day Master, the character treated as you.</p>
+
+      <div class="pillar-row">
+        <div class="pillar">
+          <div class="zh">年柱</div>
+          <div class="stem" style="background:rgba(212,160,90,.16);color:var(--earth)">甲</div>
+          <div class="branch">Branch</div>
+          <div class="en">Year</div>
+          <p>Social identity, ancestry, the generation you carry.</p>
+        </div>
+        <div class="pillar">
+          <div class="zh">月柱</div>
+          <div class="stem" style="background:rgba(109,142,168,.16);color:var(--water)">壬</div>
+          <div class="branch">Branch</div>
+          <div class="en">Month</div>
+          <p>Career climate, parents, the season you were born into.</p>
+        </div>
+        <div class="pillar is-self">
+          <div class="zh">日柱</div>
+          <div class="stem" style="background:rgba(196,84,58,.20);color:#f0c0a8">丙 ✦</div>
+          <div class="branch">Branch</div>
+          <div class="en">Day</div>
+          <p>The self. The stem here is your Day Master.</p>
+        </div>
+        <div class="pillar">
+          <div class="zh">时柱</div>
+          <div class="stem" style="background:rgba(110,163,106,.16);color:var(--wood)">乙</div>
+          <div class="branch">Branch</div>
+          <div class="en">Hour</div>
+          <p>Inner life, later years, the shape of a legacy.</p>
+        </div>
+      </div>
+
+      <h3 class="eyebrow" style="margin-top:12px">The 10 Heavenly Stems · 天干</h3>
+      <p>The stems cycle through the Five Elements in Yin–Yang pairs. Each one colours the pillar it occupies.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Character</th><th>Pinyin</th><th>Element</th><th>Polarity</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td class="han" style="color:var(--wood)">甲</td><td>Jiǎ</td><td>木 Wood</td><td>Yang</td></tr>
+            <tr><td>2</td><td class="han" style="color:var(--wood)">乙</td><td>Yǐ</td><td>木 Wood</td><td>Yin</td></tr>
+            <tr><td>3</td><td class="han" style="color:var(--fire)">丙</td><td>Bǐng</td><td>火 Fire</td><td>Yang</td></tr>
+            <tr><td>4</td><td class="han" style="color:var(--fire)">丁</td><td>Dīng</td><td>火 Fire</td><td>Yin</td></tr>
+            <tr><td>5</td><td class="han" style="color:var(--earth)">戊</td><td>Wù</td><td>土 Earth</td><td>Yang</td></tr>
+            <tr><td>6</td><td class="han" style="color:var(--earth)">己</td><td>Jǐ</td><td>土 Earth</td><td>Yin</td></tr>
+            <tr><td>7</td><td class="han" style="color:var(--metal)">庚</td><td>Gēng</td><td>金 Metal</td><td>Yang</td></tr>
+            <tr><td>8</td><td class="han" style="color:var(--metal)">辛</td><td>Xīn</td><td>金 Metal</td><td>Yin</td></tr>
+            <tr><td>9</td><td class="han" style="color:var(--water)">壬</td><td>Rén</td><td>水 Water</td><td>Yang</td></tr>
+            <tr><td>10</td><td class="han" style="color:var(--water)">癸</td><td>Guǐ</td><td>水 Water</td><td>Yin</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="eyebrow">The 12 Earthly Branches · 地支</h3>
+      <p>The branches are the twelve Chinese zodiac animals. Each holds a two-hour window of the day and a month of the year.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Character</th><th>Pinyin</th><th>Animal</th><th>Element</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td class="han" style="color:var(--water)">子</td><td>Zǐ</td><td>Rat</td><td>水 Water</td></tr>
+            <tr><td>2</td><td class="han" style="color:var(--earth)">丑</td><td>Chǒu</td><td>Ox</td><td>土 Earth</td></tr>
+            <tr><td>3</td><td class="han" style="color:var(--wood)">寅</td><td>Yín</td><td>Tiger</td><td>木 Wood</td></tr>
+            <tr><td>4</td><td class="han" style="color:var(--wood)">卯</td><td>Mǎo</td><td>Rabbit</td><td>木 Wood</td></tr>
+            <tr><td>5</td><td class="han" style="color:var(--earth)">辰</td><td>Chén</td><td>Dragon</td><td>土 Earth</td></tr>
+            <tr><td>6</td><td class="han" style="color:var(--fire)">巳</td><td>Sì</td><td>Snake</td><td>火 Fire</td></tr>
+            <tr><td>7</td><td class="han" style="color:var(--fire)">午</td><td>Wǔ</td><td>Horse</td><td>火 Fire</td></tr>
+            <tr><td>8</td><td class="han" style="color:var(--earth)">未</td><td>Wèi</td><td>Goat</td><td>土 Earth</td></tr>
+            <tr><td>9</td><td class="han" style="color:var(--metal)">申</td><td>Shēn</td><td>Monkey</td><td>金 Metal</td></tr>
+            <tr><td>10</td><td class="han" style="color:var(--metal)">酉</td><td>Yǒu</td><td>Rooster</td><td>金 Metal</td></tr>
+            <tr><td>11</td><td class="han" style="color:var(--earth)">戌</td><td>Xū</td><td>Dog</td><td>土 Earth</td></tr>
+            <tr><td>12</td><td class="han" style="color:var(--water)">亥</td><td>Hài</td><td>Pig</td><td>水 Water</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="chapter" id="elements">
+      <p class="eyebrow">五行 · Wǔxíng</p>
+      <h2>Five elements, two cycles.</h2>
+      <p>Every character belongs to one elemental family. How those families nourish or restrain one another is the engine of a reading.</p>
+      <div class="el-row">
+        <div class="el"><b style="color:var(--wood)">木</b><span style="color:var(--wood)">Wood</span></div>
+        <div class="el"><b style="color:var(--fire)">火</b><span style="color:var(--fire)">Fire</span></div>
+        <div class="el"><b style="color:var(--earth)">土</b><span style="color:var(--earth)">Earth</span></div>
+        <div class="el"><b style="color:var(--metal)">金</b><span style="color:var(--metal)">Metal</span></div>
+        <div class="el"><b style="color:var(--water)">水</b><span style="color:var(--water)">Water</span></div>
+      </div>
+      <div class="cycle">
+        <article>
+          <h3>Production · 相生</h3>
+          <p><strong>Wood</strong> feeds Fire → Fire creates Earth (ash) → Earth bears Metal (ore) → Metal collects Water → Water nourishes Wood. When a “mother” element is present, that part of life tends to grow without being forced.</p>
+        </article>
+        <article>
+          <h3>Control · 相克</h3>
+          <p><strong>Wood</strong> parts Earth → Earth dams Water → Water extinguishes Fire → Fire melts Metal → Metal chops Wood. Control is structure, not a curse. Too much of it on a weak element is where struggle shows.</p>
+        </article>
+      </div>
+    </article>
+
+    <article class="chapter" id="yin-yang">
+      <p class="eyebrow">阴阳 · Yīnyáng</p>
+      <h2>The same element, two tempers.</h2>
+      <p>Every element appears twice — Yang (阳) and Yin (阴). Yang is outward, active, expansive. Yin is inward, receptive, subtle. <strong>Yang Wood (甲)</strong> is an oak: upright, unyielding. <strong>Yin Wood (乙)</strong> is a vine: flexible, graceful. Both are Wood. They do not live the same life.</p>
+      <p>That split is why BaZi has ten Day Masters, not five. The balance of Yin and Yang across a chart also shows whether someone leads by assertion or by reception — and where the missing polarity needs to be cultivated.</p>
+      <div class="yy">
+        <article>
+          <div class="mark">阳</div>
+          <h3>Yang</h3>
+          <p>Active, expansive, outward.<br>Bold, direct, initiating.</p>
+        </article>
+        <article>
+          <div class="mark">阴</div>
+          <h3>Yin</h3>
+          <p>Receptive, subtle, inward.<br>Flexible, reflective, nurturing.</p>
+        </article>
+      </div>
+    </article>
+
+    <article class="chapter" id="zodiac">
+      <p class="eyebrow">十二生肖</p>
+      <h2>Twelve animals, sixty years.</h2>
+      <p>Your year animal is only the Year Branch. Animals also sit in the Month, Day, and Hour — so a person can carry as many as four animal energies. The twelve-year cycle repeats, but the elemental overlay (a Wood Rat is not a Fire Rat) makes a full sixty-year grand cycle before any pairing returns.</p>
+      <div class="zodiac">
+        <div class="z"><span class="e">🐀</span><b>Rat</b><i style="color:var(--water)">子 · Water</i><small>Clever, charming, resourceful</small></div>
+        <div class="z"><span class="e">🐂</span><b>Ox</b><i style="color:var(--earth)">丑 · Earth</i><small>Dependable, patient, strong</small></div>
+        <div class="z"><span class="e">🐅</span><b>Tiger</b><i style="color:var(--wood)">寅 · Wood</i><small>Bold, magnetic, fearless</small></div>
+        <div class="z"><span class="e">🐇</span><b>Rabbit</b><i style="color:var(--wood)">卯 · Wood</i><small>Graceful, intuitive, diplomatic</small></div>
+        <div class="z"><span class="e">🐉</span><b>Dragon</b><i style="color:var(--earth)">辰 · Earth</i><small>Visionary, powerful, lucky</small></div>
+        <div class="z"><span class="e">🐍</span><b>Snake</b><i style="color:var(--fire)">巳 · Fire</i><small>Wise, mysterious, elegant</small></div>
+        <div class="z"><span class="e">🐎</span><b>Horse</b><i style="color:var(--fire)">午 · Fire</i><small>Free-spirited, energetic, wild</small></div>
+        <div class="z"><span class="e">🐑</span><b>Goat</b><i style="color:var(--earth)">未 · Earth</i><small>Creative, gentle, empathetic</small></div>
+        <div class="z"><span class="e">🐒</span><b>Monkey</b><i style="color:var(--metal)">申 · Metal</i><small>Inventive, witty, unstoppable</small></div>
+        <div class="z"><span class="e">🐓</span><b>Rooster</b><i style="color:var(--metal)">酉 · Metal</i><small>Precise, confident, loyal</small></div>
+        <div class="z"><span class="e">🐕</span><b>Dog</b><i style="color:var(--earth)">戌 · Earth</i><small>Loyal, just, protective</small></div>
+        <div class="z"><span class="e">🐗</span><b>Pig</b><i style="color:var(--water)">亥 · Water</i><small>Generous, sincere, optimistic</small></div>
+      </div>
+    </article>
+
+    <article class="chapter" id="day-master">
+      <p class="eyebrow">日主 · Rìzhǔ</p>
+      <h2>The Day Master is the self.</h2>
+      <p>Of the eight characters, one is treated as you: the <strong>Heavenly Stem of the Day Pillar</strong>. It is the reference for every other character. There are ten possible Day Masters — one for each stem.</p>
+      <div class="masters">
+        <div class="m"><b style="color:var(--wood)">甲</b><div><span>Jiǎ</span><small>Yang Wood</small></div></div>
+        <div class="m"><b style="color:var(--wood)">乙</b><div><span>Yǐ</span><small>Yin Wood</small></div></div>
+        <div class="m"><b style="color:var(--fire)">丙</b><div><span>Bǐng</span><small>Yang Fire</small></div></div>
+        <div class="m"><b style="color:var(--fire)">丁</b><div><span>Dīng</span><small>Yin Fire</small></div></div>
+        <div class="m"><b style="color:var(--earth)">戊</b><div><span>Wù</span><small>Yang Earth</small></div></div>
+        <div class="m"><b style="color:var(--earth)">己</b><div><span>Jǐ</span><small>Yin Earth</small></div></div>
+        <div class="m"><b style="color:var(--metal)">庚</b><div><span>Gēng</span><small>Yang Metal</small></div></div>
+        <div class="m"><b style="color:var(--metal)">辛</b><div><span>Xīn</span><small>Yin Metal</small></div></div>
+        <div class="m"><b style="color:var(--water)">壬</b><div><span>Rén</span><small>Yang Water</small></div></div>
+        <div class="m"><b style="color:var(--water)">癸</b><div><span>Guǐ</span><small>Yin Water</small></div></div>
+      </div>
+      <p>A strong Day Master is challenged and channelled. A weak Day Master is fed and sheltered. That single judgement sets the strategy for the rest of the chart. <a href="/day-master" style="color:var(--gold)">Full Day Master guide →</a></p>
+    </article>
+
+    <article class="chapter" id="compatibility">
+      <p class="eyebrow">合婚 · Héhūn</p>
+      <h2>Compatibility is two full charts.</h2>
+      <p>BaZi has been used for centuries to weigh a pairing — romance, business, friendship. It does not stop at the year animal. A real reading compares both elemental profiles.</p>
+      <ul class="facts">
+        <li><strong>Elemental balance.</strong> Do the two charts cover each other’s excesses and gaps?</li>
+        <li><strong>Day Master interaction.</strong> Do the two selves support, control, or clash?</li>
+        <li><strong>Zodiac harmony.</strong> Rat and Ox ally; Rat and Horse clash. Tradition still counts.</li>
+        <li><strong>Branch combinations.</strong> Six Harmonies and Three Harmonies can bind two charts into one weather.</li>
+      </ul>
+      <p><a href="/bazi-compatibility" style="color:var(--gold)">Check compatibility →</a></p>
+    </article>
+
+    <article class="chapter" id="how-it-works">
+      <p class="eyebrow">The reading</p>
+      <h2>How a chart is actually read.</h2>
+      <p>A traditional master and a modern calculator walk the same five steps.</p>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><div><h3>Enter the birth</h3><p>Date, and hour if you have it. The Hour pillar is the one that goes silent when the clock is unknown.</p></div></div>
+        <div class="step"><div class="num">2</div><div><h3>Convert the calendar</h3><p>Birth data becomes Chinese stems and branches for Year, Month, Day, and Hour.</p></div></div>
+        <div class="step"><div class="num">3</div><div><h3>Name the Day Master</h3><p>The Heavenly Stem of the Day pillar becomes the anchor. Its element and polarity are the archetype.</p></div></div>
+        <div class="step"><div class="num">4</div><div><h3>Weigh the elements</h3><p>Count what dominates, what is missing, and how production and control move through the eight characters.</p></div></div>
+        <div class="step"><div class="num">5</div><div><h3>Read for life, then for time</h3><p>Personality, work, health, and bonds — then Luck Pillars and annual cycles for when those themes wake.</p></div></div>
+      </div>
+    </article>
+
+    <article class="chapter" id="faq">
+      <p class="eyebrow">Questions</p>
+      <h2>Asked before the first chart.</h2>
+      <div class="faq">
+        <details>
+          <summary>What does BaZi mean?</summary>
+          <p>BaZi (八字) translates to “Eight Characters.” It is the eight Chinese characters — two for each of the Four Pillars — taken from the exact date and time of birth. Together they are treated as a blueprint of temperament, strength, friction, and path.</p>
+        </details>
+        <details>
+          <summary>How is a BaZi chart calculated?</summary>
+          <p>Birth date and time are converted into the Chinese calendar. Each pillar is a Heavenly Stem paired with an Earthly Branch. Stems cycle through ten elemental, Yin–Yang characters. Branches cycle through twelve zodiac animals.</p>
+        </details>
+        <details>
+          <summary>What are the Five Elements?</summary>
+          <p>Wood, Fire, Earth, Metal, Water. Production nourishes the next; Control restrains another. Balance and imbalance in a chart are where personality and fortune are read.</p>
+        </details>
+        <details>
+          <summary>What is a Day Master?</summary>
+          <p>The Heavenly Stem of your Day Pillar. It is the most important single character because it stands for you. Everything else is interpreted in relation to it.</p>
+        </details>
+        <details>
+          <summary>Can BaZi speak to compatibility?</summary>
+          <p>Yes. Two charts are compared for elemental complement, Day Master relation, animal harmony, and branch combinations. Complementary gaps often read as ease; shared excess can read as heat.</p>
+        </details>
+      </div>
+    </article>
+
+    <div class="close">
+      <div class="han">八字</div>
+      <h2>The hour is already written.<br>The reading is not.</h2>
+      <p>WoBazi calculates your Four Pillars from the moment you were born — then lets you ask the chart what it actually says.</p>
+      <a class="cta" href="/app"><span>Calculate your chart free</span></a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-foot">
+  <span>WoBazi · Four Pillars of Destiny</span>
+  <span>
+    <a href="/what-is-bazi">Classic guide</a> ·
+    <a href="/day-master">Day Master</a> ·
+    <a href="/bazi-compatibility">Compatibility</a> ·
+    <a href="/app">Open the app</a>
+  </span>
+</footer>
+
+<script src="/wobazi2-assets/three.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    || /[?&]reduced=1/.test(location.search);
+  var NARROW = window.matchMedia('(max-width: 900px)');
+  var heroEl = document.getElementById('hero');
+  var stageEl = document.getElementById('stage');
+  var canvas = document.getElementById('scene');
+
+  var pointer = { x: 0, y: 0 }, smooth = { x: 0, y: 0 };
+  var lastX = null, lastY = null, parOn = false, ticking = false, lastTick = 0;
+  var ndc = { x: 10, y: 0 };
+  var renderer, scene, camera, clock, nearGroup, farGroup;
+  var scanUni, wireMesh, moths = [];
+  var spray, sprayPrev = null, sprayIdle = 0;
+  var hidden = false, onScreen = true;
+  var readyStarted = false;
+
+  /* ── dock + specular ─────────────────────────────────── */
+  var DOCK = { root: null, items: [], on: false, live: false, key: false, dirty: false, u: 1 };
+  var SPEC = { items: [], on: false, dirty: false };
+  var aimX = 0, aimY = 0, aimSeen = false, aimMoved = false;
+
+  function fineHover() {
+    return !REDUCED && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  }
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+  function measureDock() {
+    if (!DOCK.root) return;
+    DOCK.on = fineHover();
+    DOCK.u = stageEl.getBoundingClientRect().width / (NARROW.matches ? 760 : 1600);
+    var i, st;
+    for (i = 0; i < DOCK.items.length; i++) {
+      st = DOCK.items[i];
+      st.el.style.width = st.el.style.height = st.el.style.transform = '';
+      st.el.dataset.near = 'false';
+      st.v = st.vel = st.target = 0;
+    }
+    for (i = 0; i < DOCK.items.length; i++) {
+      var r = DOCK.items[i].el.getBoundingClientRect();
+      DOCK.items[i].w = r.width;
+      DOCK.items[i].h = r.height;
+    }
+    DOCK.live = false;
+    DOCK.dirty = true;
+    aimMoved = aimSeen;
+  }
+
+  function dockRest() {
+    DOCK.live = false;
+    DOCK.dirty = true;
+    for (var i = 0; i < DOCK.items.length; i++) {
+      DOCK.items[i].target = 0;
+      DOCK.items[i].el.dataset.near = 'false';
+    }
+  }
+
+  function drawDock(dt) {
+    if (!DOCK.root || !DOCK.on) return;
+    var i, st;
+    if (aimSeen && aimMoved && !DOCK.key) {
+      var rr = DOCK.root.getBoundingClientRect();
+      if (aimX > rr.left - 48 && aimX < rr.right + 48 && aimY > rr.top - 44 && aimY < rr.bottom + 104) {
+        for (i = 0; i < DOCK.items.length; i++) {
+          st = DOCK.items[i];
+          var r = st.el.getBoundingClientRect();
+          var prox = clamp01(1 - Math.abs(aimX - (r.left + r.width * 0.5)) / (128 * DOCK.u));
+          st.target = prox * prox * (3 - 2 * prox);
+          st.el.dataset.near = st.target > 0.08 ? 'true' : 'false';
+        }
+        DOCK.live = true;
+        DOCK.dirty = true;
+      } else if (DOCK.live) dockRest();
+    }
+    if (!DOCK.dirty) return;
+    var moving = false;
+    for (i = 0; i < DOCK.items.length; i++) {
+      st = DOCK.items[i];
+      st.vel += (st.target - st.v) * 190 * dt;
+      st.vel *= Math.exp(-23 * dt);
+      st.v += st.vel * dt;
+      if (Math.abs(st.target - st.v) < 0.001 && Math.abs(st.vel) < 0.004) { st.v = st.target; st.vel = 0; }
+      else moving = true;
+      var v = Math.min(Math.max(st.v, 0), 1.08);
+      var mark = st.el.classList.contains('dock-mark');
+      var ew = mark ? 14 * DOCK.u : Math.min(18 * DOCK.u, st.w * 0.24);
+      var eh = mark ? 14 * DOCK.u : 16 * DOCK.u;
+      st.el.style.width = (st.w + ew * v).toFixed(2) + 'px';
+      st.el.style.height = (st.h + eh * v).toFixed(2) + 'px';
+      st.el.style.transform = 'translateY(' + (v * 3.5 * DOCK.u).toFixed(2) + 'px)';
+    }
+    if (!moving) DOCK.dirty = false;
+  }
+
+  function drawSpec(dt) {
+    if (!SPEC.on) return;
+    var i, st;
+    if (aimSeen && aimMoved) {
+      for (i = 0; i < SPEC.items.length; i++) {
+        st = SPEC.items[i];
+        var r = st.el.getBoundingClientRect();
+        var cx = r.left + r.width * 0.5, cy = r.top + r.height * 0.5;
+        var dx = Math.max(r.left - aimX, 0, aimX - r.right);
+        var dy = Math.max(r.top - aimY, 0, aimY - r.bottom);
+        var d = Math.sqrt(dx * dx + dy * dy);
+        st.tAng = d === 0
+          ? Math.atan2(2 / Math.max(r.height, 1), -2 / Math.max(r.width, 1))
+          : Math.atan2(cy - aimY, aimX - cx);
+        var raw = clamp01(1 - d / (st.reach * DOCK.u));
+        st.tBr = Math.max(raw * raw * (3 - 2 * raw), st.focused ? 0.9 : 0);
+      }
+      SPEC.dirty = true;
+    }
+    if (!SPEC.dirty) return;
+    var moving = false;
+    for (i = 0; i < SPEC.items.length; i++) {
+      st = SPEC.items[i];
+      var diff = ((st.tAng - st.ang + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+      st.ang += diff * (1 - Math.exp(-dt * 8));
+      st.br += (st.tBr - st.br) * (1 - Math.exp(-dt * 9));
+      if (Math.abs(diff) < 0.001 && Math.abs(st.tBr - st.br) < 0.002) { st.ang = st.tAng; st.br = st.tBr; }
+      else moving = true;
+      st.el.style.setProperty('--spec-angle', st.ang.toFixed(4) + 'rad');
+      st.el.style.setProperty('--spec-bright', (clamp01(st.br) * 0.92).toFixed(3));
+    }
+    if (!moving) SPEC.dirty = false;
+  }
+
+  function initDock() {
+    var root = document.querySelector('.dock');
+    if (!root) return;
+    DOCK.root = root;
+    DOCK.items = [].map.call(root.querySelectorAll('[data-dock]'), function (el) {
+      return { el: el, w: 0, h: 0, v: 0, vel: 0, target: 0 };
+    });
+    SPEC.items = [].map.call(document.querySelectorAll('[data-spec]'), function (el) {
+      return { el: el, ang: 2.4, tAng: 2.4, br: 0, tBr: 0, focused: false,
+               reach: el.classList.contains('dock') ? 250 : 185 };
+    });
+    SPEC.on = fineHover();
+    measureDock();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureDock);
+    window.addEventListener('resize', measureDock);
+    window.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
+      aimX = e.clientX; aimY = e.clientY; aimSeen = true; aimMoved = true; DOCK.key = false;
+    }, { passive: true });
+  }
+
+  /* ── card pixel reveal ───────────────────────────────── */
+  function startPortalReveal() {
+    if (REDUCED) return;
+    var figs = document.querySelectorAll('.portal');
+    for (var i = 0; i < figs.length; i++) revealPortal(figs[i]);
+  }
+  function revealPortal(fig) {
+    var img = fig.querySelector('img');
+    var canvasEl = fig.querySelector('.pixel-reveal');
+    var media = fig.querySelector('.portal-media');
+    if (!img || !canvasEl || !media) return;
+    var delay = parseFloat(fig.getAttribute('data-delay')) || 1080;
+    function launch() {
+      setTimeout(function () {
+        var box = canvasEl.getBoundingClientRect();
+        if (!box.width) return;
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvasEl.width = Math.max(1, Math.round(box.width * dpr));
+        canvasEl.height = Math.max(1, Math.round(box.height * dpr));
+        var ctx = canvasEl.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        var cols = 48, rows = Math.max(16, Math.round(cols * box.height / box.width));
+        var sample = document.createElement('canvas');
+        sample.width = cols; sample.height = rows;
+        var sg = sample.getContext('2d', { willReadFrequently: true });
+        var rgba = null;
+        try { sg.drawImage(img, 0, 0, cols, rows); rgba = sg.getImageData(0, 0, cols, rows).data; } catch (e) {}
+        var over = -media.offsetLeft, span = media.offsetWidth, reach = box.width;
+        canvasEl.style.opacity = '1';
+        var startedAt = performance.now(), CUT_MS = 1450, STEPS = 12;
+        function paint(now) {
+          var t = Math.min(1, (now - startedAt) / CUT_MS);
+          var stepped = Math.floor(t * STEPS) / STEPS;
+          var front = (stepped * span - over) / reach;
+          var tail = t < .88 ? 1 : (1 - t) / .12;
+          ctx.clearRect(0, 0, box.width, box.height);
+          for (var y = 0; y < rows; y++) {
+            for (var x = 0; x < cols; x++) {
+              var an = (x + .5) / cols, delta = an - front;
+              if (delta < -.16 || delta > .16) continue;
+              var band = 1 - Math.abs(delta) / .16;
+              var pulse = .68 + .32 * Math.sin(x * 2.71 + y * 1.93 + t * 26);
+              var alpha = Math.max(0, band * pulse * tail);
+              if (alpha < .08) continue;
+              var r = 232, g = 210, b = 160;
+              if (rgba) {
+                var q = (y * cols + x) * 4;
+                r = Math.min(255, rgba[q] * 1.16 + 18);
+                g = Math.min(255, rgba[q + 1] * 1.14 + 16);
+                b = Math.min(255, rgba[q + 2] * 1.08 + 10);
+              }
+              var px = (x + .5) * box.width / cols + Math.sin(y * 3.17 + x) * (1 - band) * 5;
+              var py = (y + .5) * box.height / rows + Math.cos(x * 2.41 - y) * (1 - band) * 5;
+              ctx.fillStyle = 'rgba(' + Math.round(r) + ',' + Math.round(g) + ',' + Math.round(b) + ',' + (alpha * .92) + ')';
+              ctx.beginPath();
+              ctx.arc(px, py, (.55 + band * 1.25) * Math.max(.75, reach / 300), 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+          if (t < 1) requestAnimationFrame(paint);
+          else { ctx.clearRect(0, 0, box.width, box.height); canvasEl.style.opacity = '0'; }
+        }
+        requestAnimationFrame(paint);
+      }, delay);
+    }
+    if (img.complete && img.naturalWidth) launch();
+    else img.addEventListener('load', launch, { once: true });
+  }
+
+  /* ── loop ────────────────────────────────────────────── */
+  function startTick() {
+    if (ticking) return;
+    ticking = true;
+    (function loop() {
+      requestAnimationFrame(loop);
+      if (document.hidden) return;
+      var now = performance.now();
+      var dt = lastTick ? Math.min((now - lastTick) / 1000, 0.033) : 0.016;
+      lastTick = now;
+      drawDock(dt);
+      drawSpec(dt);
+      aimMoved = false;
+      if (parOn) {
+        var alpha = 1 - Math.pow(1 - 0.055, dt * 60);
+        if (REDUCED) { smooth.x = 0.28; smooth.y = -0.12; }
+        else {
+          smooth.x += (pointer.x - smooth.x) * alpha;
+          smooth.y += (pointer.y - smooth.y) * alpha;
+        }
+        var nx = Math.round(smooth.x * 1000) / 1000;
+        var ny = Math.round(smooth.y * 1000) / 1000;
+        if (nx !== lastX || ny !== lastY) {
+          lastX = nx; lastY = ny;
+          heroEl.style.setProperty('--px', nx);
+          heroEl.style.setProperty('--py', ny);
+        }
+      }
+      if (renderer && clock) renderFrame(dt);
+    })();
+  }
+
+  function startParallax() {
+    startTick();
+    if (parOn) return;
+    parOn = true;
+    var sel = '.dock,.headline,.lede,.cta,.begin-wrap,.stat--a,.stat--b,.card--about,.knob-float,.card--note,.scroll';
+    var nodes = document.querySelectorAll(sel);
+    for (var i = 0; i < nodes.length; i++) nodes[i].classList.add('par');
+    window.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
+      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = (e.clientY / window.innerHeight) * 2 - 1;
+      var r = heroEl.getBoundingClientRect();
+      ndc.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      ndc.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    }, { passive: true });
+    window.addEventListener('pointerleave', function () {
+      pointer.x = pointer.y = 0; ndc.x = 10; sprayPrev = null;
+    });
+  }
+
+  function markReady() {
+    if (readyStarted) return;
+    readyStarted = true;
+    document.body.classList.add('is-ready');
+    startPortalReveal();
+    setTimeout(function () { document.body.classList.add('intro-done'); }, 2800);
+  }
+
+  /* ── three.js scene ──────────────────────────────────── */
+  function softTex() {
+    var c = document.createElement('canvas');
+    c.width = c.height = 64;
+    var g = c.getContext('2d');
+    var grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grd.addColorStop(0, 'rgba(255,236,196,1)');
+    grd.addColorStop(.35, 'rgba(232,196,120,.55)');
+    grd.addColorStop(1, 'rgba(232,196,120,0)');
+    g.fillStyle = grd; g.fillRect(0, 0, 64, 64);
+    var t = new THREE.CanvasTexture(c);
+    t.needsUpdate = true;
+    return t;
+  }
+
+  function makeScanMaterial(color, metal, rough) {
+    return new THREE.MeshStandardMaterial({
+      color: color,
+      metalness: metal,
+      roughness: rough,
+      emissive: new THREE.Color(color).multiplyScalar(0.12)
+    });
+  }
+
+  function makeWireMaterial() {
+    return new THREE.ShaderMaterial({
+      uniforms: {
+        uScanOrigin: scanUni.origin,
+        uScanRadius: scanUni.radius,
+        uOpacity: { value: 1 }
+      },
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      vertexShader: [
+        'varying vec3 vW;',
+        'void main(){',
+        '  vec4 wp = modelMatrix * vec4(position,1.0);',
+        '  vW = wp.xyz;',
+        '  gl_Position = projectionMatrix * viewMatrix * wp;',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform vec3 uScanOrigin; uniform float uScanRadius, uOpacity;',
+        'varying vec3 vW;',
+        'void main(){',
+        '  float d = distance(vW, uScanOrigin);',
+        '  float rim = exp(-pow((d - uScanRadius) / 18.0, 2.0));',
+        '  float trail = smoothstep(uScanRadius, uScanRadius - 90.0, d);',
+        '  float a = (rim * 1.6 + trail * 0.32) * uOpacity;',
+        '  if (a < 0.02) discard;',
+        '  gl_FragColor = vec4(0.95, 0.84, 0.58, a);',
+        '}'
+      ].join('\n')
+    });
+  }
+
+  function addPillar(group, x, z, h, r, color, highlight) {
+    var geo = new THREE.CylinderGeometry(r * 0.72, r, h, 10, 1);
+    var mesh = new THREE.Mesh(geo, makeScanMaterial(color, 0.35, 0.55));
+    mesh.position.set(x, h * 0.5, z);
+    group.add(mesh);
+
+    var ring = new THREE.TorusGeometry(r * 0.92, 1.15, 8, 20);
+    var rm = new THREE.Mesh(ring, makeScanMaterial(highlight ? 0xe8c97a : 0x8a6a3e, 0.7, 0.3));
+    rm.rotation.x = Math.PI / 2;
+    rm.position.set(x, h * 0.62, z);
+    group.add(rm);
+
+    var cap = new THREE.SphereGeometry(r * 0.42, 12, 10);
+    var cm = new THREE.Mesh(cap, makeScanMaterial(highlight ? 0xf0d090 : 0xc9a36a, 0.8, 0.25));
+    cm.position.set(x, h + 4, z);
+    group.add(cm);
+
+    return [mesh, rm, cm];
+  }
+
+  function buildSilk(group, count) {
+    var geo = new THREE.PlaneGeometry(0.55, 7, 1, 4);
+    geo.translate(0, 3.5, 0);
+    var mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uScanOrigin: scanUni.origin,
+        uScanRadius: scanUni.radius,
+        uScanEnabled: scanUni.enabled
+      },
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      vertexShader: [
+        'attribute vec3 aOff; attribute float aPhase; attribute float aTint;',
+        'uniform float uTime; varying float vA; varying float vTint;',
+        'void main(){',
+        '  float t = position.y / 7.0;',
+        '  float sway = sin(uTime * 1.5 + aPhase) * 1.1 * t;',
+        '  vec3 p = position;',
+        '  p.x += sway;',
+        '  p += aOff;',
+        '  vA = 0.06 + (1.0 - t) * 0.16;',
+        '  vTint = aTint;',
+        '  gl_Position = projectionMatrix * modelViewMatrix * vec4(p,1.0);',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform vec3 uScanOrigin; uniform float uScanRadius, uScanEnabled;',
+        'varying float vA; varying float vTint;',
+        'void main(){',
+        '  vec3 gold = vec3(0.83, 0.64, 0.35);',
+        '  vec3 cin = vec3(0.76, 0.36, 0.24);',
+        '  vec3 col = mix(gold, cin, vTint);',
+        '  gl_FragColor = vec4(col, vA);',
+        '}'
+      ].join('\n')
+    });
+    var mesh = new THREE.InstancedMesh(geo, mat, count);
+    var off = new Float32Array(count * 3);
+    var phase = new Float32Array(count);
+    var tint = new Float32Array(count);
+    var dummy = new THREE.Object3D();
+    var i, a, rad, y;
+    for (i = 0; i < count; i++) {
+      a = Math.random() * Math.PI * 2;
+      rad = 18 + Math.random() * 70;
+      y = 2 + Math.random() * 28;
+      off[i * 3] = Math.cos(a) * rad - 20;
+      off[i * 3 + 1] = y;
+      off[i * 3 + 2] = Math.sin(a) * rad * 0.65;
+      phase[i] = Math.random() * 6.28;
+      tint[i] = Math.random() < 0.18 ? 1 : Math.random() * 0.35;
+      dummy.position.set(0, 0, 0);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+    geo.setAttribute('aOff', new THREE.InstancedBufferAttribute(off, 3));
+    geo.setAttribute('aPhase', new THREE.InstancedBufferAttribute(phase, 1));
+    geo.setAttribute('aTint', new THREE.InstancedBufferAttribute(tint, 1));
+    group.add(mesh);
+    return mesh;
+  }
+
+  function buildSpray() {
+    var N = 620;
+    var geo = new THREE.BufferGeometry();
+    var pos = new Float32Array(N * 3);
+    var vel = new Float32Array(N * 3);
+    var birth = new Float32Array(N);
+    var rnd = new Float32Array(N * 2);
+    for (var i = 0; i < N; i++) birth[i] = -99;
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('aVel', new THREE.BufferAttribute(vel, 3));
+    geo.setAttribute('aBirth', new THREE.BufferAttribute(birth, 1));
+    geo.setAttribute('aRnd', new THREE.BufferAttribute(rnd, 2));
+    var mat = new THREE.ShaderMaterial({
+      uniforms: { uTime: { value: 0 }, uLife: { value: 1.6 }, uMap: { value: softTex() } },
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: [
+        'attribute vec3 aVel; attribute float aBirth; attribute vec2 aRnd;',
+        'uniform float uTime, uLife; varying float vA;',
+        'void main(){',
+        '  float age = uTime - aBirth;',
+        '  float u = age / uLife;',
+        '  if (u < 0.0 || u > 1.0) { gl_Position = vec4(2.0); gl_PointSize = 0.0; return; }',
+        '  vec3 p = position + aVel * age * (1.0 - 0.34 * u);',
+        '  p.x += sin(aRnd.y * 6.283 + age * 2.6) * 6.0 * u;',
+        '  p.y += 14.0 * age;',
+        '  vA = smoothstep(0.0, 0.09, u) * (1.0 - smoothstep(0.40, 1.0, u));',
+        '  vec4 mv = modelViewMatrix * vec4(p,1.0);',
+        '  gl_Position = projectionMatrix * mv;',
+        '  gl_PointSize = (aRnd.x * 7.0 + 3.0) * (300.0 / -mv.z);',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform sampler2D uMap; varying float vA;',
+        'void main(){',
+        '  vec4 t = texture2D(uMap, gl_PointCoord);',
+        '  gl_FragColor = vec4(t.rgb, t.a * vA * 0.9);',
+        '}'
+      ].join('\n')
+    });
+    var pts = new THREE.Points(geo, mat);
+    pts.frustumCulled = false;
+    return { mesh: pts, N: N, head: 0, pos: pos, vel: vel, birth: birth, rnd: rnd, geo: geo, mat: mat };
+  }
+
+  function spawnSpray(p, spread) {
+    if (!spray) return;
+    var i = spray.head;
+    spray.head = (i + 1) % spray.N;
+    spray.pos[i * 3] = p.x + (Math.random() - .5) * spread;
+    spray.pos[i * 3 + 1] = p.y + (Math.random() - .5) * spread * 0.4;
+    spray.pos[i * 3 + 2] = p.z + (Math.random() - .5) * spread;
+    spray.vel[i * 3] = (Math.random() - .5) * 18;
+    spray.vel[i * 3 + 1] = 10 + Math.random() * 16;
+    spray.vel[i * 3 + 2] = (Math.random() - .5) * 12;
+    spray.birth[i] = clock.getElapsedTime();
+    spray.rnd[i * 2] = 0.5 + Math.random() * 0.65;
+    spray.rnd[i * 2 + 1] = Math.random();
+    spray.geo.attributes.position.needsUpdate = true;
+    spray.geo.attributes.aVel.needsUpdate = true;
+    spray.geo.attributes.aBirth.needsUpdate = true;
+    spray.geo.attributes.aRnd.needsUpdate = true;
+  }
+
+  function emitAlong(hit, dt) {
+    if (REDUCED || !spray) return;
+    if (!sprayPrev) { sprayPrev = hit.clone(); return; }
+    var dist = hit.distanceTo(sprayPrev);
+    var n = Math.min(14, Math.floor(dist / 7));
+    var tmp = new THREE.Vector3();
+    for (var i = 1; i <= n; i++) {
+      tmp.lerpVectors(sprayPrev, hit, i / n);
+      spawnSpray(tmp, 4);
+    }
+    if (n) { sprayPrev.copy(hit); sprayIdle = 0; }
+    else if ((sprayIdle += dt) > 0.055) { spawnSpray(hit, 2.2); sprayIdle = 0; }
+  }
+
+  function buildScene() {
+    if (typeof THREE === 'undefined') { markReady(); return; }
+    var rect = heroEl.getBoundingClientRect();
+    var w = Math.max(1, rect.width), h = Math.max(1, rect.height);
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(w, h, false);
+    renderer.setClearColor(0x000000, 0);
+    if (renderer.outputColorSpace !== undefined) renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x3c352f, 180, 780);
+
+    camera = new THREE.PerspectiveCamera(28, w / h, 2, 3000);
+    camera.position.set(-90, 130, 560);
+
+    clock = new THREE.Clock();
+    scanUni = {
+      origin: { value: new THREE.Vector3(-260, -10, 40) },
+      radius: { value: REDUCED ? 900 : 40 },
+      enabled: { value: REDUCED ? 0 : 1 }
+    };
+
+    nearGroup = new THREE.Group();
+    farGroup = new THREE.Group();
+    scene.add(farGroup);
+    scene.add(nearGroup);
+
+    var ground = new THREE.Mesh(
+      new THREE.CircleGeometry(420, 48),
+      makeScanMaterial(0x2c2620, 0.05, 0.9)
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = 0;
+    farGroup.add(ground);
+
+    for (var k = 0; k < 4; k++) {
+      var ringG = new THREE.RingGeometry(70 + k * 48, 71.4 + k * 48, 64);
+      var ringM = new THREE.Mesh(ringG, makeScanMaterial(0x6a5840, 0.2, 0.7));
+      ringM.rotation.x = -Math.PI / 2;
+      ringM.position.y = 0.6;
+      farGroup.add(ringM);
+    }
+
+    var specs = [
+      { x: -90, z: 30, h: 150, r: 18, c: 0xb08a58, hi: false },
+      { x: -18, z: 8,  h: 195, r: 16, c: 0xc9a36a, hi: false },
+      { x: 52,  z: 22, h: 230, r: 20, c: 0xe0b86a, hi: true },
+      { x: 122, z: 4,  h: 132, r: 14, c: 0xa88852, hi: false }
+    ];
+    var wireGeos = [];
+    for (var i = 0; i < specs.length; i++) {
+      var s = specs[i];
+      var parts = addPillar(nearGroup, s.x, s.z, s.h, s.r, s.c, s.hi);
+      for (var p = 0; p < parts.length; p++) {
+        wireGeos.push(new THREE.EdgesGeometry(parts[p].geometry, 28));
+      }
+    }
+
+    var curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-150, 70, 18),
+      new THREE.Vector3(-70, 118, -8),
+      new THREE.Vector3(16, 142, 6),
+      new THREE.Vector3(108, 108, -12),
+      new THREE.Vector3(168, 64, 8)
+    ]);
+    var tube = new THREE.Mesh(
+      new THREE.TubeGeometry(curve, 64, 4.2, 8, false),
+      makeScanMaterial(0x6b5338, 0.45, 0.5)
+    );
+    nearGroup.add(tube);
+    wireGeos.push(new THREE.EdgesGeometry(tube.geometry, 22));
+
+    var merged = [];
+    var tmp = new THREE.BufferGeometry();
+    for (i = 0; i < wireGeos.length; i++) merged.push(wireGeos[i]);
+    // keep separate line pieces in one group
+    var wireGroup = new THREE.Group();
+    var wmat = makeWireMaterial();
+    for (i = 0; i < specs.length; i++) {
+      var cyl = new THREE.CylinderGeometry(specs[i].r * 0.72, specs[i].r, specs[i].h, 10, 1);
+      var eg = new THREE.EdgesGeometry(cyl, 25);
+      var ls = new THREE.LineSegments(eg, wmat);
+      ls.position.set(specs[i].x, specs[i].h * 0.5, specs[i].z);
+      wireGroup.add(ls);
+    }
+    var teg = new THREE.EdgesGeometry(tube.geometry, 18);
+    var tls = new THREE.LineSegments(teg, wmat);
+    wireGroup.add(tls);
+    nearGroup.add(wireGroup);
+    wireMesh = { group: wireGroup, mat: wmat };
+
+    try {
+      var silkCount = NARROW.matches ? 280 : 700;
+      nearGroup.userData.silk = buildSilk(nearGroup, silkCount);
+    } catch (silkErr) {
+      console.warn('silk failed', silkErr);
+    }
+
+    var amb = new THREE.Points(
+      (function () {
+        var n = NARROW.matches ? 180 : 420;
+        var g = new THREE.BufferGeometry();
+        var a = new Float32Array(n * 3);
+        for (var i = 0; i < n; i++) {
+          a[i * 3] = (Math.random() - .5) * 520;
+          a[i * 3 + 1] = 20 + Math.random() * 260;
+          a[i * 3 + 2] = (Math.random() - .5) * 280;
+        }
+        g.setAttribute('position', new THREE.BufferAttribute(a, 3));
+        return g;
+      })(),
+      new THREE.PointsMaterial({
+        map: softTex(), size: 3.2, transparent: true, depthWrite: false,
+        blending: THREE.AdditiveBlending, opacity: 0.45, sizeAttenuation: true, color: 0xf0d8a0
+      })
+    );
+    farGroup.add(amb);
+
+    spray = buildSpray();
+    nearGroup.add(spray.mesh);
+
+    for (i = 0; i < 3; i++) {
+      var mgeo = new THREE.PlaneGeometry(7, 4);
+      var mmat = new THREE.MeshBasicMaterial({
+        color: i === 1 ? 0xc4543a : 0xe8c97a,
+        transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false
+      });
+      var moth = new THREE.Mesh(mgeo, mmat);
+      moth.userData = { phase: i * 2.1, radius: 40 + i * 18, height: 150 + i * 18, flee: 0 };
+      moths.push(moth);
+      nearGroup.add(moth);
+    }
+
+    var key = new THREE.DirectionalLight(0xffe6b8, 2.2);
+    key.position.set(90, 240, 180);
+    scene.add(key);
+    scene.add(new THREE.AmbientLight(0x6a5a44, 0.55));
+    scene.add(new THREE.HemisphereLight(0xf0e0c0, 0x2a2218, 0.85));
+    var rim = new THREE.DirectionalLight(0xffc8a0, 0.7);
+    rim.position.set(-140, 90, -90);
+    scene.add(rim);
+    var pool = new THREE.PointLight(0xffe4b0, 40, 420, 1.6);
+    pool.position.set(20, 30, 80);
+    scene.add(pool);
+
+    var ro = new ResizeObserver(function () {
+      var r = heroEl.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      camera.aspect = r.width / r.height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(r.width, r.height, false);
+    });
+    ro.observe(heroEl);
+
+    var io = new IntersectionObserver(function (entries) {
+      onScreen = entries[0] && entries[0].isIntersecting;
+    }, { threshold: 0.02 });
+    io.observe(heroEl);
+
+    document.addEventListener('visibilitychange', function () {
+      hidden = document.hidden;
+      if (!hidden && clock) clock.getDelta();
+    });
+
+    scanUni.enabled.value = 0;
+    camera.lookAt(-70, 48, 8);
+    renderer.render(scene, camera);
+    markReady();
+  }
+
+  var scanT = 0, scanDone = false, hitPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 40);
+  var raycaster = typeof THREE !== 'undefined' ? new THREE.Raycaster() : null;
+  var hitPoint = typeof THREE !== 'undefined' ? new THREE.Vector3() : null;
+
+  function renderFrame(dt) {
+    var t = clock.getElapsedTime();
+    if (!REDUCED && !scanDone) {
+      scanT += dt;
+      var e = Math.min(1, scanT / 3.4);
+      var ease = 1 - Math.pow(1 - e, 1.35);
+      scanUni.radius.value = 280 + ease * 520;
+      if (wireMesh) {
+        wireMesh.mat.uniforms.uOpacity.value = Math.min(1, e / 0.06) * (1 - smoothstep(0.72, 1, e));
+      }
+      if (e >= 1) {
+        scanDone = true;
+        scanUni.enabled.value = 0;
+        if (wireMesh) {
+          nearGroup.remove(wireMesh.group);
+          wireMesh.group.traverse(function (o) {
+            if (o.geometry) o.geometry.dispose();
+          });
+          wireMesh.mat.dispose();
+          wireMesh = null;
+        }
+      }
+    }
+
+    if (nearGroup && nearGroup.userData.silk) {
+      nearGroup.userData.silk.material.uniforms.uTime.value = t;
+    }
+    if (spray) spray.mat.uniforms.uTime.value = t;
+
+    if (!REDUCED && raycaster && ndc.x < 9) {
+      raycaster.setFromCamera(ndc, camera);
+      hitPlane.constant = 20;
+      if (raycaster.ray.intersectPlane(hitPlane, hitPoint)) emitAlong(hitPoint, dt);
+    }
+
+    for (var i = 0; i < moths.length; i++) {
+      var m = moths[i], u = m.userData;
+      var px = Math.cos(t * 0.55 + u.phase) * u.radius;
+      var pz = Math.sin(t * 0.4 + u.phase) * u.radius * 0.55;
+      var py = u.height + Math.sin(t * 1.3 + u.phase) * 10;
+      if (!REDUCED && ndc.x < 9) {
+        var dx = px - ndc.x * 80, dz = pz - 20;
+        if (dx * dx + dz * dz < 3600) u.flee = 1;
+      }
+      u.flee *= 0.96;
+      m.position.set(px + u.flee * 30, py + u.flee * 18, pz - u.flee * 24);
+      m.rotation.y = t * 0.8 + u.phase;
+      m.rotation.z = Math.sin(t * 6 + u.phase) * 0.4;
+    }
+
+    if (camera && nearGroup && farGroup) {
+      camera.position.x = -90 - smooth.x * 26;
+      camera.position.y = 130 + smooth.y * 14;
+      camera.position.z = 560;
+      camera.lookAt(-70 + camera.position.x * 0.12, 48, 8);
+      nearGroup.rotation.y = smooth.x * 0.055;
+      nearGroup.rotation.x = smooth.y * 0.026;
+      farGroup.rotation.y = smooth.x * 0.03;
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  function smoothstep(a, b, x) {
+    var t = clamp01((x - a) / (b - a));
+    return t * t * (3 - 2 * t);
+  }
+
+  /* ── dock active on scroll ───────────────────────────── */
+  function watchSections() {
+    var map = [
+      { id: 'pillars', el: document.querySelector('[href="#pillars"]') },
+      { id: 'elements', el: document.querySelector('[href="#elements"]') },
+      { id: 'day-master', el: document.querySelector('[href="#day-master"]') }
+    ];
+    var items = document.querySelectorAll('.dock-item:not(.dock-mark):not(.dock-item--enter)');
+    function sync() {
+      var y = window.scrollY + 140;
+      var current = null;
+      for (var i = 0; i < map.length; i++) {
+        var node = document.getElementById(map[i].id);
+        if (node && node.offsetTop <= y) current = map[i].el;
+      }
+      for (i = 0; i < items.length; i++) items[i].classList.toggle('is-active', items[i] === current || (!current && i === 0 && window.scrollY < 200));
+    }
+    window.addEventListener('scroll', sync, { passive: true });
+    sync();
+  }
+
+  var shot = /(?:\?|&)shot=([a-z0-9-]+)/i.exec(location.search);
+  if (shot) {
+    window.addEventListener('load', function () {
+      var hero = document.getElementById('hero');
+      if (hero) { hero.style.minHeight = '0'; hero.style.height = '0'; hero.style.overflow = 'hidden'; }
+      var node = document.getElementById(shot[1]);
+      if (node) node.scrollIntoView();
+    });
+  }
+
+  initDock();
+  startParallax();
+  function safeBuild() {
+    try { buildScene(); }
+    catch (err) {
+      console.error('WoBazi scene failed', err);
+      var dbg = document.getElementById('gl-debug');
+      if (dbg) dbg.textContent = (err && err.message) ? err.message : String(err);
+      markReady();
+    }
+  }
+  if (document.readyState === 'complete') safeBuild();
+  else window.addEventListener('load', safeBuild);
+  setTimeout(markReady, 180);
+  watchSections();
+})();
+</script>
+</body>
+</html>

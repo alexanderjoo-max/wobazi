@@ -129,6 +129,14 @@ app.get('/', (req, res) => {
   res.redirect(301, '/app');
 });
 
+app.use('/wobazi2-assets', express.static(path.join(__dirname, 'wobazi2-assets')));
+app.get('/wobazi2', (req, res) => {
+  res.sendFile(path.join(__dirname, 'wobazi2.html'));
+});
+app.get('/wobazi2.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'wobazi2.html'));
+});
+
 app.get('/what-is-bazi', (req, res) => {
   res.render('pages/what-is-bazi', {
     ...seoBase,
