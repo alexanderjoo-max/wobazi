@@ -4399,7 +4399,7 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 
 .hero-sigil {
   position: relative;
-  width: min(300px, 78vw);
+  width: min(240px, 62.4vw);
   height: auto;
   aspect-ratio: 688 / 535;
   margin: 0 auto 8px;
@@ -4849,7 +4849,7 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 
 @media (min-width: 720px) {
   .splash-hero { padding: 20px 0 4px; }
-  .hero-sigil { width: 320px; }
+  .hero-sigil { width: 256px; }
   .splash-features {
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
@@ -4869,7 +4869,7 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 @media (max-width: 479px) {
   .splash-inner { padding: 0 16px 56px; }
   .splash-hero { padding: 12px 0 4px; }
-  .hero-sigil { width: min(260px, 82vw); }
+  .hero-sigil { width: min(208px, 65.6vw); }
   .whim, .sigil { width: 76px; height: 76px; }
   .feat-copy h2 { font-size: 18px; }
   .feat-copy p { font-size: 13px; }
