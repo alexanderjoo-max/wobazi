@@ -65,7 +65,10 @@ app.set('views', path.join(__dirname, 'views'));
 
 /* ── Static Files ── */
 app.use('/public', express.static(path.join(__dirname, 'public')));
-app.use('/app', express.static(path.join(__dirname, 'app')));
+app.use('/app', express.static(path.join(__dirname, 'app'), {
+  index: false,
+  redirect: false,
+}));
 // Serve logos and og-card from root for backward compat
 app.use('/Logos', express.static(path.join(__dirname, 'Logos')));
 app.use('/app/Logos', express.static(path.join(__dirname, 'Logos')));
@@ -128,6 +131,7 @@ function checkRateLimit(ip) {
 const seoBase = { baseUrl: 'https://wobazi.com' };
 
 function sendApp(req, res) {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
   res.sendFile(path.join(__dirname, 'app', 'index.html'));
 }
 app.get('/', sendApp);
@@ -151,7 +155,7 @@ app.get('/what-is-bazi', (req, res) => {
 });
 
 app.get('/bazi-calculator', (req, res) => {
-  res.redirect(301, '/app');
+  res.redirect(302, '/');
 });
 
 app.get('/four-pillars-of-destiny', (req, res) => {
@@ -215,9 +219,12 @@ app.get('/terms', (req, res) => {
 app.get('/terms-of-service', (req, res) => res.redirect(301, '/terms'));
 app.get('/tos', (req, res) => res.redirect(301, '/terms'));
 
-/* ── SPA App (same front page as /) ── */
-app.get('/app', sendApp);
-app.get('/app/*', sendApp);
+/* ── SPA App (same front page as /; /app stays 200 to avoid a loop with cached 301s) ── */
+app.get(['/app', '/app/'], sendApp);
+app.get('/app/*', (req, res, next) => {
+  if (path.extname(req.path)) return next();
+  sendApp(req, res);
+});
 
 /* ═══════════════════════════════════════
    GOOGLE OAUTH
