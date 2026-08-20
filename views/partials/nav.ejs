@@ -5,21 +5,20 @@
     <img src="/app/assets/logo-horiz.png?v=5" class="nav-logo" alt="Wobazi">
   </a>
 
-  <nav class="site-nav-links" aria-label="Legal">
-    <a href="/privacy" data-i18n="nav.privacy">Privacy Policy</a>
-    <a href="/terms" data-i18n="nav.terms">Terms of Service</a>
+  <nav class="site-nav-links" aria-label="Primary">
+    <a href="/what-is-bazi" data-i18n="nav.explainer">BaZi Explainer</a>
   </nav>
 
   <div class="site-nav-actions">
     <div class="lang-switch" data-lang-switch>
-      <button type="button" class="lang-switch-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Language">
+      <button type="button" class="lang-switch-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Language" onclick="toggleLangMenu(this, event)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 3.5 6 3.5 9s-1 6-3.5 9c-2.5-3-3.5-6-3.5-9S9.5 6 12 3z"/></svg>
         <span class="lang-switch-label">EN</span>
       </button>
       <ul class="lang-switch-menu" role="listbox">
-        <li><button type="button" role="option" data-lang="en">English</button></li>
-        <li><button type="button" role="option" data-lang="th">ไทย</button></li>
-        <li><button type="button" role="option" data-lang="zh">中文</button></li>
+        <li><button type="button" role="option" data-lang="en" onclick="setWobaziLang('en', event)">English</button></li>
+        <li><button type="button" role="option" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button></li>
+        <li><button type="button" role="option" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button></li>
       </ul>
     </div>
 
@@ -31,14 +30,12 @@
     </a>
   </div>
 
-  <button type="button" class="site-nav-toggle" aria-label="Menu" aria-expanded="false">
+  <button type="button" class="site-nav-toggle" aria-label="Menu" aria-expanded="false" onclick="toggleSiteNav(this, event)">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
   </button>
 
   <div class="site-nav-drawer">
-    <a href="/privacy" data-i18n="nav.privacy">Privacy Policy</a>
-    <a href="/terms" data-i18n="nav.terms">Terms of Service</a>
-    <a href="/what-is-bazi" data-i18n="footer.what">What is BaZi?</a>
+    <a href="/what-is-bazi" data-i18n="nav.explainer">BaZi Explainer</a>
     <a href="/auth/google" data-i18n="nav.signin">Sign in</a>
     <a href="/?begin=1" class="btn-primary" data-i18n="nav.begin">Begin your free reading</a>
   </div>

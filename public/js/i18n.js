@@ -13,6 +13,7 @@
   var STR = {
     'nav.privacy': { en: 'Privacy Policy', th: 'นโยบายความเป็นส่วนตัว', zh: '隐私政策' },
     'nav.terms': { en: 'Terms of Service', th: 'ข้อกำหนดการให้บริการ', zh: '服务条款' },
+    'nav.explainer': { en: 'BaZi Explainer', th: 'คู่มือปาจื้อ', zh: '八字讲解' },
     'nav.begin': { en: 'Begin your free reading', th: 'เริ่มดูดวงฟรี', zh: '开始免费解读' },
     'nav.beginShort': { en: 'Free reading', th: 'ดูดวงฟรี', zh: '免费解读' },
     'nav.signin': { en: 'Sign in', th: 'เข้าสู่ระบบ', zh: '登录' },
@@ -146,41 +147,57 @@
     var open = document.querySelectorAll('.lang-switch.is-open, .site-nav.is-open');
     for (var i = 0; i < open.length; i++) {
       open[i].classList.remove('is-open');
-      var btn = open[i].querySelector('[aria-expanded]');
-      if (btn) btn.setAttribute('aria-expanded', 'false');
+      var btns = open[i].querySelectorAll('[aria-expanded="true"]');
+      for (var b = 0; b < btns.length; b++) btns[b].setAttribute('aria-expanded', 'false');
     }
+  }
+
+  function fromEvent(el) {
+    if (!el) return null;
+    if (el.nodeType === 3) el = el.parentElement;
+    return el;
+  }
+
+  function toggleLangMenu(btn, e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    btn = fromEvent(btn);
+    if (!btn) return;
+    var root = btn.closest ? btn.closest('.lang-switch') : btn.parentElement;
+    if (!root) return;
+    var willOpen = !root.classList.contains('is-open');
+    closeMenus();
+    if (willOpen) {
+      root.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  function toggleSiteNav(btn, e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    btn = fromEvent(btn);
+    if (!btn) return;
+    var nav = btn.closest ? btn.closest('.site-nav') : null;
+    if (!nav) return;
+    var willOpen = !nav.classList.contains('is-open');
+    closeMenus();
+    if (willOpen) {
+      nav.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  function setLangFromUi(code, e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    apply(code);
+    closeMenus();
   }
 
   function bind() {
     document.addEventListener('click', function (e) {
-      var langBtn = e.target.closest('[data-lang]');
-      if (langBtn && langBtn.getAttribute('data-lang')) {
-        apply(langBtn.getAttribute('data-lang'));
-        closeMenus();
-        return;
-      }
-      var toggle = e.target.closest('.lang-switch-btn');
-      if (toggle) {
-        var root = toggle.closest('.lang-switch');
-        var willOpen = !root.classList.contains('is-open');
-        closeMenus();
-        if (willOpen) {
-          root.classList.add('is-open');
-          toggle.setAttribute('aria-expanded', 'true');
-        }
-        return;
-      }
-      var menuBtn = e.target.closest('.site-nav-toggle');
-      if (menuBtn) {
-        var nav = menuBtn.closest('.site-nav');
-        var open = !nav.classList.contains('is-open');
-        nav.classList.toggle('is-open', open);
-        menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        return;
-      }
-      if (!e.target.closest('.lang-switch') && !e.target.closest('.site-nav-toggle') && !e.target.closest('.site-nav-drawer')) {
-        closeMenus();
-      }
+      var t = fromEvent(e.target);
+      if (!t || !t.closest) { closeMenus(); return; }
+      if (t.closest('.lang-switch') || t.closest('.site-nav-toggle') || t.closest('.site-nav-drawer')) return;
+      closeMenus();
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeMenus();
@@ -200,6 +217,9 @@
     langs: LANGS,
     labels: LABELS
   };
+  global.toggleLangMenu = toggleLangMenu;
+  global.toggleSiteNav = toggleSiteNav;
+  global.setWobaziLang = setLangFromUi;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

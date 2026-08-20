@@ -235,7 +235,7 @@ input  { font-family: inherit; }
 }
 .screen.active {
   opacity: 1;
-  pointer-events: all;
+  pointer-events: auto;
   transform: translateY(0);
 }
 
@@ -4402,7 +4402,8 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
   width: min(240px, 62.4vw);
   height: auto;
   aspect-ratio: 688 / 535;
-  margin: 0 auto 8px;
+  margin: 36px auto 40px;
+  padding: 12px 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4935,13 +4936,15 @@ html[lang="th"], html[data-lang="th"] body {
 .site-nav {
   position: sticky;
   top: 0;
-  z-index: 80;
+  z-index: 200;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   padding: 12px 18px;
   width: 100%;
   margin: 0 auto;
+  overflow: visible;
   background: rgba(7, 7, 15, 0.55);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -4989,6 +4992,12 @@ html[lang="th"], html[data-lang="th"] body {
   color: var(--text);
   background: var(--w07);
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+.site-nav-toggle svg,
+.lang-switch-btn svg {
+  pointer-events: none;
 }
 .site-nav-drawer {
   display: none;
@@ -5001,6 +5010,7 @@ html[lang="th"], html[data-lang="th"] body {
   background: rgba(7, 7, 15, 0.96);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid rgba(240, 192, 64, 0.08);
+  z-index: 220;
 }
 .site-nav-drawer a {
   color: var(--text);
@@ -5041,11 +5051,11 @@ html[lang="th"], html[data-lang="th"] body {
   min-width: 148px;
   padding: 6px;
   list-style: none;
-  background: rgba(15, 15, 28, 0.96);
+  background: rgba(15, 15, 28, 0.98);
   border: 1px solid rgba(240, 192, 64, 0.14);
   border-radius: 14px;
   box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-  z-index: 90;
+  z-index: 230;
 }
 .lang-switch.is-open .lang-switch-menu { display: block; }
 .lang-switch-menu button {
@@ -5094,6 +5104,13 @@ html[lang="th"], html[data-lang="th"] body {
   .site-nav-cta .cta-short { display: inline; }
   .site-nav-toggle { display: flex; }
   .site-nav { max-width: none; }
+  .site-nav-drawer {
+    flex: 1 0 100%;
+    position: static;
+    width: 100%;
+    max-height: min(70vh, 420px);
+    overflow-y: auto;
+  }
 }
 
 @media (max-width: 560px) {
