@@ -48,7 +48,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/app/style.css?v=30">
-  <script src="/public/js/i18n.js?v=3"></script>
+  <script src="/public/js/i18n.js?v=4"></script>
+  <script src="/public/js/i18n-copy.js?v=1"></script>
+  <script src="/public/js/i18n-copy-more.js?v=1"></script>
 </head>
 <body>
 
@@ -220,41 +222,41 @@
       <section class="splash-bazi">
         <div class="splash-divider" aria-hidden="true"><span>✦</span></div>
         <h2><span class="en">What is Bāzì?</span><span class="zh hide">什么是八字？</span><span class="th hide">ปาจื้อคืออะไร?</span></h2>
-        <p class="bazi-lead">BaZi (八字) literally means <strong>Eight Characters</strong>. It converts your exact birth date and time into a chart of eight Chinese characters — a cosmic blueprint of who you are, refined over a thousand years of Chinese metaphysics.</p>
-        <p class="bazi-lead">Those characters sit across four pillars. Each has a Heavenly Stem above and an Earthly Branch below. The Day Stem is your <strong>Day Master</strong> — the essence of your core self.</p>
+        <p class="bazi-lead" data-i18n="home.lead1">BaZi (八字) literally means <strong>Eight Characters</strong>. It converts your exact birth date and time into a chart of eight Chinese characters — a cosmic blueprint of who you are, refined over a thousand years of Chinese metaphysics.</p>
+        <p class="bazi-lead" data-i18n="home.lead2">Those characters sit across four pillars. Each has a Heavenly Stem above and an Earthly Branch below. The Day Stem is your <strong>Day Master</strong> — the essence of your core self.</p>
 
         <div class="bazi-pillar-meanings">
           <div class="bazi-mean">
             <span class="zh">年</span>
-            <strong>Year</strong>
-            <p>Ancestry, social identity, the generational energy you carry</p>
+            <strong data-i18n="label.year">Year</strong>
+            <p data-i18n="home.year.p">Ancestry, social identity, the generational energy you carry</p>
           </div>
           <div class="bazi-mean">
             <span class="zh">月</span>
-            <strong>Month</strong>
-            <p>Career climate, parents, the season that shaped you</p>
+            <strong data-i18n="label.month">Month</strong>
+            <p data-i18n="home.month.p">Career climate, parents, the season that shaped you</p>
           </div>
           <div class="bazi-mean">
             <span class="zh">日</span>
-            <strong>Day</strong>
-            <p>Your Day Master — the single character that is you</p>
+            <strong data-i18n="label.day">Day</strong>
+            <p data-i18n="home.day.p">Your Day Master — the single character that is you</p>
           </div>
           <div class="bazi-mean">
             <span class="zh">时</span>
-            <strong>Hour</strong>
-            <p>Inner world, later years, the life you build after 40</p>
+            <strong data-i18n="label.hour">Hour</strong>
+            <p data-i18n="home.hour.p">Inner world, later years, the life you build after 40</p>
           </div>
         </div>
 
         <div class="about-elements-row splash-elements">
-          <div class="about-element-chip" style="color:var(--el-wood)"><span class="zh">木</span>Wood</div>
-          <div class="about-element-chip" style="color:var(--el-fire)"><span class="zh">火</span>Fire</div>
-          <div class="about-element-chip" style="color:var(--el-earth)"><span class="zh">土</span>Earth</div>
-          <div class="about-element-chip" style="color:var(--el-metal)"><span class="zh">金</span>Metal</div>
-          <div class="about-element-chip" style="color:var(--el-water)"><span class="zh">水</span>Water</div>
+          <div class="about-element-chip" style="color:var(--el-wood)"><span class="zh">木</span><span data-i18n="el.wood">Wood</span></div>
+          <div class="about-element-chip" style="color:var(--el-fire)"><span class="zh">火</span><span data-i18n="el.fire">Fire</span></div>
+          <div class="about-element-chip" style="color:var(--el-earth)"><span class="zh">土</span><span data-i18n="el.earth">Earth</span></div>
+          <div class="about-element-chip" style="color:var(--el-metal)"><span class="zh">金</span><span data-i18n="el.metal">Metal</span></div>
+          <div class="about-element-chip" style="color:var(--el-water)"><span class="zh">水</span><span data-i18n="el.water">Water</span></div>
         </div>
 
-        <blockquote class="bazi-callout">BaZi is a weather forecast, not a prison sentence. The chart shows the terrain — you still choose how to walk it.</blockquote>
+        <blockquote class="bazi-callout" data-i18n="home.callout">BaZi is a weather forecast, not a prison sentence. The chart shows the terrain — you still choose how to walk it.</blockquote>
 
         <p class="splash-learn"><a href="/what-is-bazi" class="btn-about-link"><span class="en">Read the full guide →</span><span class="zh hide">阅读完整指南 →</span><span class="th hide">อ่านคู่มือฉบับเต็ม →</span></a></p>
       </section>
@@ -684,8 +686,8 @@
       </div>
       <form id="bazi-form" onsubmit="handleSubmit(event)">
         <div class="field">
-          <label><span class="en">Name <span class="label-opt">personalize your reading</span></span><span class="zh hide">姓名 <span class="label-opt">个性化你的命理</span></span></label>
-          <input type="text" id="name" placeholder="What do we call you?" autocomplete="off" spellcheck="false">
+          <label><span class="en">Name <span class="label-opt">personalize your reading</span></span><span class="zh hide">姓名 <span class="label-opt">个性化你的命理</span></span><span class="th hide">ชื่อ <span class="label-opt">ปรับการอ่านให้เป็นของคุณ</span></span></label>
+          <input type="text" id="name" placeholder="What do we call you?" data-i18n-placeholder="form.name.ph" autocomplete="off" spellcheck="false">
         </div>
 
         <div class="field field-row field-datetime">
@@ -701,7 +703,7 @@
             <p class="field-error hide" id="dob-error" role="alert"></p>
           </div>
           <div class="field-col field-col-time">
-            <label><span class="en">Time <span class="label-opt">Four Pillars</span></span><span class="zh hide">时间 <span class="label-opt">四柱命盘</span></span></label>
+            <label><span class="en">Time <span class="label-opt">Four Pillars</span></span><span class="zh hide">时间 <span class="label-opt">四柱命盘</span></span><span class="th hide">เวลา <span class="label-opt">สี่เสา</span></span></label>
             <input type="time" id="birthtime" class="time-input">
           </div>
         </div>
@@ -710,12 +712,12 @@
           <div class="field-col">
             <label><span class="en">Birth City <span class="label-opt">geographic energy</span></span><span class="zh hide">出生城市 <span class="label-opt">地理能量</span></span><span class="th hide">เมืองเกิด <span class="label-opt">พลังงานภูมิศาสตร์</span></span></label>
             <div class="city-wrap">
-              <input type="text" id="birthplace" placeholder="Start typing a city..." autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="city-suggest">
+              <input type="text" id="birthplace" placeholder="Start typing a city..." data-i18n-placeholder="form.city.ph" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="city-suggest">
               <ul id="city-suggest" class="city-suggest hide" role="listbox"></ul>
             </div>
           </div>
           <div class="field-col">
-            <label><span class="en">Blood Type <span class="label-opt">personality traits</span></span><span class="zh hide">血型 <span class="label-opt">性格特征</span></span></label>
+            <label><span class="en">Blood Type <span class="label-opt">personality traits</span></span><span class="zh hide">血型 <span class="label-opt">性格特征</span></span><span class="th hide">หมู่เลือด <span class="label-opt">ลักษณะนิสัย</span></span></label>
             <select id="blood-type" class="select-input">
               <option value="">Unknown</option>
               <option value="A">A</option>
@@ -727,10 +729,10 @@
         </div>
 
         <div class="field">
-          <label><span class="en">Gender <span class="label-opt">Feng Shui</span></span><span class="zh hide">性别 <span class="label-opt">风水</span></span></label>
+          <label><span class="en">Gender <span class="label-opt">Feng Shui</span></span><span class="zh hide">性别 <span class="label-opt">风水</span></span><span class="th hide">เพศ <span class="label-opt">ฮวงจุ้ย</span></span></label>
           <div class="gender-row">
-            <label class="gender-opt"><input type="radio" name="gender" value="M"> ♂ <span class="en">Male</span><span class="zh hide">男</span></label>
-            <label class="gender-opt"><input type="radio" name="gender" value="F"> ♀ <span class="en">Female</span><span class="zh hide">女</span></label>
+            <label class="gender-opt"><input type="radio" name="gender" value="M"> ♂ <span class="en">Male</span><span class="zh hide">男</span><span class="th hide">ชาย</span></label>
+            <label class="gender-opt"><input type="radio" name="gender" value="F"> ♀ <span class="en">Female</span><span class="zh hide">女</span><span class="th hide">หญิง</span></label>
           </div>
         </div>
 

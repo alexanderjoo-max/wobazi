@@ -114,24 +114,28 @@
       var key = el.getAttribute('data-i18n');
       if (!key || !STR[key]) continue;
       var text = t(key, lang);
-      var target = el.querySelector('[data-i18n-label]') || el;
-      if (target.childNodes.length === 1 && target.childNodes[0].nodeType === 3) {
-        target.textContent = text;
-      } else if (target.hasAttribute('data-i18n-label') || target === el) {
-        var label = el.querySelector('[data-i18n-label]');
-        if (label) label.textContent = text;
-        else if (!el.querySelector('svg, img')) el.textContent = text;
-        else {
-          var span = el.querySelector('span:not(.cta-short)');
-          if (span && !span.querySelector('svg')) span.textContent = text;
-        }
+      var labeled = el.querySelector('[data-i18n-label]');
+      if (labeled) {
+        labeled.textContent = text;
+        continue;
       }
+      if (el.querySelector('svg, img, canvas')) continue;
+      if (/<[a-z][\s\S]*>/i.test(text)) el.innerHTML = text;
+      else el.textContent = text;
     }
     var ph = document.querySelectorAll('[data-i18n-placeholder]');
     for (var j = 0; j < ph.length; j++) {
       var pkey = ph[j].getAttribute('data-i18n-placeholder');
       if (STR[pkey]) ph[j].placeholder = t(pkey, lang);
     }
+  }
+
+  function add(map) {
+    if (!map) return;
+    for (var k in map) {
+      if (Object.prototype.hasOwnProperty.call(map, k)) STR[k] = map[k];
+    }
+    apply(current);
   }
 
   function updateSwitchers(lang) {
@@ -229,7 +233,12 @@
 
   function init() {
     bind();
-    apply(current);
+    if (global.__WOBAZI_I18N_PENDING) {
+      add(global.__WOBAZI_I18N_PENDING);
+      global.__WOBAZI_I18N_PENDING = null;
+    } else {
+      apply(current);
+    }
   }
 
   global.WoBaziI18n = {
@@ -237,6 +246,7 @@
     get: function () { return current; },
     set: apply,
     apply: apply,
+    add: add,
     langs: LANGS,
     labels: LABELS
   };
