@@ -47,8 +47,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=29">
-  <script src="/public/js/i18n.js?v=2"></script>
+  <link rel="stylesheet" href="/app/style.css?v=30">
+  <script src="/public/js/i18n.js?v=3"></script>
 </head>
 <body>
 
@@ -100,10 +100,19 @@
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
       <div class="site-nav-drawer">
-        <a href="/what-is-bazi"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
-        <a href="/?begin=1" class="btn-primary" onclick="if(!event.metaKey&&!event.ctrlKey){event.preventDefault();haptic(12);showScreen('input');}">
-          <span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span>
-        </a>
+        <div class="drawer-card">
+          <p class="drawer-kicker"><span class="en">Language</span><span class="zh hide">语言</span><span class="th hide">ภาษา</span></p>
+          <div class="drawer-lang">
+            <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">English</button>
+            <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
+            <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+          </div>
+          <a href="/what-is-bazi" class="drawer-link"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
+          <button type="button" class="drawer-link" onclick="haptic(10); loginWithGoogle()"><span class="en">Sign in</span><span class="zh hide">登录</span><span class="th hide">เข้าสู่ระบบ</span></button>
+          <button type="button" class="btn-primary drawer-cta" onclick="haptic(12); showScreen('input'); document.querySelector('.site-nav') && document.querySelector('.site-nav').classList.remove('is-open');">
+            <span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -1360,6 +1369,6 @@
     </div>
   </div>
 
-  <script src="/app/script.js?v=21"></script>
+  <script src="/app/script.js?v=22"></script>
 </body>
 </html>

@@ -35,8 +35,16 @@
   </button>
 
   <div class="site-nav-drawer">
-    <a href="/what-is-bazi" data-i18n="nav.explainer">BaZi Explainer</a>
-    <a href="/auth/google" data-i18n="nav.signin">Sign in</a>
-    <a href="/?begin=1" class="btn-primary" data-i18n="nav.begin">Begin your free reading</a>
+    <div class="drawer-card">
+      <p class="drawer-kicker" data-i18n="nav.language">Language</p>
+      <div class="drawer-lang">
+        <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">English</button>
+        <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
+        <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+      </div>
+      <a href="/what-is-bazi" class="drawer-link" data-i18n="nav.explainer">BaZi Explainer</a>
+      <a href="/auth/google" class="drawer-link" data-i18n="nav.signin">Sign in</a>
+      <a href="/?begin=1" class="btn-primary drawer-cta" data-i18n="nav.begin">Begin your free reading</a>
+    </div>
   </div>
 </header>

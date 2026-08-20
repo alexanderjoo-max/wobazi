@@ -41,7 +41,25 @@
       en: 'The English version of this document is the binding agreement. Other languages are provided for convenience only.',
       th: 'ฉบับภาษาอังกฤษของเอกสารนี้เป็นข้อตกลงที่มีผลผูกพัน ภาษาอื่นจัดไว้เพื่อความสะดวกเท่านั้น',
       zh: '本文档以英文版本为准。其他语言译本仅供参考。'
-    }
+    },
+    'toc.overview': { en: 'Overview', th: 'ภาพรวม', zh: '总览' },
+    'toc.pillars': { en: 'Four Pillars', th: 'สี่เสา', zh: '四柱' },
+    'toc.elements': { en: 'Five Elements', th: 'ธาตุทั้งห้า', zh: '五行' },
+    'toc.yinyang': { en: 'Yin & Yang', th: 'หยินหยาง', zh: '阴阳' },
+    'toc.zodiac': { en: 'Zodiac', th: 'นักษัตร', zh: '生肖' },
+    'toc.daymaster': { en: 'Day Master', th: 'วันมาสเตอร์', zh: '日主' },
+    'toc.compat': { en: 'Compatibility', th: 'ความเข้ากัน', zh: '合婚' },
+    'toc.how': { en: 'How It Works', th: 'วิธีอ่านดวง', zh: '如何排盘' },
+    'page.what.title': { en: 'What is BaZi?', th: 'ปาจื้อคืออะไร?', zh: '什么是八字？' },
+    'page.what.sub': {
+      en: 'The ancient Chinese system of Four Pillars astrology that decodes your destiny from the moment you were born.',
+      th: 'ระบบโหราศาสตร์จีนโบราณแห่งสี่เสา ที่ถอดรหัสโชคชะตาจากวินาทีที่คุณเกิด',
+      zh: '源自出生时刻的古代中国四柱命理，用以解读命运。'
+    },
+    'page.pillars.title': { en: 'Four Pillars of Destiny', th: 'สี่เสาแห่งโชคชะตา', zh: '四柱命理' },
+    'page.astrology.title': { en: 'Chinese Astrology', th: 'โหราศาสตร์จีน', zh: '中国占星' },
+    'page.daymaster.title': { en: 'BaZi Day Master Guide', th: 'คู่มือวันมาสเตอร์', zh: '八字日主指南' },
+    'page.compat.title': { en: 'BaZi Compatibility', th: 'ความเข้ากันทางปาจื้อ', zh: '八字合婚' }
   };
 
   function normalize(code) {
@@ -122,10 +140,10 @@
       var root = switches[i];
       var label = root.querySelector('.lang-switch-label');
       if (label) label.textContent = LANGS[lang] || 'EN';
-      var opts = root.querySelectorAll('[data-lang]');
-      for (var k = 0; k < opts.length; k++) {
-        opts[k].setAttribute('aria-selected', opts[k].getAttribute('data-lang') === lang ? 'true' : 'false');
-      }
+    }
+    var opts = document.querySelectorAll('[data-lang]');
+    for (var k = 0; k < opts.length; k++) {
+      opts[k].setAttribute('aria-selected', opts[k].getAttribute('data-lang') === lang ? 'true' : 'false');
     }
   }
 
@@ -189,7 +207,12 @@
   function setLangFromUi(code, e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     apply(code);
-    closeMenus();
+    var open = document.querySelectorAll('.lang-switch.is-open');
+    for (var i = 0; i < open.length; i++) {
+      open[i].classList.remove('is-open');
+      var btn = open[i].querySelector('[aria-expanded="true"]');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
   }
 
   function bind() {

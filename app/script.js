@@ -1704,7 +1704,7 @@ function showShareCard() {
       </div>
     </div>
     <div class="share-footer-logo">
-      <img src="/Logos/SVG/rev-horiz.svg" class="share-logo-img" alt="WoBazi">
+      <img src="/app/assets/logo-horiz.png?v=5" class="share-logo-img" alt="WoBazi">
       <span class="share-footer-dot">.com</span>
     </div>`;
 

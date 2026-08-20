@@ -5,6 +5,11 @@
  * Two formats: 1080x1080 (square) and 1080x1920 (story).
  */
 
+const fs = require('fs');
+const path = require('path');
+const LOGO_PNG = 'data:image/png;base64,' +
+  fs.readFileSync(path.join(__dirname, '..', 'app', 'assets', 'logo-horiz.png')).toString('base64');
+
 const COLORS = {
   bg1: '#07030f',
   bg2: '#1a0a3d',
@@ -107,31 +112,23 @@ function fortuneGrid(love, career, health, wealth, s) {
   );
 }
 
-// ── WoBazi logo footer (text-based since we can't embed SVG easily in Satori) ──
 function logoFooter(s) {
-  return el('div', { alignItems: 'baseline', gap: s ? '6px' : '4px', marginTop: s ? '8px' : '4px' },
-    // 八字 characters
-    el('span', {
-      fontSize: s ? 26 : 20,
-      fontWeight: 700,
-      color: '#e8753a', // orange like the logo
-      fontFamily: '"Noto Sans SC", sans-serif',
-    }, '八字'),
-    // WoBaZi text
-    el('span', {
-      fontSize: s ? 26 : 20,
-      fontWeight: 800,
-      color: COLORS.white,
-      letterSpacing: '0.02em',
-    }, 'WoBaZi'),
-    // .com
-    el('span', {
-      fontSize: s ? 22 : 17,
-      fontWeight: 600,
-      color: COLORS.gold,
-      marginLeft: s ? '4px' : '2px',
-    }, '.com'),
-  );
+  const w = s ? 280 : 200;
+  const h = s ? 43 : 31;
+  return {
+    type: 'img',
+    props: {
+      src: LOGO_PNG,
+      width: w,
+      height: h,
+      style: {
+        width: w,
+        height: h,
+        objectFit: 'contain',
+        marginTop: s ? 8 : 4,
+      },
+    },
+  };
 }
 
 /**
