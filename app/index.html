@@ -14,7 +14,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="robots" content="noindex, nofollow">
   <title>Wobazi ✦ Your Chinese Destiny</title>
 
   <!-- Primary meta -->
@@ -38,8 +37,9 @@
   <meta name="twitter:image"       content="https://wobazi.com/og-card.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=27">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/app/style.css?v=28">
 </head>
 <body>
 
@@ -53,16 +53,51 @@
     <div class="splash-aurora" aria-hidden="true"></div>
 
     <!-- Top navigation -->
-    <header class="splash-nav">
-      <img src="/app/assets/logo-horiz.png?v=5" class="nav-logo" alt="Wobazi">
-      <div class="splash-nav-actions">
-        <!-- Guest: official Google sign-in (hidden once logged in) -->
+    <header class="site-nav">
+      <a href="/" class="site-nav-logo" onclick="if(!event.metaKey&&!event.ctrlKey){event.preventDefault();haptic(6);showScreen('splash');}">
+        <img src="/app/assets/logo-horiz.png?v=5" class="nav-logo" alt="Wobazi">
+      </a>
+      <nav class="site-nav-links" aria-label="Legal">
+        <a href="/privacy"><span class="en">Privacy Policy</span><span class="zh hide">隐私政策</span><span class="th hide">นโยบายความเป็นส่วนตัว</span></a>
+        <a href="/terms"><span class="en">Terms of Service</span><span class="zh hide">服务条款</span><span class="th hide">ข้อกำหนดการให้บริการ</span></a>
+      </nav>
+      <div class="site-nav-actions">
+        <div class="lang-switch" data-lang-switch>
+          <button type="button" class="lang-switch-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Language">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 3.5 6 3.5 9s-1 6-3.5 9c-2.5-3-3.5-6-3.5-9S9.5 6 12 3z"/></svg>
+            <span class="lang-switch-label">EN</span>
+          </button>
+          <ul class="lang-switch-menu" role="listbox">
+            <li><button type="button" role="option" data-lang="en">English</button></li>
+            <li><button type="button" role="option" data-lang="th">ไทย</button></li>
+            <li><button type="button" role="option" data-lang="zh">中文</button></li>
+          </ul>
+        </div>
         <div id="splash-guest">
           <button class="google-login-btn splash-signin" onclick="haptic(10); loginWithGoogle()">
             <svg class="google-logo" viewBox="0 0 24 24" width="16" height="16"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Sign in
+            <span class="en">Sign in</span><span class="zh hide">登录</span><span class="th hide">เข้าสู่ระบบ</span>
           </button>
         </div>
+        <div id="nav-authed" class="nav-authed hide">
+          <img id="nav-authed-avatar" class="nav-authed-avatar" alt="" referrerpolicy="no-referrer">
+          <button class="nav-logout" onclick="haptic(6); logout()"><span class="en">Logout</span><span class="zh hide">退出</span><span class="th hide">ออกจากระบบ</span></button>
+        </div>
+        <a href="/?begin=1" class="btn-primary site-nav-cta" onclick="if(!event.metaKey&&!event.ctrlKey){event.preventDefault();haptic(12);showScreen('input');}">
+          <span class="cta-full"><span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span></span>
+          <span class="cta-short"><span class="en">Free reading</span><span class="zh hide">免费解读</span><span class="th hide">ดูดวงฟรี</span></span>
+        </a>
+      </div>
+      <button type="button" class="site-nav-toggle" aria-label="Menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div class="site-nav-drawer">
+        <a href="/privacy"><span class="en">Privacy Policy</span><span class="zh hide">隐私政策</span><span class="th hide">นโยบายความเป็นส่วนตัว</span></a>
+        <a href="/terms"><span class="en">Terms of Service</span><span class="zh hide">服务条款</span><span class="th hide">ข้อกำหนดการให้บริการ</span></a>
+        <a href="/what-is-bazi"><span class="en">What is BaZi?</span><span class="zh hide">什么是八字？</span><span class="th hide">ปาจื้อคืออะไร?</span></a>
+        <a href="/?begin=1" class="btn-primary" onclick="if(!event.metaKey&&!event.ctrlKey){event.preventDefault();haptic(12);showScreen('input');}">
+          <span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span>
+        </a>
       </div>
     </header>
 
@@ -80,13 +115,13 @@
           <img src="/app/assets/logo-stack.png?v=5" class="hero-logo" alt="八字 Wobazi">
         </div>
         <h1 class="hero-wordmark visually-hidden">Wobazi</h1>
-        <p class="logo-sub">Chinese Destiny System</p>
-        <p class="splash-tagline">The moment you were born left eight characters in the heavens — a two-thousand-year-old art, still startlingly precise.</p>
+        <p class="logo-sub"><span class="en">Chinese Destiny System</span><span class="zh hide">中国命运系统</span><span class="th hide">ระบบโชคชะตาจีน</span></p>
+        <p class="splash-tagline"><span class="en">The moment you were born left eight characters in the heavens — a two-thousand-year-old art, still startlingly precise.</span><span class="zh hide">你诞生的那一刻，八个字符写进了天象——两千年的古老技艺，至今精确得令人心惊。</span><span class="th hide">วินาทีที่คุณเกิดได้ฝากรอยแปดตัวอักษรไว้บนฟ้า — ศาสตร์เก่าแก่สองพันปี ที่ยังแม่นยำจนน่าทึ่ง</span></p>
         <button class="btn-primary splash-cta" onclick="haptic(12); showScreen('input')">
-          Begin Your Reading
+          <span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
-        <p class="splash-google-hint">Free · No account needed · Sign in to save your chart &amp; history</p>
+        <p class="splash-google-hint"><span class="en">Free · No account needed · Sign in to save your chart &amp; history</span><span class="zh hide">免费 · 无需账号 · 登录即可保存命盘与记录</span><span class="th hide">ฟรี · ไม่ต้องมีบัญชี · เข้าสู่ระบบเพื่อบันทึกดวงและประวัติ</span></p>
       </section>
 
       <!-- Returning user (authed only) -->
@@ -125,8 +160,8 @@
             </svg>
           </div>
           <div class="feat-copy">
-            <h2>Know who you truly are.</h2>
-            <p>Your nature, your strengths, your blind spots — read from the moment you were born.</p>
+            <h2><span class="en">Know who you truly are.</span><span class="zh hide">真正认识你自己。</span><span class="th hide">รู้จักตัวเองอย่างแท้จริง</span></h2>
+            <p><span class="en">Your nature, your strengths, your blind spots — read from the moment you were born.</span><span class="zh hide">性情、长处与盲点——都写在你诞生的那一刻。</span><span class="th hide">นิสัย จุดแข็ง จุดบอด — อ่านได้จากวินาทีที่คุณเกิด</span></p>
           </div>
         </article>
 
@@ -144,8 +179,8 @@
             </svg>
           </div>
           <div class="feat-copy">
-            <h2>Move when the time is right.</h2>
-            <p>See the years that reward your boldest decisions.</p>
+            <h2><span class="en">Move when the time is right.</span><span class="zh hide">在对的时机行动。</span><span class="th hide">ขยับเมื่อเวลาเหมาะ</span></h2>
+            <p><span class="en">See the years that reward your boldest decisions.</span><span class="zh hide">看见那些奖赏果敢决定的年份。</span><span class="th hide">เห็นปีที่การตัดสินใจกล้าจะได้รับรางวัล</span></p>
           </div>
         </article>
 
@@ -159,8 +194,8 @@
             </svg>
           </div>
           <div class="feat-copy">
-            <h2>Find the people you belong with.</h2>
-            <p>Discover whose energy harmonizes with yours.</p>
+            <h2><span class="en">Find the people you belong with.</span><span class="zh hide">找到属于你的人。</span><span class="th hide">พบคนที่พลังตรงกับคุณ</span></h2>
+            <p><span class="en">Discover whose energy harmonizes with yours.</span><span class="zh hide">发现谁的能量与你相合。</span><span class="th hide">ค้นพบว่าพลังของใครกลมกลืนกับคุณ</span></p>
           </div>
         </article>
 
@@ -169,7 +204,7 @@
       <!-- What is Bazi -->
       <section class="splash-bazi">
         <div class="splash-divider" aria-hidden="true"><span>✦</span></div>
-        <h2>What is Bāzì?</h2>
+        <h2><span class="en">What is Bāzì?</span><span class="zh hide">什么是八字？</span><span class="th hide">ปาจื้อคืออะไร?</span></h2>
         <p class="bazi-lead">BaZi (八字) literally means <strong>Eight Characters</strong>. It converts your exact birth date and time into a chart of eight Chinese characters — a cosmic blueprint of who you are, refined over a thousand years of Chinese metaphysics.</p>
         <p class="bazi-lead">Those characters sit across four pillars. Each has a Heavenly Stem above and an Earthly Branch below. The Day Stem is your <strong>Day Master</strong> — the essence of your core self.</p>
 
@@ -206,15 +241,21 @@
 
         <blockquote class="bazi-callout">BaZi is a weather forecast, not a prison sentence. The chart shows the terrain — you still choose how to walk it.</blockquote>
 
-        <p class="splash-learn"><a href="/what-is-bazi" class="btn-about-link">Read the full guide →</a></p>
+        <p class="splash-learn"><a href="/what-is-bazi" class="btn-about-link"><span class="en">Read the full guide →</span><span class="zh hide">阅读完整指南 →</span><span class="th hide">อ่านคู่มือฉบับเต็ม →</span></a></p>
       </section>
 
       <!-- Final CTA -->
       <div class="about-cta splash-final-cta">
         <button class="btn-primary splash-cta" onclick="haptic(12); showScreen('input')">
-          Begin Your Reading
+          <span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
+      </div>
+
+      <div class="splash-foot">
+        <a href="/privacy"><span class="en">Privacy Policy</span><span class="zh hide">隐私政策</span><span class="th hide">นโยบายความเป็นส่วนตัว</span></a>
+        <a href="/terms"><span class="en">Terms of Service</span><span class="zh hide">服务条款</span><span class="th hide">ข้อกำหนดการให้บริการ</span></a>
+        <a href="/what-is-bazi"><span class="en">What is BaZi?</span><span class="zh hide">什么是八字？</span><span class="th hide">ปาจื้อคืออะไร?</span></a>
       </div>
 
     </div>
@@ -605,7 +646,7 @@
       <div class="about-cta">
         <p>Ready to decode your chart?</p>
         <button class="btn-primary" onclick="haptic(10); showScreen('input')">
-          <span class="en">Begin Your Reading</span><span class="zh hide">开始算命</span>
+          <span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </div>
@@ -625,7 +666,7 @@
     <div class="input-body">
       <div class="input-intro">
         <div class="intro-icon">✦</div>
-        <p><span class="en">Enter your details to unlock your<br><strong>Four Pillars of Destiny</strong></span><span class="zh hide">输入出生信息，解锁<br><strong>四柱命盘</strong></span></p>
+        <p><span class="en">Enter your details to unlock your<br><strong>Four Pillars of Destiny</strong></span><span class="zh hide">输入出生信息，解锁<br><strong>四柱命盘</strong></span><span class="th hide">กรอกข้อมูลเพื่อปลดล็อก<br><strong>สี่เสาแห่งโชคชะตา</strong></span></p>
       </div>
       <form id="bazi-form" onsubmit="handleSubmit(event)">
         <div class="field">
@@ -635,14 +676,15 @@
 
         <div class="field field-row field-datetime">
           <div class="field-col field-col-date">
-            <label><span class="en">Date of Birth <span class="label-opt">Four Pillars</span></span><span class="zh hide">出生日期 <span class="label-opt">四柱命盘</span></span></label>
+            <label><span class="en">Date of Birth <span class="label-req">*Required</span></span><span class="zh hide">出生日期 <span class="label-req">*必填</span></span><span class="th hide">วันเกิด <span class="label-req">*จำเป็น</span></span></label>
             <div class="date-trio">
-              <input type="number" id="birth-day"   class="date-part" placeholder="DD"   min="1"    max="31"   inputmode="numeric">
+              <input type="number" id="birth-day"   class="date-part" placeholder="DD"   min="1"    max="31"   inputmode="numeric" required aria-required="true">
               <span class="date-sep">/</span>
-              <input type="number" id="birth-month" class="date-part" placeholder="MM"   min="1"    max="12"   inputmode="numeric">
+              <input type="number" id="birth-month" class="date-part" placeholder="MM"   min="1"    max="12"   inputmode="numeric" required aria-required="true">
               <span class="date-sep">/</span>
-              <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1920" max="2030" inputmode="numeric">
+              <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1920" max="2030" inputmode="numeric" required aria-required="true">
             </div>
+            <p class="field-error hide" id="dob-error" role="alert"></p>
           </div>
           <div class="field-col field-col-time">
             <label><span class="en">Time <span class="label-opt">Four Pillars</span></span><span class="zh hide">时间 <span class="label-opt">四柱命盘</span></span></label>
@@ -652,8 +694,11 @@
 
         <div class="field field-row">
           <div class="field-col">
-            <label><span class="en">Birth City <span class="label-opt">geographic energy</span></span><span class="zh hide">出生城市 <span class="label-opt">地理能量</span></span></label>
-            <input type="text" id="birthplace" placeholder="Start typing a city..." autocomplete="address-level2" spellcheck="false">
+            <label><span class="en">Birth City <span class="label-opt">geographic energy</span></span><span class="zh hide">出生城市 <span class="label-opt">地理能量</span></span><span class="th hide">เมืองเกิด <span class="label-opt">พลังงานภูมิศาสตร์</span></span></label>
+            <div class="city-wrap">
+              <input type="text" id="birthplace" placeholder="Start typing a city..." autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="city-suggest">
+              <ul id="city-suggest" class="city-suggest hide" role="listbox"></ul>
+            </div>
           </div>
           <div class="field-col">
             <label><span class="en">Blood Type <span class="label-opt">personality traits</span></span><span class="zh hide">血型 <span class="label-opt">性格特征</span></span></label>
@@ -720,7 +765,17 @@
         <button class="btn-share-icon" id="share-btn" onclick="haptic(8); showShareCard()" title="Share">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         </button>
-        <button class="btn-lang" id="lang-btn" onclick="toggleLang()">中文</button>
+        <div class="lang-switch" data-lang-switch>
+          <button type="button" class="lang-switch-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Language">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 3.5 6 3.5 9s-1 6-3.5 9c-2.5-3-3.5-6-3.5-9S9.5 6 12 3z"/></svg>
+            <span class="lang-switch-label">EN</span>
+          </button>
+          <ul class="lang-switch-menu" role="listbox">
+            <li><button type="button" role="option" data-lang="en">English</button></li>
+            <li><button type="button" role="option" data-lang="th">ไทย</button></li>
+            <li><button type="button" role="option" data-lang="zh">中文</button></li>
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -1179,15 +1234,15 @@
             <span class="en">New Reading</span><span class="zh hide">重新算命</span>
           </button>
           <span class="footer-dot">·</span>
-          <button class="footer-link" onclick="toggleLang()">
-            <span class="en">中文</span><span class="zh hide">English</span>
-          </button>
+          <a href="/privacy" class="footer-link"><span class="en">Privacy</span><span class="zh hide">隐私</span><span class="th hide">ความเป็นส่วนตัว</span></a>
+          <span class="footer-dot">·</span>
+          <a href="/terms" class="footer-link"><span class="en">Terms</span><span class="zh hide">条款</span><span class="th hide">ข้อกำหนด</span></a>
         </div>
         <div class="footer-brand">
           <img src="/app/assets/logo-horiz.png?v=5" class="footer-logo" alt="Wobazi">
-          <p class="footer-tagline"><span class="en">Ancient wisdom, modern clarity</span><span class="zh hide">古老智慧，现代洞见</span></p>
+          <p class="footer-tagline"><span class="en">Ancient wisdom, modern clarity</span><span class="zh hide">古老智慧，现代洞见</span><span class="th hide">ภูมิปัญญาโบราณ ความชัดเจนสมัยใหม่</span></p>
         </div>
-        <p class="footer-copy">© 2026 Wobazi. <span class="en">All rights reserved.</span><span class="zh hide">保留所有权利。</span></p>
+        <p class="footer-copy">© 2026 Wobazi. <span class="en">All rights reserved.</span><span class="zh hide">保留所有权利。</span><span class="th hide">สงวนลิขสิทธิ์</span></p>
         <p class="footer-disclaimer"><span class="en">For entertainment &amp; self-reflection purposes only. Not a substitute for professional advice.</span><span class="zh hide">仅供娱乐与自我反思。不能替代专业建议。</span></p>
       </footer>
     </div>
@@ -1304,6 +1359,7 @@
     </div>
   </div>
 
-  <script src="script.js?v=19"></script>
+  <script src="/public/js/i18n.js"></script>
+  <script src="/app/script.js?v=20"></script>
 </body>
 </html>

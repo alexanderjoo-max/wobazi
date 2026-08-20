@@ -74,11 +74,14 @@ app.use('/og-card.png', express.static(path.join(__dirname, 'og-card.png')));
 /* ── SEO: Sitemap & Robots ── */
 app.get('/sitemap.xml', (req, res) => {
   const pages = [
-    { loc: '/what-is-bazi', priority: '1.0', changefreq: 'monthly' },
+    { loc: '/', priority: '1.0', changefreq: 'weekly' },
+    { loc: '/what-is-bazi', priority: '0.9', changefreq: 'monthly' },
     { loc: '/four-pillars-of-destiny', priority: '0.8', changefreq: 'monthly' },
     { loc: '/chinese-astrology', priority: '0.8', changefreq: 'monthly' },
     { loc: '/day-master', priority: '0.8', changefreq: 'monthly' },
     { loc: '/bazi-compatibility', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/privacy', priority: '0.3', changefreq: 'yearly' },
+    { loc: '/terms', priority: '0.3', changefreq: 'yearly' },
   ];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -94,7 +97,6 @@ ${pages.map(p => `  <url>
 app.get('/robots.txt', (req, res) => {
   res.type('text/plain').send(`User-agent: *
 Allow: /
-Disallow: /app/
 Disallow: /api/
 Disallow: /auth/
 
@@ -125,9 +127,10 @@ function checkRateLimit(ip) {
 ═══════════════════════════════════════ */
 const seoBase = { baseUrl: 'https://wobazi.com' };
 
-app.get('/', (req, res) => {
-  res.redirect(301, '/app');
-});
+function sendApp(req, res) {
+  res.sendFile(path.join(__dirname, 'app', 'index.html'));
+}
+app.get('/', sendApp);
 
 app.use('/wobazi2-assets', express.static(path.join(__dirname, 'wobazi2-assets')));
 app.get('/wobazi2', (req, res) => {
@@ -191,13 +194,30 @@ app.get('/bazi-compatibility', (req, res) => {
   });
 });
 
-/* ── SPA App ── */
-app.get('/app', (req, res) => {
-  res.sendFile(path.join(__dirname, 'app', 'index.html'));
+app.get('/privacy', (req, res) => {
+  res.render('pages/privacy', {
+    ...seoBase,
+    title: 'Privacy Policy | WoBazi',
+    description: 'How WoBazi collects, uses, and protects your information, including Google sign-in, birth data, and AI-generated readings.',
+    canonical: '/privacy',
+  });
 });
-app.get('/app/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'app', 'index.html'));
+app.get('/privacy-policy', (req, res) => res.redirect(301, '/privacy'));
+
+app.get('/terms', (req, res) => {
+  res.render('pages/terms', {
+    ...seoBase,
+    title: 'Terms of Service | WoBazi',
+    description: 'Terms of Service for WoBazi, the free BaZi (Four Pillars of Destiny) reading app.',
+    canonical: '/terms',
+  });
 });
+app.get('/terms-of-service', (req, res) => res.redirect(301, '/terms'));
+app.get('/tos', (req, res) => res.redirect(301, '/terms'));
+
+/* ── SPA App (same front page as /) ── */
+app.get('/app', sendApp);
+app.get('/app/*', sendApp);
 
 /* ═══════════════════════════════════════
    GOOGLE OAUTH
@@ -222,7 +242,7 @@ app.get('/auth/google', (req, res) => {
 /* ── Step 2: Handle callback ── */
 app.get('/auth/google/callback', async (req, res) => {
   const { code } = req.query;
-  if (!code) return res.redirect('/app?auth=error');
+  if (!code) return res.redirect('/?auth=error');
 
   try {
     // Exchange code for tokens
@@ -262,20 +282,53 @@ app.get('/auth/google/callback', async (req, res) => {
     };
 
     console.log(`[auth] Session set for ${profile.name}`);
-    res.redirect('/app?auth=success');
+    res.redirect('/?auth=success');
   } catch (err) {
     console.error('[Google OAuth error]', err.message);
-    res.redirect('/app?auth=error');
+    res.redirect('/?auth=error');
   }
 });
 
 /* ── Logout ── */
 app.get('/auth/logout', (req, res) => {
   req.session = null; // cookie-session: clear by setting to null
-  res.redirect('/app');
+  res.redirect('/');
 });
 
 /* ── Current user ── */
+app.get('/api/city-suggest', async (req, res) => {
+  const q = String(req.query.q || '').trim();
+  if (q.length < 2 || q.length > 80) return res.json({ suggestions: [] });
+  try {
+    const url = 'https://photon.komoot.io/api/?limit=6&lang=en&q=' + encodeURIComponent(q);
+    const r = await fetch(url, { headers: { 'User-Agent': 'WoBazi/1.0 (https://wobazi.com)' } });
+    if (!r.ok) throw new Error('photon ' + r.status);
+    const data = await r.json();
+    const seen = new Set();
+    const suggestions = [];
+    (data.features || []).forEach(f => {
+      const p = f.properties || {};
+      const name = p.name || '';
+      const city = p.city || p.county || '';
+      const state = p.state || p.region || '';
+      const country = p.country || '';
+      const parts = [name];
+      if (city && city !== name) parts.push(city);
+      if (state && state !== city && state !== name) parts.push(state);
+      if (country) parts.push(country);
+      const label = parts.filter(Boolean).join(', ');
+      if (label && !seen.has(label)) {
+        seen.add(label);
+        suggestions.push(label);
+      }
+    });
+    res.json({ suggestions });
+  } catch (err) {
+    console.error('[city-suggest]', err.message);
+    res.json({ suggestions: [] });
+  }
+});
+
 app.get('/api/me', (req, res) => {
   if (req.session && req.session.user) {
     return res.json({ user: req.session.user });

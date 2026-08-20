@@ -622,6 +622,24 @@ function runLoader(callback) {
 /* ═══════════════════════════════════════
    UI — Form Submit
 ═══════════════════════════════════════ */
+function setDobError(msg) {
+  const hint = document.getElementById('dob-error');
+  const trio = document.querySelector('#bazi-form .date-trio');
+  if (hint) {
+    hint.textContent = msg || '';
+    hint.classList.toggle('hide', !msg);
+  }
+  if (trio) trio.classList.toggle('is-invalid', !!msg);
+}
+
+function isValidBirthDate(y, m, d) {
+  if (!d || !m || !y) return false;
+  if (y < 1900 || y > new Date().getFullYear()) return false;
+  if (m < 1 || m > 12 || d < 1 || d > 31) return false;
+  const dt = new Date(y, m - 1, d);
+  return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
+}
+
 function handleSubmit(e) {
   e.preventDefault();
   haptic([15, 50, 15]);
@@ -629,7 +647,15 @@ function handleSubmit(e) {
   const d     = parseInt(document.getElementById('birth-day').value,   10);
   const m     = parseInt(document.getElementById('birth-month').value, 10);
   const y     = parseInt(document.getElementById('birth-year').value,  10);
-  if (!d || !m || !y || y < 1900 || y > new Date().getFullYear()) return;
+  if (!isValidBirthDate(y, m, d)) {
+    const lang = currentLang();
+    const dobMsg = lang === 'zh' ? '请填写出生日期。' : lang === 'th' ? 'กรุณากรอกวันเกิด' : 'Please enter your date of birth.';
+    setDobError(dobMsg);
+    const dayEl = document.getElementById('birth-day');
+    if (dayEl) dayEl.focus();
+    return;
+  }
+  setDobError('');
 
   const timeVal = document.getElementById('birthtime').value;
   let hour = null;
@@ -1099,21 +1125,45 @@ function renderLucky(lucky) {
 ═══════════════════════════════════════ */
 let isZh = false;
 
-function toggleLang() {
-  isZh = !isZh;
-  document.querySelectorAll('.en').forEach(el => el.classList.toggle('hide', isZh));
-  document.querySelectorAll('.zh').forEach(el => el.classList.toggle('hide', !isZh));
-  document.querySelectorAll('.btn-lang').forEach(btn => {
-    btn.textContent = isZh ? 'EN' : '中文';
-    btn.classList.toggle('zh-active', isZh);
-  });
-  document.documentElement.lang = isZh ? 'zh-CN' : 'en';
+function currentLang() {
+  return (window.WoBaziI18n && WoBaziI18n.get()) || (isZh ? 'zh' : 'en');
 }
 
+function toggleLang() {
+  const order = ['en', 'th', 'zh'];
+  const cur = currentLang();
+  const next = order[(Math.max(0, order.indexOf(cur)) + 1) % order.length];
+  if (window.WoBaziI18n) WoBaziI18n.set(next);
+  else applyLangSpans(next);
+}
+
+function applyLangSpans(lang) {
+  isZh = lang === 'zh';
+  document.querySelectorAll('.en').forEach(el => {
+    let show = lang === 'en';
+    if (lang === 'th' && el.parentElement && !el.parentElement.querySelector('.th')) show = true;
+    el.classList.toggle('hide', !show);
+  });
+  document.querySelectorAll('.zh').forEach(el => el.classList.toggle('hide', lang !== 'zh'));
+  document.querySelectorAll('.th').forEach(el => el.classList.toggle('hide', lang !== 'th'));
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'th' ? 'th' : 'en';
+}
+
+document.addEventListener('wobazi:lang', (e) => {
+  applyLangSpans(e.detail && e.detail.lang ? e.detail.lang : 'en');
+});
+
 /* ── Bilingual text helper ── */
-function _t(en, zh) {
-  if (!zh) return `<span class="en">${en}</span>`;
-  return `<span class="en">${en}</span><span class="zh hide">${zh}</span>`;
+function _t(en, zh, th) {
+  if (!zh && !th) return en;
+  const lang = currentLang();
+  const enHide = (lang !== 'en' && !(lang === 'th' && !th)) ? ' hide' : '';
+  const zhHide = lang !== 'zh' ? ' hide' : '';
+  const thHide = lang !== 'th' ? ' hide' : '';
+  let html = `<span class="en${enHide}">${en}</span>`;
+  if (zh) html += `<span class="zh${zhHide}">${zh}</span>`;
+  if (th) html += `<span class="th${thHide}">${th}</span>`;
+  return html;
 }
 
 /* ── Sparkline helpers (Gyroscope-style) ── */
@@ -1760,11 +1810,94 @@ function initDateInputs() {
   if (!dayEl) return;
 
   dayEl.addEventListener('input', () => {
+    setDobError('');
     if (dayEl.value.length >= 2) monEl.focus();
   });
   monEl.addEventListener('input', () => {
+    setDobError('');
     if (monEl.value.length >= 2) yearEl.focus();
   });
+  yearEl.addEventListener('input', () => setDobError(''));
+}
+
+function initCityAutocomplete() {
+  const input = document.getElementById('birthplace');
+  const box = document.getElementById('city-suggest');
+  if (!input || !box) return;
+
+  let timer = null;
+  let abort = null;
+  let items = [];
+  let active = -1;
+
+  function hide() {
+    box.classList.add('hide');
+    box.innerHTML = '';
+    input.setAttribute('aria-expanded', 'false');
+    active = -1;
+    items = [];
+  }
+
+  function render(list) {
+    items = list;
+    active = -1;
+    if (!list.length) { hide(); return; }
+    box.innerHTML = list.map((label, i) =>
+      `<li role="option" data-i="${i}">${label.replace(/</g, '&lt;')}</li>`
+    ).join('');
+    box.classList.remove('hide');
+    input.setAttribute('aria-expanded', 'true');
+  }
+
+  function pick(i) {
+    if (items[i]) input.value = items[i];
+    hide();
+  }
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim();
+    if (timer) clearTimeout(timer);
+    if (q.length < 2) { hide(); return; }
+    timer = setTimeout(async () => {
+      if (abort) abort.abort();
+      abort = new AbortController();
+      try {
+        const res = await fetch('/api/city-suggest?q=' + encodeURIComponent(q), { signal: abort.signal });
+        const data = await res.json();
+        render(data.suggestions || []);
+      } catch (e) {
+        if (e.name !== 'AbortError') hide();
+      }
+    }, 220);
+  });
+
+  box.addEventListener('mousedown', (e) => {
+    const li = e.target.closest('li');
+    if (!li) return;
+    e.preventDefault();
+    pick(+li.dataset.i);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (box.classList.contains('hide') || !items.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      active = Math.min(active + 1, items.length - 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      active = Math.max(active - 1, 0);
+    } else if (e.key === 'Enter' && active >= 0) {
+      e.preventDefault();
+      pick(active);
+      return;
+    } else if (e.key === 'Escape') {
+      hide();
+      return;
+    }
+    [...box.children].forEach((li, i) => li.classList.toggle('is-active', i === active));
+  });
+
+  input.addEventListener('blur', () => setTimeout(hide, 160));
 }
 
 /* ═══════════════════════════════════════
@@ -3787,8 +3920,17 @@ function showAuthState() {
   // Switch splash to logged-in state
   const guest = document.getElementById('splash-guest');
   const authed = document.getElementById('splash-authed');
+  const navAuthed = document.getElementById('nav-authed');
   if (guest) guest.classList.add('hide');
   if (authed) authed.classList.remove('hide');
+  if (navAuthed) {
+    navAuthed.classList.remove('hide');
+    const av = document.getElementById('nav-authed-avatar');
+    if (av && _currentUser.avatar) {
+      av.src = _currentUser.avatar;
+      av.alt = _currentUser.name || '';
+    }
+  }
 
   // Set welcome message
   const welcomeEl = document.getElementById('splash-welcome');
@@ -3796,7 +3938,7 @@ function showAuthState() {
     const avatarHtml = _currentUser.avatar
       ? `<img src="${_currentUser.avatar}" class="splash-welcome-avatar" referrerpolicy="no-referrer">`
       : '';
-    welcomeEl.innerHTML = `${avatarHtml}<span class="en">Welcome back, ${_currentUser.name}</span><span class="zh hide">欢迎回来，${_currentUser.name}</span>`;
+    welcomeEl.innerHTML = `${avatarHtml}${_t('Welcome back, ' + _currentUser.name, '欢迎回来，' + _currentUser.name, 'ยินดีต้อนรับกลับ, ' + _currentUser.name)}`;
   }
 }
 
@@ -3812,10 +3954,12 @@ async function loadUserData() {
       const btn = document.getElementById('btn-continue-reading');
       if (btn) {
         const enSpan = btn.querySelector('.en');
-        if (enSpan) enSpan.textContent = 'Begin Your Reading';
-        else btn.childNodes.forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) n.textContent = 'Begin Your Reading '; });
+        if (enSpan) enSpan.textContent = 'Begin your free reading';
+        else btn.childNodes.forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) n.textContent = 'Begin your free reading '; });
         const zhSpan = btn.querySelector('.zh');
-        if (zhSpan) zhSpan.textContent = '开始算命';
+        if (zhSpan) zhSpan.textContent = '开始免费解读';
+        const thSpan = btn.querySelector('.th');
+        if (thSpan) thSpan.textContent = 'เริ่มดูดวงฟรี';
         btn.onclick = function() { haptic(10); showScreen('input'); };
       }
     }
@@ -4385,7 +4529,11 @@ function initLightMode() {
 buildStars();
 initSplashExperience();
 initDateInputs();
+initCityAutocomplete();
 initTooltips();
 initLightMode();
 checkAuth();
+if (/[?&]begin=1(?:&|$)/.test(location.search) || location.hash === '#begin' || location.hash === '#input') {
+  showScreen('input');
+}
 

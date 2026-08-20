@@ -1,9 +1,8 @@
 /* ═══════════════════════════════════════
-   WOBAZI — Public SEO Pages Styles
-   Supplements app/style.css (same :root vars)
+   WOBAZI — Public SEO / legal pages
+   Matches the live splash (galaxy, Outfit, gold)
 ═══════════════════════════════════════ */
 
-/* ── Reset for SEO pages (override SPA fixed positioning) ── */
 html:has(body.seo-page),
 html:has(body.seo-page) body {
   height: auto;
@@ -15,116 +14,42 @@ body.seo-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--bg, #07070f);
+  color: var(--text, #f0f0ff);
+  font-family: 'Outfit', 'Noto Sans SC', 'Noto Sans Thai', system-ui, sans-serif;
+}
+body.seo-page .site-nav {
+  position: sticky;
+  max-width: none;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 body.seo-page .seo-main {
+  position: relative;
+  z-index: 1;
   flex: 1;
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 80px 20px 40px;
+  padding: 28px 20px 48px;
   width: 100%;
-}
-
-/* ═══════════════════════════════════════
-   NAV BAR
-═══════════════════════════════════════ */
-.seo-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 24px;
-  background: rgba(7, 7, 15, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(240, 192, 64, 0.08);
-}
-
-.seo-nav-logo img {
-  display: block;
-  height: 28px;
-}
-
-.seo-nav-links {
-  display: flex;
-  gap: 4px;
-  flex: 1;
-  justify-content: center;
-}
-
-.seo-nav-links a {
-  color: var(--muted, #888a9e);
-  text-decoration: none;
-  font-size: 13px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  transition: color 0.2s, background 0.2s;
-  white-space: nowrap;
-}
-
-.seo-nav-links a:hover {
-  color: var(--text, #f0f0ff);
-  background: rgba(240, 192, 64, 0.06);
-}
-
-.seo-nav-cta {
-  color: var(--bg, #07070f);
-  background: linear-gradient(135deg, #f0c040, #e8862e);
-  font-weight: 600;
-  font-size: 13px;
-  padding: 8px 18px;
-  border-radius: 10px;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: opacity 0.2s;
-}
-.seo-nav-cta:hover { opacity: 0.88; }
-
-.seo-nav-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: var(--text, #f0f0ff);
-  cursor: pointer;
-  padding: 4px;
-}
-
-/* Mobile nav */
-@media (max-width: 768px) {
-  .seo-nav-links {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    background: rgba(7, 7, 15, 0.96);
-    backdrop-filter: blur(16px);
-    padding: 12px 20px;
-    border-bottom: 1px solid rgba(240, 192, 64, 0.08);
-  }
-  .seo-nav-links.open { display: flex; }
-  .seo-nav-links a { padding: 10px 12px; font-size: 15px; }
-  .seo-nav-cta { display: none; }
-  .seo-nav-toggle { display: block; margin-left: auto; }
 }
 
 /* ═══════════════════════════════════════
    FOOTER
 ═══════════════════════════════════════ */
 .seo-footer {
-  background: var(--bg-card, #0f0f1c);
-  border-top: 1px solid rgba(240, 192, 64, 0.08);
+  position: relative;
+  z-index: 1;
+  background: rgba(10, 8, 20, 0.72);
+  border-top: 1px solid rgba(240, 192, 64, 0.10);
   padding: 48px 24px 24px;
-  margin-top: 60px;
+  margin-top: 40px;
+  backdrop-filter: blur(16px);
 }
 
 .seo-footer-inner {
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 2fr;
@@ -151,10 +76,11 @@ body.seo-page .seo-main {
 
 .seo-footer-col h4 {
   color: var(--gold, #f0c040);
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.4px;
   margin-bottom: 12px;
+  font-weight: 600;
 }
 
 .seo-footer-col a {
@@ -168,10 +94,10 @@ body.seo-page .seo-main {
 .seo-footer-col a:hover { color: var(--text, #f0f0ff); }
 
 .seo-footer-bottom {
-  max-width: 720px;
+  max-width: 760px;
   margin: 32px auto 0;
   padding-top: 20px;
-  border-top: 1px solid rgba(240, 192, 64, 0.06);
+  border-top: 1px solid rgba(240, 192, 64, 0.08);
   text-align: center;
 }
 .seo-footer-bottom p {
@@ -185,28 +111,54 @@ body.seo-page .seo-main {
 }
 
 /* ═══════════════════════════════════════
-   ABOUT-STYLE REUSE FOR SEO PAGES
-   These classes mirror the #about screen
-   patterns from style.css, scoped to .seo-main
+   INNER PAGE CONTENT (structure unchanged)
 ═══════════════════════════════════════ */
+.seo-main .about-hero {
+  position: static;
+  padding: 12px 0 36px;
+  text-align: center;
+}
+.seo-main .about-hanzi {
+  font-size: 72px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gold, #f0c040), #e8a020);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1.15;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 24px rgba(240, 192, 64, 0.25));
+}
+.seo-main .about-hero h1,
+.seo-main .about-hero h2 {
+  color: var(--text, #f0f0ff);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  margin-bottom: 10px;
+}
+.seo-main .about-hero p {
+  color: var(--muted, #888a9e);
+  font-size: 16px;
+  max-width: 540px;
+  margin: 0 auto;
+  line-height: 1.7;
+  font-weight: 300;
+}
 
-/* Hero (same as .about-hero) */
-.seo-main .about-hero { position: static; padding: 20px 0 32px; text-align: center; }
-.seo-main .about-hanzi { font-size: 62px; font-family: 'Noto Sans SC', sans-serif; font-weight: 700; background: linear-gradient(135deg, var(--gold, #f0c040), #e8a020); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.2; margin-bottom: 12px; }
-.seo-main .about-hero h2 { color: var(--text, #f0f0ff); font-size: 22px; margin-bottom: 8px; }
-.seo-main .about-hero p { color: var(--muted, #888a9e); font-size: 14px; max-width: 500px; margin: 0 auto; line-height: 1.6; }
-
-/* TOC chip bar */
 .seo-main .about-toc-bar {
   position: sticky;
-  top: 56px;
+  top: 62px;
   z-index: 50;
-  background: rgba(7, 7, 15, 0.92);
-  backdrop-filter: blur(12px);
+  background: rgba(7, 7, 15, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 10px 0;
   margin: 0 -20px 24px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid rgba(240, 192, 64, 0.06);
 }
 .seo-main .about-toc-inner {
   display: flex;
@@ -215,83 +167,78 @@ body.seo-page .seo-main {
   min-width: max-content;
 }
 .seo-main .about-toc-chip {
-  background: var(--bg-card, #0f0f1c);
+  background: rgba(10, 8, 20, 0.7);
   color: var(--muted, #888a9e);
-  border: 1px solid rgba(240, 192, 64, 0.1);
+  border: 1px solid rgba(196, 162, 255, 0.18);
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 12px;
   white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s;
+  font-family: inherit;
 }
 .seo-main .about-toc-chip:hover,
 .seo-main .about-toc-chip.active {
-  background: rgba(240, 192, 64, 0.1);
+  background: rgba(240, 192, 64, 0.12);
   color: var(--gold, #f0c040);
-  border-color: rgba(240, 192, 64, 0.3);
+  border-color: rgba(240, 192, 64, 0.35);
 }
 
-/* Section cards (same as .about-section) */
 .seo-main .about-section {
-  background: var(--bg-card, #0f0f1c);
-  border: 1px solid rgba(240, 192, 64, 0.06);
-  border-radius: 16px;
+  background: rgba(10, 8, 20, 0.68);
+  border: 1px solid rgba(196, 162, 255, 0.16);
+  border-radius: 22px;
   padding: 28px 24px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
+.seo-main .about-section h2,
 .seo-main .about-section h3 {
   color: var(--gold, #f0c040);
   font-size: 18px;
+  font-weight: 600;
   margin-bottom: 12px;
+  letter-spacing: -0.02em;
 }
 .seo-main .about-section p {
-  color: var(--muted, #888a9e);
-  font-size: 14px;
-  line-height: 1.7;
+  color: rgba(240, 240, 255, 0.72);
+  font-size: 15px;
+  line-height: 1.75;
   margin-bottom: 16px;
+  font-weight: 300;
 }
 .seo-main .about-section p:last-child { margin-bottom: 0; }
+.seo-main .about-section strong { color: var(--text, #f0f0ff); font-weight: 550; }
 
-/* Callout box */
 .seo-main .about-callout {
-  background: rgba(240, 192, 64, 0.04);
-  border: 1px solid rgba(240, 192, 64, 0.12);
-  border-radius: 12px;
+  background: rgba(240, 192, 64, 0.06);
+  border: 1px solid rgba(240, 192, 64, 0.16);
+  border-radius: 16px;
   padding: 16px 20px;
   margin: 16px 0;
   font-size: 14px;
   line-height: 1.7;
-  color: var(--muted, #888a9e);
+  color: rgba(240, 240, 255, 0.72);
 }
 .seo-main .about-callout strong { color: var(--gold, #f0c040); }
 
-/* CTA button */
 .seo-main .about-cta {
   text-align: center;
-  margin: 32px 0 16px;
+  margin: 36px 0 12px;
 }
 .seo-main .about-cta .btn-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, #f0c040, #e8862e);
-  color: var(--bg, #07070f);
-  font-weight: 600;
-  font-size: 15px;
-  padding: 14px 32px;
-  border-radius: 14px;
   text-decoration: none;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.2s;
 }
-.seo-main .about-cta .btn-primary:hover { opacity: 0.88; }
 
-/* FAQ accordion */
 .seo-main .about-faq { margin-top: 8px; }
 .seo-main .about-faq-item {
-  border-bottom: 1px solid rgba(240, 192, 64, 0.06);
+  border-bottom: 1px solid rgba(240, 192, 64, 0.08);
   padding: 14px 0;
 }
 .seo-main .about-faq-q {
@@ -307,24 +254,91 @@ body.seo-page .seo-main {
   width: 100%;
   text-align: left;
   padding: 0;
+  font-family: inherit;
 }
 .seo-main .about-faq-q::after {
   content: '+';
   color: var(--gold, #f0c040);
   font-size: 18px;
   font-weight: 300;
-  transition: transform 0.2s;
 }
-.seo-main .about-faq-item.open .about-faq-q::after {
-  content: '−';
-}
+.seo-main .about-faq-item.open .about-faq-q::after { content: '−'; }
 .seo-main .about-faq-a {
   display: none;
-  color: var(--muted, #888a9e);
-  font-size: 13px;
+  color: rgba(240, 240, 255, 0.65);
+  font-size: 14px;
   line-height: 1.7;
   padding-top: 10px;
+  font-weight: 300;
 }
 .seo-main .about-faq-item.open .about-faq-a { display: block; }
 
-/* Mini script for FAQ toggle + TOC scroll */
+/* Legal documents */
+.legal-hero {
+  text-align: left;
+  padding: 8px 0 28px;
+}
+.legal-kicker {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold, #f0c040);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.legal-hero h1 {
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+.legal-meta {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.legal-note {
+  font-size: 13px;
+  color: rgba(240, 240, 255, 0.55);
+  border-left: 2px solid rgba(240, 192, 64, 0.4);
+  padding-left: 12px;
+  line-height: 1.6;
+}
+.legal-body {
+  background: rgba(10, 8, 20, 0.68);
+  border: 1px solid rgba(196, 162, 255, 0.16);
+  border-radius: 22px;
+  padding: 32px 28px;
+  backdrop-filter: blur(16px);
+}
+.legal-body h2 {
+  color: var(--gold, #f0c040);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 28px 0 10px;
+  letter-spacing: -0.02em;
+}
+.legal-body h2:first-child { margin-top: 0; }
+.legal-body h3 {
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  margin: 18px 0 8px;
+}
+.legal-body p,
+.legal-body li {
+  color: rgba(240, 240, 255, 0.72);
+  font-size: 15px;
+  line-height: 1.75;
+  font-weight: 300;
+}
+.legal-body p { margin-bottom: 12px; }
+.legal-body ul { padding-left: 20px; margin: 0 0 12px; }
+.legal-body li { margin-bottom: 6px; }
+.legal-body a { color: var(--gold, #f0c040); }
+
+.seo-main a[style*="background:rgba(240,192,64"] {
+  background: rgba(240, 192, 64, 0.06) !important;
+  border-color: rgba(240, 192, 64, 0.14) !important;
+}

@@ -44,11 +44,9 @@
   </script>
 </head>
 <body class="seo-page">
-  <div style="padding:16px 24px;">
-    <a href="/app"><img src="/Logos/SVG/rev-vert.svg" alt="WoBazi" height="32"></a>
-  </div>
+  <%- include('../partials/nav') %>
 
-  <main class="seo-main" style="max-width:800px;margin:0 auto;padding:0 16px 64px;">
+  <main class="seo-main">
 
     <!-- ═══ Hero ═══ -->
     <div class="about-hero">
@@ -322,7 +320,7 @@
     </div>
 
     <div class="about-cta">
-      <a href="/app" class="btn-primary">Calculate Your BaZi Free →</a>
+      <a href="/?begin=1" class="btn-primary" data-i18n="cta.begin">Begin your free reading</a>
     </div>
 
   </main>
