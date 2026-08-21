@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="WoBazi">
+  <defs>
+    <linearGradient id="gold" x1="3" y1="4" x2="29" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff23a"/>
+      <stop offset=".28" stop-color="#fdc60b"/>
+      <stop offset=".67" stop-color="#f28f3f"/>
+      <stop offset="1" stop-color="#e83e39"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="7.2" fill="#0f0f1c"/>
+  <rect x="0.55" y="0.55" width="30.9" height="30.9" rx="6.7" fill="none" stroke="url(#gold)" stroke-width="0.65" opacity="0.4"/>
+  <svg x="1.5" y="8.7" width="29" height="14.6" viewBox="0 0 83.43 40" preserveAspectRatio="xMidYMid meet">
+    <g fill="url(#gold)">
+      <path d="M13,2.57l6.44.52c-.27,7.99-1.17,17.37-4.1,24.86-.72,1.83-5.55,11.03-7.54,10.68l-4.8-4.12C11.79,26.51,12.28,13.66,13,2.57Z"/>
+      <path d="M41.39,35.33l-5.76,3.28c-7.57-8.06-9.05-20.22-10.86-30.72l-2.3-.32V1.46s8.11.52,8.11.52c.86,7.84,2.03,15.88,5.15,23.18,1.59,3.73,4.05,6.57,5.67,10.16Z"/>
+      <path d="M73.67,13.68c0-1.29,0-2.6,0-3.89h-22.5s-.32,3.89-.32,3.89h-6.12V3.69h13.91l-.56-2.22,5.87-1.47,2.76,3.69h13.63v10c-2.08-.23-4.7.32-6.68,0,0,.35,1,1.22.05,1.95l-7.28,5.83h13.08c1.58,1.46.58,4.12.83,6.11h-14.47c1.01,9.37-2.32,10.66-10.86,11.16l-.89-.38-2.16-6.33,6.71.31.52-4.75h-14.47v-6.11h14.47c.1,0-.08-1.19.52-1.96s2.01-.87,2.27-1.92h-10.02v-5.55h16.97c.2,0,.72-.69,1.54-.49,1.01.24,1.31,1.86,3.19,2.16Z"/>
+    </g>
+  </svg>
+</svg>

@@ -73,6 +73,14 @@ app.use('/app', express.static(path.join(__dirname, 'app'), {
 app.use('/Logos', express.static(path.join(__dirname, 'Logos')));
 app.use('/app/Logos', express.static(path.join(__dirname, 'Logos')));
 app.use('/og-card.png', express.static(path.join(__dirname, 'og-card.png')));
+app.get('/favicon.ico', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=86400');
+  res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
+});
+app.get('/apple-touch-icon.png', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=86400');
+  res.sendFile(path.join(__dirname, 'public', 'apple-touch-icon.png'));
+});
 
 /* ── SEO: Sitemap & Robots ── */
 app.get('/sitemap.xml', (req, res) => {
