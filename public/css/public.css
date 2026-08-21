@@ -20,6 +20,8 @@ body.seo-page {
 }
 body.seo-page .site-nav {
   position: sticky;
+  z-index: 400;
+  overflow: visible;
   max-width: none;
   padding-left: 24px;
   padding-right: 24px;
