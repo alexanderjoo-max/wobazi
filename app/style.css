@@ -2560,7 +2560,8 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
   flex: 1; padding: 8px 4px; border-radius: var(--radius-sm); text-align: center;
   font-size: 9px; font-weight: 700; letter-spacing: 0.5px; border: 1px solid currentColor;
 }
-.about-element-chip .zh {
+.about-element-chip .zh,
+.about-element-chip .hanzi {
   font-family: 'Noto Sans SC', sans-serif; font-size: 17px; display: block; margin-bottom: 3px;
 }
 
@@ -4805,7 +4806,8 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(196,162,255,0.16);
 }
-.bazi-mean .zh {
+.bazi-mean .zh,
+.bazi-mean .hanzi {
   font-family: 'Noto Sans SC', sans-serif;
   font-size: 22px;
   font-weight: 700;

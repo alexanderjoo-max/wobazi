@@ -94,16 +94,99 @@
     return code === 'zh' ? 'zh-CN' : code === 'th' ? 'th' : 'en';
   }
 
+  function normPhrase(s) {
+    return String(s || '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&middot;/g, '·')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+
+  var byEn = null;
+  function indexByEn() {
+    byEn = Object.create(null);
+    for (var k in STR) {
+      if (!Object.prototype.hasOwnProperty.call(STR, k)) continue;
+      var row = STR[k];
+      if (!row || !row.en) continue;
+      var key = normPhrase(row.en);
+      if (key) byEn[key] = row;
+    }
+  }
+
+  function lookup(en, lang) {
+    if (!en || !lang || lang === 'en') return '';
+    if (!byEn) indexByEn();
+    var row = byEn[normPhrase(en)];
+    if (!row) return '';
+    return row[lang] || '';
+  }
+
+  function setHtmlOrText(el, text) {
+    if (/<[a-z][\s\S]*>/i.test(text)) el.innerHTML = text;
+    else el.textContent = text;
+  }
+
+  function langOf(el) {
+    if (el.classList.contains('zh')) return 'zh';
+    if (el.classList.contains('th')) return 'th';
+    return 'en';
+  }
+
+  function hasLangSibling(el, lang) {
+    var p = el.parentElement;
+    if (!p) return false;
+    for (var n = p.firstElementChild; n; n = n.nextElementSibling) {
+      if (n === el) continue;
+      if (n.tagName === el.tagName && n.classList.contains(lang)) return true;
+    }
+    return false;
+  }
+
+  function ensureOrig(el) {
+    if (!el.hasAttribute('data-i18n-orig')) el.setAttribute('data-i18n-orig', el.innerHTML);
+  }
+
+  function restoreOrig(el) {
+    if (el.hasAttribute('data-i18n-orig')) el.innerHTML = el.getAttribute('data-i18n-orig');
+  }
+
   function applySpans(lang) {
     var nodes = document.querySelectorAll('.en, .zh, .th');
     for (var i = 0; i < nodes.length; i++) {
       var el = nodes[i];
-      var want = el.classList.contains('zh') ? 'zh' : el.classList.contains('th') ? 'th' : 'en';
-      var show = want === lang;
-      if (lang === 'th' && want === 'en' && el.parentElement && !el.parentElement.querySelector('.th')) {
-        show = true;
+      var want = langOf(el);
+
+      if (want === 'en') {
+        ensureOrig(el);
+        if (lang === 'en') {
+          restoreOrig(el);
+          el.classList.remove('hide');
+          continue;
+        }
+        if (hasLangSibling(el, lang)) {
+          restoreOrig(el);
+          el.classList.add('hide');
+          continue;
+        }
+        var orig = el.getAttribute('data-i18n-orig');
+        var tr = lookup(orig, lang);
+        if (tr) setHtmlOrText(el, tr);
+        else restoreOrig(el);
+        el.classList.remove('hide');
+        continue;
       }
-      el.classList.toggle('hide', !show);
+
+      if (!hasLangSibling(el, 'en')) {
+        el.classList.remove('hide');
+        continue;
+      }
+      el.classList.toggle('hide', want !== lang);
     }
   }
 
@@ -120,8 +203,8 @@
         continue;
       }
       if (el.querySelector('svg, img, canvas')) continue;
-      if (/<[a-z][\s\S]*>/i.test(text)) el.innerHTML = text;
-      else el.textContent = text;
+      if (el.querySelector('.en, .zh, .th')) continue;
+      setHtmlOrText(el, text);
     }
     var ph = document.querySelectorAll('[data-i18n-placeholder]');
     for (var j = 0; j < ph.length; j++) {
@@ -135,7 +218,8 @@
     for (var k in map) {
       if (Object.prototype.hasOwnProperty.call(map, k)) STR[k] = map[k];
     }
-    apply(current);
+    byEn = null;
+    if (document.readyState !== 'loading') apply(current);
   }
 
   function updateSwitchers(lang) {
@@ -234,15 +318,19 @@
   function init() {
     bind();
     if (global.__WOBAZI_I18N_PENDING) {
-      add(global.__WOBAZI_I18N_PENDING);
+      var pending = global.__WOBAZI_I18N_PENDING;
       global.__WOBAZI_I18N_PENDING = null;
-    } else {
-      apply(current);
+      for (var k in pending) {
+        if (Object.prototype.hasOwnProperty.call(pending, k)) STR[k] = pending[k];
+      }
+      byEn = null;
     }
+    apply(current);
   }
 
   global.WoBaziI18n = {
     t: t,
+    lookup: lookup,
     get: function () { return current; },
     set: apply,
     apply: apply,

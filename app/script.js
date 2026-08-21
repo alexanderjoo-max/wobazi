@@ -440,6 +440,7 @@ function switchTab(tab) {
   const TAB_ORDER = ['today', 'you', 'actions', 'relationships'];
   const TAB_LABELS = { today: 'Today', you: 'You', actions: 'Actions', relationships: 'Relationships' };
   const TAB_LABELS_ZH = { today: '今日', you: '你', actions: '行动', relationships: '关系' };
+  const TAB_LABELS_TH = { today: 'วันนี้', you: 'คุณ', actions: 'การกระทำ', relationships: 'ความสัมพันธ์' };
   const idx = TAB_ORDER.indexOf(tab);
   const prev = idx > 0 ? TAB_ORDER[idx - 1] : null;
   const next = idx < TAB_ORDER.length - 1 ? TAB_ORDER[idx + 1] : null;
@@ -448,10 +449,10 @@ function switchTab(tab) {
     navEl.innerHTML = `
       ${prev ? `<button class="tab-nav-btn tab-nav-prev" onclick="haptic(6); switchTab('${prev}')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        ${_t(TAB_LABELS[prev], TAB_LABELS_ZH[prev])}
+        ${_t(TAB_LABELS[prev], TAB_LABELS_ZH[prev], TAB_LABELS_TH[prev])}
       </button>` : '<div></div>'}
       ${next ? `<button class="tab-nav-btn tab-nav-next" onclick="haptic(6); switchTab('${next}')">
-        ${_t(TAB_LABELS[next], TAB_LABELS_ZH[next])}
+        ${_t(TAB_LABELS[next], TAB_LABELS_ZH[next], TAB_LABELS_TH[next])}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>` : '<div></div>'}
     `;
@@ -544,6 +545,14 @@ const LOADING_MSGS_ZH = [
   '绘制命运图谱…',
   '即将完成…',
 ];
+const LOADING_MSGS_TH = [
+  'กำลังจัดก้านฟ้า…',
+  'กำลังอ่านกิ่งดิน…',
+  'กำลังคำนวณสี่เสา…',
+  'กำลังปรึกษาอี้จิง…',
+  'กำลังวางแผนที่โชคชะตา…',
+  'ใกล้แล้ว…',
+];
 
 let _loadingAnimId = null;
 function initLoadingStars() {
@@ -608,8 +617,11 @@ function runLoader(callback) {
   const fillEl = document.getElementById('loading-fill');
   let step = 0;
   const total = LOADING_MSGS.length;
+  const lang = currentLang();
+  const msgs = lang === 'zh' ? LOADING_MSGS_ZH : lang === 'th' ? LOADING_MSGS_TH : LOADING_MSGS;
+  if (msgEl) msgEl.textContent = msgs[0];
   const iv = setInterval(() => {
-    msgEl.textContent = isZh ? LOADING_MSGS_ZH[step] : LOADING_MSGS[step];
+    msgEl.textContent = msgs[step];
     fillEl.style.width = ((step + 1) / total * 100) + '%';
     step++;
     if (step >= total) {
@@ -700,7 +712,8 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   // Greeting — simple name
   const greetEn = name ? `Hello, ${name} ✦` : 'Your Destiny ✦';
   const greetZh = name ? `你好，${name} ✦` : '你的命运 ✦';
-  document.getElementById('greeting').innerHTML = _t(greetEn, greetZh);
+  const greetTh = name ? `สวัสดี, ${name} ✦` : 'โชคชะตาของคุณ ✦';
+  document.getElementById('greeting').innerHTML = _t(greetEn, greetZh, greetTh);
 
   const elColor = EL_COLOR[yearPillar.stem.element];
   const dominantEl = Object.entries(elements).sort((a,b)=>b[1]-a[1])[0][0];
@@ -919,6 +932,8 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
                 : 'today';
   switchTab(initTab);
 
+  applyI18n();
+
   // Animate progress rings after screen shows
   setTimeout(() => animateFortune(fortune), 300);
 }
@@ -930,19 +945,19 @@ function renderPillars(pillars) {
   row.innerHTML = pillars.map((p, i) => {
     if (!p.known) {
       return `<div class="pillar-card dimmed">
-        <div class="pillar-label">${labels[i]}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px">Unknown</div>
+        <div class="pillar-label">${_t(labels[i], {Year:'年',Month:'月',Day:'日',Hour:'时'}[labels[i]], {Year:'ปี',Month:'เดือน',Day:'วัน',Hour:'ชั่วโมง'}[labels[i]])}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">${_t('Unknown','未知','ไม่ทราบ')}</div>
       </div>`;
     }
     const elColor = EL_COLOR[p.stem.element];
     return `<div class="pillar-card">
-      <div class="pillar-label">${labels[i]}</div>
+      <div class="pillar-label">${_t(labels[i], {Year:'年',Month:'月',Day:'日',Hour:'时'}[labels[i]], {Year:'ปี',Month:'เดือน',Day:'วัน',Hour:'ชั่วโมง'}[labels[i]])}</div>
       <div class="pillar-stem-char" style="color:${elColor}">${p.stem.char}</div>
       <div class="pillar-stem-name">${p.stem.pinyin}</div>
       <div class="pillar-sep"></div>
       <div class="pillar-branch-char">${p.branch.char}</div>
       ${makeMedallion(p.branch.animal, EL_COLOR[p.branch.element], 'pillar-med')}
-      <div class="pillar-animal-name">${p.branch.animal}</div>
+      <div class="pillar-animal-name">${_t(p.branch.animal, ANIMAL_ZH[p.branch.animal])}</div>
       <div class="pillar-el-dot" style="background:${EL_COLOR[p.branch.element]}"></div>
     </div>`;
   }).join('');
@@ -1012,7 +1027,7 @@ function renderRadar(elements) {
     return `<div class="legend-item">
       <div class="legend-dot" style="background:${EL_COLOR[el]}"></div>
       <div class="legend-info">
-        <span class="legend-name en">${el}</span><span class="legend-name zh hide">${EL_ZH_NAMES[el]}</span>
+        <span class="legend-name">${_t(el, EL_ZH_NAMES[el])}</span>
         <div class="legend-bar-track">
           <div class="legend-bar-fill" style="width:0%;background:${EL_COLOR[el]}"
             data-pct="${pct}"></div>
@@ -1031,10 +1046,10 @@ function renderRadar(elements) {
 
 /* ── Fortune Cards ── */
 const FORTUNE_META = [
-  { key:'love',   icon:'❤️',  label:'Love',   label_zh:'爱情', color:'#f43f5e', circ:138 },
-  { key:'career', icon:'💼',  label:'Career', label_zh:'事业', color:'#8b5cf6', circ:138 },
-  { key:'health', icon:'🌿',  label:'Health', label_zh:'健康', color:'#22c55e', circ:138 },
-  { key:'wealth', icon:'💰',  label:'Wealth', label_zh:'财运', color:'#f59e0b', circ:138 },
+  { key:'love',   icon:'❤️',  label:'Love',   label_zh:'爱情', label_th:'ความรัก', color:'#f43f5e', circ:138 },
+  { key:'career', icon:'💼',  label:'Career', label_zh:'事业', label_th:'อาชีพ', color:'#8b5cf6', circ:138 },
+  { key:'health', icon:'🌿',  label:'Health', label_zh:'健康', label_th:'สุขภาพ', color:'#22c55e', circ:138 },
+  { key:'wealth', icon:'💰',  label:'Wealth', label_zh:'财运', label_th:'ทรัพย์', color:'#f59e0b', circ:138 },
 ];
 
 function renderFortune(fortune) {
@@ -1044,11 +1059,12 @@ function renderFortune(fortune) {
     const s = fortune[m.key];
     const tierEn = s >= 75 ? 'Excellent ✦' : s >= 55 ? 'Steady' : 'Low';
     const tierZh = s >= 75 ? '极佳 ✦'        : s >= 55 ? '平稳'   : '低迷';
+    const tierTh = s >= 75 ? 'ยอดเยี่ยม ✦'   : s >= 55 ? 'มั่นคง' : 'ต่ำ';
     return `
     <div class="gyro-stat" style="--ga:${m.color}">
-      <div class="gyro-stat-label">${_t(m.label, m.label_zh)}</div>
+      <div class="gyro-stat-label">${_t(m.label, m.label_zh, m.label_th)}</div>
       <div class="gyro-stat-num" id="score-${m.key}" style="color:${m.color}">0</div>
-      <div class="gyro-stat-tier">${_t(tierEn, tierZh)}</div>
+      <div class="gyro-stat-tier">${_t(tierEn, tierZh, tierTh)}</div>
       <div class="gyro-spark">${_sparkSVG(_sparkPts(s), m.color)}</div>
     </div>`;
   }).join('');
@@ -1139,13 +1155,6 @@ function toggleLang() {
 
 function applyLangSpans(lang) {
   isZh = lang === 'zh';
-  document.querySelectorAll('.en').forEach(el => {
-    let show = lang === 'en';
-    if (lang === 'th' && el.parentElement && !el.parentElement.querySelector('.th')) show = true;
-    el.classList.toggle('hide', !show);
-  });
-  document.querySelectorAll('.zh').forEach(el => el.classList.toggle('hide', lang !== 'zh'));
-  document.querySelectorAll('.th').forEach(el => el.classList.toggle('hide', lang !== 'th'));
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'th' ? 'th' : 'en';
 }
 
@@ -1155,15 +1164,28 @@ document.addEventListener('wobazi:lang', (e) => {
 
 /* ── Bilingual text helper ── */
 function _t(en, zh, th) {
+  if (window.WoBaziI18n && typeof WoBaziI18n.lookup === 'function') {
+    if (!th) th = WoBaziI18n.lookup(en, 'th') || '';
+    if (!zh) zh = WoBaziI18n.lookup(en, 'zh') || zh;
+  }
   if (!zh && !th) return en;
   const lang = currentLang();
-  const enHide = (lang !== 'en' && !(lang === 'th' && !th)) ? ' hide' : '';
+  const enHide = (lang === 'zh' && zh) || (lang === 'th' && th) ? ' hide' : '';
   const zhHide = lang !== 'zh' ? ' hide' : '';
   const thHide = lang !== 'th' ? ' hide' : '';
   let html = `<span class="en${enHide}">${en}</span>`;
   if (zh) html += `<span class="zh${zhHide}">${zh}</span>`;
   if (th) html += `<span class="th${thHide}">${th}</span>`;
   return html;
+}
+
+function applyI18n() {
+  if (window.WoBaziI18n) WoBaziI18n.apply(WoBaziI18n.get());
+}
+
+function dateLocale() {
+  const lang = currentLang();
+  return lang === 'zh' ? 'zh-CN' : lang === 'th' ? 'th-TH' : 'en-GB';
 }
 
 /* ── Sparkline helpers (Gyroscope-style) ── */
@@ -1447,9 +1469,7 @@ function renderDailyFortune(userAnimal) {
     msg_zh = `今日${todayAnimal}日平稳，无明显顺逆之风。专注于一致性，打磨细节，相信过程。`;
   }
 
-  const dateLabel = isZh
-    ? now.toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric' })
-    : now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  const dateLabel = now.toLocaleDateString(dateLocale(), { year:'numeric', month:'long', day:'numeric' });
   document.getElementById('today-date-label').textContent = dateLabel;
 
   const card = document.getElementById('daily-card');
@@ -1459,7 +1479,7 @@ function renderDailyFortune(userAnimal) {
         <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${_t("Today's Day Animal",'今日日柱')}</div>
         <div class="daily-animal-chip">
           <svg viewBox="0 0 100 100" width="22" height="22" style="color:${color}">${ANIMAL_SVGS[todayAnimal]||''}</svg>
-          ${todayAnimal}
+          ${_t(todayAnimal, ANIMAL_ZH[todayAnimal])}
         </div>
       </div>
       <div class="daily-score-wrap">
@@ -2524,8 +2544,8 @@ function renderOracleTab(animal, elements, fortune, pillars, forecast2026, domin
           <div class="orc-month-name">${m.name}${m.isnow ? ` · ${_t('Now','当前')}` : ''}</div>
           <div class="orc-month-score" style="color:${m.t === 'high' ? '#f0c040' : m.t === 'mid' ? '#94a3b8' : '#64748b'}">${m.score}</div>
         </div>
-        <div class="orc-month-theme">${MONTH_THEMES[m.t].emoji} ${isZh ? MONTH_THEMES[m.t].label_zh : MONTH_THEMES[m.t].label}</div>
-        <p class="orc-month-note">${isZh ? MONTH_THEMES[m.t].note_zh : MONTH_THEMES[m.t].note}</p>
+        <div class="orc-month-theme">${MONTH_THEMES[m.t].emoji} ${_t(MONTH_THEMES[m.t].label, MONTH_THEMES[m.t].label_zh)}</div>
+        <p class="orc-month-note">${_t(MONTH_THEMES[m.t].note, MONTH_THEMES[m.t].note_zh)}</p>
         ${m.isnow ? `<ul class="orc-actions">${THIS_MONTH_ACTIONS[nowTier].map(a => `<li class="orc-action-item">→ ${a}</li>`).join('')}</ul>` : ''}
       </div>
     `).join('')}
@@ -3512,25 +3532,25 @@ function renderLifeAreas(fortune, heroIsCompat, heroIsClash) {
   const el = document.getElementById('life-areas-grid');
   if (!el) return;
   const col = s => s >= 66 ? '#22c55e' : s >= 40 ? '#f0c040' : '#ef4444';
-  const lbl = s => s >= 66 ? ['Strong','旺'] : s >= 40 ? ['Mixed','平'] : ['Caution','弱'];
+  const lbl = s => s >= 66 ? ['Strong','旺','แข็งแรง'] : s >= 40 ? ['Mixed','平','ปนกัน'] : ['Caution','弱','ระวัง'];
   const socialScore = heroIsCompat ? 80 : heroIsClash ? 30 : 60;
   const avg = Math.round((fortune.love + fortune.career + fortune.health + fortune.wealth) / 4);
   const riskScore = 100 - avg;
-  const riskLbl = riskScore < 34 ? ['Low','低'] : riskScore < 60 ? ['Medium','中'] : ['High','高'];
+  const riskLbl = riskScore < 34 ? ['Low','低','ต่ำ'] : riskScore < 60 ? ['Medium','中','กลาง'] : ['High','高','สูง'];
   const areas = [
-    { icon:'💼', en:'Work',   zh:'事业', s: fortune.career, l: lbl(fortune.career) },
-    { icon:'💰', en:'Money',  zh:'财运', s: fortune.wealth, l: lbl(fortune.wealth) },
-    { icon:'❤️', en:'Love',   zh:'爱情', s: fortune.love,   l: lbl(fortune.love)   },
-    { icon:'🌐', en:'Social', zh:'社交', s: socialScore,    l: lbl(socialScore)    },
-    { icon:'🌿', en:'Energy', zh:'精力', s: fortune.health, l: lbl(fortune.health) },
-    { icon:'⚡', en:'Risk',   zh:'风险', s: riskScore,      l: riskLbl, inv: true  },
+    { icon:'💼', en:'Work',   zh:'事业', th:'งาน',     s: fortune.career, l: lbl(fortune.career) },
+    { icon:'💰', en:'Money',  zh:'财运', th:'เงิน',    s: fortune.wealth, l: lbl(fortune.wealth) },
+    { icon:'❤️', en:'Love',   zh:'爱情', th:'ความรัก', s: fortune.love,   l: lbl(fortune.love)   },
+    { icon:'🌐', en:'Social', zh:'社交', th:'สังคม',   s: socialScore,    l: lbl(socialScore)    },
+    { icon:'🌿', en:'Energy', zh:'精力', th:'พลังงาน', s: fortune.health, l: lbl(fortune.health) },
+    { icon:'⚡', en:'Risk',   zh:'风险', th:'ความเสี่ยง', s: riskScore,    l: riskLbl, inv: true  },
   ];
   el.innerHTML = areas.map(a => `
     <div class="life-area-tile">
       <div class="la-icon">${a.icon}</div>
-      <div class="la-name"><span class="en">${a.en}</span><span class="zh hide">${a.zh}</span></div>
+      <div class="la-name">${_t(a.en, a.zh, a.th)}</div>
       <div class="la-status" style="color:${a.inv ? col(100 - a.s) : col(a.s)}">
-        <span class="en">${a.l[0]}</span><span class="zh hide">${a.l[1]}</span>
+        ${_t(a.l[0], a.l[1], a.l[2])}
       </div>
     </div>`).join('');
 }

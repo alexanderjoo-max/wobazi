@@ -47,10 +47,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=30">
-  <script src="/public/js/i18n.js?v=4"></script>
-  <script src="/public/js/i18n-copy.js?v=1"></script>
-  <script src="/public/js/i18n-copy-more.js?v=1"></script>
+  <link rel="stylesheet" href="/app/style.css?v=31">
+  <script src="/public/js/i18n.js?v=5"></script>
+  <script src="/public/js/i18n-ui.js?v=1"></script>
+  <script src="/public/js/i18n-copy.js?v=2"></script>
+  <script src="/public/js/i18n-copy-more.js?v=2"></script>
 </head>
 <body>
 
@@ -222,41 +223,53 @@
       <section class="splash-bazi">
         <div class="splash-divider" aria-hidden="true"><span>✦</span></div>
         <h2><span class="en">What is Bāzì?</span><span class="zh hide">什么是八字？</span><span class="th hide">ปาจื้อคืออะไร?</span></h2>
-        <p class="bazi-lead" data-i18n="home.lead1">BaZi (八字) literally means <strong>Eight Characters</strong>. It converts your exact birth date and time into a chart of eight Chinese characters — a cosmic blueprint of who you are, refined over a thousand years of Chinese metaphysics.</p>
-        <p class="bazi-lead" data-i18n="home.lead2">Those characters sit across four pillars. Each has a Heavenly Stem above and an Earthly Branch below. The Day Stem is your <strong>Day Master</strong> — the essence of your core self.</p>
+        <p class="bazi-lead">
+          <span class="en">BaZi (八字) literally means <strong>Eight Characters</strong>. It converts your exact birth date and time into a chart of eight Chinese characters — a cosmic blueprint of who you are, refined over a thousand years of Chinese metaphysics.</span>
+          <span class="zh hide">八字字面意思是<strong>八个字</strong>。它把你精确的出生日期与时辰，转成八个汉字组成的命盘——一份关于你是谁的宇宙蓝图，历经千年中国术数打磨。</span>
+          <span class="th hide">ปาจื้อ (八字) แปลตรงตัวว่า <strong>แปดตัวอักษร</strong> ระบบนี้แปลงวันและเวลาเกิดให้เป็นแผนภูมิแปดตัวอักษรจีน — แบบแปลนจักรวาลของตัวคุณ ที่ถูกขัดเกลาในวิชาอภิปรัชญาจีนมานับพันปี</span>
+        </p>
+        <p class="bazi-lead">
+          <span class="en">Those characters sit across four pillars. Each has a Heavenly Stem above and an Earthly Branch below. The Day Stem is your <strong>Day Master</strong> — the essence of your core self.</span>
+          <span class="zh hide">这八个字分列四柱。每柱上为天干、下为地支。日干就是你的<strong>日主</strong>——核心自我的本质。</span>
+          <span class="th hide">ตัวอักษรเหล่านั่งบนสี่เสา แต่ละเสามีก้านฟ้าอยู่บนและกิ่งดินอยู่ล่าง ก้านของวันคือ <strong>วันมาสเตอร์</strong> — แก่นของตัวคุณ</span>
+        </p>
 
         <div class="bazi-pillar-meanings">
           <div class="bazi-mean">
-            <span class="zh">年</span>
-            <strong data-i18n="label.year">Year</strong>
-            <p data-i18n="home.year.p">Ancestry, social identity, the generational energy you carry</p>
+            <span class="hanzi">年</span>
+            <strong><span class="en">Year</span><span class="zh hide">年</span><span class="th hide">ปี</span></strong>
+            <p><span class="en">Ancestry, social identity, the generational energy you carry</span><span class="zh hide">祖荫、社会身份、你所携带的世代之气</span><span class="th hide">บรรพบุรุษ ตัวตนทางสังคม พลังรุ่นที่คุณถืออยู่</span></p>
           </div>
           <div class="bazi-mean">
-            <span class="zh">月</span>
-            <strong data-i18n="label.month">Month</strong>
-            <p data-i18n="home.month.p">Career climate, parents, the season that shaped you</p>
+            <span class="hanzi">月</span>
+            <strong><span class="en">Month</span><span class="zh hide">月</span><span class="th hide">เดือน</span></strong>
+            <p><span class="en">Career climate, parents, the season that shaped you</span><span class="zh hide">事业气候、父母、塑造你的时令</span><span class="th hide">บรรยากาศอาชีพ พ่อแม่ ฤดูที่หล่อหลอมคุณ</span></p>
           </div>
           <div class="bazi-mean">
-            <span class="zh">日</span>
-            <strong data-i18n="label.day">Day</strong>
-            <p data-i18n="home.day.p">Your Day Master — the single character that is you</p>
+            <span class="hanzi">日</span>
+            <strong><span class="en">Day</span><span class="zh hide">日</span><span class="th hide">วัน</span></strong>
+            <p><span class="en">Your Day Master — the single character that is you</span><span class="zh hide">你的日主——那个代表你的字</span><span class="th hide">วันมาสเตอร์ — ตัวอักษรเดียวที่เป็นคุณ</span></p>
           </div>
           <div class="bazi-mean">
-            <span class="zh">时</span>
-            <strong data-i18n="label.hour">Hour</strong>
-            <p data-i18n="home.hour.p">Inner world, later years, the life you build after 40</p>
+            <span class="hanzi">时</span>
+            <strong><span class="en">Hour</span><span class="zh hide">时</span><span class="th hide">ชั่วโมง</span></strong>
+            <p><span class="en">Inner world, later years, the life you build after 40</span><span class="zh hide">内在世界、晚年、四十岁之后你所建立的人生</span><span class="th hide">โลกภายใน บั้นปลายชีวิต ชีวิตที่สร้างหลัง 40</span></p>
           </div>
         </div>
 
         <div class="about-elements-row splash-elements">
-          <div class="about-element-chip" style="color:var(--el-wood)"><span class="zh">木</span><span data-i18n="el.wood">Wood</span></div>
-          <div class="about-element-chip" style="color:var(--el-fire)"><span class="zh">火</span><span data-i18n="el.fire">Fire</span></div>
-          <div class="about-element-chip" style="color:var(--el-earth)"><span class="zh">土</span><span data-i18n="el.earth">Earth</span></div>
-          <div class="about-element-chip" style="color:var(--el-metal)"><span class="zh">金</span><span data-i18n="el.metal">Metal</span></div>
-          <div class="about-element-chip" style="color:var(--el-water)"><span class="zh">水</span><span data-i18n="el.water">Water</span></div>
+          <div class="about-element-chip" style="color:var(--el-wood)"><span class="hanzi">木</span><span class="en">Wood</span><span class="th hide">ไม้</span></div>
+          <div class="about-element-chip" style="color:var(--el-fire)"><span class="hanzi">火</span><span class="en">Fire</span><span class="th hide">ไฟ</span></div>
+          <div class="about-element-chip" style="color:var(--el-earth)"><span class="hanzi">土</span><span class="en">Earth</span><span class="th hide">ดิน</span></div>
+          <div class="about-element-chip" style="color:var(--el-metal)"><span class="hanzi">金</span><span class="en">Metal</span><span class="th hide">โลหะ</span></div>
+          <div class="about-element-chip" style="color:var(--el-water)"><span class="hanzi">水</span><span class="en">Water</span><span class="th hide">น้ำ</span></div>
         </div>
 
-        <blockquote class="bazi-callout" data-i18n="home.callout">BaZi is a weather forecast, not a prison sentence. The chart shows the terrain — you still choose how to walk it.</blockquote>
+        <blockquote class="bazi-callout">
+          <span class="en">BaZi is a weather forecast, not a prison sentence. The chart shows the terrain — you still choose how to walk it.</span>
+          <span class="zh hide">八字是天气预报，不是无期徒刑。盘显示地形——怎么走，仍由你选。</span>
+          <span class="th hide">ปาจื้อคือพยากรณ์อากาศ ไม่ใช่คำพิพากษา แผนภูมิชี้ภูมิประเทศ — คุณยังเลือกวิธีเดินเอง</span>
+        </blockquote>
 
         <p class="splash-learn"><a href="/what-is-bazi" class="btn-about-link"><span class="en">Read the full guide →</span><span class="zh hide">阅读完整指南 →</span><span class="th hide">อ่านคู่มือฉบับเต็ม →</span></a></p>
       </section>
@@ -719,7 +732,7 @@
           <div class="field-col">
             <label><span class="en">Blood Type <span class="label-opt">personality traits</span></span><span class="zh hide">血型 <span class="label-opt">性格特征</span></span><span class="th hide">หมู่เลือด <span class="label-opt">ลักษณะนิสัย</span></span></label>
             <select id="blood-type" class="select-input">
-              <option value="">Unknown</option>
+              <option value="" data-i18n="form.unknown">Unknown</option>
               <option value="A">A</option>
               <option value="B">B</option>
               <option value="AB">AB</option>
@@ -737,7 +750,7 @@
         </div>
 
         <button type="submit" class="btn-primary btn-full">
-          <span class="en">Reveal My Destiny</span><span class="zh hide">揭示我的命运</span>
+          <span class="en">Reveal My Destiny</span><span class="zh hide">揭示我的命运</span><span class="th hide">เปิดเผยโชคชะตา</span>
           <span class="btn-char">龙</span>
         </button>
       </form>
@@ -762,7 +775,7 @@
       <div class="loading-hanzi-float">
         <span>天</span><span>地</span><span>金</span><span>木</span><span>水</span><span>火</span><span>土</span><span>命</span>
       </div>
-      <p class="loading-msg" id="loading-msg">Aligning the heavenly stems…</p>
+      <p class="loading-msg" id="loading-msg" data-i18n="load.1">Aligning the heavenly stems…</p>
       <div class="loading-track">
         <div class="loading-fill" id="loading-fill"></div>
       </div>
@@ -797,52 +810,52 @@
 
     <div class="results-tab-bar">
       <div class="tab-bar-inner">
-        <button class="tab-btn active" id="tab-btn-today" onclick="haptic(6); switchTab('today')"><span class="en">Today</span><span class="zh hide">今日</span></button>
-        <button class="tab-btn" id="tab-btn-you" onclick="haptic(6); switchTab('you')"><span class="en">You</span><span class="zh hide">你</span></button>
-        <button class="tab-btn" id="tab-btn-actions" onclick="haptic(6); switchTab('actions')"><span class="en">Actions</span><span class="zh hide">行动</span></button>
-        <button class="tab-btn" id="tab-btn-relationships" onclick="haptic(6); switchTab('relationships')"><span class="en">Relationships</span><span class="zh hide">关系</span></button>
+        <button class="tab-btn active" id="tab-btn-today" onclick="haptic(6); switchTab('today')"><span class="en">Today</span><span class="zh hide">今日</span><span class="th hide">วันนี้</span></button>
+        <button class="tab-btn" id="tab-btn-you" onclick="haptic(6); switchTab('you')"><span class="en">You</span><span class="zh hide">你</span><span class="th hide">คุณ</span></button>
+        <button class="tab-btn" id="tab-btn-actions" onclick="haptic(6); switchTab('actions')"><span class="en">Actions</span><span class="zh hide">行动</span><span class="th hide">การกระทำ</span></button>
+        <button class="tab-btn" id="tab-btn-relationships" onclick="haptic(6); switchTab('relationships')"><span class="en">Relationships</span><span class="zh hide">关系</span><span class="th hide">ความสัมพันธ์</span></button>
       </div>
     </div>
 
     <!-- Tab section chip bars -->
     <div class="results-toc-bar" id="toc-today">
       <div class="results-toc-inner">
-        <button class="results-toc-chip" onclick="scrollResults('res-daily')"><span class="en">Fortune</span><span class="zh hide">运势</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-life-areas')"><span class="en">Life Areas</span><span class="zh hide">领域</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-insights')"><span class="en">Insights</span><span class="zh hide">洞察</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-actions-preview')"><span class="en">Actions</span><span class="zh hide">行动</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-forecast')"><span class="en">Forecast</span><span class="zh hide">预测</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-work')"><span class="en">Work</span><span class="zh hide">事业</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-daily')"><span class="en">Fortune</span><span class="zh hide">运势</span><span class="th hide">โชคชะตา</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-life-areas')"><span class="en">Life Areas</span><span class="zh hide">领域</span><span class="th hide">ด้านชีวิต</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-insights')"><span class="en">Insights</span><span class="zh hide">洞察</span><span class="th hide">ข้อคิด</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-actions-preview')"><span class="en">Actions</span><span class="zh hide">行动</span><span class="th hide">การกระทำ</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-forecast')"><span class="en">Forecast</span><span class="zh hide">预测</span><span class="th hide">พยากรณ์</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-work')"><span class="en">Work</span><span class="zh hide">事业</span><span class="th hide">งาน</span></button>
       </div>
     </div>
     <div class="results-toc-bar hide" id="toc-actions">
       <div class="results-toc-inner">
-        <button class="results-toc-chip" onclick="scrollResults('today-actions-section')"><span class="en">Plan</span><span class="zh hide">计划</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-outfit')"><span class="en">Outfit</span><span class="zh hide">穿搭</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-foods')"><span class="en">Foods</span><span class="zh hide">食物</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-lucky-nums')"><span class="en">Numbers</span><span class="zh hide">数字</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-power-days')"><span class="en">Power Days</span><span class="zh hide">吉日</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-ritual')"><span class="en">Ritual</span><span class="zh hide">仪式</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('today-actions-section')"><span class="en">Plan</span><span class="zh hide">计划</span><span class="th hide">แผน</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-outfit')"><span class="en">Outfit</span><span class="zh hide">穿搭</span><span class="th hide">ชุด</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-foods')"><span class="en">Foods</span><span class="zh hide">食物</span><span class="th hide">อาหาร</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-lucky-nums')"><span class="en">Numbers</span><span class="zh hide">数字</span><span class="th hide">ตัวเลข</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-power-days')"><span class="en">Power Days</span><span class="zh hide">吉日</span><span class="th hide">วันมงคล</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-ritual')"><span class="en">Ritual</span><span class="zh hide">仪式</span><span class="th hide">พิธี</span></button>
       </div>
     </div>
     <div class="results-toc-bar hide" id="toc-you">
       <div class="results-toc-inner">
-        <button class="results-toc-chip" onclick="scrollResults('you-profile-section')"><span class="en">Profile</span><span class="zh hide">档案</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-pillars')"><span class="en">Pillars</span><span class="zh hide">四柱</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-elements')"><span class="en">Elements</span><span class="zh hide">五行</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-fortune')"><span class="en">Fortune</span><span class="zh hide">命运</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-career')"><span class="en">Career</span><span class="zh hide">职业</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-season')"><span class="en">Season</span><span class="zh hide">旺季</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-yinyang')"><span class="en">Yin Yang</span><span class="zh hide">阴阳</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('you-profile-section')"><span class="en">Profile</span><span class="zh hide">档案</span><span class="th hide">โปรไฟล์</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-pillars')"><span class="en">Pillars</span><span class="zh hide">四柱</span><span class="th hide">เสา</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-elements')"><span class="en">Elements</span><span class="zh hide">五行</span><span class="th hide">ธาตุ</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-fortune')"><span class="en">Fortune</span><span class="zh hide">命运</span><span class="th hide">โชคชะตา</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-career')"><span class="en">Career</span><span class="zh hide">职业</span><span class="th hide">อาชีพ</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-season')"><span class="en">Season</span><span class="zh hide">旺季</span><span class="th hide">ฤดู</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-yinyang')"><span class="en">Yin Yang</span><span class="zh hide">阴阳</span><span class="th hide">หยินหยาง</span></button>
       </div>
     </div>
     <div class="results-toc-bar hide" id="toc-relationships">
       <div class="results-toc-inner">
-        <button class="results-toc-chip" onclick="scrollResults('res-rel-profile')"><span class="en">Profile</span><span class="zh hide">档案</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-rel-compat')"><span class="en">Compatibility</span><span class="zh hide">相合</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-rel-forecast')"><span class="en">Forecast</span><span class="zh hide">预测</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-rel-soul')"><span class="en">Soul Animals</span><span class="zh hide">灵兽</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-rel-business')"><span class="en">Business</span><span class="zh hide">商业</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-profile')"><span class="en">Profile</span><span class="zh hide">档案</span><span class="th hide">โปรไฟล์</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-compat')"><span class="en">Compatibility</span><span class="zh hide">相合</span><span class="th hide">ความเข้ากัน</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-forecast')"><span class="en">Forecast</span><span class="zh hide">预测</span><span class="th hide">พยากรณ์</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-soul')"><span class="en">Soul Animals</span><span class="zh hide">灵兽</span><span class="th hide">สัตว์คู่ใจ</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-rel-business')"><span class="en">Business</span><span class="zh hide">商业</span><span class="th hide">ธุรกิจ</span></button>
       </div>
     </div>
 
@@ -900,6 +913,7 @@
         <div class="section-head" data-tip="daily-fortune">
           <h3 class="en">Today's Fortune</h3>
           <h3 class="zh hide">今日运势</h3>
+          <h3 class="th hide">โชคชะตาวันนี้</h3>
           <span class="section-sub" id="today-date-label"></span>
         </div>
         <div id="daily-card"></div>
@@ -907,8 +921,8 @@
           <div class="oracle-cta-inner">
             <span class="oracle-cta-icon">✦</span>
             <div class="oracle-cta-text">
-              <span class="oracle-cta-title"><span class="en">Ask the Oracle</span><span class="zh hide">问神谕</span></span>
-              <span class="oracle-cta-sub"><span class="en">AI-powered BaZi guidance</span><span class="zh hide">AI 八字指引</span></span>
+              <span class="oracle-cta-title"><span class="en">Ask the Oracle</span><span class="zh hide">问神谕</span><span class="th hide">ถามเทพพยากรณ์</span></span>
+              <span class="oracle-cta-sub"><span class="en">AI-powered BaZi guidance</span><span class="zh hide">AI 八字指引</span><span class="th hide">คำแนะนำปาจื้อจาก AI</span></span>
             </div>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
@@ -920,7 +934,8 @@
         <div class="section-head">
           <h3 class="en">Life Areas</h3>
           <h3 class="zh hide">生活领域</h3>
-          <span class="section-sub"><span class="en">Today's status</span><span class="zh hide">今日状态</span></span>
+          <h3 class="th hide">ด้านชีวิต</h3>
+          <span class="section-sub"><span class="en">Today's status</span><span class="zh hide">今日状态</span><span class="th hide">สถานะวันนี้</span></span>
         </div>
         <div class="life-areas-grid" id="life-areas-grid"></div>
       </section>
@@ -930,6 +945,7 @@
         <div class="section-head">
           <h3 class="en">Insights</h3>
           <h3 class="zh hide">洞察</h3>
+          <h3 class="th hide">ข้อคิด</h3>
         </div>
         <div class="insight-cards" id="insight-cards"></div>
       </section>
@@ -938,12 +954,12 @@
       <section class="section" data-tab="today" id="res-actions-preview">
         <div class="actions-preview-card">
           <div class="actions-preview-top">
-            <div class="actions-preview-title"><span class="en">Top 3 Actions Today</span><span class="zh hide">今日3项行动</span></div>
-            <button class="btn-see-all" onclick="haptic(6); switchTab('actions')"><span class="en">Full plan →</span><span class="zh hide">完整计划 →</span></button>
+            <div class="actions-preview-title"><span class="en">Top 3 Actions Today</span><span class="zh hide">今日3项行动</span><span class="th hide">3 การกระทำวันนี้</span></div>
+            <button class="btn-see-all" onclick="haptic(6); switchTab('actions')"><span class="en">Full plan →</span><span class="zh hide">完整计划 →</span><span class="th hide">แผนเต็ม →</span></button>
           </div>
           <div id="actions-preview-list"></div>
           <button class="tap-actions-link" onclick="haptic(6); switchTab('actions')">
-            <span class="en">See full Action Plan — outfit, foods, rituals, lucky numbers →</span><span class="zh hide">查看完整行动计划——穿搭、饮食、仪式、幸运数字 →</span>
+            <span class="en">See full Action Plan — outfit, foods, rituals, lucky numbers →</span><span class="zh hide">查看完整行动计划——穿搭、饮食、仪式、幸运数字 →</span><span class="th hide">ดูแผนการกระทำเต็ม — ชุด อาหาร พิธี เลขมงคล →</span>
           </button>
         </div>
       </section>
@@ -953,6 +969,7 @@
         <div class="section-head" data-tip="forecast-2026">
           <h3 class="en">2026 Forecast</h3>
           <h3 class="zh hide">2026年运势</h3>
+          <h3 class="th hide">พยากรณ์ 2026</h3>
           <span class="section-sub">丙午 · Fire Horse</span>
         </div>
         <div id="forecast-card"></div>
@@ -963,7 +980,8 @@
         <div class="section-head">
           <h3 class="en">Today's Action Plan</h3>
           <h3 class="zh hide">今日行动计划</h3>
-          <span class="section-sub"><span class="en">3 things to do now</span><span class="zh hide">立即行动的3件事</span></span>
+          <h3 class="th hide">แผนการกระทำวันนี้</h3>
+          <span class="section-sub"><span class="en">3 things to do now</span><span class="zh hide">立即行动的3件事</span><span class="th hide">3 สิ่งที่ควรทำตอนนี้</span></span>
         </div>
         <div id="today-actions-card"></div>
       </section>
@@ -973,6 +991,7 @@
         <div class="section-head" data-tip="love-section">
           <h3 class="en">Monthly Love Forecast</h3>
           <h3 class="zh hide">每月爱情运势</h3>
+          <h3 class="th hide">พยากรณ์รักรายเดือน</h3>
           <span class="section-sub">2026 · 情缘运势</span>
         </div>
         <div id="love-card"></div>
@@ -983,6 +1002,7 @@
         <div class="section-head" data-tip="work-section">
           <h3 class="en">Work &amp; Career</h3>
           <h3 class="zh hide">事业运势</h3>
+          <h3 class="th hide">งานและอาชีพ</h3>
           <span class="section-sub">2026 · 职业运势</span>
         </div>
         <div id="work-card"></div>
@@ -993,6 +1013,7 @@
         <div class="section-head" data-tip="four-pillars">
           <h3 class="en">Four Pillars</h3>
           <h3 class="zh hide">四柱</h3>
+          <h3 class="th hide">สี่เสา</h3>
           <span class="section-sub">八字 Bāzì</span>
         </div>
         <div class="pillars-row" id="pillars-row"></div>
@@ -1003,6 +1024,7 @@
         <div class="section-head" data-tip="element-balance">
           <h3 class="en">Element Balance</h3>
           <h3 class="zh hide">五行平衡</h3>
+          <h3 class="th hide">สมดุลธาตุ</h3>
           <span class="section-sub">五行 Wǔxíng</span>
           <span class="tip-hint">ⓘ What is this?</span>
         </div>
@@ -1017,6 +1039,7 @@
         <div class="section-head" data-tip="fortune-cards">
           <h3 class="en">Life Fortune</h3>
           <h3 class="zh hide">命运</h3>
+          <h3 class="th hide">โชคชะตาชีวิต</h3>
           <span class="section-sub">命运 Mìngyùn</span>
         </div>
         <div class="fortune-grid" id="fortune-grid"></div>
@@ -1027,6 +1050,7 @@
         <div class="section-head">
           <h3 class="en">Feng Shui Outfit Guide</h3>
           <h3 class="zh hide">风水穿搭指南</h3>
+          <h3 class="th hide">คู่มือชุดฮวงจุ้ย</h3>
           <span class="section-sub"><span class="en">2026 · Monthly Colors</span><span class="zh hide">2026 · 月度色彩</span></span>
         </div>
         <div id="outfit-card"></div>
@@ -1037,6 +1061,7 @@
         <div class="section-head">
           <h3 class="en">Lucky Numbers</h3>
           <h3 class="zh hide">幸运数字</h3>
+          <h3 class="th hide">เลขมงคล</h3>
           <span class="section-sub">数字运势</span>
         </div>
         <div id="lucky-num-card"></div>
@@ -1046,6 +1071,8 @@
       <section class="section" data-tab="actions" data-tip="power-days" id="res-power-days">
         <div class="section-head">
           <h3 class="en">Power Days</h3>
+          <h3 class="zh hide">吉日</h3>
+          <h3 class="th hide">วันมงคล</h3>
           <span class="section-sub">2026 · 吉日</span>
         </div>
         <div id="power-days-card"></div>
@@ -1056,6 +1083,7 @@
         <div class="section-head" data-tip="career-archetype">
           <h3 class="en">Career Archetype</h3>
           <h3 class="zh hide">职业原型</h3>
+          <h3 class="th hide">ต้นแบบอาชีพ</h3>
         </div>
         <div id="career-card"></div>
       </section>
@@ -1065,6 +1093,7 @@
         <div class="section-head" data-tip="power-season">
           <h3 class="en">Power Season</h3>
           <h3 class="zh hide">旺季</h3>
+          <h3 class="th hide">ฤดูพลัง</h3>
         </div>
         <div id="season-card"></div>
       </section>
@@ -1074,6 +1103,7 @@
         <div class="section-head" data-tip="yin-yang">
           <h3 class="en">Yin · Yang Balance</h3>
           <h3 class="zh hide">阴阳平衡</h3>
+          <h3 class="th hide">สมดุลหยิน·หยาง</h3>
           <span class="section-sub">阴阳 Yīn Yáng</span>
         </div>
         <div id="yinyang-card"></div>
@@ -1084,6 +1114,7 @@
         <div class="section-head" data-tip="blood-type">
           <h3 class="en">Blood Type Profile</h3>
           <h3 class="zh hide">血型个性</h3>
+          <h3 class="th hide">โปรไฟล์หมู่เลือด</h3>
         </div>
         <div id="blood-card"></div>
       </section>
@@ -1093,6 +1124,7 @@
         <div class="section-head" data-tip="birthplace">
           <h3 class="en">Geographic Energy</h3>
           <h3 class="zh hide">地理能量</h3>
+          <h3 class="th hide">พลังงานภูมิศาสตร์</h3>
         </div>
         <div id="birthplace-card"></div>
       </section>
@@ -1102,7 +1134,8 @@
         <div class="section-head">
           <h3 class="en">Lucky Foods</h3>
           <h3 class="zh hide">幸运食物</h3>
-          <span class="section-sub"><span class="en">Element Nutrition</span><span class="zh hide">五行饮食</span></span>
+          <h3 class="th hide">อาหารมงคล</h3>
+          <span class="section-sub"><span class="en">Element Nutrition</span><span class="zh hide">五行饮食</span><span class="th hide">โภชนาการธาตุ</span></span>
         </div>
         <div id="foods-card"></div>
       </section>
@@ -1112,6 +1145,7 @@
         <div class="section-head">
           <h3 class="en">Morning Ritual</h3>
           <h3 class="zh hide">晨间仪式</h3>
+          <h3 class="th hide">พิธียามเช้า</h3>
           <span class="section-sub">元素晨练</span>
         </div>
         <div id="ritual-card"></div>
@@ -1119,7 +1153,8 @@
           <div class="section-head" style="margin-top:24px">
             <h3 class="en">Crystals &amp; Gems</h3>
             <h3 class="zh hide">水晶宝石</h3>
-            <span class="section-sub"><span class="en">Energy Stones</span><span class="zh hide">能量宝石</span></span>
+          <h3 class="th hide">คริสตัลและอัญมณี</h3>
+            <span class="section-sub"><span class="en">Energy Stones</span><span class="zh hide">能量宝石</span><span class="th hide">หินพลังงาน</span></span>
           </div>
           <div id="crystals-card"></div>
         </div>
@@ -1130,6 +1165,7 @@
         <div class="section-head">
           <h3 class="en">Sleep Direction</h3>
           <h3 class="zh hide">睡眠方位</h3>
+          <h3 class="th hide">ทิศการนอน</h3>
           <span class="section-sub">卦数 · Feng Shui Kua</span>
         </div>
         <div id="kua-card"></div>
@@ -1140,6 +1176,7 @@
         <div class="section-head">
           <h3 class="en">Life Decades 大运</h3>
           <h3 class="zh hide">人生大运</h3>
+          <h3 class="th hide">ทศวรรษชีวิต 大运</h3>
           <span class="section-sub"><span class="en">Your 10-Year Cycles</span><span class="zh hide">十年大运周期</span></span>
         </div>
         <div id="decades-card"></div>
@@ -1150,6 +1187,7 @@
         <div class="section-head" data-tip="zodiac">
           <h3 class="en">Your Reading</h3>
           <h3 class="zh hide">您的命理</h3>
+          <h3 class="th hide">การอ่านของคุณ</h3>
         </div>
         <div class="reading-card">
           <p class="en" id="reading-en"></p>
@@ -1162,6 +1200,7 @@
         <div class="section-head" data-tip="compatibility">
           <h3 class="en">Zodiac Compatibility</h3>
           <h3 class="zh hide">生肖相合</h3>
+          <h3 class="th hide">ความเข้ากันนักษัตร</h3>
         </div>
         <div id="compat-wrap"></div>
       </section>
@@ -1171,6 +1210,7 @@
         <div class="section-head" data-tip="lucky-vibes">
           <h3 class="en">Lucky Vibes</h3>
           <h3 class="zh hide">吉祥元素</h3>
+          <h3 class="th hide">คลื่นมงคล</h3>
         </div>
         <div class="lucky-grid" id="lucky-grid"></div>
       </section>
@@ -1180,7 +1220,8 @@
         <div class="section-head">
           <h3 class="en">Your Relationship Profile</h3>
           <h3 class="zh hide">你的感情档案</h3>
-          <span class="section-sub"><span class="en">Based on your Day Pillar</span><span class="zh hide">基于日柱</span></span>
+          <h3 class="th hide">โปรไฟล์ความสัมพันธ์</h3>
+          <span class="section-sub"><span class="en">Based on your Day Pillar</span><span class="zh hide">基于日柱</span><span class="th hide">จากเสาวันของคุณ</span></span>
         </div>
         <div id="rel-profile-card"></div>
       </section>
@@ -1190,7 +1231,8 @@
         <div class="section-head">
           <h3 class="en">Compatibility Check</h3>
           <h3 class="zh hide">八字合婚</h3>
-          <span class="section-sub"><span class="en">Enter partner's details</span><span class="zh hide">输入伴侣信息</span></span>
+          <h3 class="th hide">ตรวจความเข้ากัน</h3>
+          <span class="section-sub"><span class="en">Enter partner's details</span><span class="zh hide">输入伴侣信息</span><span class="th hide">กรอกข้อมูลคู่</span></span>
         </div>
         <div class="compat-check-card">
           <div class="compat-input-row">
@@ -1211,7 +1253,7 @@
             </select>
           </div>
           <button class="btn-primary btn-full" onclick="haptic(10); checkCompatibility()" style="margin-top:12px">
-            <span class="en">Check Compatibility</span><span class="zh hide">查看合婚</span>
+            <span class="en">Check Compatibility</span><span class="zh hide">查看合婚</span><span class="th hide">ตรวจความเข้ากัน</span>
           </button>
           <div id="compat-result"></div>
         </div>
@@ -1222,6 +1264,7 @@
         <div class="section-head">
           <h3 class="en">Soul Animals</h3>
           <h3 class="zh hide">灵兽</h3>
+          <h3 class="th hide">สัตว์คู่ใจ</h3>
           <span class="section-sub"><span class="en">Your secret allies</span><span class="zh hide">你的秘密盟友</span></span>
         </div>
         <div id="soul-animals-card"></div>
@@ -1232,6 +1275,7 @@
         <div class="section-head">
           <h3 class="en">Business Compatibility</h3>
           <h3 class="zh hide">商业合作</h3>
+          <h3 class="th hide">ความเข้ากันทางธุรกิจ</h3>
           <span class="section-sub"><span class="en">Partner &amp; team dynamics</span><span class="zh hide">合伙与团队动态</span></span>
         </div>
         <div id="business-compat-card"></div>
@@ -1255,7 +1299,7 @@
           <p class="footer-tagline"><span class="en">Ancient wisdom, modern clarity</span><span class="zh hide">古老智慧，现代洞见</span><span class="th hide">ภูมิปัญญาโบราณ ความชัดเจนสมัยใหม่</span></p>
         </div>
         <p class="footer-copy">© 2026 Wobazi. <span class="en">All rights reserved.</span><span class="zh hide">保留所有权利。</span><span class="th hide">สงวนลิขสิทธิ์</span></p>
-        <p class="footer-disclaimer"><span class="en">For entertainment &amp; self-reflection purposes only. Not a substitute for professional advice.</span><span class="zh hide">仅供娱乐与自我反思。不能替代专业建议。</span></p>
+        <p class="footer-disclaimer"><span class="en">For entertainment &amp; self-reflection purposes only. Not a substitute for professional advice.</span><span class="zh hide">仅供娱乐与自我反思。不能替代专业建议。</span><span class="th hide">เพื่อความบันเทิงและการใคร่ครวญเท่านั้น ไม่ใช่คำแนะนำจากผู้เชี่ยวชาญ</span></p>
       </footer>
     </div>
   </div>
@@ -1263,7 +1307,7 @@
   <!-- ORACLE BOTTOM BAR -->
   <div class="oracle-bottom-bar hide" id="oracle-fab" onclick="haptic(10); openOracleDrawer()">
     <span class="oracle-bar-icon">✦</span>
-    <span class="oracle-bar-text">Ask the Oracle</span>
+    <span class="oracle-bar-text"><span class="en">Ask the Oracle</span><span class="zh hide">问神谕</span><span class="th hide">ถามเทพพยากรณ์</span></span>
     <svg class="oracle-bar-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
   </div>
 
@@ -1272,7 +1316,7 @@
   <div class="oracle-drawer hide" id="oracle-drawer">
     <div class="oracle-drawer-header">
       <div class="oracle-drawer-handle"></div>
-      <span class="oracle-drawer-title"><span class="en">The Oracle</span><span class="zh hide">神谕</span></span>
+      <span class="oracle-drawer-title"><span class="en">The Oracle</span><span class="zh hide">神谕</span><span class="th hide">เทพพยากรณ์</span></span>
       <button class="oracle-drawer-close" onclick="haptic(6); closeOracleDrawer()">&times;</button>
     </div>
     <div class="oracle-drawer-ctx" id="oracle-drawer-ctx"></div>
@@ -1282,6 +1326,7 @@
           <span class="oracle-welcome-icon">✦</span>
           <p class="en">I see your chart. Ask me anything about your destiny, timing, or path forward.</p>
           <p class="zh hide">我已看到你的命盘。尽管问我关于命运、时机或前路的任何问题。</p>
+          <p class="th hide">ฉันเห็นแผนภูมิของคุณ ถามได้ทุกอย่างเกี่ยวกับโชคชะตา จังหวะ หรือทางข้างหน้า</p>
         </div>
       </div>
       <div class="oracle-chips" id="oracle-drawer-chips">
@@ -1293,7 +1338,7 @@
       </div>
     </div>
     <div class="oracle-drawer-input">
-      <textarea class="oracle-input" id="oracle-drawer-input" placeholder="Ask the Oracle..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOracleDrawerMessage()}"></textarea>
+      <textarea class="oracle-input" id="oracle-drawer-input" placeholder="Ask the Oracle..." data-i18n-placeholder="ui.askPh" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOracleDrawerMessage()}"></textarea>
       <button class="oracle-send-btn" id="oracle-drawer-send" onclick="sendOracleDrawerMessage()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
       </button>
@@ -1308,9 +1353,9 @@
       <div class="share-buttons">
         <button class="btn-share-action primary-share" onclick="doShare()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          <span class="en">Share My Reading</span><span class="zh hide">分享我的命运</span>
+          <span class="en">Share My Reading</span><span class="zh hide">分享我的命运</span><span class="th hide">แชร์การอ่านของฉัน</span>
         </button>
-        <button class="btn-share-action secondary-share" onclick="closeShare()"><span class="en">Close</span><span class="zh hide">关闭</span></button>
+        <button class="btn-share-action secondary-share" onclick="closeShare()"><span class="en">Close</span><span class="zh hide">关闭</span><span class="th hide">ปิด</span></button>
       </div>
     </div>
   </div>
@@ -1325,7 +1370,7 @@
       <div class="tip-title-zh" id="tip-title-zh"></div>
       <div class="tip-body-en" id="tip-body-en"></div>
       <div class="tip-body-zh" id="tip-body-zh"></div>
-      <button class="tip-close" onclick="closeTip()"><span class="en">Got it ✓</span><span class="zh hide">知道了 ✓</span></button>
+      <button class="tip-close" onclick="closeTip()"><span class="en">Got it ✓</span><span class="zh hide">知道了 ✓</span><span class="th hide">เข้าใจแล้ว ✓</span></button>
     </div>
   </div>
 
@@ -1335,7 +1380,7 @@
       <button class="btn-back" onclick="haptic(8); showScreen('results')">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
-      <span class="nav-title"><span class="en">The Oracle</span><span class="zh hide">神谕</span></span>
+      <span class="nav-title"><span class="en">The Oracle</span><span class="zh hide">神谕</span><span class="th hide">เทพพยากรณ์</span></span>
       <div style="width:40px"></div>
     </div>
 
@@ -1349,6 +1394,7 @@
           <span class="oracle-welcome-icon">✦</span>
           <p class="en">I see your chart. Ask me anything about your destiny, timing, or path forward.</p>
           <p class="zh hide">我已看到你的命盘。尽管问我关于命运、时机或前路的任何问题。</p>
+          <p class="th hide">ฉันเห็นแผนภูมิของคุณ ถามได้ทุกอย่างเกี่ยวกับโชคชะตา จังหวะ หรือทางข้างหน้า</p>
         </div>
       </div>
 
@@ -1364,13 +1410,13 @@
 
     <!-- Input bar -->
     <div class="oracle-input-bar">
-      <textarea class="oracle-input" id="oracle-input" placeholder="Ask the Oracle..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOracleMessage()}"></textarea>
+      <textarea class="oracle-input" id="oracle-input" placeholder="Ask the Oracle..." data-i18n-placeholder="ui.askPh" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOracleMessage()}"></textarea>
       <button class="oracle-send-btn" id="oracle-send-btn" onclick="sendOracleMessage()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
       </button>
     </div>
   </div>
 
-  <script src="/app/script.js?v=22"></script>
+  <script src="/app/script.js?v=23"></script>
 </body>
 </html>
