@@ -16,6 +16,14 @@
       if (p === '/app' || p === '/app/') {
         history.replaceState(null, '', '/' + location.search + location.hash);
       }
+      var lang = 'en';
+      try { lang = localStorage.getItem('wobazi-lang') || 'en'; } catch (e) {}
+      lang = String(lang).toLowerCase();
+      if (lang.indexOf('zh') === 0) lang = 'zh';
+      else if (lang.indexOf('th') === 0) lang = 'th';
+      else lang = 'en';
+      document.documentElement.setAttribute('data-lang', lang);
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
     })();
   </script>
   <meta charset="UTF-8">
@@ -47,9 +55,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=31">
-  <script src="/public/js/i18n.js?v=5"></script>
-  <script src="/public/js/i18n-ui.js?v=1"></script>
+  <link rel="stylesheet" href="/app/style.css?v=32">
+  <style id="wobazi-i18n-css">
+    html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
+    html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
+    html[data-lang="th"] .en:has(~ .th) { display: none !important; }
+    html[data-lang="th"] .th { display: revert !important; }
+    html[data-lang="zh"] .th { display: none !important; }
+    html[data-lang="zh"] .en:has(~ .zh) { display: none !important; }
+    html[data-lang="zh"] .zh { display: revert !important; }
+  </style>
+  <script src="/public/js/i18n.js?v=6"></script>
+  <script src="/public/js/i18n-ui.js?v=2"></script>
   <script src="/public/js/i18n-copy.js?v=2"></script>
   <script src="/public/js/i18n-copy-more.js?v=2"></script>
 </head>
@@ -303,18 +320,18 @@
     <!-- Sticky TOC chips -->
     <div class="about-toc-bar">
       <div class="about-toc-inner">
-        <button class="about-toc-chip" onclick="scrollAbout('ab-intro')">Intro</button>
-        <button class="about-toc-chip" onclick="scrollAbout('ab-pillars')">4 Pillars</button>
-        <button class="about-toc-chip" onclick="scrollAbout('ab-stems')">10 Stems</button>
-        <button class="about-toc-chip" onclick="scrollAbout('ab-branches')">12 Branches</button>
-        <button class="about-toc-chip" onclick="scrollAbout('ab-elements')">5 Elements</button>
-        <button class="about-toc-chip" onclick="scrollAbout('ab-yinyang')">Yin &amp; Yang</button>
-        <button class="about-toc-chip" onclick="scrollAbout('ab-cycle')">60-Year Cycle</button>
-        <button class="about-toc-chip" onclick="scrollAbout('ab-zodiac')">12 Animals</button>
-        <button class="about-toc-chip" onclick="scrollAbout('ab-daymaster')">Day Master</button>
-        <button class="about-toc-chip" onclick="scrollAbout('ab-compat')">Compatibility</button>
-        <button class="about-toc-chip" onclick="scrollAbout('ab-reading')">How it Works</button>
-        <button class="about-toc-chip" onclick="scrollAbout('ab-philosophy')">Free Will</button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-intro')"><span class="en">Intro</span><span class="zh hide">导读</span><span class="th hide">บทนำ</span></button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-pillars')"><span class="en">4 Pillars</span><span class="zh hide">四柱</span><span class="th hide">สี่เสา</span></button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-stems')"><span class="en">10 Stems</span><span class="zh hide">十天干</span><span class="th hide">สิบก้าน</span></button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-branches')"><span class="en">12 Branches</span><span class="zh hide">十二地支</span><span class="th hide">สิบสองกิ่ง</span></button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-elements')"><span class="en">5 Elements</span><span class="zh hide">五行</span><span class="th hide">ห้าธาตุ</span></button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-yinyang')"><span class="en">Yin &amp; Yang</span><span class="zh hide">阴阳</span><span class="th hide">หยินหยาง</span></button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-cycle')"><span class="en">60-Year Cycle</span><span class="zh hide">六十甲子</span><span class="th hide">รอบ 60 ปี</span></button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-zodiac')"><span class="en">12 Animals</span><span class="zh hide">十二生肖</span><span class="th hide">สิบสองนักษัตร</span></button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-daymaster')"><span class="en">Day Master</span><span class="zh hide">日主</span><span class="th hide">วันมาสเตอร์</span></button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-compat')"><span class="en">Compatibility</span><span class="zh hide">合冲</span><span class="th hide">ความเข้ากัน</span></button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-reading')"><span class="en">How it Works</span><span class="zh hide">如何排盘</span><span class="th hide">วิธีอ่านดวง</span></button>
+        <button class="about-toc-chip" onclick="scrollAbout('ab-philosophy')"><span class="en">Free Will</span><span class="zh hide">自由意志</span><span class="th hide">เจตจำนงเสรี</span></button>
       </div>
     </div>
 
@@ -1026,7 +1043,7 @@
           <h3 class="zh hide">五行平衡</h3>
           <h3 class="th hide">สมดุลธาตุ</h3>
           <span class="section-sub">五行 Wǔxíng</span>
-          <span class="tip-hint">ⓘ What is this?</span>
+          <span class="tip-hint">ⓘ <span class="en">What is this?</span><span class="zh hide">这是什么？</span><span class="th hide">นี่คืออะไร?</span></span>
         </div>
         <div class="element-chart-wrap">
           <svg id="radar-svg" viewBox="0 0 200 190" class="radar-svg"></svg>
@@ -1051,7 +1068,7 @@
           <h3 class="en">Feng Shui Outfit Guide</h3>
           <h3 class="zh hide">风水穿搭指南</h3>
           <h3 class="th hide">คู่มือชุดฮวงจุ้ย</h3>
-          <span class="section-sub"><span class="en">2026 · Monthly Colors</span><span class="zh hide">2026 · 月度色彩</span></span>
+          <span class="section-sub"><span class="en">2026 · Monthly Colors</span><span class="zh hide">2026 · 月度色彩</span><span class="th hide">2026 · สีประจำเดือน</span></span>
         </div>
         <div id="outfit-card"></div>
       </section>
@@ -1177,7 +1194,7 @@
           <h3 class="en">Life Decades 大运</h3>
           <h3 class="zh hide">人生大运</h3>
           <h3 class="th hide">ทศวรรษชีวิต 大运</h3>
-          <span class="section-sub"><span class="en">Your 10-Year Cycles</span><span class="zh hide">十年大运周期</span></span>
+          <span class="section-sub"><span class="en">Your 10-Year Cycles</span><span class="zh hide">十年大运周期</span><span class="th hide">รอบสิบปีของคุณ</span></span>
         </div>
         <div id="decades-card"></div>
       </section>
@@ -1265,7 +1282,7 @@
           <h3 class="en">Soul Animals</h3>
           <h3 class="zh hide">灵兽</h3>
           <h3 class="th hide">สัตว์คู่ใจ</h3>
-          <span class="section-sub"><span class="en">Your secret allies</span><span class="zh hide">你的秘密盟友</span></span>
+          <span class="section-sub"><span class="en">Your secret allies</span><span class="zh hide">你的秘密盟友</span><span class="th hide">พันธมิตรลับของคุณ</span></span>
         </div>
         <div id="soul-animals-card"></div>
       </section>
@@ -1276,7 +1293,7 @@
           <h3 class="en">Business Compatibility</h3>
           <h3 class="zh hide">商业合作</h3>
           <h3 class="th hide">ความเข้ากันทางธุรกิจ</h3>
-          <span class="section-sub"><span class="en">Partner &amp; team dynamics</span><span class="zh hide">合伙与团队动态</span></span>
+          <span class="section-sub"><span class="en">Partner &amp; team dynamics</span><span class="zh hide">合伙与团队动态</span><span class="th hide">พลวัตคู่และทีม</span></span>
         </div>
         <div id="business-compat-card"></div>
       </section>
@@ -1417,6 +1434,6 @@
     </div>
   </div>
 
-  <script src="/app/script.js?v=23"></script>
+  <script src="/app/script.js?v=24"></script>
 </body>
 </html>

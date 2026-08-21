@@ -270,9 +270,14 @@ const EL_COLOR = {
   Water: '#3b82f6',
 };
 const EL_ZH    = { Wood:'木', Fire:'火', Earth:'土', Metal:'金', Water:'水' };
+const EL_TH    = { Wood:'ไม้', Fire:'ไฟ', Earth:'ดิน', Metal:'โลหะ', Water:'น้ำ' };
 const ANIMAL_ZH = {
   Rat:'鼠', Ox:'牛', Tiger:'虎', Rabbit:'兔', Dragon:'龙', Snake:'蛇',
   Horse:'马', Goat:'羊', Monkey:'猴', Rooster:'鸡', Dog:'狗', Pig:'猪',
+};
+const ANIMAL_TH = {
+  Rat:'หนู', Ox:'วัว', Tiger:'เสือ', Rabbit:'กระต่าย', Dragon:'มังกร', Snake:'งู',
+  Horse:'ม้า', Goat:'แพะ', Monkey:'ลิง', Rooster:'ไก่', Dog:'สุนัข', Pig:'หมู',
 };
 const COLOR_ZH = {
   Blue:'蓝色', Gold:'金色', Green:'绿色', Yellow:'黄色', White:'白色',
@@ -394,6 +399,7 @@ function showScreen(id) {
   // Show/hide floating Oracle FAB
   const fab = document.getElementById('oracle-fab');
   if (fab) fab.classList.toggle('hide', id !== 'results');
+  if (typeof applyI18n === 'function') applyI18n();
 }
 
 function showAbout() {
@@ -617,11 +623,13 @@ function runLoader(callback) {
   const fillEl = document.getElementById('loading-fill');
   let step = 0;
   const total = LOADING_MSGS.length;
-  const lang = currentLang();
-  const msgs = lang === 'zh' ? LOADING_MSGS_ZH : lang === 'th' ? LOADING_MSGS_TH : LOADING_MSGS;
-  if (msgEl) msgEl.textContent = msgs[0];
+  const setLoadMsg = (i) => {
+    if (!msgEl) return;
+    msgEl.innerHTML = _t(LOADING_MSGS[i], LOADING_MSGS_ZH[i], LOADING_MSGS_TH[i]);
+  };
+  setLoadMsg(0);
   const iv = setInterval(() => {
-    msgEl.textContent = msgs[step];
+    setLoadMsg(step);
     fillEl.style.width = ((step + 1) / total * 100) + '%';
     step++;
     if (step >= total) {
@@ -727,15 +735,15 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   const _heroMed = document.getElementById('hero-medallion');
   if (_heroMed) _heroMed.innerHTML = makeMedallion(animal, elColor, 'hero-med');
   document.getElementById('hero-year-tag').innerHTML =
-    _t(`Year of the ${animal} · ${year}`, `${ANIMAL_ZH[animal]}年 · ${year}`);
-  document.getElementById('hero-name').innerHTML = _t(animal, ANIMAL_ZH[animal]);
+    _t(`Year of the ${animal} · ${year}`, `${ANIMAL_ZH[animal]}年 · ${year}`, `ปี${ANIMAL_TH[animal]} · ${year}`);
+  document.getElementById('hero-name').innerHTML = _t(animal, ANIMAL_ZH[animal], ANIMAL_TH[animal]);
   document.getElementById('hero-chinese').textContent =
     yearPillar.stem.char + yearPillar.branch.char;
 
   const badgeEl = document.getElementById('hero-badges');
   badgeEl.innerHTML = [
-    _t(yearPillar.stem.element, EL_ZH[yearPillar.stem.element]),
-    _t(yearPillar.stem.polarity, yearPillar.stem.polarity === 'Yang' ? '阳' : '阴'),
+    _t(yearPillar.stem.element, EL_ZH[yearPillar.stem.element], EL_TH[yearPillar.stem.element]),
+    _t(yearPillar.stem.polarity, yearPillar.stem.polarity === 'Yang' ? '阳' : '阴', yearPillar.stem.polarity === 'Yang' ? 'หยาง' : 'หยิน'),
     yearPillar.branch.pinyin,
   ].map(t => `<span class="badge">${t}</span>`).join('');
 
@@ -744,7 +752,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
 
   // Compact hero: Today Summary
   const heroNow = new Date();
-  const heroDateStr = heroNow.toLocaleDateString('en-GB', { day:'numeric', month:'short' }).toUpperCase();
+  const heroDateStr = heroNow.toLocaleDateString(dateLocale(), { day:'numeric', month:'short' });
   const heroTodayIdx  = calcDayBranch(heroNow.getFullYear(), heroNow.getMonth(), heroNow.getDate());
   const heroTodayAnimal = BRANCHES[heroTodayIdx].animal;
   const heroIsCompat  = zData.compat.includes(heroTodayAnimal);
@@ -759,6 +767,11 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     : heroIsClash
     ? `今日${ANIMAL_ZH[heroTodayAnimal]}日与命盘有冲，放缓节奏。`
     : `今日${ANIMAL_ZH[heroTodayAnimal]}日平稳，坚持一致，相信过程。`;
+  const heroMsgTh = heroIsCompat
+    ? `วัน${ANIMAL_TH[heroTodayAnimal]}วันนี้ไหลไปกับแผนภูมิของคุณ — กล้าได้`
+    : heroIsClash
+    ? `วัน${ANIMAL_TH[heroTodayAnimal]}วันนี้เสียดกับแผนภูมิ — ขยับช้าๆ`
+    : `วัน${ANIMAL_TH[heroTodayAnimal]}ที่มั่นคง — สม่ำเสมอและเชื่อกระบวนการ`;
   // Static fallbacks for DO/AVOID/WATCH (used while AI loads or on failure)
   const fallbackDo    = MORNING_RITUAL[dominantEl][0];
   const fallbackAvoidEn = LUCKY_FOODS[dominantEl].avoid[0];
@@ -770,11 +783,11 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
                     : heroIsClash  ? '冲动决定——行动前先暂停'
                     : '分心——今天专注一件事';
   const heroEmoji = BRANCHES.find(b => b.animal === animal)?.emoji || '';
-  document.getElementById('hero-today-label').innerHTML = _t(`TODAY · ${heroDateStr}`, `今日 · ${heroDateStr}`);
+  document.getElementById('hero-today-label').innerHTML = _t(`TODAY · ${heroDateStr}`, `今日 · ${heroDateStr}`, `วันนี้ · ${heroDateStr}`);
   document.getElementById('hero-zodiac-title').innerHTML =
-    `${heroEmoji} ${_t(`${yearPillar.stem.element} ${animal}`, `${EL_ZH[yearPillar.stem.element]}${ANIMAL_ZH[animal]}`)}`;
+    `${heroEmoji} ${_t(`${yearPillar.stem.element} ${animal}`, `${EL_ZH[yearPillar.stem.element]}${ANIMAL_ZH[animal]}`, `${EL_TH[yearPillar.stem.element]} ${ANIMAL_TH[animal]}`)}`;
   document.getElementById('hero-profile-chip').innerHTML = '';
-  document.getElementById('hero-summary-msg').innerHTML = _t(heroMsgEn, heroMsgZh);
+  document.getElementById('hero-summary-msg').innerHTML = _t(heroMsgEn, heroMsgZh, heroMsgTh);
 
   // Compact context strip (Today, You, Relationships tabs)
   const csTodayPillar = calcTodayPillar();
@@ -782,22 +795,23 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   const csScore = Math.round(50 + (heroIsCompat ? 25 : heroIsClash ? -20 : 0));
   const csVerdictEn = heroIsCompat ? 'AUSPICIOUS' : heroIsClash ? 'CAUTION' : 'BALANCED';
   const csVerdictZh = heroIsCompat ? '吉' : heroIsClash ? '慎' : '平';
+  const csVerdictTh = heroIsCompat ? 'มงคล' : heroIsClash ? 'ระวัง' : 'สมดุล';
   document.getElementById('cs-bg').style.background =
     `linear-gradient(135deg, ${elColor}28, ${elColor}55, #0f0f1c)`;
   document.getElementById('cs-date').textContent = heroDateStr;
   document.getElementById('cs-pillar').innerHTML =
-    `${csTodayEmoji} ${_t(`${csTodayPillar.stem.element} ${csTodayPillar.animal}`, `${EL_ZH[csTodayPillar.stem.element]}${ANIMAL_ZH[csTodayPillar.animal]}`)}`;
+    `${csTodayEmoji} ${_t(`${csTodayPillar.stem.element} ${csTodayPillar.animal}`, `${EL_ZH[csTodayPillar.stem.element]}${ANIMAL_ZH[csTodayPillar.animal]}`, `${EL_TH[csTodayPillar.stem.element]} ${ANIMAL_TH[csTodayPillar.animal]}`)}`;
   document.getElementById('cs-chinese').textContent = `${csTodayPillar.stem.char}${csTodayPillar.branch.char}`;
   document.getElementById('cs-score').textContent = csScore;
-  document.getElementById('cs-verdict').innerHTML = _t(csVerdictEn, csVerdictZh);
-  document.getElementById('cs-hero-text').innerHTML = _t(heroMsgEn, heroMsgZh);
+  document.getElementById('cs-verdict').innerHTML = _t(csVerdictEn, csVerdictZh, csVerdictTh);
+  document.getElementById('cs-hero-text').innerHTML = _t(heroMsgEn, heroMsgZh, heroMsgTh);
   // Default: show strip (Today tab is default), hide hero card
   document.getElementById('hero-card').classList.add('hide');
   document.getElementById('context-strip').classList.remove('hide');
 
   // Show loading shimmer for DO/AVOID/WATCH, then fetch AI guidance
   document.getElementById('hero-bullets').innerHTML = `
-    <div class="hc-bullet"><span class="hc-bullet-key">${_t('DO','做')}</span><span class="guidance-loading">✦ Reading your chart…</span></div>
+    <div class="hc-bullet"><span class="hc-bullet-key">${_t('DO','做','ทำ')}</span><span class="guidance-loading">✦ ${_t('Reading your chart…','正在解读命盘…','กำลังอ่านแผนภูมิ…')}</span></div>
     <div class="hc-bullet"><span class="hc-bullet-key">${_t('AVOID','避')}</span><span class="guidance-loading">✦</span></div>
     <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span class="guidance-loading">✦</span></div>`;
 
@@ -1451,22 +1465,25 @@ function renderDailyFortune(userAnimal) {
   const todayAnimal    = BRANCHES[todayBranchIdx].animal;
   const userZodiac     = ZODIAC[userAnimal];
 
-  let score, color, levelLabel, levelLabel_zh, msg_en, msg_zh;
+  let score, color, levelLabel, levelLabel_zh, levelLabel_th, msg_en, msg_zh, msg_th;
   if (userZodiac.compat.includes(todayAnimal)) {
     score = 85 + Math.floor(Math.random() * 12);
-    color = '#22c55e'; levelLabel = 'Auspicious'; levelLabel_zh = '大吉';
+    color = '#22c55e'; levelLabel = 'Auspicious'; levelLabel_zh = '大吉'; levelLabel_th = 'มงคล';
     msg_en = `Today's energy flows with you. The ${todayAnimal} day amplifies your natural power — make your boldest moves now.`;
-    msg_zh = `今日能量与你同频。${todayAnimal}日增强你的天赋能量，大胆出击，正当时。`;
+    msg_zh = `今日能量与你同频。${ANIMAL_ZH[todayAnimal]}日增强你的天赋能量，大胆出击，正当时。`;
+    msg_th = `พลังวันนี้ไหลไปกับคุณ วัน${ANIMAL_TH[todayAnimal]}เสริมพลังธรรมชาติ — กล้าได้เลย`;
   } else if (userZodiac.clash.includes(todayAnimal)) {
     score = 38 + Math.floor(Math.random() * 18);
-    color = '#ef4444'; levelLabel = 'Challenging'; levelLabel_zh = '冲煞';
+    color = '#ef4444'; levelLabel = 'Challenging'; levelLabel_zh = '冲煞'; levelLabel_th = 'ท้าทาย';
     msg_en = `The ${todayAnimal} day creates friction with your chart. Navigate slowly, hold decisions until tomorrow, and protect your energy.`;
-    msg_zh = `今日${todayAnimal}日与你的命盘有冲突。放缓节奏，重要决定推迟到明天，注意保护自己的能量。`;
+    msg_zh = `今日${ANIMAL_ZH[todayAnimal]}日与你的命盘有冲突。放缓节奏，重要决定推迟到明天，注意保护自己的能量。`;
+    msg_th = `วัน${ANIMAL_TH[todayAnimal]}เสียดกับแผนภูมิ ช้าลง เลื่อนตัดสินใจไปพรุ่งนี้ และปกป้องพลัง`;
   } else {
     score = 60 + Math.floor(Math.random() * 22);
-    color = '#f0c040'; levelLabel = 'Balanced'; levelLabel_zh = '平稳';
+    color = '#f0c040'; levelLabel = 'Balanced'; levelLabel_zh = '平稳'; levelLabel_th = 'สมดุล';
     msg_en = `A steady ${todayAnimal} day — neither tailwind nor headwind. Focus on consistency, refine the details, and trust the process.`;
-    msg_zh = `今日${todayAnimal}日平稳，无明显顺逆之风。专注于一致性，打磨细节，相信过程。`;
+    msg_zh = `今日${ANIMAL_ZH[todayAnimal]}日平稳，无明显顺逆之风。专注于一致性，打磨细节，相信过程。`;
+    msg_th = `วัน${ANIMAL_TH[todayAnimal]}ที่มั่นคง — ไม่ท้ายลมหรือทวนลม โฟกัสความสม่ำเสมอ ขัดรายละเอียด และเชื่อกระบวนการ`;
   }
 
   const dateLabel = now.toLocaleDateString(dateLocale(), { year:'numeric', month:'long', day:'numeric' });
@@ -1476,15 +1493,15 @@ function renderDailyFortune(userAnimal) {
   card.innerHTML = `<div class="daily-fortune-card">
     <div class="daily-top">
       <div>
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${_t("Today's Day Animal",'今日日柱')}</div>
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${_t("Today's Day Animal",'今日日柱','สัตว์ประจำวันนี้')}</div>
         <div class="daily-animal-chip">
           <svg viewBox="0 0 100 100" width="22" height="22" style="color:${color}">${ANIMAL_SVGS[todayAnimal]||''}</svg>
-          ${_t(todayAnimal, ANIMAL_ZH[todayAnimal])}
+          ${_t(todayAnimal, ANIMAL_ZH[todayAnimal], ANIMAL_TH[todayAnimal])}
         </div>
       </div>
       <div class="daily-score-wrap">
         <div class="daily-score-num" id="daily-score-num" style="color:${color}">0</div>
-        <div class="daily-score-label">${_t(levelLabel, levelLabel_zh)}</div>
+        <div class="daily-score-label">${_t(levelLabel, levelLabel_zh, levelLabel_th)}</div>
       </div>
     </div>
     <div class="daily-bar-track">
@@ -1492,8 +1509,7 @@ function renderDailyFortune(userAnimal) {
     </div>
     <div class="daily-msg">
       <span class="daily-level-dot" style="background:${color}"></span>
-      <span class="en">${msg_en}</span>
-      <span class="zh hide">${msg_zh}</span>
+      ${_t(msg_en, msg_zh, msg_th)}
     </div>
   </div>`;
 
@@ -3561,21 +3577,21 @@ function renderInsightCards(todayMsg, fortune, dominantEl) {
   if (!el) return;
   const loveScore = fortune.love, careerScore = fortune.career;
   const loveTip = loveScore >= 66
-    ? _t('Connections flow easily — a good time to reach out and deepen bonds.', '感情顺畅，适合主动联系、深化关系。')
+    ? _t('Connections flow easily — a good time to reach out and deepen bonds.', '感情顺畅，适合主动联系、深化关系。', 'ความสัมพันธ์ไหลง่าย — เหมาะที่จะเอื้อมและลึกความผูกพัน')
     : loveScore >= 40
-    ? _t('Keep expectations balanced — focus on understanding before action.', '保持平衡期望，行动前先寻求理解。')
-    : _t('Protect your emotional energy today — quality over quantity in social time.', '今日注意保护情感能量，社交质量优于数量。');
+    ? _t('Keep expectations balanced — focus on understanding before action.', '保持平衡期望，行动前先寻求理解。', 'รักษาความคาดหวังให้สมดุล — เข้าใจก่อนลงมือ')
+    : _t('Protect your emotional energy today — quality over quantity in social time.', '今日注意保护情感能量，社交质量优于数量。', 'ปกป้องพลังใจวันนี้ — คุณภาพกว่าปริมาณในสังคม');
   const workTip = careerScore >= 66
-    ? _t('Career energy is high — take initiative and present bold ideas.', '事业运旺，主动出击，大胆提出想法。')
+    ? _t('Career energy is high — take initiative and present bold ideas.', '事业运旺，主动出击，大胆提出想法。', 'พลังงานอาชีพสูง — ริเริ่มและเสนอไอเดียกล้า')
     : careerScore >= 40
-    ? _t('Steady progress over bold moves — finish what is already in motion.', '稳扎稳打优于冒进，完成手头已有的工作。')
-    : _t('Avoid major work decisions today — observe and gather information instead.', '今日避免重大工作决定，以观察与收集信息为主。');
+    ? _t('Steady progress over bold moves — finish what is already in motion.', '稳扎稳打优于冒进，完成手头已有的工作。', 'คืบหน้ามั่นคงดีกว่าก้าวใหญ่ — ปิดงานที่กำลังทำ')
+    : _t('Avoid major work decisions today — observe and gather information instead.', '今日避免重大工作决定，以观察与收集信息为主。', 'เลี่ยงตัดสินใจงานใหญ่วันนี้ — สังเกตและเก็บข้อมูลก่อน');
   const elTips = {
-    Wood:  _t('Your Wood energy favors growth and collaboration — say yes to new connections.', '木气利于成长与合作，对新连接说是。'),
-    Fire:  _t('Your Fire energy brings charisma today — lead, inspire, and be visible.', '火气今日带来魅力，引领他人，展现自我。'),
-    Earth: _t('Your Earth energy grounds you — trust your gut and support those around you.', '土气令你沉稳，相信直觉，支持身边的人。'),
-    Metal: _t('Your Metal energy sharpens focus today — ideal for precision and detail work.', '金气今日提升专注，适合精细与细节工作。'),
-    Water: _t('Your Water energy flows — adapt quickly and listen more than you speak.', '水气流动，迅速适应，多听少说。'),
+    Wood:  _t('Your Wood energy favors growth and collaboration — say yes to new connections.', '木气利于成长与合作，对新连接说是。', 'พลังไม้เอื้อการเติบโตและความร่วมมือ — รับการเชื่อมใหม่'),
+    Fire:  _t('Your Fire energy brings charisma today — lead, inspire, and be visible.', '火气今日带来魅力，引领他人，展现自我。', 'พลังไฟนำเสน่ห์วันนี้ — นำ สร้างแรงบันดาลใจ และปรากฏตัว'),
+    Earth: _t('Your Earth energy grounds you — trust your gut and support those around you.', '土气令你沉稳，相信直觉，支持身边的人。', 'พลังดินทำให้มั่น — เชื่อสัญชาตญาณและซัพพอร์ตคนรอบตัว'),
+    Metal: _t('Your Metal energy sharpens focus today — ideal for precision and detail work.', '金气今日提升专注，适合精细与细节工作。', 'พลังโลหะคมโฟกัสวันนี้ — เหมาะกับงานละเอียด'),
+    Water: _t('Your Water energy flows — adapt quickly and listen more than you speak.', '水气流动，迅速适应，多听少说。', 'พลังน้ำไหล — ปรับเร็ว และฟังมากกว่าพูด'),
   };
   const cards = [
     { icon:'🌅', text: todayMsg },
@@ -3595,12 +3611,12 @@ function renderActionsPreview(heroDo, heroAvoidEn, heroAvoidZh, heroWatchEn, her
   const el = document.getElementById('actions-preview-list');
   if (!el) return;
   el.innerHTML = [
-    { key:'DO',    key_zh:'做',  en: heroDo.title, zh: heroDo.title_zh },
-    { key:'AVOID', key_zh:'避',  en: heroAvoidEn,  zh: heroAvoidZh     },
-    { key:'WATCH', key_zh:'注意',en: heroWatchEn,  zh: heroWatchZh     },
+    { key:'DO',    key_zh:'做',  key_th:'ทำ',  en: heroDo.title, zh: heroDo.title_zh },
+    { key:'AVOID', key_zh:'避',  key_th:'เลี่ยง', en: heroAvoidEn,  zh: heroAvoidZh     },
+    { key:'WATCH', key_zh:'注意',key_th:'ระวัง', en: heroWatchEn,  zh: heroWatchZh     },
   ].map(item => `
     <div class="hc-bullet">
-      <span class="hc-bullet-key">${_t(item.key, item.key_zh)}</span>
+      <span class="hc-bullet-key">${_t(item.key, item.key_zh, item.key_th)}</span>
       <span>${_t(item.en, item.zh)}</span>
     </div>`).join('');
 }
@@ -3613,7 +3629,7 @@ function renderYouProfile(animal, yearPillar, elColor) {
   const stem = yearPillar.stem;
   el.innerHTML = `
     <div class="you-profile-card" style="border-color:${elColor}55">
-      <div class="you-profile-label"><span class="en">Wǒ Bāzì Profile</span><span class="zh hide">我的八字命盘</span></div>
+      <div class="you-profile-label"><span class="en">Wǒ Bāzì Profile</span><span class="zh hide">我的八字命盘</span><span class="th hide">โปรไฟล์ปาจื้อ</span></div>
       <div class="you-profile-identity">
         <span class="you-profile-badge" style="background:${elColor}22;color:${elColor}">${emoji} <span class="en">${stem.element} ${animal}</span><span class="zh hide">${EL_ZH[stem.element]}${ANIMAL_ZH[animal]}</span></span>
         <span class="you-profile-badge"><span class="en">${stem.polarity}</span><span class="zh hide">${stem.polarity === 'Yang' ? '阳' : '阴'}</span></span>

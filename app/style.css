@@ -242,6 +242,20 @@ input  { font-family: inherit; }
 /* ── Utility ── */
 .hide { display: none !important; }
 
+/* Language visibility — CSS is the source of truth so Thai/ZH
+   still show if a stale script never toggles .hide */
+html[data-lang="en"] .zh,
+html[data-lang="en"] .th { display: none !important; }
+
+html[data-lang="th"] .zh:has(~ .th),
+html[data-lang="th"] .zh.hide { display: none !important; }
+html[data-lang="th"] .en:has(~ .th) { display: none !important; }
+html[data-lang="th"] .th { display: revert !important; }
+
+html[data-lang="zh"] .th { display: none !important; }
+html[data-lang="zh"] .en:has(~ .zh) { display: none !important; }
+html[data-lang="zh"] .zh { display: revert !important; }
+
 /* ── Stars (splash bg) ── */
 .stars { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
 .star {
