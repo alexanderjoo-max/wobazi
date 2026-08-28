@@ -1508,10 +1508,14 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 }
 
 /* Date + Time row */
-.field-datetime { align-items: flex-start; }
+.field-datetime {
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
 .field-datetime .field-col-date { flex: 1.2 1 0; min-width: 0; }
 .field-datetime .field-col-time { flex: 0.8 1 0; min-width: 100px; }
-.date-trio { width: 100%; }
+.field-datetime .field-col-time .time-input { height: 48px; }
+.date-trio { width: 100%; min-height: 48px; }
 .time-input {
   background: var(--w05);
   border: 1.5px solid var(--border);
@@ -5277,14 +5281,15 @@ html[lang="th"], html[data-lang="th"] body {
 
 /* ── Calendar segmented control ── */
 .field-date-block { gap: 10px; }
-.date-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
+.datetime-labels {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) auto minmax(100px, 0.8fr);
+  align-items: end;
+  gap: 10px 12px;
 }
-.date-head label { margin: 0; }
+.datetime-labels label { margin: 0; }
+.datetime-labels .cal-seg { justify-self: start; }
+.datetime-labels .time-label { justify-self: stretch; }
 .cal-seg {
   display: inline-flex;
   background: var(--w05);
@@ -5412,7 +5417,11 @@ html[lang="th"], html[data-lang="th"] body {
 
 @media (max-width: 480px) {
   .cal-seg-btn { font-size: 10px; padding: 6px 8px; }
-  .date-head { flex-direction: column; align-items: stretch; }
+  .datetime-labels {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .datetime-labels .time-label { grid-column: 2; grid-row: 1; }
+  .datetime-labels .cal-seg { grid-column: 1 / -1; }
   .tengods-row { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 40px; gap: 8px; }
   .btn-edit-birth { font-size: 9px; }
 }

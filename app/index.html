@@ -58,7 +58,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=34">
+  <link rel="stylesheet" href="/app/style.css?v=35">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
     html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
@@ -734,25 +734,37 @@
         </div>
 
         <div class="field field-date-block">
-          <div class="date-head">
+          <div class="datetime-labels">
             <label for="birth-day"><span class="en">Date of Birth <span class="label-req">*Required</span></span><span class="zh hide">出生日期 <span class="label-req">*必填</span></span><span class="th hide">วันเกิด <span class="label-req">*จำเป็น</span></span></label>
             <div class="cal-seg" role="radiogroup" aria-label="Calendar type">
               <button type="button" class="cal-seg-btn active" id="cal-solar" role="radio" aria-checked="true" onclick="setCalendarType('solar')">
                 <span aria-hidden="true">☀️</span>
-                <span class="en">Solar / Gregorian</span><span class="zh hide">阳历 / 公历</span><span class="th hide">สุริยคติ</span>
+                <span class="en">Solar</span><span class="zh hide">阳历</span><span class="th hide">สุริยคติ</span>
               </button>
               <button type="button" class="cal-seg-btn" id="cal-lunar" role="radio" aria-checked="false" onclick="setCalendarType('lunar')">
                 <span aria-hidden="true">🌙</span>
-                <span class="en">Lunar / 农历</span><span class="zh hide">农历</span><span class="th hide">จันทรคติ / 农历</span>
+                <span class="en">Lunar / 农历</span><span class="zh hide">农历</span><span class="th hide">จันทรคติ</span>
               </button>
             </div>
+            <label for="birthtime" class="time-label"><span class="en">Birth time <span class="label-opt">local clock</span></span><span class="zh hide">出生时间 <span class="label-opt">当地钟点</span></span><span class="th hide">เวลาเกิด <span class="label-opt">นาฬิกาท้องถิ่น</span></span></label>
           </div>
-          <div class="date-trio">
-            <input type="number" id="birth-day"   class="date-part" placeholder="DD"   min="1"    max="31"   inputmode="numeric" required aria-required="true">
-            <span class="date-sep">/</span>
-            <input type="number" id="birth-month" class="date-part" placeholder="MM"   min="1"    max="12"   inputmode="numeric" required aria-required="true">
-            <span class="date-sep">/</span>
-            <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1900" max="2100" inputmode="numeric" required aria-required="true">
+          <div class="field-row field-datetime">
+            <div class="field-col field-col-date">
+              <div class="date-trio">
+                <input type="number" id="birth-day"   class="date-part" placeholder="DD"   min="1"    max="31"   inputmode="numeric" required aria-required="true">
+                <span class="date-sep">/</span>
+                <input type="number" id="birth-month" class="date-part" placeholder="MM"   min="1"    max="12"   inputmode="numeric" required aria-required="true">
+                <span class="date-sep">/</span>
+                <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1900" max="2100" inputmode="numeric" required aria-required="true">
+              </div>
+            </div>
+            <div class="field-col field-col-time">
+              <input type="time" id="birthtime" class="time-input">
+              <label class="time-unknown-opt">
+                <input type="checkbox" id="time-unknown" onchange="onTimeUnknownToggle()">
+                <span class="en">Time unknown</span><span class="zh hide">时间未知</span><span class="th hide">ไม่ทราบเวลา</span>
+              </label>
+            </div>
           </div>
           <p class="field-hint" id="cal-hint">
             <span class="en">Most hospital / passport dates are Solar. Use Lunar only if the birth date was recorded on the Chinese calendar.</span>
@@ -767,15 +779,6 @@
           </label>
           <p class="solar-equiv hide" id="solar-equivalent"></p>
           <p class="field-error hide" id="dob-error" role="alert"></p>
-        </div>
-
-        <div class="field field-col-time">
-          <label for="birthtime"><span class="en">Birth time (local clock) <span class="label-opt">Four Pillars</span></span><span class="zh hide">出生时间（当地钟点） <span class="label-opt">四柱命盘</span></span><span class="th hide">เวลาเกิด (นาฬิกาท้องถิ่น) <span class="label-opt">สี่เสา</span></span></label>
-          <input type="time" id="birthtime" class="time-input">
-          <label class="time-unknown-opt">
-            <input type="checkbox" id="time-unknown" onchange="onTimeUnknownToggle()">
-            <span class="en">Time unknown</span><span class="zh hide">时间未知</span><span class="th hide">ไม่ทราบเวลา</span>
-          </label>
         </div>
 
         <div class="field field-row">
