@@ -316,44 +316,20 @@ function hourToBranch(h) {
   return Math.floor(((h + 1) % 24) / 2);
 }
 
-/* ── Bazi Calculation ── */
-function calcBazi(year, month, day, hour) {
-  // Year Pillar
-  const yStemIdx   = ((year - 4) % 10 + 10) % 10;
-  const yBranchIdx = ((year - 4) % 12 + 12) % 12;
-
-  // Month Pillar (approximate)
-  const mBranchIdx = MONTH_BRANCH[month];
-  // Month stem: depends on year stem group (5 groups of 2)
-  const mStemBase  = (yStemIdx % 5) * 2;
-  // Tiger month (index 2) is month 1 in the cycle
-  const mOffset    = (mBranchIdx - 2 + 12) % 12;
-  const mStemIdx   = (mStemBase + mOffset) % 10;
-
-  // Day Pillar (referenced from known Jiazi day: 2000-01-07)
-  const ref = new Date(2000, 0, 7);
-  const birthDay = new Date(year, month, day);
-  const diffDays = Math.round((birthDay - ref) / 86400000);
-  const dCyclePos = ((diffDays % 60) + 60) % 60;
-  const dStemIdx   = dCyclePos % 10;
-  const dBranchIdx = dCyclePos % 12;
-
-  // Hour Pillar
-  let hStemIdx = null, hBranchIdx = null;
-  if (hour !== null) {
-    hBranchIdx = hourToBranch(hour);
-    // Hour stem based on day stem group
-    const hStemBase = (dStemIdx % 5) * 2;
-    hStemIdx = (hStemBase + hBranchIdx) % 10;
+/* ── Bazi Calculation (thin wrapper → bazi-engine.js) ──
+   month is 0-indexed (legacy JS Date). Prefer calcBaziAccurate for new code. */
+function calcBazi(year, month, day, hour, minute) {
+  if (window.BaziEngine && typeof BaziEngine.calcBaziAccurate === 'function') {
+    return BaziEngine.calcBaziAccurate({
+      year,
+      month: Number(month) + 1,
+      day,
+      hour: hour === undefined ? null : hour,
+      minute: minute || 0,
+      calendar: 'solar',
+    }).pillars;
   }
-
-  return [
-    { label:'Year',  stem: STEMS[yStemIdx],   branch: BRANCHES[yBranchIdx],  known: true },
-    { label:'Month', stem: STEMS[mStemIdx],   branch: BRANCHES[mBranchIdx],  known: true },
-    { label:'Day',   stem: STEMS[dStemIdx],   branch: BRANCHES[dBranchIdx],  known: true },
-    { label:'Hour',  stem: hour !== null ? STEMS[hStemIdx] : null,
-                     branch: hour !== null ? BRANCHES[hBranchIdx] : null,    known: hour !== null },
-  ];
+  return [];
 }
 
 /* ── Element Balance (from 8 characters) ── */
@@ -424,7 +400,8 @@ function scrollResults(id) {
   scroll.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
 }
 
-function switchTab(tab) {
+function switchTab(tab, opts) {
+  opts = opts || {};
   ['today', 'you', 'actions', 'relationships'].forEach(t => {
     const btn = document.getElementById('tab-btn-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
@@ -440,7 +417,9 @@ function switchTab(tab) {
   if (heroCard) heroCard.classList.toggle('hide', tab !== 'actions');
   if (ctxStrip) ctxStrip.classList.toggle('hide', tab === 'actions');
   document.querySelector('#results .scroll-body').scrollTop = 0;
-  history.replaceState(null, '', location.pathname + '#' + tab);
+  if (!opts.skipHash && typeof currentHash === 'function' && currentHash() !== tab) {
+    history.pushState({ wobazi: tab }, '', location.pathname + location.search + '#' + tab);
+  }
 
   // Render prev/next tab navigation
   const TAB_ORDER = ['today', 'you', 'actions', 'relationships'];
@@ -464,6 +443,348 @@ function switchTab(tab) {
     `;
   }
 }
+
+/* ═══════════════════════════════════════
+   Hash routing + birth persistence
+═══════════════════════════════════════ */
+const RESULT_TABS = ['today', 'you', 'actions', 'relationships'];
+const CHART_STORE_KEY = 'wobazi_chart_v1';
+let _birthMeta = { calendarType: 'solar', leapMonth: false, minute: 0 };
+let _lastAccurate = null;
+let _appNavigating = false;
+let _currentUser = null;
+let _savedReading = null;
+
+function currentHash() {
+  return (location.hash || '').replace(/^#/, '');
+}
+
+function goHash(hash, opts) {
+  opts = opts || {};
+  const h = hash || '';
+  const url = location.pathname + (location.search || '').replace(/[?&]begin=1/, '').replace(/^&/, '?') + (h ? '#' + h : '');
+  const state = { wobazi: h || 'landing' };
+  _appNavigating = true;
+  if (opts.replace) history.replaceState(state, '', url || location.pathname);
+  else if (currentHash() !== h) history.pushState(state, '', url || location.pathname);
+  else history.replaceState(state, '', url || location.pathname);
+  _appNavigating = false;
+  applyRoute(h);
+}
+
+function goToLanding() { goHash(''); }
+function goToInput() {
+  fillFormFromStore();
+  updateInputMode();
+  goHash('input');
+}
+function onLandingPrimary() {
+  if (hasStoredChart()) continueReading();
+  else goToInput();
+}
+function backFromInput() {
+  if (history.length > 1 && (history.state && history.state.wobazi === 'input' || currentHash() === 'input')) {
+    history.back();
+  } else {
+    goToLanding();
+  }
+}
+
+function currentUserKey() {
+  if (typeof _currentUser !== 'undefined' && _currentUser && _currentUser.googleId) return _currentUser.googleId;
+  try {
+    let id = localStorage.getItem('wobazi_guest_id');
+    if (!id) {
+      id = 'g_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem('wobazi_guest_id', id);
+    }
+    return id;
+  } catch (e) { return 'guest'; }
+}
+
+function getStoredChart() {
+  try {
+    const raw = localStorage.getItem(CHART_STORE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+function hasStoredChart() {
+  const p = getStoredChart();
+  return !!(p && p.year && p.month && p.day);
+}
+function saveLocalChart(payload) {
+  try {
+    const prev = getStoredChart() || {};
+    const next = Object.assign({}, prev, payload, { savedAt: Date.now() });
+    localStorage.setItem(CHART_STORE_KEY, JSON.stringify(next));
+    updateLandingCtas();
+    updateInputMode();
+  } catch (e) { /* quota / private mode */ }
+}
+
+function collectBirthPayload() {
+  const name = document.getElementById('name')?.value.trim() || '';
+  const d = parseInt(document.getElementById('birth-day')?.value, 10);
+  const m = parseInt(document.getElementById('birth-month')?.value, 10);
+  const y = parseInt(document.getElementById('birth-year')?.value, 10);
+  const unknown = document.getElementById('time-unknown')?.checked;
+  const timeVal = document.getElementById('birthtime')?.value;
+  let hour = null, minute = 0;
+  if (!unknown && timeVal) {
+    const parts = timeVal.split(':');
+    hour = parseInt(parts[0], 10);
+    minute = parseInt(parts[1] || '0', 10);
+  }
+  const calendarType = getCalendarType();
+  const leapMonth = !!document.getElementById('leap-month')?.checked;
+  const birthplace = document.getElementById('birthplace')?.value.trim() || '';
+  const bloodType = document.getElementById('blood-type')?.value || null;
+  const gender = document.querySelector('input[name="gender"]:checked')?.value || null;
+  if (!y || !m || !d) return null;
+  let solarY = y, solarM = m, solarD = d;
+  if (calendarType === 'lunar' && window.BaziEngine) {
+    try {
+      const conv = BaziEngine.lunarToSolar(y, m, d, leapMonth);
+      solarY = conv.year; solarM = conv.month; solarD = conv.day;
+    } catch (e) { return null; }
+  }
+  return {
+    name, year: solarY, month: solarM, day: solarD, hour, minute,
+    calendarType, leapMonth,
+    lunarYear: calendarType === 'lunar' ? y : null,
+    lunarMonth: calendarType === 'lunar' ? m : null,
+    lunarDay: calendarType === 'lunar' ? d : null,
+    birthplace, bloodType, gender,
+  };
+}
+
+function persistBirthIfValid() {
+  const p = collectBirthPayload();
+  if (!p) return;
+  const y = p.calendarType === 'lunar' ? p.lunarYear : p.year;
+  const m = p.calendarType === 'lunar' ? p.lunarMonth : p.month;
+  const d = p.calendarType === 'lunar' ? p.lunarDay : p.day;
+  if (!isValidBirthDate(y, m, d)) return;
+  saveLocalChart(p);
+}
+
+function fillFormFromPayload(p) {
+  if (!p) return;
+  const lunar = p.calendarType === 'lunar';
+  setCalendarType(lunar ? 'lunar' : 'solar', { silent: true });
+  const nameEl = document.getElementById('name');
+  const dayEl = document.getElementById('birth-day');
+  const monthEl = document.getElementById('birth-month');
+  const yearEl = document.getElementById('birth-year');
+  const timeEl = document.getElementById('birthtime');
+  const placeEl = document.getElementById('birthplace');
+  const bloodEl = document.getElementById('blood-type');
+  const leapEl = document.getElementById('leap-month');
+  const unkEl = document.getElementById('time-unknown');
+  if (nameEl) nameEl.value = p.name || '';
+  if (lunar) {
+    if (dayEl) dayEl.value = p.lunarDay || '';
+    if (monthEl) monthEl.value = p.lunarMonth || '';
+    if (yearEl) yearEl.value = p.lunarYear || '';
+    if (leapEl) leapEl.checked = !!p.leapMonth;
+  } else {
+    if (dayEl) dayEl.value = p.day || '';
+    if (monthEl) monthEl.value = p.month || '';
+    if (yearEl) yearEl.value = p.year || '';
+    if (leapEl) leapEl.checked = false;
+  }
+  if (unkEl) unkEl.checked = p.hour == null;
+  if (timeEl) {
+    if (p.hour != null) {
+      timeEl.value = String(p.hour).padStart(2, '0') + ':' + String(p.minute || 0).padStart(2, '0');
+      timeEl.disabled = false;
+    } else {
+      timeEl.value = '';
+      if (unkEl && unkEl.checked) timeEl.disabled = true;
+    }
+  }
+  if (placeEl) placeEl.value = p.birthplace || '';
+  if (bloodEl) bloodEl.value = p.bloodType || p.blood_type || '';
+  if (p.gender) {
+    const radio = document.querySelector(`input[name="gender"][value="${p.gender}"]`);
+    if (radio) radio.checked = true;
+  }
+  updateLunarPreview();
+  onTimeUnknownToggle();
+}
+
+function fillFormFromStore() {
+  const p = getStoredChart();
+  if (p) fillFormFromPayload(p);
+}
+
+function updateInputMode() {
+  const has = hasStoredChart();
+  document.querySelectorAll('.submit-reveal').forEach(el => el.classList.toggle('hide', has));
+  document.querySelectorAll('.submit-recalc').forEach(el => el.classList.toggle('hide', !has));
+}
+
+function updateLandingCtas() {
+  const has = hasStoredChart() || !!(typeof _savedReading !== 'undefined' && _savedReading);
+  const primary = document.getElementById('splash-cta-primary');
+  const secondary = document.getElementById('splash-cta-secondary');
+  if (primary) {
+    primary.querySelectorAll('.cta-begin').forEach(el => el.classList.toggle('hide', has));
+    primary.querySelectorAll('.cta-continue').forEach(el => el.classList.toggle('hide', !has));
+  }
+  if (secondary) secondary.classList.toggle('hide', !has);
+}
+
+function getCalendarType() {
+  return document.getElementById('cal-lunar')?.classList.contains('active') ? 'lunar' : 'solar';
+}
+function setCalendarType(type, opts) {
+  opts = opts || {};
+  const solar = type !== 'lunar';
+  const solarBtn = document.getElementById('cal-solar');
+  const lunarBtn = document.getElementById('cal-lunar');
+  if (solarBtn) {
+    solarBtn.classList.toggle('active', solar);
+    solarBtn.setAttribute('aria-checked', solar ? 'true' : 'false');
+  }
+  if (lunarBtn) {
+    lunarBtn.classList.toggle('active', !solar);
+    lunarBtn.setAttribute('aria-checked', solar ? 'false' : 'true');
+  }
+  const leapWrap = document.getElementById('leap-month-wrap');
+  if (leapWrap) leapWrap.classList.toggle('hide', solar);
+  updateLunarPreview();
+  if (!opts.silent) persistBirthIfValid();
+}
+function updateLunarPreview() {
+  const eq = document.getElementById('solar-equivalent');
+  const leapWrap = document.getElementById('leap-month-wrap');
+  if (!eq) return;
+  if (getCalendarType() !== 'lunar' || !window.BaziEngine) {
+    eq.classList.add('hide');
+    eq.textContent = '';
+    return;
+  }
+  const y = parseInt(document.getElementById('birth-year')?.value, 10);
+  const m = parseInt(document.getElementById('birth-month')?.value, 10);
+  const leap = !!document.getElementById('leap-month')?.checked;
+  if (leapWrap && y) {
+    const lm = BaziEngine.leapMonth(y);
+    leapWrap.classList.toggle('hide', false);
+    leapWrap.title = lm ? ('闰' + lm + '月') : '';
+  }
+  const d = parseInt(document.getElementById('birth-day')?.value, 10);
+  if (!y || !m || !d) { eq.classList.add('hide'); return; }
+  try {
+    const s = BaziEngine.lunarToSolar(y, m, d, leap);
+    const pad = n => String(n).padStart(2, '0');
+    const iso = s.year + '-' + pad(s.month) + '-' + pad(s.day);
+    eq.innerHTML = _t('Solar equivalent: ' + iso, '阳历对应：' + iso, 'เทียบสุริยคติ: ' + iso);
+    eq.classList.remove('hide');
+  } catch (err) {
+    eq.textContent = err.message || '';
+    eq.classList.remove('hide');
+  }
+}
+function onTimeUnknownToggle() {
+  const unk = document.getElementById('time-unknown');
+  const timeEl = document.getElementById('birthtime');
+  if (!unk || !timeEl) return;
+  timeEl.disabled = !!unk.checked;
+  if (unk.checked) timeEl.value = '';
+}
+
+function restoreResults(p, opts) {
+  opts = opts || {};
+  if (!p || !p.year) { goToInput(); return; }
+  fillFormFromPayload(p);
+  const hour = p.hour != null ? Number(p.hour) : null;
+  _birthMeta = {
+    calendarType: p.calendarType || 'solar',
+    leapMonth: !!p.leapMonth,
+    minute: p.minute || 0,
+    lunarYear: p.lunarYear, lunarMonth: p.lunarMonth, lunarDay: p.lunarDay,
+  };
+  const go = () => {
+    renderResults(p.name || '', p.year, p.month - 1, p.day, hour, p.birthplace || '', p.bloodType || p.blood_type || null, p.gender || null, {
+      skipHash: opts.skipHash,
+      monthlyCache: p.monthlyForecasts,
+      minute: p.minute || 0,
+    });
+  };
+  if (opts.skipLoader) go();
+  else runLoader(go);
+}
+
+function continueReading() {
+  const local = getStoredChart();
+  const p = (typeof _savedReading !== 'undefined' && _savedReading)
+    ? Object.assign({}, local || {}, {
+        name: _savedReading.name,
+        year: _savedReading.year,
+        month: _savedReading.month,
+        day: _savedReading.day,
+        hour: _savedReading.hour,
+        minute: _savedReading.minute || (local && local.minute) || 0,
+        birthplace: _savedReading.birthplace,
+        bloodType: _savedReading.blood_type,
+        gender: _savedReading.gender,
+        calendarType: _savedReading.calendar_type || (local && local.calendarType) || 'solar',
+        leapMonth: !!(_savedReading.leap_month || (local && local.leapMonth)),
+        lunarYear: _savedReading.lunar_year,
+        lunarMonth: _savedReading.lunar_month,
+        lunarDay: _savedReading.lunar_day,
+      })
+    : local;
+  if (!p) { goToInput(); return; }
+  restoreResults(p);
+}
+
+function applyRoute(hash) {
+  const h = (hash == null ? currentHash() : hash);
+  if (h === 'begin') {
+    showScreen('input');
+    fillFormFromStore();
+    updateInputMode();
+    return;
+  }
+  if (!h || h === 'landing') {
+    showScreen('splash');
+    updateLandingCtas();
+    return;
+  }
+  if (h === 'input') {
+    showScreen('input');
+    fillFormFromStore();
+    updateInputMode();
+    return;
+  }
+  if (RESULT_TABS.indexOf(h) >= 0) {
+    const p = getStoredChart() || (typeof _savedReading !== 'undefined' && _savedReading ? {
+      name: _savedReading.name, year: _savedReading.year, month: _savedReading.month, day: _savedReading.day,
+      hour: _savedReading.hour, birthplace: _savedReading.birthplace, bloodType: _savedReading.blood_type, gender: _savedReading.gender,
+      calendarType: _savedReading.calendar_type || 'solar',
+    } : null);
+    if (!p || !p.year) {
+      goHash('input', { replace: true });
+      return;
+    }
+    const resultsOn = document.getElementById('results')?.classList.contains('active');
+    if (!resultsOn || !_shareData) {
+      restoreResults(p, { skipHash: true, skipLoader: true });
+    } else {
+      showScreen('results');
+      switchTab(h, { skipHash: true });
+    }
+    return;
+  }
+  showScreen('splash');
+}
+
+window.addEventListener('popstate', () => {
+  if (_appNavigating) return;
+  applyRoute(currentHash());
+});
 
 /* ── Stars (splash background) ── */
 function buildStars() {
@@ -654,8 +975,13 @@ function setDobError(msg) {
 
 function isValidBirthDate(y, m, d) {
   if (!d || !m || !y) return false;
-  if (y < 1900 || y > new Date().getFullYear()) return false;
+  if (y < 1900 || y > 2100) return false;
   if (m < 1 || m > 12 || d < 1 || d > 31) return false;
+  if (getCalendarType() === 'lunar' && window.BaziEngine) {
+    const leap = !!document.getElementById('leap-month')?.checked;
+    const max = BaziEngine.getLunarMonthLength(y, m, leap);
+    return max > 0 && d >= 1 && d <= max;
+  }
   const dt = new Date(y, m - 1, d);
   return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
 }
@@ -663,11 +989,11 @@ function isValidBirthDate(y, m, d) {
 function handleSubmit(e) {
   e.preventDefault();
   haptic([15, 50, 15]);
-  const name  = document.getElementById('name').value.trim();
-  const d     = parseInt(document.getElementById('birth-day').value,   10);
-  const m     = parseInt(document.getElementById('birth-month').value, 10);
-  const y     = parseInt(document.getElementById('birth-year').value,  10);
-  if (!isValidBirthDate(y, m, d)) {
+  const payload = collectBirthPayload();
+  const y = payload && (payload.calendarType === 'lunar' ? payload.lunarYear : payload.year);
+  const m = payload && (payload.calendarType === 'lunar' ? payload.lunarMonth : payload.month);
+  const d = payload && (payload.calendarType === 'lunar' ? payload.lunarDay : payload.day);
+  if (!payload || !isValidBirthDate(y, m, d)) {
     const lang = currentLang();
     const dobMsg = lang === 'zh' ? '请填写出生日期。' : lang === 'th' ? 'กรุณากรอกวันเกิด' : 'Please enter your date of birth.';
     setDobError(dobMsg);
@@ -677,20 +1003,23 @@ function handleSubmit(e) {
   }
   setDobError('');
 
-  const timeVal = document.getElementById('birthtime').value;
-  let hour = null;
-  if (timeVal) hour = parseInt(timeVal.split(':')[0], 10);
-
-  const birthplace = document.getElementById('birthplace').value.trim();
-  const bloodType  = document.getElementById('blood-type').value || null;
-  const gender     = document.querySelector('input[name="gender"]:checked')?.value || null;
+  _birthMeta = {
+    calendarType: payload.calendarType,
+    leapMonth: payload.leapMonth,
+    minute: payload.minute || 0,
+    lunarYear: payload.lunarYear,
+    lunarMonth: payload.lunarMonth,
+    lunarDay: payload.lunarDay,
+  };
+  saveLocalChart(payload);
 
   runLoader(() => {
     try {
-      renderResults(name, y, m - 1, d, hour, birthplace, bloodType, gender);
+      renderResults(payload.name, payload.year, payload.month - 1, payload.day, payload.hour, payload.birthplace, payload.bloodType, payload.gender, { minute: payload.minute || 0 });
     } catch (err) {
       console.error('[renderResults error]', err);
       showScreen('input');
+      goHash('input', { replace: true });
       alert('Something went wrong generating your reading. Please try again.');
     }
   });
@@ -699,8 +1028,24 @@ function handleSubmit(e) {
 /* ═══════════════════════════════════════
    UI — Render Results
 ═══════════════════════════════════════ */
-function renderResults(name, year, month, day, hour, birthplace = '', bloodType = null, gender = null) {
-  const pillars  = calcBazi(year, month, day, hour);
+function renderResults(name, year, month, day, hour, birthplace = '', bloodType = null, gender = null, opts = {}) {
+  const minute = (opts && opts.minute != null) ? opts.minute : (_birthMeta.minute || 0);
+  let accurate = null;
+  let pillars;
+  if (window.BaziEngine && typeof BaziEngine.calcBaziAccurate === 'function') {
+    accurate = BaziEngine.calcBaziAccurate({
+      year,
+      month: month + 1,
+      day,
+      hour,
+      minute,
+      calendar: 'solar',
+    });
+    pillars = accurate.pillars;
+    _lastAccurate = accurate;
+  } else {
+    pillars = calcBazi(year, month, day, hour, minute);
+  }
   const yearPillar = pillars[0];
   const animal   = yearPillar.branch.animal;
   const zData    = ZODIAC[animal];
@@ -727,7 +1072,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   const dominantEl = Object.entries(elements).sort((a,b)=>b[1]-a[1])[0][0];
 
   // Store share data
-  _shareData = { name, animal, element: yearPillar.stem.element, polarity: yearPillar.stem.polarity, year, fortune, dominantEl, bloodType };
+  _shareData = { name, animal, element: yearPillar.stem.element, polarity: yearPillar.stem.polarity, year, fortune, dominantEl, bloodType, tenGods: accurate && accurate.tenGods, pillars };
 
   // Hero card
   document.getElementById('hero-bg').style.background =
@@ -842,6 +1187,10 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
           isCompat: heroIsCompat,
           score: Math.round(50 + (heroIsCompat ? 25 : heroIsClash ? -20 : 0)),
         },
+        tenGods: accurate && accurate.tenGods ? accurate.tenGods.list.map(g => ({
+          id: g.id, en: g.en, zh: g.zh, percent: g.percent,
+        })) : null,
+        tenGodsSentence: accurate && accurate.tenGods ? accurate.tenGods.sentence : null,
       };
       const resp = await fetch('/api/daily-guidance', {
         method: 'POST',
@@ -868,6 +1217,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     }
   })();
   renderYouProfile(animal, yearPillar, elColor);
+  renderTenGods(accurate && accurate.tenGods, pillars);
 
   // Daily fortune
   renderDailyFortune(animal);
@@ -884,6 +1234,8 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   // 2026 Forecast (pre-calc once so love section shares same overall score)
   const forecast2026 = calc2026Fortune(animal, elements);
   render2026Fortune(animal, elements, forecast2026);
+
+  cacheMonthlyWithChart(pillars, accurate && accurate.dayMaster, opts.monthlyCache);
 
   // Love & Relationships
   renderLoveSection(animal, elements, forecast2026.overall);
@@ -940,11 +1292,14 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   showScreen('results');
   haptic([20, 60, 20]);
 
-  // Init tab from URL hash (default: today)
-  const initTab = location.hash === '#you'     ? 'you'
-                : location.hash === '#actions' ? 'actions'
-                : 'today';
-  switchTab(initTab);
+  const hashTab = currentHash();
+  const initTab = RESULT_TABS.indexOf(hashTab) >= 0 ? hashTab : 'today';
+  switchTab(initTab, { skipHash: true });
+  if (!opts.skipHash && currentHash() !== 'today') {
+    _appNavigating = true;
+    history.pushState({ wobazi: 'today' }, '', location.pathname + location.search + '#today');
+    _appNavigating = false;
+  }
 
   applyI18n();
 
@@ -975,6 +1330,90 @@ function renderPillars(pillars) {
       <div class="pillar-el-dot" style="background:${EL_COLOR[p.branch.element]}"></div>
     </div>`;
   }).join('');
+  const disc = document.getElementById('pillar-disclaimer');
+  if (disc) {
+    disc.innerHTML = _t(
+      'Chart uses local clock time (not true solar time). Year changes at 立春; month at 节气.',
+      '命盘使用当地钟点（非真太阳时）。年柱以立春为界，月柱以节气为界。',
+      'แผนใช้เวลาตามนาฬิกาท้องถิ่น (ไม่ใช่สุริยคติแท้) ปีเปลี่ยนที่立春 เดือนเปลี่ยนที่节气'
+    );
+  }
+}
+
+function renderTenGods(profile, pillars) {
+  const lead = document.getElementById('tengods-lead');
+  const list = document.getElementById('tengods-list');
+  if (!list) return;
+  if (!profile || !profile.list) {
+    if (lead) lead.innerHTML = '';
+    list.innerHTML = '';
+    return;
+  }
+  if (lead) lead.innerHTML = _t(profile.sentence.en, profile.sentence.zh, profile.sentence.th);
+  const maxAxis = Math.max(33.3, ...profile.list.map(g => g.percent));
+  list.innerHTML = profile.list.map((g, i) => {
+    const fam = (g.family === 'peer' || g.family === 'resource') ? 'fam-peer' : 'fam-power';
+    const loc = (g.sources || []).slice(0, 4).map(s => s.pillar + ' ' + s.char).join(', ');
+    const meaning = g.meaning || {};
+    const how = loc
+      ? _t('Shows up in ' + loc + '.', '出现在：' + loc + '。', 'ปรากฏที่ ' + loc)
+      : '';
+    return `<div class="tengods-row${g.percent === 0 ? ' is-zero' : ''}" onclick="toggleTenGod(this)">
+      <div class="tengods-name">${g.en}<span class="tg-zh">${g.zh}</span></div>
+      <div class="tengods-bar-track"><div class="tengods-bar-fill ${fam}" style="width:${Math.min(100, (g.percent / maxAxis) * 100)}%"></div></div>
+      <div class="tengods-pct">${g.percent}%</div>
+      <div class="tengods-detail hide">${_t(meaning.en || '', meaning.zh || '', meaning.th || '')}${how ? ' ' + how : ''}</div>
+    </div>`;
+  }).join('');
+}
+function toggleTenGod(row) {
+  if (!row) return;
+  const open = row.classList.contains('is-open');
+  document.querySelectorAll('.tengods-row.is-open').forEach(r => {
+    r.classList.remove('is-open');
+    const d = r.querySelector('.tengods-detail');
+    if (d) d.classList.add('hide');
+  });
+  if (!open) {
+    row.classList.add('is-open');
+    const d = row.querySelector('.tengods-detail');
+    if (d) d.classList.remove('hide');
+  }
+}
+
+function birthChartKeyFromPillars(pillars) {
+  const dm = pillars[2] && pillars[2].stem ? pillars[2].stem.char : '';
+  const ys = pillars[0] && pillars[0].stem ? pillars[0].stem.char : '';
+  const ms = pillars[1] && pillars[1].stem ? pillars[1].stem.char : '';
+  const db = pillars[2] && pillars[2].branch ? pillars[2].branch.char : '';
+  return dm + ys + ms + db;
+}
+
+function cacheMonthlyWithChart(pillars, dayMaster, cached) {
+  if (!window.BaziEngine || !pillars) return;
+  const year = new Date().getFullYear();
+  const key = birthChartKeyFromPillars(pillars);
+  let bundle = cached;
+  if (!bundle || bundle.year !== year || bundle.chartKey !== key) {
+    const love = BaziEngine.calcMonthlyForecast({
+      year, domain: 'love', pillars, dayMaster, userId: currentUserKey(), birthChartKey: key,
+    });
+    const career = BaziEngine.calcMonthlyForecast({
+      year, domain: 'career', pillars, dayMaster, userId: currentUserKey(), birthChartKey: key,
+    });
+    bundle = { year, chartKey: key, love, career };
+  }
+  _lastAccurate = _lastAccurate || {};
+  _lastAccurate.monthly = bundle;
+  saveLocalChart({ monthlyForecasts: bundle });
+}
+
+function getCachedMonthly(domain) {
+  const b = _lastAccurate && _lastAccurate.monthly;
+  if (b && b[domain]) return b[domain];
+  const store = getStoredChart();
+  if (store && store.monthlyForecasts && store.monthlyForecasts[domain]) return store.monthlyForecasts[domain];
+  return null;
 }
 
 /* ── Element Radar (pentagon SVG) ── */
@@ -1453,6 +1892,10 @@ function makeMedallion(animal, elColor, cls = 'hero-med') {
 
 /* ── Daily Fortune ── */
 function calcDayBranch(year, month, day) {
+  if (window.BaziEngine && BaziEngine.calcBaziAccurate) {
+    const r = BaziEngine.calcBaziAccurate({ year, month: month + 1, day, hour: null });
+    return BRANCHES.findIndex(b => b.char === r.pillars[2].branch.char);
+  }
   const ref = new Date(2000, 0, 7);
   const d   = new Date(year, month, day);
   const diff = Math.round((d - ref) / 86400000);
@@ -1848,12 +2291,17 @@ function initDateInputs() {
   dayEl.addEventListener('input', () => {
     setDobError('');
     if (dayEl.value.length >= 2) monEl.focus();
+    updateLunarPreview();
   });
   monEl.addEventListener('input', () => {
     setDobError('');
     if (monEl.value.length >= 2) yearEl.focus();
+    updateLunarPreview();
   });
-  yearEl.addEventListener('input', () => setDobError(''));
+  yearEl.addEventListener('input', () => { setDobError(''); updateLunarPreview(); });
+  [dayEl, monEl, yearEl].forEach(el => el.addEventListener('blur', persistBirthIfValid));
+  const timeEl = document.getElementById('birthtime');
+  if (timeEl) timeEl.addEventListener('blur', persistBirthIfValid);
 }
 
 function initCityAutocomplete() {
@@ -1972,15 +2420,29 @@ function calcWork2026(animal, elements, overall2026) {
   )));
 }
 
+function monthlyToneLevel(tone) {
+  if (tone === 'pursue' || tone === 'celebrate') return 'high';
+  if (tone === 'receive' || tone === 'deepen' || tone === 'repair') return 'mid';
+  return 'low';
+}
+
 function genWorkMonthly(workScore) {
-  // Q1 slow start, Q2 ramps, summer strong push, Q4 winds down
+  const fc = getCachedMonthly('career');
+  if (fc && fc.months) {
+    return fc.months.map(m => Object.assign({
+      emoji: m.emoji,
+      action: m.title_en, action_zh: m.title_zh, action_th: m.title_th,
+      sub: m.sub_en, sub_zh: m.sub_zh, sub_th: m.sub_th,
+      level: monthlyToneLevel(m.tone),
+    }, m));
+  }
   const boost = [-5, -2, +4, +7, +5, +8, +9, +6, +3, -1, -4, -6];
   return boost.map((b, i) => {
     const score = Math.min(95, Math.max(20, Math.round(workScore + b)));
     const level = score >= 65 ? 'high' : score >= 45 ? 'mid' : 'low';
     const pool  = WORK_ACTIONS[level];
     const pick  = pool[(i * 5 + Math.round(workScore)) % pool.length];
-    return { ...pick, score, level };
+    return Object.assign({}, pick, { score, level });
   });
 }
 
@@ -2004,8 +2466,8 @@ function renderWorkSection(animal, elements, forecast2026) {
     <div class="love-month-tile level-${d.level}${i === nowMonth ? ' now-month work-now' : ''}">
       <div class="love-month-name">${_t(MONTHS[i], MONTHS_ZH[i])}</div>
       <div class="love-month-emoji">${d.emoji}</div>
-      <div class="love-month-action">${_t(d.action, d.action_zh)}</div>
-      <div class="love-month-sub">${_t(d.sub, d.sub_zh)}</div>
+      <div class="love-month-action">${_t(d.action, d.action_zh, d.action_th)}</div>
+      <div class="love-month-sub">${_t(d.sub, d.sub_zh, d.sub_th)}</div>
     </div>`).join('');
 
   document.getElementById('work-card').innerHTML = `
@@ -2145,10 +2607,10 @@ function getLoveNote(userAnimal, matchAnimal) {
 /* ── Monthly love advice ── */
 const LOVE_ACTIONS = {
   high: [
-    { emoji:'✨', action:'Say yes to everything', action_zh:'全盘接受',      sub:'High chance of getting what you want',  sub_zh:'获得所求的几率极高' },
-    { emoji:'❤️', action:'Make the first move',   action_zh:'主动出击',      sub:'Stars are aligned in your favour',      sub_zh:'星象正与你同频' },
-    { emoji:'🔥', action:'Be bold — act now',     action_zh:'大胆行动',      sub:'Your energy is magnetic right now',     sub_zh:'此刻你的能量极具吸引力' },
-    { emoji:'🌟', action:'Put yourself out there',action_zh:'走出去',        sub:'A meaningful connection is very close',  sub_zh:'有意义的缘分近在眼前' },
+    { emoji:'✨', action:'Ask once, then wait', action_zh:'问一次就停',      sub:'Name a time and stop circling the maybe.',  sub_zh:'把时间说清楚，别再绕着“也许”转。' },
+    { emoji:'❤️', action:'Choose one person',   action_zh:'只选一个人',      sub:'Scatter dilutes whatever is already warming.',      sub_zh:'分散会把已经在升温的东西稀释掉。' },
+    { emoji:'🔥', action:'Send the unsent note',     action_zh:'把没发的话发出去',      sub:'A short honest line beats another week of drafts.',     sub_zh:'一句老实话，胜过再改一周的草稿。' },
+    { emoji:'🌟', action:'Make a small plan',action_zh:'定一个小计划',        sub:'Coffee on a real day outranks a floating hope.',  sub_zh:'把咖啡约在具体的一天，比悬着的希望有用。' },
   ],
   mid: [
     { emoji:'🌿', action:'Deepen what you have',  action_zh:'深化已有关系',  sub:'Quality over new connections',           sub_zh:'质量胜于新缘分' },
@@ -2165,14 +2627,22 @@ const LOVE_ACTIONS = {
 };
 
 function genLoveMonthly(loveScore) {
-  // Valentine's Feb peaks, summer high, winter quieter
+  const fc = getCachedMonthly('love');
+  if (fc && fc.months) {
+    return fc.months.map(m => Object.assign({
+      emoji: m.emoji,
+      action: m.title_en, action_zh: m.title_zh, action_th: m.title_th,
+      sub: m.sub_en, sub_zh: m.sub_zh, sub_th: m.sub_th,
+      level: monthlyToneLevel(m.tone),
+    }, m));
+  }
   const boost = [-4, +9, +5, +4, +1, +7, +5, +3, -1, -3, -6, +2];
   return boost.map((b, i) => {
     const score = Math.min(96, Math.max(20, Math.round(loveScore + b)));
     const level = score >= 68 ? 'high' : score >= 48 ? 'mid' : 'low';
     const pool  = LOVE_ACTIONS[level];
     const pick  = pool[(i * 7 + Math.round(loveScore)) % pool.length];
-    return { ...pick, score, level };
+    return Object.assign({}, pick, { score, level });
   });
 }
 
@@ -2199,8 +2669,8 @@ function renderLoveSection(animal, elements, overall2026) {
     <div class="love-month-tile level-${d.level}${i === nowMonth ? ' now-month' : ''}">
       <div class="love-month-name">${_t(MONTHS[i], MONTHS_ZH[i])}</div>
       <div class="love-month-emoji">${d.emoji}</div>
-      <div class="love-month-action">${_t(d.action, d.action_zh)}</div>
-      <div class="love-month-sub">${_t(d.sub, d.sub_zh)}</div>
+      <div class="love-month-action">${_t(d.action, d.action_zh, d.action_th)}</div>
+      <div class="love-month-sub">${_t(d.sub, d.sub_zh, d.sub_th)}</div>
     </div>`).join('');
 
   /* Expanded soul animal cards */
@@ -2592,6 +3062,13 @@ const TIPS = {
     title_zh: '四柱八字',
     body_en: 'The Four Pillars (八字 Bāzì — "Eight Characters") are Year, Month, Day, and Hour. Each pillar has a Heavenly Stem on top and an Earthly Branch below. These 8 characters form the complete map of your destiny.',
     body_zh: '四柱即年、月、日、时，每柱含天干与地支各一字，合为八字，是命运的完整蓝图。'
+  },
+  'ten-gods': {
+    icon: '十',
+    title_en: 'Ten Gods 十神',
+    title_zh: '十神',
+    body_en: 'Ten Gods are the Day Master read against every stem in the chart — visible stems plus hidden stems in the branches. They describe how you compete, create, earn, answer to authority, and take in support.',
+    body_zh: '十神是日主对照盘中每一干（含地支藏干）的关系：比劫、食伤、财、官杀、印。用来看你如何竞争、创造、取财、面对权威与受助。'
   },
   'daily-fortune': {
     icon: '📅',
@@ -3647,6 +4124,18 @@ let _oracleSending = false;
 /* ── Calculate today's full day pillar ── */
 function calcTodayPillar() {
   const now = new Date();
+  if (window.BaziEngine && BaziEngine.calcBaziAccurate) {
+    const r = BaziEngine.calcBaziAccurate({
+      year: now.getFullYear(),
+      month: now.getMonth() + 1,
+      day: now.getDate(),
+      hour: now.getHours(),
+      minute: now.getMinutes(),
+      calendar: 'solar',
+    });
+    const p = r.pillars[2];
+    return { stem: p.stem, branch: p.branch, animal: p.branch.animal };
+  }
   const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
   const ref = new Date(2000, 0, 7);
   const diffDays = Math.round((new Date(y, m, d) - ref) / 86400000);
@@ -3817,7 +4306,8 @@ async function sendOracleMessage() {
     polarity: _shareData.polarity,
     dominantEl: _shareData.dominantEl,
     fortune: _shareData.fortune,
-    pillars: null, // pillars aren't stored in _shareData in a serializable way, use recalc
+    pillars: _shareData.pillars || null,
+    tenGods: _shareData.tenGods || null,
     today: _oracleTodayData,
   };
 
@@ -3917,9 +4407,6 @@ async function sendOracleMessage() {
 /* ═══════════════════════════════════════
    GOOGLE AUTH & DATA PERSISTENCE
 ═══════════════════════════════════════ */
-let _currentUser = null;
-let _savedReading = null;
-
 function loginWithGoogle() {
   window.location.href = '/auth/google';
 }
@@ -3936,16 +4423,13 @@ async function checkAuth() {
       _currentUser = data.user;
       showAuthState();
       await loadUserData();
-
-      // Auto-load saved reading for returning users (skip splash)
-      const onSplash = document.querySelector('#splash.screen.active');
-      if (onSplash && _savedReading) {
-        loadSavedReading();
-      }
-      // Clean up auth param from URL
+      updateLandingCtas();
+      const h = currentHash();
+      if (RESULT_TABS.indexOf(h) >= 0 || h === 'input') applyRoute(h);
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.has('auth')) {
-        window.history.replaceState({}, '', window.location.pathname);
+        const keepHash = location.hash || '';
+        window.history.replaceState({ wobazi: currentHash() || 'landing' }, '', window.location.pathname + keepHash);
       }
     }
   } catch (e) { /* guest mode — file:// or server down, continue as guest */ }
@@ -3984,20 +4468,21 @@ async function loadUserData() {
     const data = await res.json();
     if (data.reading) {
       _savedReading = data.reading;
-      // If no saved reading, show "Start Fresh" instead of "Continue"
-    }
-    if (!_savedReading) {
-      const btn = document.getElementById('btn-continue-reading');
-      if (btn) {
-        const enSpan = btn.querySelector('.en');
-        if (enSpan) enSpan.textContent = 'Begin your free reading';
-        else btn.childNodes.forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) n.textContent = 'Begin your free reading '; });
-        const zhSpan = btn.querySelector('.zh');
-        if (zhSpan) zhSpan.textContent = '开始免费解读';
-        const thSpan = btn.querySelector('.th');
-        if (thSpan) thSpan.textContent = 'เริ่มดูดวงฟรี';
-        btn.onclick = function() { haptic(10); showScreen('input'); };
-      }
+      const r = data.reading;
+      const local = getStoredChart() || {};
+      const same = local.year === r.year && local.month === r.month && local.day === r.day && local.hour === r.hour;
+      saveLocalChart({
+        name: r.name,
+        year: r.year, month: r.month, day: r.day, hour: r.hour,
+        minute: r.minute != null ? r.minute : (local.minute || 0),
+        birthplace: r.birthplace,
+        bloodType: r.blood_type,
+        gender: r.gender,
+        calendarType: r.calendar_type || local.calendarType || 'solar',
+        leapMonth: !!r.leap_month,
+        lunarYear: r.lunar_year, lunarMonth: r.lunar_month, lunarDay: r.lunar_day,
+        monthlyForecasts: same ? local.monthlyForecasts : local.monthlyForecasts,
+      });
     }
     // Restore Oracle chat history if available
     if (data.chat && data.chat.length > 0) {
@@ -4007,47 +4492,8 @@ async function loadUserData() {
 }
 
 async function loadSavedReading() {
-  // If data hasn't loaded yet (race with checkAuth), wait for it
-  if (!_savedReading && _currentUser) {
-    await loadUserData();
-  }
-  if (!_savedReading) {
-    showScreen('input');
-    return;
-  }
-  const r = _savedReading;
-  // Pre-fill form and auto-submit
-  const nameEl = document.getElementById('name');
-  const dayEl = document.getElementById('birth-day');
-  const monthEl = document.getElementById('birth-month');
-  const yearEl = document.getElementById('birth-year');
-  const timeEl = document.getElementById('birthtime');
-  const placeEl = document.getElementById('birthplace');
-  const bloodEl = document.getElementById('blood-type');
-
-  if (nameEl) nameEl.value = r.name || '';
-  if (dayEl) dayEl.value = r.day || '';
-  if (monthEl) monthEl.value = r.month || '';
-  if (yearEl) yearEl.value = r.year || '';
-  if (timeEl && r.hour != null) timeEl.value = String(r.hour).padStart(2, '0') + ':00';
-  if (placeEl) placeEl.value = r.birthplace || '';
-  if (bloodEl) bloodEl.value = r.blood_type || '';
-  if (r.gender) {
-    const radio = document.querySelector(`input[name="gender"][value="${r.gender}"]`);
-    if (radio) radio.checked = true;
-  }
-
-  // Auto-submit
-  const hour = r.hour != null ? r.hour : null;
-  runLoader(() => {
-    try {
-      renderResults(r.name || '', r.year, r.month - 1, r.day, hour, r.birthplace || '', r.blood_type || null, r.gender || null);
-    } catch (err) {
-      console.error('[loadSavedReading error]', err);
-      showScreen('input');
-      alert('Something went wrong loading your reading. Please try again.');
-    }
-  });
+  if (!_savedReading && _currentUser) await loadUserData();
+  continueReading();
 }
 
 /* ── Save reading after form submit (if logged in) ── */
@@ -4055,21 +4501,17 @@ const _origHandleSubmit = handleSubmit;
 handleSubmit = function(e) {
   _origHandleSubmit(e);
   if (_currentUser) {
-    const name = document.getElementById('name').value.trim();
-    const d = parseInt(document.getElementById('birth-day').value, 10);
-    const m = parseInt(document.getElementById('birth-month').value, 10);
-    const y = parseInt(document.getElementById('birth-year').value, 10);
-    const timeVal = document.getElementById('birthtime').value;
-    let hour = null;
-    if (timeVal) hour = parseInt(timeVal.split(':')[0], 10);
-    const birthplace = document.getElementById('birthplace').value.trim();
-    const bloodType = document.getElementById('blood-type').value || null;
-    const gender = document.querySelector('input[name="gender"]:checked')?.value || null;
-
+    const p = collectBirthPayload();
+    if (!p) return;
     fetch('/api/save-reading', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, year: y, month: m, day: d, hour, birthplace, bloodType, gender }),
+      body: JSON.stringify({
+        name: p.name, year: p.year, month: p.month, day: p.day, hour: p.hour,
+        minute: p.minute, birthplace: p.birthplace, bloodType: p.bloodType, gender: p.gender,
+        calendarType: p.calendarType, leapMonth: p.leapMonth,
+        lunarYear: p.lunarYear, lunarMonth: p.lunarMonth, lunarDay: p.lunarDay,
+      }),
     }).catch(() => {});
   }
 };
@@ -4201,7 +4643,8 @@ async function sendOracleDrawerMessage() {
     polarity: _shareData.polarity,
     dominantEl: _shareData.dominantEl,
     fortune: _shareData.fortune,
-    pillars: null,
+    pillars: _shareData.pillars || null,
+    tenGods: _shareData.tenGods || null,
     today: _drawerOracleTodayData,
   };
 
@@ -4568,8 +5011,10 @@ initDateInputs();
 initCityAutocomplete();
 initTooltips();
 initLightMode();
-checkAuth();
-if (/[?&]begin=1(?:&|$)/.test(location.search) || location.hash === '#begin' || location.hash === '#input') {
-  showScreen('input');
+updateLandingCtas();
+if (/[?&]begin=1(?:&|$)/.test(location.search) && !currentHash()) {
+  history.replaceState({ wobazi: 'input' }, '', location.pathname + '#input');
 }
+applyRoute(currentHash());
+checkAuth();
 

@@ -43,6 +43,20 @@ db.exec(`
   );
 `);
 
+function ensureColumn(table, name, def) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!cols.some(c => c.name === name)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${name} ${def}`);
+  }
+}
+ensureColumn('readings', 'calendar_type', "TEXT DEFAULT 'solar'");
+ensureColumn('readings', 'leap_month', 'INTEGER DEFAULT 0');
+ensureColumn('readings', 'lunar_year', 'INTEGER');
+ensureColumn('readings', 'lunar_month', 'INTEGER');
+ensureColumn('readings', 'lunar_day', 'INTEGER');
+ensureColumn('readings', 'minute', 'INTEGER');
+ensureColumn('readings', 'monthly_forecasts', 'TEXT');
+
 /* ── Cookie-based Session (survives Render deploys — no server-side store needed) ── */
 const isProduction = process.env.NODE_ENV === 'production' || (process.env.BASE_URL || '').startsWith('https');
 if (isProduction) app.set('trust proxy', 1); // trust first proxy (Render, Railway, etc.)
@@ -73,6 +87,11 @@ app.use('/app', express.static(path.join(__dirname, 'app'), {
 app.use('/Logos', express.static(path.join(__dirname, 'Logos')));
 app.use('/app/Logos', express.static(path.join(__dirname, 'Logos')));
 app.use('/og-card.png', express.static(path.join(__dirname, 'og-card.png')));
+app.get('/bazi-engine.js', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=3600');
+  res.type('application/javascript');
+  res.sendFile(path.join(__dirname, 'bazi-engine.js'));
+});
 app.get('/favicon.ico', (req, res) => {
   res.set('Cache-Control', 'public, max-age=86400');
   res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
@@ -142,7 +161,7 @@ function sendApp(req, res) {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
   res.sendFile(path.join(__dirname, 'app', 'index.html'));
 }
-app.get('/', sendApp);
+app.get(['/', '/index.html', '/index'], sendApp);
 
 app.use('/wobazi2-assets', express.static(path.join(__dirname, 'wobazi2-assets')));
 app.get('/wobazi2', (req, res) => {
@@ -358,15 +377,28 @@ app.get('/api/me', (req, res) => {
 /* ── Save reading ── */
 app.post('/api/save-reading', (req, res) => {
   if (!req.session || !req.session.user) return res.status(401).json({ error: 'Not logged in' });
-  const { name, year, month, day, hour, birthplace, bloodType, gender } = req.body;
+  const {
+    name, year, month, day, hour, minute, birthplace, bloodType, gender,
+    calendarType, leapMonth, lunarYear, lunarMonth, lunarDay, monthlyForecasts,
+  } = req.body;
   db.prepare(`
-    INSERT INTO readings (google_id, name, year, month, day, hour, birthplace, blood_type, gender, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    INSERT INTO readings (
+      google_id, name, year, month, day, hour, birthplace, blood_type, gender,
+      calendar_type, leap_month, lunar_year, lunar_month, lunar_day, minute, monthly_forecasts, updated_at
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
     ON CONFLICT(google_id) DO UPDATE SET
       name=excluded.name, year=excluded.year, month=excluded.month, day=excluded.day,
       hour=excluded.hour, birthplace=excluded.birthplace, blood_type=excluded.blood_type,
-      gender=excluded.gender, updated_at=datetime('now')
-  `).run(req.session.user.googleId, name, year, month, day, hour || null, birthplace || null, bloodType || null, gender || null);
+      gender=excluded.gender, calendar_type=excluded.calendar_type, leap_month=excluded.leap_month,
+      lunar_year=excluded.lunar_year, lunar_month=excluded.lunar_month, lunar_day=excluded.lunar_day,
+      minute=excluded.minute, monthly_forecasts=excluded.monthly_forecasts, updated_at=datetime('now')
+  `).run(
+    req.session.user.googleId, name, year, month, day, hour || null, birthplace || null, bloodType || null, gender || null,
+    calendarType || 'solar', leapMonth ? 1 : 0, lunarYear || null, lunarMonth || null, lunarDay || null,
+    minute != null ? minute : null,
+    monthlyForecasts ? JSON.stringify(monthlyForecasts) : null
+  );
   res.json({ ok: true });
 });
 
@@ -406,7 +438,7 @@ const deepseek = new OpenAI({
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 function buildSystemPrompt(chartData) {
-  const { animal, element, polarity, dominantEl, fortune, pillars, today } = chartData;
+  const { animal, element, polarity, dominantEl, fortune, pillars, today, tenGods } = chartData;
 
   const pillarStr = (pillars || []).map(p => {
     if (!p.known) return `${p.label}: unknown`;
@@ -429,6 +461,10 @@ FOUR PILLARS:
 ${pillarStr}
 
 ${todayStr}
+
+TEN GODS (十神 vs Day Master, visible stem 1.0 / main hidden 0.5 / mid 0.3 / residual 0.2):
+${tenGods && tenGods.list ? tenGods.list.map(g => `${g.en} ${g.zh}: ${g.percent}%`).join(', ') : (Array.isArray(tenGods) ? tenGods.map(g => `${g.en} ${g.zh}: ${g.percent}%`).join(', ') : 'n/a')}
+${tenGods && tenGods.sentence ? tenGods.sentence.en : ''}
 
 RULES:
 - Speak as an oracle — direct, confident, no hedging or disclaimers
@@ -520,7 +556,7 @@ function calcTenGod(dayMasterEl, dayMasterPolarity, targetEl, targetPolarity) {
 }
 
 function buildGuidancePrompt(chartData) {
-  const { pillars, today, animal, dominantEl } = chartData;
+  const { pillars, today, animal, dominantEl, tenGods } = chartData;
 
   // Day Master details
   const dayPillar = pillars.find(p => p.label === 'Day');
@@ -561,6 +597,7 @@ Ten God of Today's Stem vs Day Master: ${todayTenGod}
 Branch clashes with user's pillars: ${branchClashes.length ? branchClashes.join(', ') : 'None'}
 Nobleman (貴人) star: ${nobStr}
 Day Force Score: ${today.score}/100
+Ten Gods: ${tenGods && tenGods.list ? tenGods.list.map(g => g.en + ' ' + g.percent + '%').join(', ') : (Array.isArray(tenGods) ? tenGods.map(g => g.en + ' ' + g.percent + '%').join(', ') : (tenGods && tenGods.sentence && tenGods.sentence.en) || 'n/a')}
 
 RULES — you MUST follow ALL of these:
 1. Return EXACTLY this JSON format, nothing else:

@@ -110,6 +110,37 @@ require('./share').mount(app);
 - Responses: `{ ok: true }`, `{ error: "..." }`, or data objects
 - No API versioning
 
+## BaZi Engine (updated 2026-08-28)
+
+`bazi-engine.js` is the shared UMD source of truth (client + server).
+
+### Calendar type vs true solar time
+- **Calendar type** converts the *date*: Solar/Gregorian vs Lunar/农历 (with 闰月). Lunar Y/M/D is converted to a Gregorian civil date **before** any 排盘.
+- **True solar time** (longitude + equation of time) is **not** in this pass. The UI states: “Chart uses local clock time (not true solar time).”
+- Default `tzOffsetMinutes` is `+480` (UTC+8), the usual 排盘 default when no birth timezone is stored.
+
+### 排盘 rules
+- **Year pillar** changes at **立春**, not Jan 1 and not 春节.
+- **Month pillar** follows the 12 节: 立春, 惊蛰, 清明, 立夏, 芒种, 小暑, 立秋, 白露, 寒露, 立冬, 大雪, 小寒.
+- **Day pillar** is the sexagenary day from Julian Day at civil noon (offset −11; 2000-01-07 = 甲子). Day changes at **00:00**, not 23:00.
+- **Hour convention (夜子时)**: 子时 = 23:00–00:59. Early 子 (23:00–23:59) keeps today’s day pillar but takes the **next civil day’s hour stem**. Late 子 (00:00–00:59) uses the current day’s stem.
+- **藏干** are attached to each branch. Ten Gods weight visible stem 1.0 / main hidden 0.5 / mid 0.3 / residual 0.2.
+
+API: `calcBaziAccurate({ year, month, day, hour, calendar, leapMonth, tzOffsetMinutes, minute })` — `month` is **1-indexed**. Legacy `calcBazi(y, month0, d, h)` still uses 0-indexed month.
+
+Fixtures: `npm test` (`test/bazi-engine.test.js`) vs lunar-javascript / BaZi Lab 排盘 (no true solar time).
+
+### Hash routing (SPA)
+- `/` landing
+- `/#input` birth form (prefilled from `localStorage` `wobazi_chart_v1`)
+- `/#today` `/#you` `/#actions` `/#relationships` — each tab is a history state
+- Begin → push `#input`. Calculate → push `#today`. Back: tab → tab → input (fields kept) → landing.
+- Refresh on `/#today` restores the last chart. Guest cache is localStorage; signed-in `readings` remain source of truth.
+
+### Ten Gods + monthly forecasts
+- Ten Gods bars live on the You tab; the vector is sent to `/api/oracle` and daily-guidance / batch prompts.
+- Monthly love + career strips are deterministic: `hash(userId, birthChartKey, domain, year)` + 流月 pillar / 十神 / clash-combine. Cached with the chart; recalc when year or birth data changes.
+
 ## UI: Tab Banner System (updated 2026-03-18)
 - **Today, You, Relationships tabs**: Show a compact context strip (`#context-strip`) — single row with date, day pillar emoji+name+Chinese, overall score, and verdict. Tapping expands to show hero_text summary.
 - **Actions tab**: Shows the full hero banner (`#hero-card`) with date, title, hero_text, and DO/AVOID/WATCH items.

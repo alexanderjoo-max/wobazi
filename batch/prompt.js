@@ -29,6 +29,8 @@ function buildUserPrompt(data) {
     wealthStars,
     indirectWealth,
     resourceStars,
+    tenGods,
+    tenGodsSentence,
   } = data;
 
   return `Generate today's BaZi reading for this person.
@@ -53,6 +55,8 @@ Nobleman stars: ${nobleman}
 Wealth stars: ${wealthStars}
 Indirect wealth stars: ${indirectWealth}
 Resource stars: ${resourceStars}
+Ten Gods (十神): ${tenGods || 'n/a'}
+${tenGodsSentence ? 'Dominant gods: ' + tenGodsSentence : ''}
 
 SCORING RULES:
 Score each category 0-100 based on how today's pillar interacts with this specific chart.

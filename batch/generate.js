@@ -39,8 +39,17 @@ function getGemini() {
 function buildChartContext(user, today) {
   const { name, year, month, day, hour, gender } = user;
 
-  // User's natal pillars
-  const pillars = bazi.calcBazi(year, month, day, hour);
+  // User's natal pillars (DB month is 1–12)
+  // year/month/day on readings are always the solar civil date (lunar was converted on save)
+  const accurate = bazi.calcBaziAccurate({
+    year,
+    month,
+    day,
+    hour,
+    minute: user.minute || 0,
+    calendar: 'solar',
+  });
+  const pillars = accurate.pillars;
   const elements = bazi.calcElements(pillars);
   const dayPillar = pillars[2];
   const dmEl = dayPillar.stem.element;
@@ -112,6 +121,10 @@ function buildChartContext(user, today) {
     wealthStars: directWealth || 'None',
     indirectWealth: indirectWealth || 'None',
     resourceStars: resourceStar || 'None',
+    tenGods: (accurate.tenGods && accurate.tenGods.list)
+      ? accurate.tenGods.list.map(g => `${g.en} ${g.zh} ${g.percent}%`).join(', ')
+      : 'n/a',
+    tenGodsSentence: (accurate.tenGods && accurate.tenGods.sentence && accurate.tenGods.sentence.en) || '',
     // Raw data for DB storage
     _todayStemChar: todayStem.char,
     _todayBranchChar: todayBranch.char,

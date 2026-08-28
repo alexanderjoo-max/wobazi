@@ -219,12 +219,16 @@ function hasResourceStar(dayMasterEl, dayMasterPol, todayStem) {
 
 /* ── Calculate today's pillar from a Date object ── */
 function calcTodayPillar(date) {
-  const y = date.getFullYear();
-  const m = date.getMonth();
-  const d = date.getDate();
-  const pillars = bazi.calcBazi(y, m, d, null);
-  const dayPillar = pillars[2]; // Day pillar
-  return dayPillar;
+  const r = bazi.calcBaziAccurate({
+    year: date.getFullYear(),
+    month: date.getMonth() + 1,
+    day: date.getDate(),
+    hour: date.getHours(),
+    minute: date.getMinutes(),
+    calendar: 'solar',
+  });
+  const dayPillar = r.pillars[2];
+  return Object.assign({ animal: dayPillar.branch && dayPillar.branch.animal }, dayPillar);
 }
 
 module.exports = {
