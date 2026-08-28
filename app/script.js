@@ -472,8 +472,15 @@ function goHash(hash, opts) {
   applyRoute(h);
 }
 
-function goToLanding() { goHash(''); }
+function closeAppNav() {
+  document.querySelectorAll('.app-nav.is-open, .site-nav.is-open').forEach(n => {
+    n.classList.remove('is-open');
+    n.querySelectorAll('[aria-expanded="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+  });
+}
+function goToLanding() { closeAppNav(); goHash(''); }
 function goToInput() {
+  closeAppNav();
   fillFormFromStore();
   updateInputMode();
   goHash('input');
@@ -4451,6 +4458,8 @@ function showAuthState() {
       av.alt = _currentUser.name || '';
     }
   }
+  document.querySelectorAll('.drawer-guest').forEach(el => el.classList.add('hide'));
+  document.querySelectorAll('.drawer-authed').forEach(el => el.classList.remove('hide'));
 
   // Set welcome message
   const welcomeEl = document.getElementById('splash-welcome');

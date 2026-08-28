@@ -250,7 +250,7 @@
   }
 
   function closeMenus() {
-    var open = document.querySelectorAll('.lang-switch.is-open, .site-nav.is-open');
+    var open = document.querySelectorAll('.lang-switch.is-open, .app-nav.is-open, .site-nav.is-open');
     for (var i = 0; i < open.length; i++) {
       open[i].classList.remove('is-open');
       var btns = open[i].querySelectorAll('[aria-expanded="true"]');
@@ -282,7 +282,7 @@
     if (e) { e.preventDefault(); e.stopPropagation(); }
     btn = fromEvent(btn);
     if (!btn) return;
-    var nav = btn.closest ? btn.closest('.site-nav') : null;
+    var nav = btn.closest ? (btn.closest('.app-nav') || btn.closest('.site-nav')) : null;
     if (!nav) return;
     var willOpen = !nav.classList.contains('is-open');
     closeMenus();

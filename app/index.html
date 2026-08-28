@@ -58,7 +58,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=35">
+  <link rel="stylesheet" href="/app/style.css?v=36">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
     html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
@@ -68,7 +68,7 @@
     html[data-lang="zh"] .en:has(~ .zh) { display: none !important; }
     html[data-lang="zh"] .zh { display: revert !important; }
   </style>
-  <script src="/public/js/i18n.js?v=6"></script>
+  <script src="/public/js/i18n.js?v=7"></script>
   <script src="/public/js/i18n-ui.js?v=2"></script>
   <script src="/public/js/i18n-copy.js?v=2"></script>
   <script src="/public/js/i18n-copy-more.js?v=2"></script>
@@ -85,8 +85,8 @@
     <div class="splash-aurora" aria-hidden="true"></div>
 
     <!-- Top navigation -->
-    <header class="site-nav">
-      <a href="/" class="site-nav-logo" onclick="if(!event.metaKey&&!event.ctrlKey){event.preventDefault();haptic(6);goToLanding();}">
+    <header class="site-nav app-nav">
+      <a href="/" class="site-nav-logo" onclick="if(!event.metaKey&&!event.ctrlKey){event.preventDefault();haptic(6);closeAppNav();goToLanding();}">
         <img src="/app/assets/logo-horiz.png?v=5" class="nav-logo" alt="Wobazi">
       </a>
       <nav class="site-nav-links" aria-label="Primary">
@@ -120,7 +120,7 @@
         </a>
       </div>
       <button type="button" class="site-nav-toggle" aria-label="Menu" aria-expanded="false" onclick="toggleSiteNav(this, event)">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <span class="nav-burger" aria-hidden="true"><span></span><span></span><span></span></span>
       </button>
       <div class="site-nav-drawer">
         <div class="drawer-card">
@@ -130,9 +130,10 @@
             <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
             <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
           </div>
-          <a href="/what-is-bazi" class="drawer-link"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
-          <button type="button" class="drawer-link" onclick="haptic(10); loginWithGoogle()"><span class="en">Sign in</span><span class="zh hide">登录</span><span class="th hide">เข้าสู่ระบบ</span></button>
-          <button type="button" class="btn-primary drawer-cta" onclick="haptic(12); goToInput(); document.querySelector('.site-nav') && document.querySelector('.site-nav').classList.remove('is-open');">
+          <a href="/what-is-bazi" class="drawer-link" onclick="closeAppNav()"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
+          <button type="button" class="drawer-link drawer-guest" onclick="haptic(10); closeAppNav(); loginWithGoogle()"><span class="en">Sign in</span><span class="zh hide">登录</span><span class="th hide">เข้าสู่ระบบ</span></button>
+          <button type="button" class="drawer-link drawer-authed hide" onclick="haptic(6); closeAppNav(); logout()"><span class="en">Logout</span><span class="zh hide">退出</span><span class="th hide">ออกจากระบบ</span></button>
+          <button type="button" class="btn-primary drawer-cta" onclick="haptic(12); closeAppNav(); goToInput();">
             <span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span>
           </button>
         </div>
@@ -715,12 +716,27 @@
 
   <!-- INPUT -->
   <div id="input" class="screen">
-    <div class="nav-bar">
-      <button class="btn-back" onclick="haptic(8); backFromInput()">
+    <div class="nav-bar app-nav">
+      <button class="btn-back" onclick="haptic(8); closeAppNav(); backFromInput()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
       <img src="/app/assets/logo-horiz.png?v=5" class="nav-logo" alt="Wobazi">
-      <div style="width:40px"></div>
+      <button type="button" class="site-nav-toggle" aria-label="Menu" aria-expanded="false" onclick="toggleSiteNav(this, event)">
+        <span class="nav-burger" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+      <div class="site-nav-drawer">
+        <div class="drawer-card">
+          <p class="drawer-kicker"><span class="en">Language</span><span class="zh hide">语言</span><span class="th hide">ภาษา</span></p>
+          <div class="drawer-lang">
+            <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">English</button>
+            <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
+            <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+          </div>
+          <a href="/what-is-bazi" class="drawer-link" onclick="closeAppNav()"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
+          <button type="button" class="drawer-link drawer-guest" onclick="haptic(10); closeAppNav(); loginWithGoogle()"><span class="en">Sign in</span><span class="zh hide">登录</span><span class="th hide">เข้าสู่ระบบ</span></button>
+          <button type="button" class="drawer-link drawer-authed hide" onclick="haptic(6); closeAppNav(); logout()"><span class="en">Logout</span><span class="zh hide">退出</span><span class="th hide">ออกจากระบบ</span></button>
+        </div>
+      </div>
     </div>
     <div class="input-body">
       <div class="input-intro">
@@ -849,9 +865,9 @@
 
   <!-- RESULTS -->
   <div id="results" class="screen">
-    <div class="results-header">
+    <div class="results-header app-nav">
       <div class="header-left">
-        <img src="/app/assets/logo-horiz.png?v=5" class="nav-logo" alt="Wobazi" onclick="haptic(6); goToLanding()">
+        <img src="/app/assets/logo-horiz.png?v=5" class="nav-logo" alt="Wobazi" onclick="haptic(6); closeAppNav(); goToLanding()">
         <div id="greeting" class="greeting"></div>
         <button type="button" class="btn-edit-birth" id="btn-edit-birth" onclick="haptic(6); goToInput()">
           <span class="en">Edit birth data</span><span class="zh hide">修改出生资料</span><span class="th hide">แก้ข้อมูลเกิด</span>
@@ -872,6 +888,24 @@
             <li><button type="button" role="option" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button></li>
             <li><button type="button" role="option" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button></li>
           </ul>
+        </div>
+      </div>
+      <button type="button" class="site-nav-toggle" aria-label="Menu" aria-expanded="false" onclick="toggleSiteNav(this, event)">
+        <span class="nav-burger" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+      <div class="site-nav-drawer">
+        <div class="drawer-card">
+          <p class="drawer-kicker"><span class="en">Language</span><span class="zh hide">语言</span><span class="th hide">ภาษา</span></p>
+          <div class="drawer-lang">
+            <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">English</button>
+            <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
+            <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+          </div>
+          <a href="/what-is-bazi" class="drawer-link" onclick="closeAppNav()"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
+          <button type="button" class="drawer-link" onclick="haptic(8); closeAppNav(); showShareCard()"><span class="en">Share</span><span class="zh hide">分享</span><span class="th hide">แชร์</span></button>
+          <button type="button" class="drawer-link" onclick="haptic(6); closeAppNav(); goToInput()"><span class="en">Edit birth data</span><span class="zh hide">修改出生资料</span><span class="th hide">แก้ข้อมูลเกิด</span></button>
+          <button type="button" class="drawer-link drawer-guest" onclick="haptic(10); closeAppNav(); loginWithGoogle()"><span class="en">Sign in</span><span class="zh hide">登录</span><span class="th hide">เข้าสู่ระบบ</span></button>
+          <button type="button" class="drawer-link drawer-authed hide" onclick="haptic(6); closeAppNav(); logout()"><span class="en">Logout</span><span class="zh hide">退出</span><span class="th hide">ออกจากระบบ</span></button>
         </div>
       </div>
     </div>
@@ -1500,6 +1534,6 @@
   </div>
 
   <script src="/bazi-engine.js?v=1"></script>
-  <script src="/app/script.js?v=25"></script>
+  <script src="/app/script.js?v=26"></script>
 </body>
 </html>
