@@ -3,6 +3,9 @@
  * Story 1080×1920, OG 1200×630. Mirrors the client canvas card in app/share-viral.js:
  * luopan dial with the Day Master at its heart, a cinnabar weather seal, and the verdict.
  */
+const fs = require('fs');
+const path = require('path');
+
 const EL_HEX = {
   Wood: '#22c55e',
   Fire: '#ef4444',
@@ -16,6 +19,13 @@ const CINNABAR = '#c8412c';
 const BRANCHES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 const SEAL_ZH = { Peak: ['巅', '峰'], Open: ['开', '运'], Friction: ['冲'], Hidden: ['暗', '助'] };
 const TONE_LABEL = { oracle: 'ORACLE', roast: 'ROAST', power: 'POWER' };
+const LOGO_URI = 'data:image/png;base64,' +
+  fs.readFileSync(path.join(__dirname, '..', 'app', 'assets', 'logo-horiz.png')).toString('base64');
+const LOGO_RATIO = 1641 / 315;
+
+function logo(h) {
+  return { type: 'img', props: { src: LOGO_URI, width: Math.round(h * LOGO_RATIO), height: h } };
+}
 
 function el(type, style, ...children) {
   const flat = children.flat().filter(Boolean);
@@ -163,7 +173,7 @@ function storyLayout(v) {
     corner({ left: 29, top: 29 }), corner({ right: 29, top: 29 }), corner({ left: 29, bottom: 29 }), corner({ right: 29, bottom: 29 }),
 
     el('div', { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-      el('div', { fontSize: 24, fontWeight: 700, letterSpacing: '0.38em', color: GOLD }, 'WOBAZI'),
+      logo(58),
       el('div', { fontSize: 19, letterSpacing: '0.26em', color: rgba(PAPER, 0.55), textTransform: 'uppercase' }, kindLabel)
     ),
 
@@ -234,8 +244,9 @@ function ogLayout(v) {
       el('div', { position: 'absolute', left: 250 + 250 * 0.74 - 50, top: 250 + 250 * 0.7 - 50 }, seal(100, v.weather))
     ),
     el('div', { flexDirection: 'column', flex: 1, gap: 18 },
-      el('div', { fontSize: 18, fontWeight: 700, letterSpacing: '0.32em', color: GOLD },
-        `WOBAZI  ·  ${(v.weatherLabel || '').toUpperCase()}`),
+      logo(46),
+      el('div', { fontSize: 18, fontWeight: 700, letterSpacing: '0.32em', color: accent, marginTop: 4 },
+        `${(v.weatherLabel || '').toUpperCase()}  ·  ${TONE_LABEL[v.tone] || 'ORACLE'}`),
       el('div', { fontSize: hookSize(v.hook, 50), fontWeight: 700, lineHeight: 1.14, color: PAPER, letterSpacing: '-0.02em', fontFamily: 'Space Grotesk, Noto Sans SC' }, v.hook),
       el('div', { fontSize: 24, fontWeight: 700, color: accent, fontFamily: 'Space Grotesk, Noto Sans SC' }, `「 ${v.dare} 」`),
       el('div', { fontSize: 20, color: rgba(PAPER, 0.55), letterSpacing: '0.2em', marginTop: 6 }, 'WOBAZI.COM  ·  PLOT YOUR CHART')

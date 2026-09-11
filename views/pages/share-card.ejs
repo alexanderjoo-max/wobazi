@@ -2,7 +2,6 @@
 <html lang="<%= verdict.lang === 'zh' ? 'zh-CN' : verdict.lang %>">
 <head>
   <%- include('../partials/head') %>
-  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@1,6..96,400..600&display=swap" rel="stylesheet">
 </head>
 <% const accent = {Wood:'#22c55e',Fire:'#ef4444',Earth:'#f59e0b',Metal:'#c0c8d4',Water:'#3b82f6'}[verdict.dmEl] || '#e8c26a'; %>
 <body class="seo-page share-landing" style="--sl-accent: <%= accent %>">

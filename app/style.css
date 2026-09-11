@@ -5716,10 +5716,10 @@ a.footer-udestiny span {
   box-shadow: 0 4px 16px rgba(232,194,106,0.3);
 }
 .viral-preview {
-  width: min(250px, 60vw);
+  /* Width derives from the height cap so the box stays exactly 9:16 (no stretched canvas). */
+  width: min(250px, 60vw, calc(46dvh * 9 / 16));
   aspect-ratio: 9 / 16;
   height: auto;
-  max-height: 46vh;
   margin: 6px auto 4px;
   flex-shrink: 0;
   border-radius: 14px;
@@ -5744,19 +5744,32 @@ a.footer-udestiny span {
   color: var(--text); padding: 10px 12px; font-family: inherit; font-size: 13px;
 }
 .viral-disc { font-size: 11px; color: var(--muted); }
-.viral-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
-.viral-actions button {
-  padding: 11px 6px;
-  border-radius: 12px;
-  border: 1px solid rgba(232,194,106,0.16);
-  background: rgba(246,236,216,0.04);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  transition: border-color 0.2s, background 0.2s;
+.viral-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 6px; padding-top: 6px; }
+.viral-actions .va {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 2px 0; background: none; border: 0; cursor: pointer;
+  color: var(--m7); font-family: inherit; font-size: 11px; font-weight: 600;
 }
-.viral-actions button:hover, .viral-actions button:focus-visible { border-color: rgba(232,194,106,0.6); background: rgba(232,194,106,0.08); outline: none; }
+.va-ico {
+  width: 52px; height: 52px; border-radius: 50%;
+  display: grid; place-items: center;
+  color: #fff;
+  background: rgba(246,236,216,0.08);
+  border: 1px solid rgba(232,194,106,0.22);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.va-ico svg { width: 24px; height: 24px; display: block; }
+.va-ig .va-ico { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%); border: 0; }
+.va-x .va-ico { background: #000; border-color: rgba(255,255,255,0.28); }
+.va-x .va-ico svg { width: 21px; height: 21px; }
+.va-line .va-ico { background: #06c755; border: 0; }
+.va-line .va-ico svg { width: 30px; height: 30px; }
+.va-fb .va-ico { background: #1877f2; border: 0; }
+.va-fb .va-ico svg { width: 28px; height: 28px; }
+.va-wa .va-ico { background: #25d366; border: 0; }
+.va:hover .va-ico { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.45); }
+.va:focus-visible { outline: none; }
+.va:focus-visible .va-ico { outline: 2px solid #e8c26a; outline-offset: 3px; }
 .viral-toast {
   position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
   background: #f0c040; color: #1a0a00; padding: 10px 16px; border-radius: 999px;

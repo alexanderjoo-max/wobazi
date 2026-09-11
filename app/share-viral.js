@@ -3,7 +3,8 @@
   const EL_HEX = { Wood: '#22c55e', Fire: '#ef4444', Earth: '#f59e0b', Metal: '#c0c8d4', Water: '#3b82f6' };
   const YEAR_ANIMAL_EN = { Rat:'Rat', Ox:'Ox', Tiger:'Tiger', Rabbit:'Rabbit', Dragon:'Dragon', Snake:'Snake', Horse:'Horse', Goat:'Goat', Monkey:'Monkey', Rooster:'Rooster', Dog:'Dog', Pig:'Pig' };
 
-  let state = { kind: 'today', tone: 'oracle', lang: 'en', verdict: null, comboYear: null };
+  let state = { kind: 'today', tone: 'oracle', lang: 'en', verdict: null, comboYear: null, file: null };
+  let buildSeq = 0;
 
   function lang() {
     if (window.WoBaziI18n && WoBaziI18n.get) return WoBaziI18n.get();
@@ -82,7 +83,11 @@
       state.comboYear = null;
     }
     drawPreview();
-    ensureFonts(state.verdict).then(drawPreview);
+    state.file = null;
+    const seq = ++buildSeq;
+    ensureFonts(state.verdict)
+      .then(() => { drawPreview(); return renderFile(); })
+      .then(f => { if (seq === buildSeq) state.file = f; });
     const cap = document.getElementById('viral-caption');
     if (cap) cap.value = WobaziVerdict.caption(state.verdict, shareUrl());
   }
@@ -95,12 +100,15 @@
     return location.origin + '/s/' + id;
   }
 
-  /* ── Oracle-slip card: luopan dial, cinnabar seal, serif verdict ── */
+  /* ── Oracle-slip card: Wobazi logo, luopan dial, cinnabar seal, verdict ── */
   const GOLD = '#e8c26a';
   const PAPER = '#f6ecd8';
   const CINNABAR = '#c8412c';
-  const DISPLAY = '"Bodoni Moda", "Noto Serif SC", "Noto Serif Thai", Georgia, serif';
-  const HAN = '"Noto Serif SC", "Noto Sans SC", serif';
+  const DISPLAY = 'Outfit, "Noto Sans SC", "Noto Sans Thai", sans-serif';
+  const HAN = '"Noto Sans SC", sans-serif';
+  const LOGO = new Image();
+  LOGO.src = '/app/assets/logo-horiz.png?v=5';
+  const logoReady = (LOGO.decode ? LOGO.decode() : Promise.resolve()).catch(() => null);
   const SANS = 'Outfit, "Noto Sans SC", "Noto Sans Thai", sans-serif';
   const BRANCH_CHARS = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   const SEAL_ZH = { Peak: ['巅', '峰'], Open: ['开', '运'], Friction: ['冲'], Hidden: ['暗', '助'] };
@@ -304,14 +312,19 @@
 
     // Header
     ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle = GOLD;
-    ctx.font = '700 24px ' + SANS;
-    spaced(ctx, 'WOBAZI', 104, 136, 9, 'left');
+    if (LOGO.complete && LOGO.naturalWidth) {
+      const lh = 58;
+      ctx.drawImage(LOGO, 100, 88, lh * LOGO.naturalWidth / LOGO.naturalHeight, lh);
+    } else {
+      ctx.fillStyle = GOLD;
+      ctx.font = '700 24px ' + SANS;
+      spaced(ctx, 'WOBAZI', 104, 136, 9, 'left');
+    }
     const now = new Date();
     const kindLabel = isYear ? (v.yearLabel || 'THIS YEAR').toUpperCase() : 'TODAY · ' + MONTHS[now.getMonth()] + ' ' + now.getDate();
     ctx.fillStyle = rgba(PAPER, 0.55);
     ctx.font = '600 19px ' + SANS;
-    spaced(ctx, kindLabel, w - 104, 136, 5, 'right');
+    spaced(ctx, kindLabel, w - 104, 124, 5, 'right');
 
     // Dial + Day Master
     const strip = isYear ? (v.flowYearChars || v.yearChars) : (v.todayChars || v.dayChars);
@@ -319,7 +332,7 @@
     ctx.textAlign = 'center';
     if (v.name) {
       ctx.fillStyle = rgba(PAPER, 0.72);
-      ctx.font = 'italic 400 32px ' + DISPLAY;
+      ctx.font = '500 32px ' + DISPLAY;
       ctx.textBaseline = 'alphabetic';
       ctx.fillText(v.name, cx, cy - 128);
     }
@@ -350,7 +363,7 @@
     let layout = null;
     for (let s = 1; s >= 0.6; s -= 0.05) {
       const hookSize = Math.round(84 * s);
-      ctx.font = (cjk ? '700 ' : 'italic 500 ') + hookSize + 'px ' + DISPLAY;
+      ctx.font = '700 ' + hookSize + 'px ' + DISPLAY;
       const hook = wrapLines(ctx, v.hook, maxW);
       const hookLh = Math.round(hookSize * (cjk ? 1.3 : 1.12));
       const bodySize = Math.round(32 * Math.max(s, 0.8));
@@ -373,7 +386,7 @@
     spaced(ctx, (v.weatherLabel || v.weather || '').toUpperCase() + '  ·  ' + (TONE_LABEL[v.tone] || 'Oracle').toUpperCase(), cx, y, 6, 'center');
     y += 36 + layout.hookSize * 0.9;
     ctx.fillStyle = PAPER;
-    ctx.font = (cjk ? '700 ' : 'italic 500 ') + layout.hookSize + 'px ' + DISPLAY;
+    ctx.font = '700 ' + layout.hookSize + 'px ' + DISPLAY;
     layout.hook.forEach(l => { ctx.fillText(l, cx, y); y += layout.hookLh; });
     y += 4 - layout.hookLh * 0.1;
     ctx.fillStyle = rgba(GOLD, 0.6);
@@ -402,7 +415,7 @@
       ctx.fillText('大运 · ' + v.luckPhase, cx, fy - 44);
     }
     ctx.fillStyle = GOLD;
-    ctx.font = 'italic 500 44px ' + DISPLAY;
+    ctx.font = '700 40px ' + DISPLAY;
     ctx.fillText('wobazi.com', cx, fy);
     ctx.fillStyle = rgba(PAPER, 0.55);
     ctx.font = '600 17px ' + SANS;
@@ -422,9 +435,9 @@
     if (!document.fonts || !document.fonts.load || !v) return Promise.resolve();
     const text = fontSample(v);
     return Promise.all([
-      'italic 500 80px "Bodoni Moda"', 'italic 400 32px "Bodoni Moda"', '700 80px "Noto Serif SC"',
-      '400 32px Outfit', '600 18px Outfit', '700 32px Outfit', '700 32px "Noto Serif Thai"'
-    ].map(f => document.fonts.load(f, text).catch(() => null)));
+      '700 80px Outfit', '500 32px Outfit', '400 32px Outfit', '600 18px Outfit',
+      '700 80px "Noto Sans SC"', '700 32px "Noto Sans Thai"'
+    ].map(f => document.fonts.load(f, text).catch(() => null)).concat(logoReady));
   }
 
   function canvasFor(v, combo) {
@@ -447,15 +460,21 @@
     host.appendChild(c);
   }
 
-  async function pngFile() {
-    await ensureFonts(state.verdict);
-    if (state.comboYear) await ensureFonts(state.comboYear);
+  function renderFile() {
     return new Promise(resolve => {
       const c = canvasFor(state.verdict, state.kind === 'both');
       c.toBlob(blob => {
         resolve(blob ? new File([blob], 'wobazi-verdict.png', { type: 'image/png' }) : null);
       }, 'image/png');
     });
+  }
+
+  /* Pre-rendered after each rebuild, so share/copy run inside the tap's user activation. */
+  async function pngFile() {
+    if (state.file) return state.file;
+    await ensureFonts(state.verdict);
+    if (state.comboYear) await ensureFonts(state.comboYear);
+    return renderFile();
   }
 
   function track(dest) {
@@ -490,19 +509,18 @@
         return;
       } catch (e) { if (e && e.name === 'AbortError') return; }
     }
-    await navigator.clipboard.writeText(text);
-    toast('Caption copied.');
+    toast(await copyText(text) ? 'Caption copied.' : 'Could not copy the caption.');
   }
 
-  async function downloadPng() {
+  async function downloadPng(msg) {
     const file = await pngFile();
     if (!file) return;
     const a = document.createElement('a');
     a.href = URL.createObjectURL(file);
     a.download = file.name;
     a.click();
-    track('download');
-    toast('PNG saved.');
+    if (!msg) track('download');
+    toast(msg || 'Image saved.');
   }
 
   async function copyImage() {
@@ -518,11 +536,33 @@
     } catch (e) { toast('Could not copy image.'); }
   }
 
+  /* Clipboard API first; fall back to execCommand where it is blocked (in-app browsers, unfocused pages). */
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (_) {}
+      ta.remove();
+      return ok;
+    }
+  }
+
   async function copyLink() {
-    const url = shareUrl();
-    await navigator.clipboard.writeText(url);
-    track('copy-link');
-    toast('Link copied.');
+    if (await copyText(shareUrl())) {
+      track('copy-link');
+      toast('Link copied.');
+    } else {
+      toast('Could not copy the link.');
+    }
   }
 
   function social(dest) {
@@ -531,16 +571,25 @@
     const map = {
       x: 'https://twitter.com/intent/tweet?text=' + text + '&url=' + url,
       facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + url,
-      line: 'https://social-plugins.line.me/lineit/share?url=' + url,
+      line: 'https://social-plugins.line.me/lineit/share?url=' + url + '&text=' + text,
       whatsapp: 'https://wa.me/?text=' + text + '%20' + url
     };
     track(dest);
-    if (dest === 'ig') {
-      toast('Save the PNG, then add it to Instagram Stories.');
-      downloadPng();
+    if (dest === 'instagram') return shareInstagram();
+    if (map[dest]) window.open(map[dest], '_blank', 'noopener');
+  }
+
+  /* Instagram has no web share link. On phones the system share sheet hands the card
+     straight to Instagram (Stories or Feed); on desktop we save the card and open Instagram. */
+  function shareInstagram() {
+    const file = state.file;
+    const phone = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+    if (phone && file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file] }).catch(() => {});
       return;
     }
-    if (map[dest]) window.open(map[dest], '_blank', 'noopener');
+    window.open('https://www.instagram.com/', '_blank', 'noopener');
+    downloadPng('Card saved. Upload it on Instagram.');
   }
 
   function openViralShare(kind) {
