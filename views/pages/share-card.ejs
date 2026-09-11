@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="<%= verdict.lang === 'zh' ? 'zh-CN' : verdict.lang %>">
+<head>
+  <%- include('../partials/head') %>
+</head>
+<body class="seo-page share-landing">
+  <%- include('../partials/nav') %>
+  <main class="seo-main share-landing-main">
+    <p class="alice-kicker">WOBAZI ✦ <%= verdict.weatherLabel %></p>
+    <div class="share-land-glyph" style="color:<%= {Wood:'#22c55e',Fire:'#ef4444',Earth:'#f59e0b',Metal:'#c0c8d4',Water:'#3b82f6'}[verdict.dmEl] || '#f0c040' %>"><%= verdict.dmChar %></div>
+    <h1 class="share-land-hook"><%= verdict.hook %></h1>
+    <p class="share-land-body"><%= verdict.body %></p>
+    <p class="share-land-dare"><%= verdict.dare %></p>
+    <p class="share-land-disc">Terrain, not a prison sentence.</p>
+    <div class="alice-cta">
+      <a href="/?begin=1" class="btn-primary">Plot your chart</a>
+    </div>
+    <p class="share-land-meta"><%= verdict.kind === 'year' ? (verdict.yearLabel || 'Year') : 'Today' %> · <%= verdict.tone %></p>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>

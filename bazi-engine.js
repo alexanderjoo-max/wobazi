@@ -913,6 +913,245 @@
     return { year, domain, birthChartKey, months };
   }
 
+  /* ── Natal stars: 天乙贵人 / 月德 / 天德 / 桃花 ── */
+  const TIANYI_BY_STEM = {
+    0: [1, 7], 1: [0, 8], 2: [11, 9], 3: [11, 9], 4: [1, 7],
+    5: [0, 8], 6: [6, 2], 7: [6, 2], 8: [5, 3], 9: [5, 3],
+  };
+  const YUEDE_STEM = { 2: 2, 6: 2, 10: 2, 8: 8, 0: 8, 4: 8, 11: 0, 3: 0, 7: 0, 5: 6, 9: 6, 1: 6 };
+  const TIANDE_CHAR = {
+    2: '丁', 3: '申', 4: '壬', 5: '辛', 6: '亥', 7: '甲',
+    8: '癸', 9: '寅', 10: '丙', 11: '乙', 0: '巳', 1: '庚',
+  };
+  const PEACH_BY_TRIAD = { 8: 9, 0: 9, 4: 9, 2: 3, 6: 3, 10: 3, 5: 6, 9: 6, 1: 6, 11: 0, 3: 0, 7: 0 };
+  const THREE_HARMONY = [
+    [8, 0, 4],
+    [5, 9, 1],
+    [2, 6, 10],
+    [11, 3, 7],
+  ];
+
+  function stemIdxOf(stem) {
+    if (stem == null) return -1;
+    if (typeof stem === 'number') return stem;
+    if (typeof stem === 'object' && stem.char) return STEMS.findIndex(s => s.char === stem.char);
+    return STEMS.findIndex(s => s.char === stem);
+  }
+  function branchIdxOf(branch) {
+    if (branch == null) return -1;
+    if (typeof branch === 'number') return branch;
+    if (typeof branch === 'object' && branch.char) return BRANCHES.findIndex(b => b.char === branch.char);
+    return BRANCHES.findIndex(b => b.char === branch || b.animal === branch);
+  }
+
+  function getNatalNobles(pillars) {
+    const found = [];
+    const day = pillars && pillars[2];
+    if (!day || !day.known || !day.stem) {
+      return { list: found, tianyi: [], yuede: null, tiande: null };
+    }
+    const dmIdx = stemIdxOf(day.stem);
+    const tianyiBranches = TIANYI_BY_STEM[dmIdx] || [];
+    const tianyi = [];
+    const labels = ['Year', 'Month', 'Day', 'Hour'];
+    for (let i = 0; i < (pillars || []).length; i++) {
+      const p = pillars[i];
+      if (!p || !p.known || !p.branch) continue;
+      const bi = branchIdxOf(p.branch);
+      if (tianyiBranches.indexOf(bi) >= 0) {
+        const hit = {
+          star: 'tianyi',
+          star_zh: '天乙贵人',
+          pillar: p.label || labels[i],
+          animal: BRANCHES[bi].animal,
+          branch: BRANCHES[bi].char,
+        };
+        tianyi.push(hit);
+        found.push(hit);
+      }
+    }
+    const month = pillars[1];
+    let yuede = null;
+    let tiande = null;
+    if (month && month.known && month.branch) {
+      const mi = branchIdxOf(month.branch);
+      const yueStem = YUEDE_STEM[mi];
+      if (yueStem != null) {
+        const yueChar = STEMS[yueStem].char;
+        const inChart = (pillars || []).some(p => p && p.known && p.stem && p.stem.char === yueChar);
+        yuede = { star: 'yuede', star_zh: '月德贵人', stem: yueChar, present: inChart };
+        if (inChart) found.push(Object.assign({ pillar: 'Month' }, yuede));
+      }
+      const td = TIANDE_CHAR[mi];
+      if (td) {
+        const inChart = (pillars || []).some(p => p && p.known && (
+          (p.stem && p.stem.char === td) || (p.branch && p.branch.char === td)
+        ));
+        tiande = { star: 'tiande', star_zh: '天德贵人', token: td, present: inChart };
+        if (inChart) found.push(Object.assign({ pillar: 'Month' }, tiande));
+      }
+    }
+    return { list: found, tianyi, yuede, tiande, tianyiBranches: tianyiBranches.map(i => BRANCHES[i]) };
+  }
+
+  function getPeachBlossom(pillars) {
+    const day = pillars && pillars[2];
+    const year = pillars && pillars[0];
+    const src = (day && day.known && day.branch) ? day : (year && year.known && year.branch) ? year : null;
+    if (!src) return { present: false, branch: null, animal: null, pillars: [] };
+    const peachIdx = PEACH_BY_TRIAD[branchIdxOf(src.branch)];
+    if (peachIdx == null) return { present: false, branch: null, animal: null, pillars: [] };
+    const hits = [];
+    const labels = ['Year', 'Month', 'Day', 'Hour'];
+    for (let i = 0; i < pillars.length; i++) {
+      const p = pillars[i];
+      if (!p || !p.known || !p.branch) continue;
+      if (branchIdxOf(p.branch) === peachIdx) hits.push(p.label || labels[i]);
+    }
+    return {
+      present: hits.length > 0,
+      branch: BRANCHES[peachIdx].char,
+      animal: BRANCHES[peachIdx].animal,
+      pillars: hits,
+      source: src.label || 'Day',
+    };
+  }
+
+  function elementLink(src, dst) {
+    if (!src || !dst) return 'none';
+    if (src === dst) return 'same';
+    const prod = PRODUCTION_CYCLE;
+    const i = prod.indexOf(src);
+    const j = prod.indexOf(dst);
+    if (i < 0 || j < 0) return 'none';
+    if (prod[(i + 1) % 5] === dst) return 'produces';
+    if (prod[(j + 1) % 5] === src) return 'produced_by';
+    if (CONTROL_CYCLE[src] === dst) return 'controls';
+    if (CONTROL_CYCLE[dst] === src) return 'controlled_by';
+    return 'none';
+  }
+
+  function overlayLine(flowEl, natalEl) {
+    const link = elementLink(flowEl, natalEl);
+    if (link === 'produces' || link === 'same') return { kind: 'strengthen', el: natalEl };
+    if (link === 'controls' || link === 'produced_by') return { kind: 'drain', el: natalEl };
+    return { kind: 'neutral', el: natalEl };
+  }
+
+  function analyzeNowOverlay(pillars, dayMaster) {
+    const now = new Date();
+    const r = calcBaziAccurate({
+      year: now.getFullYear(),
+      month: now.getMonth() + 1,
+      day: now.getDate(),
+      hour: now.getHours(),
+      minute: now.getMinutes(),
+      calendar: 'solar',
+    });
+    const yearP = r.pillars[0];
+    const monthP = r.pillars[1];
+    const dayP = r.pillars[2];
+    const dm = dayMaster || (pillars && pillars[2] && pillars[2].stem);
+    const dmEl = dm && dm.element;
+    const yearGod = (dm && yearP.stem) ? calcTenGod(dm.element, dm.polarity, yearP.stem.element, yearP.stem.polarity) : null;
+    const monthGod = (dm && monthP.stem) ? calcTenGod(dm.element, dm.polarity, monthP.stem.element, monthP.stem.polarity) : null;
+    const monthLine = overlayLine(monthP.stem.element, dmEl);
+    const yearLine = overlayLine(yearP.stem.element, dmEl);
+    const clashYear = pillars && pillars.some(p => p && p.known && p.branch && CLASH[branchIdxOf(p.branch)] === branchIdxOf(yearP.branch));
+    const clashMonth = pillars && pillars.some(p => p && p.known && p.branch && CLASH[branchIdxOf(p.branch)] === branchIdxOf(monthP.branch));
+    return {
+      year: yearP,
+      month: monthP,
+      day: dayP,
+      yearGod,
+      monthGod,
+      monthLine,
+      yearLine,
+      clashYear: !!clashYear,
+      clashMonth: !!clashMonth,
+    };
+  }
+
+  function branchRelation(aIdx, bIdx) {
+    if (aIdx < 0 || bIdx < 0) return null;
+    if (aIdx === bIdx) return 'same';
+    if (COMBINE[aIdx] === bIdx) return 'combine';
+    if (CLASH[aIdx] === bIdx) return 'clash';
+    if (HARM[aIdx] === bIdx) return 'harm';
+    if (isPunish(aIdx, bIdx)) return 'punish';
+    for (let g = 0; g < THREE_HARMONY.length; g++) {
+      if (THREE_HARMONY[g].indexOf(aIdx) >= 0 && THREE_HARMONY[g].indexOf(bIdx) >= 0) return 'harmony';
+    }
+    return 'neutral';
+  }
+
+  function pairBranchRelations(pillarsA, pillarsB) {
+    const labels = ['Year', 'Month', 'Day', 'Hour'];
+    const rows = [];
+    for (let i = 0; i < 4; i++) {
+      const a = pillarsA && pillarsA[i];
+      const b = pillarsB && pillarsB[i];
+      if (!a || !a.known || !b || !b.known) continue;
+      const ai = branchIdxOf(a.branch);
+      const bi = branchIdxOf(b.branch);
+      rows.push({
+        pillar: a.label || labels[i],
+        a: BRANCHES[ai],
+        b: BRANCHES[bi],
+        relation: branchRelation(ai, bi),
+      });
+    }
+    return rows;
+  }
+
+  function scoreLovePair(userPillars, partnerPillars, userAnimal, partnerAnimal) {
+    const userDM = userPillars && userPillars[2] && userPillars[2].stem;
+    const partDM = partnerPillars && partnerPillars[2] && partnerPillars[2].stem;
+    const z = ZODIAC[userAnimal] || { compat: [], clash: [] };
+    const isCompat = z.compat.indexOf(partnerAnimal) >= 0;
+    const isClash = z.clash.indexOf(partnerAnimal) >= 0;
+    let love = 58;
+    let attraction = 55;
+    let lifestyle = 56;
+    let communication = 54;
+    let longTerm = 57;
+    if (isCompat) { love += 18; longTerm += 14; lifestyle += 8; }
+    if (isClash) { love -= 12; longTerm -= 16; attraction += 10; }
+    const dmLink = (userDM && partDM) ? elementLink(userDM.element, partDM.element) : 'none';
+    if (dmLink === 'produces' || dmLink === 'produced_by') { love += 8; communication += 10; }
+    if (dmLink === 'same') { lifestyle += 10; communication += 4; }
+    if (dmLink === 'controls' || dmLink === 'controlled_by') { attraction += 8; lifestyle -= 6; longTerm -= 4; }
+    const peachU = getPeachBlossom(userPillars);
+    const peachP = getPeachBlossom(partnerPillars);
+    if (peachU.present) attraction += 8;
+    if (peachP.present) attraction += 6;
+    const rels = pairBranchRelations(userPillars, partnerPillars);
+    rels.forEach(r => {
+      if (r.relation === 'combine' || r.relation === 'harmony') { love += 6; longTerm += 7; }
+      if (r.relation === 'clash' || r.relation === 'punish') { longTerm -= 8; lifestyle -= 5; }
+      if (r.relation === 'harm') { communication -= 6; }
+    });
+    const clamp = n => Math.max(12, Math.min(96, Math.round(n)));
+    const betweenGod = (userDM && partDM)
+      ? calcTenGod(userDM.element, userDM.polarity, partDM.element, partDM.polarity)
+      : null;
+    return {
+      scores: {
+        love: clamp(love),
+        attraction: clamp(attraction),
+        lifestyle: clamp(lifestyle),
+        communication: clamp(communication),
+        longTerm: clamp(longTerm),
+      },
+      dmLink,
+      betweenGod,
+      peach: peachU,
+      partnerPeach: peachP,
+      branches: rels,
+      animal: { compat: isCompat, clash: isClash },
+    };
+  }
+
   return {
     STEMS, BRANCHES, ZODIAC, EL_COLOR, EL_ZH, ANIMAL_ZH,
     MONTH_BRANCH, hourToBranch,
@@ -926,5 +1165,8 @@
     jieqiJD, getLichunJD, julianDay, JIE_NAMES,
     getFlowMonth, calcMonthlyForecast,
     CLASH, COMBINE, HARM, isPunish,
+    getNatalNobles, getPeachBlossom, analyzeNowOverlay,
+    pairBranchRelations, scoreLovePair, branchRelation, elementLink,
+    THREE_HARMONY,
   };
 }));

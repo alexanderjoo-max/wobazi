@@ -8,6 +8,8 @@
 const { Router } = require('express');
 const { buildSquareLayout, buildStoryLayout } = require('./layout');
 const { renderImage } = require('./render');
+const verdict = require('./verdict');
+const { storyLayout, ogLayout } = require('./viral-layout');
 
 const router = Router();
 
@@ -76,6 +78,39 @@ router.get('/api/share-story', async (req, res) => {
     console.error('[share-story] Error generating image:', err);
     res.status(500).json({ error: 'Failed to generate image' });
   }
+});
+
+const shareEvents = [];
+
+router.get('/api/share-viral', async (req, res) => {
+  try {
+    const v = verdict.decodePayload(req.query.p || '');
+    if (!v || !v.hook) return res.status(400).json({ error: 'Invalid share payload' });
+    const fmt = req.query.fmt === 'og' ? 'og' : 'story';
+    const layout = fmt === 'og' ? ogLayout(v) : storyLayout(v);
+    const w = fmt === 'og' ? 1200 : 1080;
+    const h = fmt === 'og' ? 630 : 1920;
+    const png = await renderImage(layout, w, h);
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.send(png);
+  } catch (err) {
+    console.error('[share-viral] Error:', err);
+    res.status(500).json({ error: 'Failed to generate image' });
+  }
+});
+
+router.post('/api/share-event', (req, res) => {
+  const body = req.body || {};
+  shareEvents.push({
+    t: Date.now(),
+    kind: String(body.kind || '').slice(0, 12),
+    tone: String(body.tone || '').slice(0, 12),
+    dest: String(body.dest || '').slice(0, 24),
+    locale: String(body.locale || '').slice(0, 8),
+  });
+  if (shareEvents.length > 2000) shareEvents.shift();
+  res.json({ ok: true });
 });
 
 module.exports = router;

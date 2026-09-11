@@ -14,9 +14,12 @@
     'nav.privacy': { en: 'Privacy Policy', th: 'นโยบายความเป็นส่วนตัว', zh: '隐私政策' },
     'nav.terms': { en: 'Terms of Service', th: 'ข้อกำหนดการให้บริการ', zh: '服务条款' },
     'nav.explainer': { en: 'BaZi Explainer', th: 'คู่มือปาจื้อ', zh: '八字讲解' },
-    'nav.begin': { en: 'Begin your free reading', th: 'เริ่มดูดวงฟรี', zh: '开始免费解读' },
-    'nav.beginShort': { en: 'Free reading', th: 'ดูดวงฟรี', zh: '免费解读' },
+    'nav.about': { en: 'Master Alice', th: 'มาสเตอร์อลิซ', zh: 'Master Alice' },
+    'nav.back': { en: 'Back', th: 'กลับ', zh: '返回' },
+    'nav.begin': { en: 'Plot Your Chart', th: 'จัดแผนภูมิของคุณ', zh: '排出你的命盘' },
+    'nav.beginShort': { en: 'Plot chart', th: 'จัดแผนภูมิ', zh: '排盘' },
     'nav.signin': { en: 'Sign in', th: 'เข้าสู่ระบบ', zh: '登录' },
+    'nav.signinGoogle': { en: 'Sign in with Google', th: 'เข้าสู่ระบบด้วย Google', zh: '使用 Google 登录' },
     'nav.logout': { en: 'Logout', th: 'ออกจากระบบ', zh: '退出' },
     'nav.menu': { en: 'Menu', th: 'เมนู', zh: '菜单' },
     'nav.language': { en: 'Language', th: 'ภาษา', zh: '语言' },
@@ -30,13 +33,14 @@
     'footer.daymaster': { en: 'Day Master Guide', th: 'คู่มือวันมาสเตอร์', zh: '日主指南' },
     'footer.compat': { en: 'Compatibility', th: 'ความเข้ากัน', zh: '合婚' },
     'footer.calculator': { en: 'Free Calculator', th: 'เครื่องคำนวณฟรี', zh: '免费排盘' },
+    'footer.udestiny': { en: 'A U Destiny product', th: 'ผลิตภัณฑ์จาก U Destiny', zh: 'U Destiny 旗下产品' },
     'footer.tagline': {
       en: 'Decode your destiny through the ancient art of the Four Pillars.',
       th: 'ถอดรหัสโชคชะตาด้วยศาสตร์โบราณแห่งสี่เสา.',
       zh: '以四柱古法解码你的命运。'
     },
     'footer.copy': { en: 'All rights reserved.', th: 'สงวนลิขสิทธิ์', zh: '保留所有权利。' },
-    'cta.begin': { en: 'Begin your free reading', th: 'เริ่มดูดวงฟรี', zh: '开始免费解读' },
+    'cta.begin': { en: 'Plot Your Chart', th: 'จัดแผนภูมิของคุณ', zh: '排出你的命盘' },
     'legal.binding': {
       en: 'The English version of this document is the binding agreement. Other languages are provided for convenience only.',
       th: 'ฉบับภาษาอังกฤษของเอกสารนี้เป็นข้อตกลงที่มีผลผูกพัน ภาษาอื่นจัดไว้เพื่อความสะดวกเท่านั้น',
@@ -244,6 +248,8 @@
     applySpans(lang);
     applyData(lang);
     updateSwitchers(lang);
+    var backs = document.querySelectorAll('[data-wobazi-back]');
+    for (var b = 0; b < backs.length; b++) backs[b].setAttribute('aria-label', t('nav.back'));
     try {
       document.dispatchEvent(new CustomEvent('wobazi:lang', { detail: { lang: lang } }));
     } catch (e) {}
@@ -307,7 +313,7 @@
     document.addEventListener('click', function (e) {
       var t = fromEvent(e.target);
       if (!t || !t.closest) { closeMenus(); return; }
-      if (t.closest('.lang-switch') || t.closest('.site-nav-toggle') || t.closest('.site-nav-drawer')) return;
+      if (t.closest('.lang-switch') || t.closest('.site-nav-toggle') || t.closest('.drawer-card')) return;
       closeMenus();
     });
     document.addEventListener('keydown', function (e) {
@@ -315,8 +321,58 @@
     });
   }
 
+  function sameOriginRef() {
+    try {
+      if (!document.referrer) return false;
+      var u = new URL(document.referrer);
+      if (u.origin !== location.origin) return false;
+      return (u.pathname + u.search) !== (location.pathname + location.search);
+    } catch (e) { return false; }
+  }
+
+  function wobaziGoBack() {
+    var fallback = '/';
+    try { fallback = sessionStorage.getItem('wobazi-return') || '/'; } catch (e) {}
+    if (sameOriginRef() && window.history.length > 1) {
+      var left = false;
+      window.addEventListener('pagehide', function () { left = true; }, { once: true });
+      history.back();
+      setTimeout(function () {
+        if (!left) location.href = fallback;
+      }, 350);
+      return;
+    }
+    location.href = fallback;
+  }
+
+  function bindBackButtons() {
+    var btns = document.querySelectorAll('[data-wobazi-back]');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].setAttribute('aria-label', t('nav.back'));
+      btns[i].addEventListener('click', function (e) {
+        e.preventDefault();
+        wobaziGoBack();
+      });
+    }
+  }
+
+  function rememberReturn() {
+    document.addEventListener('click', function (e) {
+      var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+      if (!a) return;
+      var href = a.getAttribute('href') || '';
+      if (!href || href.charAt(0) === '#' || href.indexOf('http') === 0 || href.indexOf('mailto:') === 0) return;
+      if (href.indexOf('/auth') === 0 || href === '/' || href.indexOf('/?') === 0) return;
+      try {
+        sessionStorage.setItem('wobazi-return', location.pathname + location.search + location.hash);
+      } catch (err) {}
+    });
+  }
+
   function init() {
     bind();
+    bindBackButtons();
+    rememberReturn();
     if (global.__WOBAZI_I18N_PENDING) {
       var pending = global.__WOBAZI_I18N_PENDING;
       global.__WOBAZI_I18N_PENDING = null;
@@ -341,6 +397,7 @@
   global.toggleLangMenu = toggleLangMenu;
   global.toggleSiteNav = toggleSiteNav;
   global.setWobaziLang = setLangFromUi;
+  global.wobaziGoBack = wobaziGoBack;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

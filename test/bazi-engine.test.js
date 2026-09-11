@@ -190,3 +190,50 @@ describe('monthly forecast uniqueness', () => {
     assert.deepEqual(a.months.map(m => m.title_en), b.months.map(m => m.title_en));
   });
 });
+
+describe('viral verdicts', () => {
+  const V = require('../share/verdict');
+  it('never uses mixed/maybe and encodes round-trip', () => {
+    const v = V.build({
+      kind: 'today',
+      tone: 'roast',
+      lang: 'en',
+      facts: { todayRel: 'clash', dmChar: '壬', dmEl: 'Water', todayChars: '甲子', dayChars: '壬申' }
+    });
+    assert.equal(v.claimId, 'today_clash');
+    assert.equal(v.weather, 'Friction');
+    assert.equal(/maybe|might|perhaps|mixed|balanced/i.test(v.hook + v.body + v.dare), false);
+    const id = V.encodePayload(v);
+    const back = V.decodePayload(id);
+    assert.equal(back.hook, v.hook);
+    assert.equal(back.dmChar, '壬');
+  });
+  it('does not invent a clash when relation is neutral', () => {
+    const v = V.build({ kind: 'today', tone: 'oracle', lang: 'en', facts: { dmChar: '甲', dmEl: 'Wood' } });
+    assert.equal(v.claimId, 'dm_fallback');
+  });
+});
+
+describe('natal nobles, peach blossom, overlay', () => {
+  it('甲 day stem lists 天乙 as Ox and Goat', () => {
+    const r = bazi.calcBaziAccurate({ year: 2000, month: 1, day: 7, hour: 12 });
+    assert.equal(r.pillars[2].stem.char, '甲');
+    const nobles = bazi.getNatalNobles(r.pillars);
+    assert.deepEqual(nobles.tianyiBranches.map(b => b.animal).sort(), ['Goat', 'Ox']);
+  });
+
+  it('子 day peach blossom is 酉 Rooster', () => {
+    const r = bazi.calcBaziAccurate({ year: 2000, month: 1, day: 7, hour: 12 });
+    assert.equal(r.pillars[2].branch.char, '子');
+    const pb = bazi.getPeachBlossom(r.pillars);
+    assert.equal(pb.animal, 'Rooster');
+    assert.equal(pb.branch, '酉');
+  });
+
+  it('now overlay returns year and month pillars', () => {
+    const r = bazi.calcBaziAccurate({ year: 2000, month: 1, day: 7, hour: 12 });
+    const now = bazi.analyzeNowOverlay(r.pillars, r.dayMaster);
+    assert.ok(now.year && now.year.stem && now.month && now.month.stem);
+    assert.ok(now.monthLine && now.monthLine.kind);
+  });
+});

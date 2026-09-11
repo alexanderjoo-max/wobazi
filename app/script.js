@@ -402,7 +402,7 @@ function scrollResults(id) {
 
 function switchTab(tab, opts) {
   opts = opts || {};
-  ['today', 'you', 'actions', 'relationships'].forEach(t => {
+  ['you', 'luck', 'today', 'actions', 'relationships'].forEach(t => {
     const btn = document.getElementById('tab-btn-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
     const toc = document.getElementById('toc-' + t);
@@ -422,10 +422,10 @@ function switchTab(tab, opts) {
   }
 
   // Render prev/next tab navigation
-  const TAB_ORDER = ['today', 'you', 'actions', 'relationships'];
-  const TAB_LABELS = { today: 'Today', you: 'You', actions: 'Actions', relationships: 'Relationships' };
-  const TAB_LABELS_ZH = { today: '今日', you: '你', actions: '行动', relationships: '关系' };
-  const TAB_LABELS_TH = { today: 'วันนี้', you: 'คุณ', actions: 'การกระทำ', relationships: 'ความสัมพันธ์' };
+  const TAB_ORDER = ['you', 'luck', 'today', 'actions', 'relationships'];
+  const TAB_LABELS = { you: 'Your Chart', luck: 'Luck Cycle', today: 'Today', actions: 'Actions', relationships: 'Relationships' };
+  const TAB_LABELS_ZH = { you: '你的命盘', luck: '大运', today: '今日', actions: '行动', relationships: '关系' };
+  const TAB_LABELS_TH = { you: 'แผนภูมิของคุณ', luck: '大运 · รอบโชค', today: 'วันนี้', actions: 'การกระทำ', relationships: 'ความสัมพันธ์' };
   const idx = TAB_ORDER.indexOf(tab);
   const prev = idx > 0 ? TAB_ORDER[idx - 1] : null;
   const next = idx < TAB_ORDER.length - 1 ? TAB_ORDER[idx + 1] : null;
@@ -447,13 +447,15 @@ function switchTab(tab, opts) {
 /* ═══════════════════════════════════════
    Hash routing + birth persistence
 ═══════════════════════════════════════ */
-const RESULT_TABS = ['today', 'you', 'actions', 'relationships'];
+const RESULT_TABS = ['you', 'luck', 'today', 'actions', 'relationships'];
 const CHART_STORE_KEY = 'wobazi_chart_v1';
 let _birthMeta = { calendarType: 'solar', leapMonth: false, minute: 0 };
 let _lastAccurate = null;
 let _appNavigating = false;
 let _currentUser = null;
 let _savedReading = null;
+let _lastPartner = null;
+let _calFilter = 'all';
 
 function currentHash() {
   return (location.hash || '').replace(/^#/, '');
@@ -696,6 +698,28 @@ function updateLunarPreview() {
 function onTimeUnknownToggle() {
   const unk = document.getElementById('time-unknown');
   const timeEl = document.getElementById('birthtime');
+  if (!unk || !timeEl) return;
+  timeEl.disabled = !!unk.checked;
+  if (unk.checked) timeEl.value = '';
+}
+function setPartnerCalendarType(type) {
+  const solar = type !== 'lunar';
+  const solarBtn = document.getElementById('partner-cal-solar');
+  const lunarBtn = document.getElementById('partner-cal-lunar');
+  if (solarBtn) {
+    solarBtn.classList.toggle('active', solar);
+    solarBtn.setAttribute('aria-checked', solar ? 'true' : 'false');
+  }
+  if (lunarBtn) {
+    lunarBtn.classList.toggle('active', !solar);
+    lunarBtn.setAttribute('aria-checked', solar ? 'false' : 'true');
+  }
+  const leapWrap = document.getElementById('partner-leap-month-wrap');
+  if (leapWrap) leapWrap.classList.toggle('hide', solar);
+}
+function onPartnerTimeUnknownToggle() {
+  const unk = document.getElementById('partner-time-unknown');
+  const timeEl = document.getElementById('partner-time');
   if (!unk || !timeEl) return;
   timeEl.disabled = !!unk.checked;
   if (unk.checked) timeEl.value = '';
@@ -1079,7 +1103,8 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   const dominantEl = Object.entries(elements).sort((a,b)=>b[1]-a[1])[0][0];
 
   // Store share data
-  _shareData = { name, animal, element: yearPillar.stem.element, polarity: yearPillar.stem.polarity, year, fortune, dominantEl, bloodType, tenGods: accurate && accurate.tenGods, pillars };
+  _shareData = { name, animal, element: yearPillar.stem.element, polarity: yearPillar.stem.polarity, year, fortune, dominantEl, bloodType, tenGods: accurate && accurate.tenGods, pillars, elements };
+  window._shareData = _shareData;
 
   // Hero card
   document.getElementById('hero-bg').style.background =
@@ -1225,6 +1250,8 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   })();
   renderYouProfile(animal, yearPillar, elColor);
   renderTenGods(accurate && accurate.tenGods, pillars);
+  renderNowOverlays(pillars, accurate && accurate.dayMaster);
+  renderNobleCard(pillars);
 
   // Daily fortune
   renderDailyFortune(animal);
@@ -1300,11 +1327,11 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   haptic([20, 60, 20]);
 
   const hashTab = currentHash();
-  const initTab = RESULT_TABS.indexOf(hashTab) >= 0 ? hashTab : 'today';
+  const initTab = RESULT_TABS.indexOf(hashTab) >= 0 ? hashTab : 'you';
   switchTab(initTab, { skipHash: true });
-  if (!opts.skipHash && currentHash() !== 'today') {
+  if (!opts.skipHash && currentHash() !== 'you') {
     _appNavigating = true;
-    history.pushState({ wobazi: 'today' }, '', location.pathname + location.search + '#today');
+    history.pushState({ wobazi: 'you' }, '', location.pathname + location.search + '#you');
     _appNavigating = false;
   }
 
@@ -1373,6 +1400,87 @@ function renderTenGods(profile, pillars) {
     </div>`;
   }).join('');
 }
+function godLabel(id) {
+  if (window.BaziEngine && BaziEngine.tenGodLabel) {
+    const g = BaziEngine.tenGodLabel(id);
+    if (g) return _t(g.en, g.zh, g.th);
+  }
+  return id || '';
+}
+
+function renderNowOverlays(pillars, dayMaster) {
+  const nowEl = document.getElementById('tengods-now');
+  const elNow = document.getElementById('elements-now');
+  if (!window.BaziEngine || !BaziEngine.analyzeNowOverlay || !pillars) {
+    if (nowEl) nowEl.innerHTML = '';
+    if (elNow) elNow.innerHTML = '';
+    return;
+  }
+  const o = BaziEngine.analyzeNowOverlay(pillars, dayMaster);
+  const yStem = o.year.stem;
+  const mStem = o.month.stem;
+  const yBr = o.year.branch;
+  const mBr = o.month.branch;
+  const yLabel = `${yStem.char}${yBr.char}`;
+  const mLabel = `${mStem.char}${mBr.char}`;
+  const kindLine = (line, whenEn, whenZh, whenTh, stem, br) => {
+    const who = stem && br ? `${stem.char}${br.char} ${stem.element} ${br.animal}` : '';
+    if (line && line.kind === 'strengthen') return _t(whenEn + ' strengthens ' + line.el + (who ? ' — ' + who : '') + '.', whenZh + '生助' + (EL_ZH[line.el] || line.el) + (who ? '（' + who + '）' : '') + '。', whenTh + 'เสริมพลัง' + line.el + (who ? ' — ' + who : ''));
+    if (line && line.kind === 'drain') return _t(whenEn + ' drains ' + line.el + (who ? ' — ' + who : '') + '.', whenZh + '泄/克' + (EL_ZH[line.el] || line.el) + (who ? '（' + who + '）' : '') + '。', whenTh + 'ถอน' + line.el + (who ? ' — ' + who : ''));
+    return _t(whenEn + ' sits as ' + (who || 'a mixed month') + ' beside your Day Master.', whenZh + '为' + (who || '驳杂') + '，与日主并立。', whenTh + 'คือ ' + (who || 'ผสม') + ' ข้างวันมาสเตอร์');
+  };
+  const clashNote = o.clashMonth
+    ? _t(' This month clashes a natal branch.', ' 本月冲本命地支。', ' เดือนนี้ชงกิ่งกำเนิด')
+    : o.clashYear
+      ? _t(' This year clashes a natal branch.', ' 流年冲本命地支。', ' ปีนี้ชงกิ่งกำเนิด')
+      : '';
+  if (nowEl) {
+    nowEl.innerHTML = `
+      <div class="now-kicker">${_t('Now — 流年 / 流月', '此刻 — 流年 / 流月', 'ตอนนี้ — 流年 / 流月')}</div>
+      <div class="now-pills">
+        <span class="now-pill">${_t('Year', '年', 'ปี')} ${yLabel}${o.yearGod ? ' · ' + godLabel(o.yearGod) : ''}</span>
+        <span class="now-pill">${_t('Month', '月', 'เดือน')} ${mLabel}${o.monthGod ? ' · ' + godLabel(o.monthGod) : ''}</span>
+      </div>
+      <p class="now-line">${kindLine(o.monthLine, 'This month', '本月', 'เดือนนี้', mStem, mBr)}${clashNote}</p>
+      <p class="now-sub">${kindLine(o.yearLine, 'This year', '流年', 'ปีนี้', yStem, yBr)}</p>`;
+  }
+  if (elNow) {
+    elNow.innerHTML = `
+      <div class="now-kicker">${_t('Now vs natal elements', '此刻与本命五行', 'ธาตุตอนนี้เทียบแผนกำเนิด')}</div>
+      <p class="now-line">${kindLine(o.monthLine, 'This month', '本月', 'เดือนนี้', mStem, mBr)}</p>
+      <p class="now-sub">${kindLine(o.yearLine, 'This year', '流年', 'ปีนี้', yStem, yBr)}</p>`;
+  }
+}
+
+function renderNobleCard(pillars) {
+  const el = document.getElementById('noble-card');
+  if (!el) return;
+  if (!window.BaziEngine || !BaziEngine.getNatalNobles) {
+    el.innerHTML = '';
+    return;
+  }
+  const n = BaziEngine.getNatalNobles(pillars);
+  const animals = (n.tianyiBranches || []).map(b => _t(b.animal, ANIMAL_ZH[b.animal] || b.animal)).join(' · ');
+  const hits = (n.tianyi || []).map(h =>
+    `<span class="noble-chip">${_t(h.pillar, h.pillar)} · ${h.branch}${_t(' ' + h.animal, ANIMAL_ZH[h.animal] || '')}</span>`
+  ).join('');
+  const extra = [];
+  if (n.yuede) extra.push(`${_t('Moon Virtue 月德', '月德贵人', '月德')} ${n.yuede.stem}${n.yuede.present ? _t(' — in this chart', ' — 入盘', ' — ในแผนนี้') : _t(' — not in the four pillars', ' — 未入四柱', ' — ไม่อยู่ในสี่เสา')}`);
+  if (n.tiande) extra.push(`${_t('Heavenly Virtue 天德', '天德贵人', '天德')} ${n.tiande.token}${n.tiande.present ? _t(' — in this chart', ' — 入盘', ' — ในแผนนี้') : _t(' — not in the four pillars', ' — 未入四柱', ' — ไม่อยู่ในสี่เสา')}`);
+  el.innerHTML = `
+    <div class="noble-card">
+      <p class="noble-lead">${_t('Helpful people, mentors, earth angels. Natal BaZi marks them as 天乙贵人 — and, from the month, 月德 and 天德.', '贵人是助你的人、导师、人间天使。八字以天乙贵人标出，并以月柱看月德、天德。', 'ผู้เอื้อ พี่เลี้ยง เทวดาบนดิน ในปาจื้อดูที่ 天乙贵人 และจากเสาเดือน 月德 天德')}</p>
+      <div class="noble-block">
+        <div class="noble-label">天乙贵人</div>
+        <p class="noble-animals">${_t('Noble branches for your Day Master: ', '日主天乙地支：', 'กิ่ง贵人ของวันมาสเตอร์คุณ: ')}${animals || '—'}</p>
+        <div class="noble-hits">${hits || `<span class="noble-empty">${_t('None of those branches sit in the four pillars — support still arrives in time, just not as a natal star.', '四柱未见天乙地支——助力仍会按时出现，只是不在本命星。', 'ไม่มีกิ่งเหล่านั้นในสี่เสา — ความช่วยเหลือยังมาตามเวลา แค่ไม่ใช่ดาวกำเนิด')}</span>`}</div>
+      </div>
+      ${extra.length ? `<ul class="noble-extra">${extra.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
+      <p class="noble-qm">${_t('Qi Men Dunjia locates helpful direction in time — Chief Deity 值符, and the Three Wonders 乙 (Sun Noble), 丙 (Moon Noble), 丁 (Jade Maiden). Wobazi shows natal stars; a full Qi Men plate is a later map.', '奇门遁甲在时间里找贵人方位——值符，以及三奇：乙（日奇）、丙（月奇）、丁（星奇 / 玉女）。Wobazi 先呈现本命星；完整奇门盘是下一张地图。', '奇门遁甲 หาทิศผู้เอื้อในเวลา — 值符 และสามอัศจรรย์ 乙 丙 丁 Wobazi โชว์ดาวกำเนิดก่อน')}</p>
+      <a class="noble-more" href="/about">${_t('About Master Alice →', '关于 Master Alice →', 'เกี่ยวกับมาสเตอร์อลิซ →')}</a>
+    </div>`;
+}
+
 function toggleTenGod(row) {
   if (!row) return;
   const open = row.classList.contains('is-open');
@@ -1983,7 +2091,7 @@ function renderCareerArchetype(dominantEl) {
     <div class="career-card" style="border-color:${col}22">
       <div class="career-icon-wrap">${ca.icon}</div>
       <div class="career-info">
-        <div class="career-archetype-name" style="color:${col}">${_t(ca.name, ca.name_zh)}</div>
+        <div class="career-archetype-name" style="color:${col}">${_t('Talent · ', '天赋 · ', 'พรสวรรค์ · ')}${_t(ca.name, ca.name_zh)}</div>
         <div class="career-tagline">${_t(ca.tagline, ca.tagline_zh)}</div>
         <div class="career-roles">
           ${ca.roles.map((r,i)=>`<span class="career-role-chip">${_t(r, ca.roles_zh?.[i])}</span>`).join('')}
@@ -2312,8 +2420,12 @@ function initDateInputs() {
 }
 
 function initCityAutocomplete() {
-  const input = document.getElementById('birthplace');
-  const box = document.getElementById('city-suggest');
+  bindCityAutocomplete('birthplace', 'city-suggest');
+  bindCityAutocomplete('partner-birthplace', 'partner-city-suggest');
+}
+function bindCityAutocomplete(inputId, boxId) {
+  const input = document.getElementById(inputId);
+  const box = document.getElementById(boxId);
   if (!input || !box) return;
 
   let timer = null;
@@ -3100,10 +3212,10 @@ const TIPS = {
   },
   'career-archetype': {
     icon: '🎭',
-    title_en: 'Career Archetype',
-    title_zh: '职业原型',
-    body_en: 'Your dominant element determines your natural professional archetype — the type of work where your energy flows most freely and you\'re most likely to achieve mastery and fulfilment.',
-    body_zh: '主导五行决定你的职业原型——最能发挥天赋、最易达到卓越与满足感的工作方向。'
+    title_en: 'Talent',
+    title_zh: '天赋',
+    body_en: 'Your dominant element determines your natal talent — what you are built for, not this year\'s job luck. It is the work where your energy flows most freely.',
+    body_zh: '主导五行决定你的先天天赋——你被造就去做的事，而非今年的事业运。那是能量最顺的工作方向。'
   },
   'power-season': {
     icon: '🌸',
@@ -3149,7 +3261,7 @@ const TIPS = {
   },
   'work-section': {
     icon: '💼',
-    title_en: 'Work & Career',
+    title_en: 'Work',
     title_zh: '事业运势',
     body_en: 'Your career momentum score blends your zodiac\'s natural professional energy with the 2026 Fire Horse year. Fire Horse years reward those who move decisively — the monthly strip shows when to push and when to pace.',
     body_zh: '事业运势综合了你生肖天然的职业能量与2026火马年的影响。火马年奖励果断行动者，月份运势指引你何时发力、何时蓄势。'
@@ -3174,6 +3286,13 @@ const TIPS = {
     title_zh: '地理能量',
     body_en: 'Every place on Earth carries elemental energy based on its direction, climate, and geography. Understanding how your birth chart\'s dominant element interacts with your birthplace element reveals the environmental forces that shaped your earliest years.',
     body_zh: '地球上每个地方都因方位、气候与地理而蕴含特定五行能量。了解命盘主导五行与出生地五行的互动关系，可揭示塑造你早年成长的环境力量。'
+  },
+  'noble-stars': {
+    icon: '✦',
+    title_en: 'Nobleman · 贵人',
+    title_zh: '贵人',
+    body_en: '贵人 are helpful people — mentors, "earth angels." In natal BaZi, 天乙贵人, 月德, and 天德 mark where support sits in your chart. Qi Men Dunjia later locates helpful direction in time (值符 and the Three Wonders 乙丙丁); Wobazi shows the natal stars first.',
+    body_zh: '贵人是助你之人——贵人、导师、人间天使。八字本命看天乙、月德、天德。奇门遁甲再在时间里找贵人方位（值符与三奇乙丙丁）；Wobazi 先呈现本命贵人。'
   },
 };
 
@@ -3757,6 +3876,14 @@ function renderLuckyNumbers(year, month, day, animal, dominantEl) {
 }
 
 /* ── Render Auspicious Power Days ── */
+function setCalFilter(key) {
+  _calFilter = key || 'all';
+  document.querySelectorAll('.cal-filter').forEach(b => {
+    b.classList.toggle('is-on', b.getAttribute('data-cal-filter') === _calFilter);
+  });
+  if (_shareData && _shareData.animal) renderAuspiciousDates(_shareData.animal, _shareData.dominantEl);
+}
+
 function renderAuspiciousDates(animal, dominantEl) {
   const elColor = EL_COLOR[dominantEl];
   const { power, good } = getAuspiciousDays(animal, dominantEl);
@@ -3767,6 +3894,18 @@ function renderAuspiciousDates(animal, dominantEl) {
   const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
   const today = now.getDate();
   const MNAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const partnerDays = (_lastPartner && _lastPartner.animal)
+    ? getAuspiciousDays(_lastPartner.animal, _lastPartner.dominant).power
+    : [];
+  const both = power.filter(d => partnerDays.includes(d));
+  const purpose = {
+    all: d => true,
+    business: d => power.includes(d) || [1, 6, 8, 15, 16, 23].includes(d),
+    contract: d => power.includes(d) || good.includes(d) || [4, 9, 14, 21, 27].includes(d),
+    travel: d => good.includes(d) || [3, 7, 12, 18, 22, 28].includes(d),
+    personal: d => power.includes(d) || good.includes(d),
+  };
+  const match = purpose[_calFilter] || purpose.all;
 
   const dayHeaders = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d =>
     `<div class="cal-header">${d}</div>`
@@ -3778,9 +3917,13 @@ function renderAuspiciousDates(animal, dominantEl) {
     const isPower = power.includes(d);
     const isGood  = good.includes(d);
     const isToday = d === today;
+    const isBoth = both.includes(d);
+    const on = match(d);
     let cls = 'cal-day';
+    if (!on) cls += ' cal-dim';
     if (isPower) cls += ' cal-power';
     else if (isGood) cls += ' cal-good';
+    if (isBoth) cls += ' cal-both';
     if (isToday) cls += ' cal-today';
     return `<div class="${cls}" style="${isPower ? `--el-c:${elColor}` : ''}">${d}</div>`;
   }).join('');
@@ -3789,8 +3932,16 @@ function renderAuspiciousDates(animal, dominantEl) {
     <div class="cal-legend">
       <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power" style="background:${elColor}"></div> ${_t('Power Day', '吉日')}</div>
       <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-good"></div> ${_t('Lucky Day', '幸运日')}</div>
+      ${partnerDays.length ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-both"></div> ${_t('Works for both charts', '两盘皆宜', 'เหมาะทั้งสองแผน')}</div>` : ''}
     </div>
   `;
+  const purposeNote = {
+    all: _t('Power Days align your dominant element with the most supportive monthly qi. Use the filters to plan opening, contracts, travel, or a personal lucky date — all free.', '吉日是你主导五行与月度气场最契合之时。用筛选安排开业、签约、出行或个人吉日——全部免费。', 'วันพลังคือวันที่ธาตุคุณสอดคล้องกับลมเดือน ใช้ตัวกรองวางแผนเปิดกิจการ เซ็นสัญญา เดินทาง หรือวันมงคลส่วนตัว — ฟรีทั้งหมด'),
+    business: _t('Open-business dates favor starts, launches, and first customers.', '开业日宜启动、上线、迎来第一批客人。', 'วันเปิดกิจการเหมาะเริ่มต้น เปิดตัว และลูกค้าแรก'),
+    contract: _t('Contract dates favor signing, sealing, and making it binding.', '签约日宜落笔、盖章、把事情说定。', 'วันเซ็นสัญญาเหมาะลงนาม ปิด และทำให้ผูกพัน'),
+    travel: _t('Travel dates favor movement, visits, and leaving the house with a clean wind.', '出行日宜动身、拜访、带着清风出门。', 'วันเดินทางเหมาะเคลื่อนที่ เยี่ยม และออกจากบ้านด้วยลมดี'),
+    personal: _t('Personal lucky dates are your Power and Lucky days — asks, rituals, and private beginnings.', '个人吉日即你的吉日与幸运日——开口、仪式、私下的开始。', 'วันมงคลส่วนตัวคือวันพลังและวันโชค — คำขอ พิธี และจุดเริ่มส่วนตัว'),
+  };
 
   document.getElementById('power-days-card').innerHTML = `
     <div class="power-days-card">
@@ -3801,7 +3952,7 @@ function renderAuspiciousDates(animal, dominantEl) {
         ${days}
       </div>
       ${legendHTML}
-      <div class="cal-note">${_t('Power Days align your dominant element with the most supportive monthly qi. Schedule launches, asks, and key conversations on these dates.', '吉日是你主导五行与月度气场最契合之时。将启动、提案、关键对话安排在这些日子，事半功倍。')}</div>
+      <div class="cal-note">${purposeNote[_calFilter] || purposeNote.all}</div>
     </div>
   `;
 }
@@ -3953,6 +4104,10 @@ function renderLifeDecades(year, dominantEl) {
     `;
   }).join('');
 
+  if (_shareData) {
+    _shareData.luckPhase = themes[currentDecadeIdx].phase;
+    window._shareData = _shareData;
+  }
   document.getElementById('decades-card').innerHTML = `
     <div class="decades-card">
       <div class="decades-bar">${blocks}</div>
@@ -4017,10 +4172,10 @@ const NEW_TIPS = {
   },
   'decades': {
     icon: '🕰️',
-    title_en: 'Life Decades 大运',
+    title_en: 'Luck Cycle 大运',
     title_zh: '大运',
-    body_en: '大运 (Dà Yùn) means "Major Luck Cycles" — the 10-year phases that shape the overarching energy of your life chapters. Each phase is themed by your element\'s natural progression. Knowing your current phase helps you work with the cycle rather than against it.',
-    body_zh: '大运即"主要运势周期"——塑造人生各章节整体能量的十年阶段。每个阶段以五行自然演进为主题，了解当前所处阶段有助于顺势而为。',
+    body_en: '大运 (Dà Yùn) means "Major Luck Cycles" — the 10-year phases that color each chapter of life. Work with the climate of the decade, not against it.',
+    body_zh: '大运是十年一程的气运周期，为人生各章着色。顺势，而不是硬顶。',
   },
 };
 
@@ -4891,31 +5046,65 @@ function renderBusinessCompat(animal, dominantEl, elements) {
     </div>`;
   };
 
+  const relKey = {
+    combine: { en: 'Combine 合', zh: '合', th: 'Combine · 合' },
+    clash: { en: 'Crash 冲', zh: '冲', th: 'Crash · 冲' },
+    harm: { en: 'Harm 害', zh: '害', th: 'Harm · 害' },
+    punish: { en: 'Punishment 刑', zh: '刑', th: 'Punishment · 刑' },
+    harmony: { en: 'Harmony 三合', zh: '三合', th: 'Harmony · 三合' },
+    same: { en: 'Same branch', zh: '同支', th: 'กิ่งเดียวกัน' },
+    neutral: { en: 'Neutral', zh: '中性', th: 'กลาง' },
+  };
+  const pairNote = _lastPartner && _lastPartner.pillars && window.BaziEngine && BaziEngine.pairBranchRelations
+    ? BaziEngine.pairBranchRelations(_shareData && _shareData.pillars ? _shareData.pillars : [], _lastPartner.pillars)
+    : [];
+  const pairHtml = pairNote.length ? `
+    <div class="biz-section-label">${_t('FOUR-PILLAR ANIMALS', '四柱生肖', 'สัตว์สี่เสา')}</div>
+    <div class="biz-branch-list">${pairNote.map(r => {
+      const lab = relKey[r.relation] || relKey.neutral;
+      return `<div class="biz-branch-row"><span>${_t(r.pillar, r.pillar)}</span><span>${r.a.emoji} ${_t(r.a.animal, ANIMAL_ZH[r.a.animal])} · ${r.b.emoji} ${_t(r.b.animal, ANIMAL_ZH[r.b.animal])}</span><strong>${_t(lab.en, lab.zh, lab.th)}</strong></div>`;
+    }).join('')}</div>
+    <p class="biz-climate">${_t('Read length as climate, not an expiry date. Combine and Harmony thicken the weather; Crash and Punishment are storm cells you plan around.', '合伙长短当气候读，不是保质期。合与三合让天气变厚；冲与刑是你要绕开的风暴。', 'อ่านระยะเป็นภูมิอากาศ ไม่ใช่วันหมดอายุ 合 และ 三合 ทำให้ฟ้าหนา 冲 และ 刑 คือพายุที่ต้องวางแผน')}</p>` : `<p class="biz-hint">${_t('Enter a partner birth date in Compatibility Check to see pillar-by-pillar Combine / Crash / Harmony.', '在合婚中输入对方生日，即可看到逐柱合 / 冲 / 三合。', 'กรอกวันเกิดคู่ใน Compatibility เพื่อดู 合 / 冲 / 三合 รายเสา')}</p>`;
+
   el.innerHTML = `<div class="biz-compat-wrap">
     <div class="biz-section-label">${_t('PRODUCTIVE PARTNERSHIPS', '生产合作')}</div>
     <div class="biz-grid">
       ${bizCard(producedBy, `Fuels your ${dominantEl} — they support your growth`, `为你的${EL_ZH[dominantEl]}提供能量`)}
       ${bizCard(produces, `You inspire their ${produces} — natural mentorship`, `你激发他们的${EL_ZH[produces]} — 天然导师`)}
     </div>
-    <div class="biz-section-label">${_t('CHALLENGING DYNAMICS', '挑战关系')}</div>
+    <div class="biz-section-label">${_t('STRESS / CRASH POINTS', '压力 / 冲克')}</div>
     <div class="biz-grid">
       ${bizCard(controlledBy, `Challenges your ${dominantEl} — pushes you to evolve`, `挑战你的${EL_ZH[dominantEl]} — 推动你进化`)}
       ${bizCard(controls, `You overpower their ${controls} — be mindful of dominance`, `你压制他们的${EL_ZH[controls]} — 注意平衡`)}
     </div>
+    ${pairHtml}
   </div>`;
 }
 
 function checkCompatibility() {
-  const day = parseInt(document.getElementById('partner-day').value);
-  const month = parseInt(document.getElementById('partner-month').value);
-  const year = parseInt(document.getElementById('partner-year').value);
-  const timeVal = document.getElementById('partner-time')?.value || '';
+  let day = parseInt(document.getElementById('partner-day').value);
+  let month = parseInt(document.getElementById('partner-month').value);
+  let year = parseInt(document.getElementById('partner-year').value);
+  const timeUnknown = !!document.getElementById('partner-time-unknown')?.checked;
+  const timeVal = timeUnknown ? '' : (document.getElementById('partner-time')?.value || '');
   const bloodVal = document.getElementById('partner-blood')?.value || '';
   const resultEl = document.getElementById('compat-result');
+  const lunar = document.getElementById('partner-cal-lunar')?.classList.contains('active');
+  const leap = !!document.getElementById('partner-leap-month')?.checked;
 
-  if (!day || !month || !year || year < 1920 || year > 2030) {
+  if (!day || !month || !year || year < 1900 || year > 2100) {
     resultEl.innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:16px;font-size:13px">Please enter a valid birth date.</p>';
     return;
+  }
+
+  if (lunar && window.BaziEngine) {
+    try {
+      const conv = BaziEngine.lunarToSolar(year, month, day, leap);
+      year = conv.year; month = conv.month; day = conv.day;
+    } catch (e) {
+      resultEl.innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:16px;font-size:13px">Could not convert that lunar date.</p>';
+      return;
+    }
   }
 
   const userAnimal = _shareData ? _shareData.animal : null;
@@ -4926,8 +5115,20 @@ function checkCompatibility() {
 
   // Calculate partner's full BaZi
   let partnerHour = null;
-  if (timeVal) partnerHour = parseInt(timeVal.split(':')[0], 10);
-  const partnerPillars = calcBazi(year, month - 1, day, partnerHour);
+  let partnerMinute = 0;
+  if (timeVal) {
+    const parts = timeVal.split(':');
+    partnerHour = parseInt(parts[0], 10);
+    partnerMinute = parseInt(parts[1] || '0', 10);
+  }
+  let partnerPillars;
+  if (window.BaziEngine && typeof BaziEngine.calcBaziAccurate === 'function') {
+    partnerPillars = BaziEngine.calcBaziAccurate({
+      year, month, day, hour: partnerHour, minute: partnerMinute, calendar: 'solar',
+    }).pillars;
+  } else {
+    partnerPillars = calcBazi(year, month - 1, day, partnerHour, partnerMinute);
+  }
   const partnerAnimal = partnerPillars[0].branch.animal;
   const partnerElements = calcElements(partnerPillars);
   const partnerDominant = Object.entries(partnerElements).sort((a,b) => b[1]-a[1])[0][0];
@@ -4989,11 +5190,52 @@ function checkCompatibility() {
   const pEmoji = BRANCHES.find(b => b.animal === partnerAnimal)?.emoji || '';
   const uEmoji = BRANCHES.find(b => b.animal === userAnimal)?.emoji || '';
 
+  const scored = (window.BaziEngine && BaziEngine.scoreLovePair)
+    ? BaziEngine.scoreLovePair(_shareData.pillars || [], partnerPillars, userAnimal, partnerAnimal)
+    : null;
+  _lastPartner = { year, month, day, animal: partnerAnimal, pillars: partnerPillars, elements: partnerElements, dominant: partnerDominant };
+  if (_shareData) {
+    try { renderAuspiciousDates(_shareData.animal, _shareData.dominantEl); } catch (e) {}
+    try { renderBusinessCompat(_shareData.animal, _shareData.dominantEl, _shareData.elements); } catch (e) {}
+  }
+
+  const peach = scored && scored.peach;
+  const peachLine = peach
+    ? (peach.present
+      ? _t(`Peach Blossom 桃花 is present in your ${peach.pillars.join(', ')} pillar(s) (${peach.branch} ${peach.animal}).`, `桃花在你的${peach.pillars.join('、')}柱（${peach.branch}${peach.animal}）。`, `桃花อยู่ในเสา ${peach.pillars.join(', ')} (${peach.branch} ${peach.animal})`)
+      : _t(`Peach Blossom 桃花 for your chart is ${peach.branch} ${peach.animal} — not sitting in the four pillars.`, `你盘桃花在${peach.branch}${peach.animal}——未入四柱。`, `桃花ของแผนคุณคือ ${peach.branch} ${peach.animal} — ไม่ได้อยู่ในสี่เสา`))
+    : '';
+  const godLine = scored && scored.betweenGod
+    ? _t(`Their Day Master is your ${godLabel(scored.betweenGod)} 十神.`, `对方日主对你是${godLabel(scored.betweenGod)}。`, `วันมาสเตอร์เขาเป็น ${godLabel(scored.betweenGod)} ของคุณ`)
+    : '';
+  const dmLine = scored && scored.dmLink && scored.dmLink !== 'none'
+    ? _t(`Day Masters: ${userEl} ${scored.dmLink.replace('_', ' ')} ${pEl}.`, `日主：${EL_ZH[userEl] || userEl} 与 ${EL_ZH[pEl] || pEl}（${scored.dmLink}）。`, `วันมาสเตอร์: ${userEl} ${scored.dmLink} ${pEl}`)
+    : '';
+
+  const scoreKeys = [
+    ['love', 'Love compatibility', '感情合盘', 'ความเข้ากันทางรัก'],
+    ['attraction', 'Attraction', '吸引', 'แรงดึงดูด'],
+    ['lifestyle', 'Lifestyle', '生活节奏', 'ไลฟ์สไตล์'],
+    ['communication', 'Communication', '沟通', 'การสื่อสาร'],
+    ['longTerm', 'Long-term partner', '长期伴侣', 'คู่ระยะยาว'],
+  ];
+  const scoreHtml = scored ? `<div class="compat-scores">${scoreKeys.map(([k, en, zh, th]) => `
+    <div class="compat-score">
+      <span class="compat-score-label">${_t(en, zh, th)}</span>
+      <span class="compat-score-num">${scored.scores[k]}</span>
+      <div class="compat-score-track"><div class="compat-score-fill" style="width:${scored.scores[k]}%;background:${color}"></div></div>
+    </div>`).join('')}</div>
+    <p class="compat-guide">${_t('Guidance, not fate.', '参考，不是宿命。', 'แนวทาง ไม่ใช่ชะตา')}</p>` : '';
+
   resultEl.innerHTML = `
     <div style="margin-top:16px;padding:16px;background:rgba(255,255,255,0.03);border:1px solid ${color}33;border-radius:var(--radius-md);text-align:center">
       <div style="font-size:24px;margin-bottom:8px">${uEmoji} + ${pEmoji}</div>
       <div style="font-size:15px;font-weight:700;color:${color};margin-bottom:10px">${_t(verdict, verdict)}</div>
+      ${scoreHtml}
       ${details.map(d => `<p style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px">${d}</p>`).join('')}
+      ${dmLine ? `<p style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px">${dmLine}</p>` : ''}
+      ${godLine ? `<p style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px">${godLine}</p>` : ''}
+      ${peachLine ? `<p style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px">${peachLine}</p>` : ''}
     </div>
   `;
 }

@@ -92,6 +92,11 @@ app.get('/bazi-engine.js', (req, res) => {
   res.type('application/javascript');
   res.sendFile(path.join(__dirname, 'bazi-engine.js'));
 });
+app.get('/verdict.js', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=3600');
+  res.type('application/javascript');
+  res.sendFile(path.join(__dirname, 'share', 'verdict.js'));
+});
 app.get('/favicon.ico', (req, res) => {
   res.set('Cache-Control', 'public, max-age=86400');
   res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
@@ -105,6 +110,7 @@ app.get('/apple-touch-icon.png', (req, res) => {
 app.get('/sitemap.xml', (req, res) => {
   const pages = [
     { loc: '/', priority: '1.0', changefreq: 'weekly' },
+    { loc: '/about', priority: '0.8', changefreq: 'monthly' },
     { loc: '/what-is-bazi', priority: '0.9', changefreq: 'monthly' },
     { loc: '/four-pillars-of-destiny', priority: '0.8', changefreq: 'monthly' },
     { loc: '/chinese-astrology', priority: '0.8', changefreq: 'monthly' },
@@ -169,6 +175,34 @@ app.get('/wobazi2', (req, res) => {
 });
 app.get('/wobazi2.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'wobazi2.html'));
+});
+
+app.get('/s/:id', (req, res) => {
+  const verdict = require('./share/verdict');
+  const v = verdict.decodePayload(req.params.id);
+  if (!v || !v.hook) return res.redirect(302, '/');
+  const id = req.params.id;
+  const img = `${seoBase.baseUrl}/api/share-viral?p=${encodeURIComponent(id)}&fmt=og`;
+  const story = `${seoBase.baseUrl}/api/share-viral?p=${encodeURIComponent(id)}`;
+  res.render('pages/share-card', {
+    ...seoBase,
+    title: `${v.hook} · Wobazi`,
+    description: v.body || v.dare || v.hook,
+    canonical: `/s/${id}`,
+    ogImage: img,
+    storyImage: story,
+    verdict: v,
+    shareId: id,
+  });
+});
+
+app.get('/about', (req, res) => {
+  res.render('pages/about', {
+    ...seoBase,
+    title: 'About Master Alice | Wobazi — A U Destiny Product',
+    description: 'Master Alice (ซินแสมาสเตอร์อลิซ) is the face and engine of Wobazi. Bangkok-based BaZi, Feng Shui, and destiny consulting — a U Destiny product.',
+    canonical: '/about',
+  });
 });
 
 app.get('/what-is-bazi', (req, res) => {

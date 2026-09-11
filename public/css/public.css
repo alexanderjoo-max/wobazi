@@ -95,12 +95,145 @@ body.seo-page .seo-main {
 }
 .seo-footer-col a:hover { color: var(--text, #f0f0ff); }
 
+.seo-footer-col a.footer-udestiny,
+.footer-udestiny {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding-bottom: 0;
+  border-bottom: none;
+  text-decoration: none !important;
+  color: inherit;
+}
+.udestiny-logo {
+  display: block;
+  height: 40px;
+  width: auto;
+  max-width: 160px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.12));
+}
+.footer-udestiny span {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted, #888a9e);
+  text-decoration: none !important;
+  border-bottom: none;
+}
+
+/* Master Alice /about */
+.about-alice { max-width: 640px; }
+.alice-hero { text-align: center; padding: 8px 0 28px; }
+.alice-photo {
+  width: 168px;
+  height: 224px;
+  object-fit: cover;
+  object-position: 50% 18%;
+  border-radius: 18px;
+  border: 1px solid rgba(240, 192, 64, 0.32);
+  box-shadow: 0 18px 48px rgba(0,0,0,0.45), 0 0 32px rgba(240, 192, 64, 0.12);
+  margin: 0 auto 18px;
+  display: block;
+}
+.alice-kicker {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold, #f0c040);
+  margin-bottom: 8px;
+}
+.alice-hero h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text, #f0f0ff);
+  margin: 0 0 4px;
+}
+.alice-thai-name {
+  font-size: 18px;
+  color: var(--text, #f0f0ff);
+  margin: 0 0 6px;
+}
+.alice-legal {
+  font-size: 13px;
+  color: var(--muted, #888a9e);
+}
+.alice-creds {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted, #888a9e);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.alice-creds li { margin-bottom: 8px; }
+.alice-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin-top: 12px;
+  font-size: 13px;
+}
+.alice-links a { color: var(--gold, #f0c040); }
+.alice-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 36px;
+  text-align: center;
+}
+.alice-ext {
+  text-decoration: none;
+  padding: 10px 18px;
+}
+.about-alice .bazi-callout {
+  margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+  .alice-photo { width: 140px; height: 186px; }
+  .alice-hero h1 { font-size: 26px; }
+}
+
+.share-land-glyph {
+  font-family: 'Noto Serif SC', 'Noto Sans SC', serif;
+  font-size: 96px;
+  line-height: 1;
+  text-align: center;
+  margin: 8px 0 16px;
+}
+.share-land-hook {
+  font-size: 28px;
+  line-height: 1.25;
+  color: var(--text);
+  text-align: center;
+  margin: 0 0 12px;
+}
+.share-land-body, .share-land-dare {
+  text-align: center;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.share-land-dare { color: var(--gold); font-weight: 600; margin-top: 8px; }
+.share-land-disc { text-align: center; font-size: 11px; color: var(--m4); margin: 16px 0; }
+.share-land-meta { text-align: center; font-size: 12px; color: var(--muted); margin-top: 18px; }
+
 .seo-footer-bottom {
   max-width: 760px;
   margin: 32px auto 0;
   padding-top: 20px;
   border-top: 1px solid rgba(240, 192, 64, 0.08);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.seo-footer-bottom .footer-udestiny {
+  align-items: center;
+  margin: 0;
 }
 .seo-footer-bottom p {
   color: var(--muted, #888a9e);

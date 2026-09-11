@@ -43,7 +43,8 @@
     'load.6': { en: 'Almost there…', th: 'ใกล้แล้ว…', zh: '即将完成…' },
 
     'ui.today': { en: 'Today', th: 'วันนี้', zh: '今日' },
-    'ui.you': { en: 'You', th: 'คุณ', zh: '你' },
+    'ui.you': { en: 'Your Chart', th: 'แผนภูมิของคุณ', zh: '你的命盘' },
+    'ui.luck': { en: 'Luck Cycle', th: '大运 · รอบโชค', zh: '大运' },
     'ui.actions': { en: 'Actions', th: 'การกระทำ', zh: '行动' },
     'ui.relationships': { en: 'Relationships', th: 'ความสัมพันธ์', zh: '关系' },
     'ui.fortune': { en: 'Fortune', th: 'โชคชะตา', zh: '运势' },
@@ -84,7 +85,7 @@
     'ui.outfitGuide': { en: 'Feng Shui Outfit Guide', th: 'คู่มือชุดฮวงจุ้ย', zh: '风水穿搭指南' },
     'ui.monthlyColors': { en: '2026 · Monthly Colors', th: '2026 · สีประจำเดือน', zh: '2026 · 月度色彩' },
     'ui.luckyNumbers': { en: 'Lucky Numbers', th: 'เลขมงคล', zh: '幸运数字' },
-    'ui.careerArch': { en: 'Career Archetype', th: 'ต้นแบบอาชีพ', zh: '职业原型' },
+    'ui.careerArch': { en: 'Talent', th: 'พรสวรรค์', zh: '天赋' },
     'ui.powerSeason': { en: 'Power Season', th: 'ฤดูพลัง', zh: '旺季' },
     'ui.yyBalance': { en: 'Yin · Yang Balance', th: 'สมดุลหยิน·หยาง', zh: '阴阳平衡' },
     'ui.bloodProfile': { en: 'Blood Type Profile', th: 'โปรไฟล์หมู่เลือด', zh: '血型档案' },

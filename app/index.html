@@ -57,8 +57,8 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=36">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/app/style.css?v=48">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
     html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
@@ -68,8 +68,8 @@
     html[data-lang="zh"] .en:has(~ .zh) { display: none !important; }
     html[data-lang="zh"] .zh { display: revert !important; }
   </style>
-  <script src="/public/js/i18n.js?v=7"></script>
-  <script src="/public/js/i18n-ui.js?v=2"></script>
+  <script src="/public/js/i18n.js?v=11"></script>
+  <script src="/public/js/i18n-ui.js?v=3"></script>
   <script src="/public/js/i18n-copy.js?v=2"></script>
   <script src="/public/js/i18n-copy-more.js?v=2"></script>
 </head>
@@ -91,6 +91,7 @@
       </a>
       <nav class="site-nav-links" aria-label="Primary">
         <a href="/what-is-bazi"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
+        <a href="/about"><span class="en">Master Alice</span><span class="zh hide">Master Alice</span><span class="th hide">มาสเตอร์อลิซ</span></a>
       </nav>
       <div class="site-nav-actions">
         <div class="lang-switch" data-lang-switch>
@@ -115,8 +116,8 @@
           <button class="nav-logout" onclick="haptic(6); logout()"><span class="en">Logout</span><span class="zh hide">退出</span><span class="th hide">ออกจากระบบ</span></button>
         </div>
         <a href="/#input" class="btn-primary site-nav-cta" onclick="if(!event.metaKey&&!event.ctrlKey){event.preventDefault();haptic(12);goToInput();}">
-          <span class="cta-full"><span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span></span>
-          <span class="cta-short"><span class="en">Free reading</span><span class="zh hide">免费解读</span><span class="th hide">ดูดวงฟรี</span></span>
+          <span class="cta-full"><span class="en">Plot Your Chart</span><span class="zh hide">排出你的命盘</span><span class="th hide">จัดแผนภูมิของคุณ</span></span>
+          <span class="cta-short"><span class="en">Plot chart</span><span class="zh hide">排盘</span><span class="th hide">จัดแผนภูมิ</span></span>
         </a>
       </div>
       <button type="button" class="site-nav-toggle" aria-label="Menu" aria-expanded="false" onclick="toggleSiteNav(this, event)">
@@ -124,17 +125,25 @@
       </button>
       <div class="site-nav-drawer">
         <div class="drawer-card">
-          <p class="drawer-kicker"><span class="en">Language</span><span class="zh hide">语言</span><span class="th hide">ภาษา</span></p>
-          <div class="drawer-lang">
-            <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">English</button>
-            <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
-            <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+          <div class="drawer-lang-block">
+            <p class="drawer-kicker"><span class="en">Language</span><span class="zh hide">语言</span><span class="th hide">ภาษา</span></p>
+            <div class="drawer-lang">
+              <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">English</button>
+              <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
+              <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+            </div>
           </div>
-          <a href="/what-is-bazi" class="drawer-link" onclick="closeAppNav()"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
-          <button type="button" class="drawer-link drawer-guest" onclick="haptic(10); closeAppNav(); loginWithGoogle()"><span class="en">Sign in</span><span class="zh hide">登录</span><span class="th hide">เข้าสู่ระบบ</span></button>
+          <nav class="drawer-list">
+            <a href="/what-is-bazi" class="drawer-link" onclick="closeAppNav()"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
+            <a href="/about" class="drawer-link" onclick="closeAppNav()"><span class="en">Master Alice</span><span class="zh hide">Master Alice</span><span class="th hide">มาสเตอร์อลิซ</span></a>
+          </nav>
+          <button type="button" class="google-login-btn drawer-google drawer-guest" onclick="haptic(10); closeAppNav(); loginWithGoogle()">
+            <svg class="google-logo" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <span class="en">Sign in with Google</span><span class="zh hide">使用 Google 登录</span><span class="th hide">เข้าสู่ระบบด้วย Google</span>
+          </button>
           <button type="button" class="drawer-link drawer-authed hide" onclick="haptic(6); closeAppNav(); logout()"><span class="en">Logout</span><span class="zh hide">退出</span><span class="th hide">ออกจากระบบ</span></button>
           <button type="button" class="btn-primary drawer-cta" onclick="haptic(12); closeAppNav(); goToInput();">
-            <span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span>
+            <span class="en">Plot Your Chart</span><span class="zh hide">排出你的命盘</span><span class="th hide">จัดแผนภูมิของคุณ</span>
           </button>
         </div>
       </div>
@@ -159,7 +168,7 @@
         <div class="splash-cta-wrap" id="splash-cta-wrap">
           <button class="btn-primary splash-cta" id="splash-cta-primary" onclick="haptic(12); onLandingPrimary()">
             <span class="cta-begin">
-              <span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span>
+              <span class="en">Plot Your Chart</span><span class="zh hide">排出你的命盘</span><span class="th hide">จัดแผนภูมิของคุณ</span>
             </span>
             <span class="cta-continue hide">
               <span class="en">Continue your reading</span><span class="zh hide">继续你的解读</span><span class="th hide">ดูดวงต่อ</span>
@@ -308,14 +317,21 @@
       <!-- Final CTA -->
       <div class="about-cta splash-final-cta">
         <button class="btn-primary splash-cta" onclick="haptic(12); onLandingPrimary()">
-          <span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span>
+          <span class="en">Plot Your Chart</span><span class="zh hide">排出你的命盘</span><span class="th hide">จัดแผนภูมิของคุณ</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </div>
 
       <div class="splash-foot">
-        <a href="/privacy"><span class="en">Privacy Policy</span><span class="zh hide">隐私政策</span><span class="th hide">นโยบายความเป็นส่วนตัว</span></a>
-        <a href="/terms"><span class="en">Terms of Service</span><span class="zh hide">服务条款</span><span class="th hide">ข้อกำหนดการให้บริการ</span></a>
+        <div class="splash-foot-links">
+          <a href="/about"><span class="en">Master Alice</span><span class="zh hide">Master Alice</span><span class="th hide">มาสเตอร์อลิซ</span></a>
+          <a href="/privacy"><span class="en">Privacy Policy</span><span class="zh hide">隐私政策</span><span class="th hide">นโยบายความเป็นส่วนตัว</span></a>
+          <a href="/terms"><span class="en">Terms of Service</span><span class="zh hide">服务条款</span><span class="th hide">ข้อกำหนดการให้บริการ</span></a>
+        </div>
+        <a class="footer-udestiny splash-udestiny" href="https://www.udestinyglobal.com/en" target="_blank" rel="noopener">
+          <img src="/app/assets/brand/udestiny-logo.png" alt="U Destiny" class="udestiny-logo">
+          <span class="en">A U Destiny product</span><span class="zh hide">U Destiny 旗下产品</span><span class="th hide">ผลิตภัณฑ์จาก U Destiny</span>
+        </a>
       </div>
 
     </div>
@@ -706,7 +722,7 @@
       <div class="about-cta">
         <p>Ready to decode your chart?</p>
         <button class="btn-primary" onclick="haptic(10); goToInput()">
-          <span class="en">Begin your free reading</span><span class="zh hide">开始免费解读</span><span class="th hide">เริ่มดูดวงฟรี</span>
+          <span class="en">Plot Your Chart</span><span class="zh hide">排出你的命盘</span><span class="th hide">จัดแผนภูมิของคุณ</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </div>
@@ -726,14 +742,22 @@
       </button>
       <div class="site-nav-drawer">
         <div class="drawer-card">
-          <p class="drawer-kicker"><span class="en">Language</span><span class="zh hide">语言</span><span class="th hide">ภาษา</span></p>
-          <div class="drawer-lang">
-            <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">English</button>
-            <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
-            <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+          <div class="drawer-lang-block">
+            <p class="drawer-kicker"><span class="en">Language</span><span class="zh hide">语言</span><span class="th hide">ภาษา</span></p>
+            <div class="drawer-lang">
+              <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">English</button>
+              <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
+              <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+            </div>
           </div>
-          <a href="/what-is-bazi" class="drawer-link" onclick="closeAppNav()"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
-          <button type="button" class="drawer-link drawer-guest" onclick="haptic(10); closeAppNav(); loginWithGoogle()"><span class="en">Sign in</span><span class="zh hide">登录</span><span class="th hide">เข้าสู่ระบบ</span></button>
+          <nav class="drawer-list">
+            <a href="/what-is-bazi" class="drawer-link" onclick="closeAppNav()"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
+            <a href="/about" class="drawer-link" onclick="closeAppNav()"><span class="en">Master Alice</span><span class="zh hide">Master Alice</span><span class="th hide">มาสเตอร์อลิซ</span></a>
+          </nav>
+          <button type="button" class="google-login-btn drawer-google drawer-guest" onclick="haptic(10); closeAppNav(); loginWithGoogle()">
+            <svg class="google-logo" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <span class="en">Sign in with Google</span><span class="zh hide">使用 Google 登录</span><span class="th hide">เข้าสู่ระบบด้วย Google</span>
+          </button>
           <button type="button" class="drawer-link drawer-authed hide" onclick="haptic(6); closeAppNav(); logout()"><span class="en">Logout</span><span class="zh hide">退出</span><span class="th hide">ออกจากระบบ</span></button>
         </div>
       </div>
@@ -746,22 +770,12 @@
       <form id="bazi-form" onsubmit="handleSubmit(event)">
         <div class="field">
           <label><span class="en">Name <span class="label-opt">personalize your reading</span></span><span class="zh hide">姓名 <span class="label-opt">个性化你的命理</span></span><span class="th hide">ชื่อ <span class="label-opt">ปรับการอ่านให้เป็นของคุณ</span></span></label>
-          <input type="text" id="name" placeholder="What do we call you?" data-i18n-placeholder="form.name.ph" autocomplete="off" spellcheck="false">
+          <input type="text" id="name" placeholder="What do we call you?" data-i18n-placeholder="form.name.ph" autocomplete="off" spellcheck="false" data-1p-ignore data-lpignore="true">
         </div>
 
         <div class="field field-date-block">
           <div class="datetime-labels">
             <label for="birth-day"><span class="en">Date of Birth <span class="label-req">*Required</span></span><span class="zh hide">出生日期 <span class="label-req">*必填</span></span><span class="th hide">วันเกิด <span class="label-req">*จำเป็น</span></span></label>
-            <div class="cal-seg" role="radiogroup" aria-label="Calendar type">
-              <button type="button" class="cal-seg-btn active" id="cal-solar" role="radio" aria-checked="true" onclick="setCalendarType('solar')">
-                <span aria-hidden="true">☀️</span>
-                <span class="en">Solar</span><span class="zh hide">阳历</span><span class="th hide">สุริยคติ</span>
-              </button>
-              <button type="button" class="cal-seg-btn" id="cal-lunar" role="radio" aria-checked="false" onclick="setCalendarType('lunar')">
-                <span aria-hidden="true">🌙</span>
-                <span class="en">Lunar / 农历</span><span class="zh hide">农历</span><span class="th hide">จันทรคติ</span>
-              </button>
-            </div>
             <label for="birthtime" class="time-label"><span class="en">Birth time <span class="label-opt">local clock</span></span><span class="zh hide">出生时间 <span class="label-opt">当地钟点</span></span><span class="th hide">เวลาเกิด <span class="label-opt">นาฬิกาท้องถิ่น</span></span></label>
           </div>
           <div class="field-row field-datetime">
@@ -772,6 +786,16 @@
                 <input type="number" id="birth-month" class="date-part" placeholder="MM"   min="1"    max="12"   inputmode="numeric" required aria-required="true">
                 <span class="date-sep">/</span>
                 <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1900" max="2100" inputmode="numeric" required aria-required="true">
+              </div>
+              <div class="cal-seg" role="radiogroup" aria-label="Calendar type">
+                <button type="button" class="cal-seg-btn active" id="cal-solar" role="radio" aria-checked="true" onclick="setCalendarType('solar')">
+                  <span aria-hidden="true">☀️</span>
+                  <span class="en">Solar</span><span class="zh hide">阳历</span><span class="th hide">สุริยคติ</span>
+                </button>
+                <button type="button" class="cal-seg-btn" id="cal-lunar" role="radio" aria-checked="false" onclick="setCalendarType('lunar')">
+                  <span aria-hidden="true">🌙</span>
+                  <span class="en">Lunar</span><span class="zh hide">农历</span><span class="th hide">จันทรคติ</span>
+                </button>
               </div>
             </div>
             <div class="field-col field-col-time">
@@ -895,16 +919,24 @@
       </button>
       <div class="site-nav-drawer">
         <div class="drawer-card">
-          <p class="drawer-kicker"><span class="en">Language</span><span class="zh hide">语言</span><span class="th hide">ภาษา</span></p>
-          <div class="drawer-lang">
-            <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">English</button>
-            <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
-            <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+          <div class="drawer-lang-block">
+            <p class="drawer-kicker"><span class="en">Language</span><span class="zh hide">语言</span><span class="th hide">ภาษา</span></p>
+            <div class="drawer-lang">
+              <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">English</button>
+              <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
+              <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+            </div>
           </div>
-          <a href="/what-is-bazi" class="drawer-link" onclick="closeAppNav()"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
-          <button type="button" class="drawer-link" onclick="haptic(8); closeAppNav(); showShareCard()"><span class="en">Share</span><span class="zh hide">分享</span><span class="th hide">แชร์</span></button>
-          <button type="button" class="drawer-link" onclick="haptic(6); closeAppNav(); goToInput()"><span class="en">Edit birth data</span><span class="zh hide">修改出生资料</span><span class="th hide">แก้ข้อมูลเกิด</span></button>
-          <button type="button" class="drawer-link drawer-guest" onclick="haptic(10); closeAppNav(); loginWithGoogle()"><span class="en">Sign in</span><span class="zh hide">登录</span><span class="th hide">เข้าสู่ระบบ</span></button>
+          <nav class="drawer-list">
+            <a href="/what-is-bazi" class="drawer-link" onclick="closeAppNav()"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
+            <a href="/about" class="drawer-link" onclick="closeAppNav()"><span class="en">Master Alice</span><span class="zh hide">Master Alice</span><span class="th hide">มาสเตอร์อลิซ</span></a>
+            <button type="button" class="drawer-link" onclick="haptic(8); closeAppNav(); showShareCard()"><span class="en">Share</span><span class="zh hide">分享</span><span class="th hide">แชร์</span></button>
+            <button type="button" class="drawer-link" onclick="haptic(6); closeAppNav(); goToInput()"><span class="en">Edit birth data</span><span class="zh hide">修改出生资料</span><span class="th hide">แก้ข้อมูลเกิด</span></button>
+          </nav>
+          <button type="button" class="google-login-btn drawer-google drawer-guest" onclick="haptic(10); closeAppNav(); loginWithGoogle()">
+            <svg class="google-logo" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <span class="en">Sign in with Google</span><span class="zh hide">使用 Google 登录</span><span class="th hide">เข้าสู่ระบบด้วย Google</span>
+          </button>
           <button type="button" class="drawer-link drawer-authed hide" onclick="haptic(6); closeAppNav(); logout()"><span class="en">Logout</span><span class="zh hide">退出</span><span class="th hide">ออกจากระบบ</span></button>
         </div>
       </div>
@@ -912,8 +944,9 @@
 
     <div class="results-tab-bar">
       <div class="tab-bar-inner">
-        <button class="tab-btn active" id="tab-btn-today" onclick="haptic(6); switchTab('today')"><span class="en">Today</span><span class="zh hide">今日</span><span class="th hide">วันนี้</span></button>
-        <button class="tab-btn" id="tab-btn-you" onclick="haptic(6); switchTab('you')"><span class="en">You</span><span class="zh hide">你</span><span class="th hide">คุณ</span></button>
+        <button class="tab-btn active" id="tab-btn-you" onclick="haptic(6); switchTab('you')"><span class="en">Your Chart</span><span class="zh hide">你的命盘</span><span class="th hide">แผนภูมิของคุณ</span></button>
+        <button class="tab-btn" id="tab-btn-luck" onclick="haptic(6); switchTab('luck')"><span class="en">Luck Cycle</span><span class="zh hide">大运</span><span class="th hide">大运 · รอบโชค</span></button>
+        <button class="tab-btn" id="tab-btn-today" onclick="haptic(6); switchTab('today')"><span class="en">Today</span><span class="zh hide">今日</span><span class="th hide">วันนี้</span></button>
         <button class="tab-btn" id="tab-btn-actions" onclick="haptic(6); switchTab('actions')"><span class="en">Actions</span><span class="zh hide">行动</span><span class="th hide">การกระทำ</span></button>
         <button class="tab-btn" id="tab-btn-relationships" onclick="haptic(6); switchTab('relationships')"><span class="en">Relationships</span><span class="zh hide">关系</span><span class="th hide">ความสัมพันธ์</span></button>
       </div>
@@ -942,14 +975,20 @@
     </div>
     <div class="results-toc-bar hide" id="toc-you">
       <div class="results-toc-inner">
-        <button class="results-toc-chip" onclick="scrollResults('you-profile-section')"><span class="en">Profile</span><span class="zh hide">档案</span><span class="th hide">โปรไฟล์</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-pillars')"><span class="en">Pillars</span><span class="zh hide">四柱</span><span class="th hide">เสา</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-tengods')"><span class="en">Ten Gods</span><span class="zh hide">十神</span><span class="th hide">สิบเทพ</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('you-profile-section')"><span class="en">Profile</span><span class="zh hide">档案</span><span class="th hide">โปรไฟล์</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-elements')"><span class="en">Elements</span><span class="zh hide">五行</span><span class="th hide">ธาตุ</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-tengods')"><span class="en">Ten Gods</span><span class="zh hide">十神</span><span class="th hide">สิบเทพ</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-noble')"><span class="en">Noble</span><span class="zh hide">贵人</span><span class="th hide">贵人</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-fortune')"><span class="en">Fortune</span><span class="zh hide">命运</span><span class="th hide">โชคชะตา</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-career')"><span class="en">Career</span><span class="zh hide">职业</span><span class="th hide">อาชีพ</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-career')"><span class="en">Talent</span><span class="zh hide">天赋</span><span class="th hide">พรสวรรค์</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-season')"><span class="en">Season</span><span class="zh hide">旺季</span><span class="th hide">ฤดู</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-yinyang')"><span class="en">Yin Yang</span><span class="zh hide">阴阳</span><span class="th hide">หยินหยาง</span></button>
+      </div>
+    </div>
+    <div class="results-toc-bar hide" id="toc-luck">
+      <div class="results-toc-inner">
+        <button class="results-toc-chip" onclick="scrollResults('res-decades')"><span class="en">Life Decades</span><span class="zh hide">人生大运</span><span class="th hide">ทศวรรษชีวิต</span></button>
       </div>
     </div>
     <div class="results-toc-bar hide" id="toc-relationships">
@@ -1006,9 +1045,57 @@
         <div id="trait-pills" style="display:none"></div>
       </section>
 
-      <!-- You: Profile Header -->
+      <!-- Your Chart: Pillars first -->
+      <section class="section" data-tab="you" id="res-pillars">
+        <div class="section-head" data-tip="four-pillars">
+          <h3 class="en">Four Pillars</h3>
+          <h3 class="zh hide">四柱</h3>
+          <h3 class="th hide">สี่เสา</h3>
+          <span class="section-sub">八字 Bāzì</span>
+        </div>
+        <div class="pillars-row" id="pillars-row"></div>
+        <p class="pillar-disclaimer" id="pillar-disclaimer"></p>
+      </section>
+
       <section class="section" data-tab="you" id="you-profile-section">
         <div id="you-profile-header"></div>
+      </section>
+
+      <section class="section" data-tab="you" id="res-elements">
+        <div class="section-head" data-tip="element-balance">
+          <h3 class="en">Element Balance</h3>
+          <h3 class="zh hide">五行平衡</h3>
+          <h3 class="th hide">สมดุลธาตุ</h3>
+          <span class="section-sub">五行 Wǔxíng</span>
+          <span class="tip-hint">ⓘ <span class="en">What is this?</span><span class="zh hide">这是什么？</span><span class="th hide">นี่คืออะไร?</span></span>
+        </div>
+        <div class="element-chart-wrap">
+          <svg id="radar-svg" viewBox="0 0 200 190" class="radar-svg"></svg>
+          <div class="element-legend" id="element-legend"></div>
+        </div>
+        <div id="elements-now" class="now-overlay"></div>
+      </section>
+
+      <section class="section" data-tab="you" id="res-tengods">
+        <div class="section-head" data-tip="ten-gods">
+          <h3 class="en">Ten Gods</h3>
+          <h3 class="zh hide">十神</h3>
+          <h3 class="th hide">สิบเทพ</h3>
+          <span class="section-sub">十神 Shíshén</span>
+        </div>
+        <p class="tengods-lead" id="tengods-lead"></p>
+        <div id="tengods-list"></div>
+        <div id="tengods-now" class="now-overlay"></div>
+      </section>
+
+      <section class="section" data-tab="you" id="res-noble">
+        <div class="section-head" data-tip="noble-stars">
+          <h3 class="en">Noble · 贵人</h3>
+          <h3 class="zh hide">贵人</h3>
+          <h3 class="th hide">贵人 · ผู้เอื้อ</h3>
+          <span class="section-sub">天乙 · 月德 · 天德</span>
+        </div>
+        <div id="noble-card"></div>
       </section>
 
       <!-- Daily Fortune -->
@@ -1020,6 +1107,9 @@
           <span class="section-sub" id="today-date-label"></span>
         </div>
         <div id="daily-card"></div>
+        <button type="button" class="viral-share-pill" onclick="haptic(8); openViralShare('today')">
+          <span class="en">Share today’s verdict</span><span class="zh hide">分享今日判词</span><span class="th hide">แชร์คำตัดสินวันนี้</span>
+        </button>
         <button class="oracle-cta-btn" onclick="haptic(10); showOracle()">
           <div class="oracle-cta-inner">
             <span class="oracle-cta-icon">✦</span>
@@ -1076,6 +1166,9 @@
           <span class="section-sub">丙午 · Fire Horse</span>
         </div>
         <div id="forecast-card"></div>
+        <button type="button" class="viral-share-pill" onclick="haptic(8); openViralShare('year')">
+          <span class="en">Share this year’s verdict</span><span class="zh hide">分享今年判词</span><span class="th hide">แชร์คำตัดสินปีนี้</span>
+        </button>
       </section>
 
       <!-- Today's Action Plan (compact summary) -->
@@ -1103,51 +1196,12 @@
       <!-- Work & Career -->
       <section class="section" data-tab="today" id="res-work">
         <div class="section-head" data-tip="work-section">
-          <h3 class="en">Work &amp; Career</h3>
+          <h3 class="en">Work</h3>
           <h3 class="zh hide">事业运势</h3>
-          <h3 class="th hide">งานและอาชีพ</h3>
+          <h3 class="th hide">งาน</h3>
           <span class="section-sub">2026 · 职业运势</span>
         </div>
         <div id="work-card"></div>
-      </section>
-
-      <!-- Four Pillars -->
-      <section class="section" data-tab="you" id="res-pillars">
-        <div class="section-head" data-tip="four-pillars">
-          <h3 class="en">Four Pillars</h3>
-          <h3 class="zh hide">四柱</h3>
-          <h3 class="th hide">สี่เสา</h3>
-          <span class="section-sub">八字 Bāzì</span>
-        </div>
-        <div class="pillars-row" id="pillars-row"></div>
-        <p class="pillar-disclaimer" id="pillar-disclaimer"></p>
-      </section>
-
-      <!-- Ten Gods -->
-      <section class="section" data-tab="you" id="res-tengods">
-        <div class="section-head" data-tip="ten-gods">
-          <h3 class="en">Ten Gods</h3>
-          <h3 class="zh hide">十神</h3>
-          <h3 class="th hide">สิบเทพ</h3>
-          <span class="section-sub">十神 Shíshén</span>
-        </div>
-        <p class="tengods-lead" id="tengods-lead"></p>
-        <div id="tengods-list"></div>
-      </section>
-
-      <!-- Element Balance -->
-      <section class="section" data-tab="you" id="res-elements">
-        <div class="section-head" data-tip="element-balance">
-          <h3 class="en">Element Balance</h3>
-          <h3 class="zh hide">五行平衡</h3>
-          <h3 class="th hide">สมดุลธาตุ</h3>
-          <span class="section-sub">五行 Wǔxíng</span>
-          <span class="tip-hint">ⓘ <span class="en">What is this?</span><span class="zh hide">这是什么？</span><span class="th hide">นี่คืออะไร?</span></span>
-        </div>
-        <div class="element-chart-wrap">
-          <svg id="radar-svg" viewBox="0 0 200 190" class="radar-svg"></svg>
-          <div class="element-legend" id="element-legend"></div>
-        </div>
       </section>
 
       <!-- Fortune -->
@@ -1191,15 +1245,22 @@
           <h3 class="th hide">วันมงคล</h3>
           <span class="section-sub">2026 · 吉日</span>
         </div>
+        <div class="cal-filters" id="cal-filters" role="group" aria-label="Date filters">
+          <button type="button" class="cal-filter is-on" data-cal-filter="all" onclick="setCalFilter('all')"><span class="en">All</span><span class="zh hide">全部</span><span class="th hide">ทั้งหมด</span></button>
+          <button type="button" class="cal-filter" data-cal-filter="business" onclick="setCalFilter('business')"><span class="en">Open business</span><span class="zh hide">开业</span><span class="th hide">เปิดกิจการ</span></button>
+          <button type="button" class="cal-filter" data-cal-filter="contract" onclick="setCalFilter('contract')"><span class="en">Sign contract</span><span class="zh hide">签约</span><span class="th hide">เซ็นสัญญา</span></button>
+          <button type="button" class="cal-filter" data-cal-filter="travel" onclick="setCalFilter('travel')"><span class="en">Travel</span><span class="zh hide">出行</span><span class="th hide">เดินทาง</span></button>
+          <button type="button" class="cal-filter" data-cal-filter="personal" onclick="setCalFilter('personal')"><span class="en">Personal lucky date</span><span class="zh hide">个人吉日</span><span class="th hide">วันมงคลส่วนตัว</span></button>
+        </div>
         <div id="power-days-card"></div>
       </section>
 
       <!-- Career Archetype -->
       <section class="section" data-tab="you" id="res-career">
         <div class="section-head" data-tip="career-archetype">
-          <h3 class="en">Career Archetype</h3>
-          <h3 class="zh hide">职业原型</h3>
-          <h3 class="th hide">ต้นแบบอาชีพ</h3>
+          <h3 class="en">Talent</h3>
+          <h3 class="zh hide">天赋</h3>
+          <h3 class="th hide">พรสวรรค์</h3>
         </div>
         <div id="career-card"></div>
       </section>
@@ -1287,15 +1348,18 @@
         <div id="kua-card"></div>
       </section>
 
-      <!-- Life Decades 大运 -->
-      <section class="section" data-tab="you" data-tip="decades">
+      <!-- Luck Cycle 大运 -->
+      <section class="section" data-tab="luck" data-tip="decades" id="res-decades">
         <div class="section-head">
-          <h3 class="en">Life Decades 大运</h3>
+          <h3 class="en">Luck Cycle 大运</h3>
           <h3 class="zh hide">人生大运</h3>
-          <h3 class="th hide">ทศวรรษชีวิต 大运</h3>
+          <h3 class="th hide">รอบโชค 大运</h3>
           <span class="section-sub"><span class="en">Your 10-Year Cycles</span><span class="zh hide">十年大运周期</span><span class="th hide">รอบสิบปีของคุณ</span></span>
         </div>
         <div id="decades-card"></div>
+        <button type="button" class="viral-share-pill" onclick="haptic(8); openViralShare('year')">
+          <span class="en">Share this year’s verdict</span><span class="zh hide">分享今年判词</span><span class="th hide">แชร์คำตัดสินปีนี้</span>
+        </button>
       </section>
 
       <!-- Reading -->
@@ -1351,26 +1415,86 @@
           <span class="section-sub"><span class="en">Enter partner's details</span><span class="zh hide">输入伴侣信息</span><span class="th hide">กรอกข้อมูลคู่</span></span>
         </div>
         <div class="compat-check-card">
-          <div class="compat-input-row">
-            <input type="number" class="date-part" id="partner-day" placeholder="DD" min="1" max="31" inputmode="numeric">
-            <span class="date-sep">/</span>
-            <input type="number" class="date-part" id="partner-month" placeholder="MM" min="1" max="12" inputmode="numeric">
-            <span class="date-sep">/</span>
-            <input type="number" class="date-part year" id="partner-year" placeholder="YYYY" min="1920" max="2030" inputmode="numeric">
-          </div>
-          <div class="compat-extras-row">
-            <input type="time" id="partner-time" class="time-input compat-time" placeholder="Time">
-            <select id="partner-blood" class="select-input compat-blood">
-              <option value="">Blood</option>
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="AB">AB</option>
-              <option value="O">O</option>
-            </select>
-          </div>
-          <button class="btn-primary btn-full" onclick="haptic(10); checkCompatibility()" style="margin-top:12px">
-            <span class="en">Check Compatibility</span><span class="zh hide">查看合婚</span><span class="th hide">ตรวจความเข้ากัน</span>
-          </button>
+          <form id="partner-form" class="bazi-mini-form" onsubmit="event.preventDefault(); haptic(10); checkCompatibility();">
+            <div class="field">
+              <label><span class="en">Name <span class="label-opt">optional</span></span><span class="zh hide">姓名 <span class="label-opt">选填</span></span><span class="th hide">ชื่อ <span class="label-opt">ไม่บังคับ</span></span></label>
+              <input type="text" id="partner-name" placeholder="Partner's name" autocomplete="off" spellcheck="false" data-1p-ignore data-lpignore="true">
+            </div>
+            <div class="field field-date-block">
+              <div class="datetime-labels">
+                <label for="partner-day"><span class="en">Date of Birth <span class="label-req">*Required</span></span><span class="zh hide">出生日期 <span class="label-req">*必填</span></span><span class="th hide">วันเกิด <span class="label-req">*จำเป็น</span></span></label>
+                <label for="partner-time" class="time-label"><span class="en">Birth time <span class="label-opt">local clock</span></span><span class="zh hide">出生时间 <span class="label-opt">当地钟点</span></span><span class="th hide">เวลาเกิด <span class="label-opt">นาฬิกาท้องถิ่น</span></span></label>
+              </div>
+              <div class="field-row field-datetime">
+                <div class="field-col field-col-date">
+                  <div class="date-trio">
+                    <input type="number" id="partner-day" class="date-part" placeholder="DD" min="1" max="31" inputmode="numeric">
+                    <span class="date-sep">/</span>
+                    <input type="number" id="partner-month" class="date-part" placeholder="MM" min="1" max="12" inputmode="numeric">
+                    <span class="date-sep">/</span>
+                    <input type="number" id="partner-year" class="date-part year" placeholder="YYYY" min="1900" max="2100" inputmode="numeric">
+                  </div>
+                  <div class="cal-seg" role="radiogroup" aria-label="Partner calendar type">
+                    <button type="button" class="cal-seg-btn active" id="partner-cal-solar" role="radio" aria-checked="true" onclick="setPartnerCalendarType('solar')">
+                      <span aria-hidden="true">☀️</span>
+                      <span class="en">Solar</span><span class="zh hide">阳历</span><span class="th hide">สุริยคติ</span>
+                    </button>
+                    <button type="button" class="cal-seg-btn" id="partner-cal-lunar" role="radio" aria-checked="false" onclick="setPartnerCalendarType('lunar')">
+                      <span aria-hidden="true">🌙</span>
+                      <span class="en">Lunar</span><span class="zh hide">农历</span><span class="th hide">จันทรคติ</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="field-col field-col-time">
+                  <input type="time" id="partner-time" class="time-input">
+                  <label class="time-unknown-opt">
+                    <input type="checkbox" id="partner-time-unknown" onchange="onPartnerTimeUnknownToggle()">
+                    <span class="en">Time unknown</span><span class="zh hide">时间未知</span><span class="th hide">ไม่ทราบเวลา</span>
+                  </label>
+                </div>
+              </div>
+              <p class="field-hint">
+                <span class="en">Most hospital / passport dates are Solar. Use Lunar only if the birth date was recorded on the Chinese calendar.</span>
+                <span class="zh hide">医院与护照上的日期多为阳历。仅当出生日期记在农历上时，才选择农历。</span>
+                <span class="th hide">วันที่ในโรงพยาบาลหรือพาสปอร์ตส่วนใหญ่เป็นสุริยคติ ใช้จันทรคติเมื่อบันทึกวันเกิดเป็นปฏิทินจีนเท่านั้น</span>
+              </p>
+              <label class="leap-opt hide" id="partner-leap-month-wrap">
+                <input type="checkbox" id="partner-leap-month">
+                <span class="en">Leap month</span>
+                <span class="zh hide">闰月</span>
+                <span class="th hide">เดือนอธิกมาส</span>
+              </label>
+            </div>
+            <div class="field field-row">
+              <div class="field-col">
+                <label><span class="en">Birth City <span class="label-opt">geographic energy</span></span><span class="zh hide">出生城市 <span class="label-opt">地理能量</span></span><span class="th hide">เมืองเกิด <span class="label-opt">พลังงานภูมิศาสตร์</span></span></label>
+                <div class="city-wrap">
+                  <input type="text" id="partner-birthplace" placeholder="Start typing a city..." autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="partner-city-suggest">
+                  <ul id="partner-city-suggest" class="city-suggest hide" role="listbox"></ul>
+                </div>
+              </div>
+              <div class="field-col">
+                <label><span class="en">Blood Type <span class="label-opt">personality traits</span></span><span class="zh hide">血型 <span class="label-opt">性格特征</span></span><span class="th hide">หมู่เลือด <span class="label-opt">ลักษณะนิสัย</span></span></label>
+                <select id="partner-blood" class="select-input">
+                  <option value="">Unknown</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="AB">AB</option>
+                  <option value="O">O</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label><span class="en">Gender <span class="label-opt">Feng Shui</span></span><span class="zh hide">性别 <span class="label-opt">风水</span></span><span class="th hide">เพศ <span class="label-opt">ฮวงจุ้ย</span></span></label>
+              <div class="gender-row">
+                <label class="gender-opt"><input type="radio" name="partner-gender" value="M"> ♂ <span class="en">Male</span><span class="zh hide">男</span><span class="th hide">ชาย</span></label>
+                <label class="gender-opt"><input type="radio" name="partner-gender" value="F"> ♀ <span class="en">Female</span><span class="zh hide">女</span><span class="th hide">หญิง</span></label>
+              </div>
+            </div>
+            <button type="submit" class="btn-primary btn-full">
+              <span class="en">Check Compatibility</span><span class="zh hide">查看合婚</span><span class="th hide">ตรวจความเข้ากัน</span>
+            </button>
+          </form>
           <div id="compat-result"></div>
         </div>
       </section>
@@ -1406,6 +1530,8 @@
             <span class="en">New Reading</span><span class="zh hide">重新算命</span><span class="th hide">ดูดวงใหม่</span>
           </button>
           <span class="footer-dot">·</span>
+          <a href="/about" class="footer-link"><span class="en">Master Alice</span><span class="zh hide">Master Alice</span><span class="th hide">มาสเตอร์อลิซ</span></a>
+          <span class="footer-dot">·</span>
           <a href="/privacy" class="footer-link"><span class="en">Privacy</span><span class="zh hide">隐私</span><span class="th hide">ความเป็นส่วนตัว</span></a>
           <span class="footer-dot">·</span>
           <a href="/terms" class="footer-link"><span class="en">Terms</span><span class="zh hide">条款</span><span class="th hide">ข้อกำหนด</span></a>
@@ -1416,6 +1542,10 @@
         </div>
         <p class="footer-copy">© 2026 Wobazi. <span class="en">All rights reserved.</span><span class="zh hide">保留所有权利。</span><span class="th hide">สงวนลิขสิทธิ์</span></p>
         <p class="footer-disclaimer"><span class="en">For entertainment &amp; self-reflection purposes only. Not a substitute for professional advice.</span><span class="zh hide">仅供娱乐与自我反思。不能替代专业建议。</span><span class="th hide">เพื่อความบันเทิงและการใคร่ครวญเท่านั้น ไม่ใช่คำแนะนำจากผู้เชี่ยวชาญ</span></p>
+        <a class="footer-udestiny results-udestiny" href="https://www.udestinyglobal.com/en" target="_blank" rel="noopener">
+          <img src="/app/assets/brand/udestiny-logo.png" alt="U Destiny" class="udestiny-logo">
+          <span class="en">A U Destiny product</span><span class="zh hide">U Destiny 旗下产品</span><span class="th hide">ผลิตภัณฑ์จาก U Destiny</span>
+        </a>
       </footer>
     </div>
   </div>
@@ -1461,20 +1591,47 @@
     </div>
   </div>
 
-  <!-- SHARE OVERLAY -->
-  <div id="share-overlay" class="share-overlay hide">
-    <div class="share-backdrop" onclick="closeShare()"></div>
-    <div class="share-panel">
-      <div class="share-card-preview" id="share-card-preview"></div>
-      <div class="share-buttons">
-        <button class="btn-share-action primary-share" onclick="doShare()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          <span class="en">Share My Reading</span><span class="zh hide">分享我的命运</span><span class="th hide">แชร์การอ่านของฉัน</span>
-        </button>
-        <button class="btn-share-action secondary-share" onclick="closeShare()"><span class="en">Close</span><span class="zh hide">关闭</span><span class="th hide">ปิด</span></button>
+  <!-- SHARE OVERLAY (legacy shell kept for closeShare) -->
+  <div id="share-overlay" class="share-overlay hide"></div>
+
+  <div id="viral-overlay" class="viral-overlay hide">
+    <div class="viral-backdrop" onclick="closeViralShare()"></div>
+    <div class="viral-sheet">
+      <div class="viral-handle"></div>
+      <div class="viral-top">
+        <p class="viral-kicker">WOBAZI ✦ <span class="en">Share a verdict</span><span class="zh hide">分享判词</span><span class="th hide">แชร์คำตัดสิน</span></p>
+        <button type="button" class="viral-x" onclick="closeViralShare()" aria-label="Close">×</button>
+      </div>
+      <div class="viral-tones" role="tablist">
+        <button type="button" class="viral-chip is-on" data-viral-tone="oracle">Oracle</button>
+        <button type="button" class="viral-chip" data-viral-tone="roast">Roast</button>
+        <button type="button" class="viral-chip" data-viral-tone="power">Power</button>
+      </div>
+      <div class="viral-kinds" role="tablist">
+        <button type="button" class="viral-chip is-on" data-viral-kind="today"><span class="en">Today</span><span class="zh hide">今日</span><span class="th hide">วันนี้</span></button>
+        <button type="button" class="viral-chip" data-viral-kind="year"><span class="en">Year</span><span class="zh hide">流年</span><span class="th hide">ปีนี้</span></button>
+        <button type="button" class="viral-chip" data-viral-kind="both"><span class="en">Both</span><span class="zh hide">双卡</span><span class="th hide">ทั้งคู่</span></button>
+      </div>
+      <div id="viral-preview" class="viral-preview"></div>
+      <label class="viral-cap-label"><span class="en">Caption</span><span class="zh hide">文案</span><span class="th hide">แคปชัน</span></label>
+      <textarea id="viral-caption" class="viral-caption" rows="3" maxlength="180"></textarea>
+      <p class="viral-disc"><span class="en">Terrain, not a prison sentence. Day Master only — no birth date.</span><span class="zh hide">地形，不是徒刑。只含日主，不含生日。</span><span class="th hide">ภูมิประเทศ ไม่ใช่คุก มีแค่วันมาสเตอร์ ไม่มีวันเกิด</span></p>
+      <button type="button" class="btn-primary btn-full" data-viral-native>
+        <span class="en">Share</span><span class="zh hide">分享</span><span class="th hide">แชร์</span>
+      </button>
+      <div class="viral-actions">
+        <button type="button" data-viral-social="ig">Stories</button>
+        <button type="button" data-viral-social="x">X</button>
+        <button type="button" data-viral-social="line">LINE</button>
+        <button type="button" data-viral-social="facebook">Facebook</button>
+        <button type="button" data-viral-social="whatsapp">WhatsApp</button>
+        <button type="button" data-viral-copy-img>Copy image</button>
+        <button type="button" data-viral-copy-link>Copy link</button>
+        <button type="button" data-viral-download>Download PNG</button>
       </div>
     </div>
   </div>
+  <div id="viral-toast" class="viral-toast"></div>
 
   <!-- TIP OVERLAY -->
   <div id="tip-overlay" class="tip-overlay">
@@ -1533,7 +1690,9 @@
     </div>
   </div>
 
-  <script src="/bazi-engine.js?v=1"></script>
-  <script src="/app/script.js?v=26"></script>
+  <script src="/bazi-engine.js?v=2"></script>
+  <script src="/verdict.js?v=2"></script>
+  <script src="/app/script.js?v=29"></script>
+  <script src="/app/share-viral.js?v=2"></script>
 </body>
 </html>
