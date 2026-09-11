@@ -4620,7 +4620,7 @@ function showAuthState() {
   const welcomeEl = document.getElementById('splash-welcome');
   if (welcomeEl) {
     const avatarHtml = _currentUser.avatar
-      ? `<img src="${_currentUser.avatar}" class="splash-welcome-avatar" referrerpolicy="no-referrer">`
+      ? `<img src="${_currentUser.avatar}" class="splash-welcome-avatar" alt="" referrerpolicy="no-referrer">`
       : '';
     welcomeEl.innerHTML = `${avatarHtml}${_t('Welcome back, ' + _currentUser.name, '欢迎回来，' + _currentUser.name, 'ยินดีต้อนรับกลับ, ' + _currentUser.name)}`;
   }

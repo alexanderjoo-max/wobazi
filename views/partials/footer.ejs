@@ -33,3 +33,18 @@
     <p>&copy; <%= new Date().getFullYear() %> WoBazi. <span data-i18n="footer.copy">All rights reserved.</span></p>
   </div>
 </footer>
+
+<!-- Sticky mobile CTA: hidden while the footer is on screen -->
+<a href="/?begin=1" class="sticky-cta" id="seo-sticky-cta">
+  <span data-i18n="nav.begin">Plot Your Chart</span>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+</a>
+<script>
+  (function () {
+    const cta = document.getElementById('seo-sticky-cta');
+    const foot = document.querySelector('.seo-footer');
+    if (!cta) return;
+    if (!foot || !('IntersectionObserver' in window)) { cta.classList.add('is-on'); return; }
+    new IntersectionObserver(([e]) => cta.classList.toggle('is-on', !e.isIntersecting)).observe(foot);
+  })();
+</script>

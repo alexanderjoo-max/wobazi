@@ -54,11 +54,25 @@
   <meta name="twitter:title"       content="Wobazi ✦ Your Chinese Destiny">
   <meta name="twitter:description" content="Discover your Bāzì chart, zodiac animal, Chinese destiny name, and fortune reading. What does your birth date reveal?">
   <meta name="twitter:image"       content="https://wobazi.com/og-card.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "Is Wobazi free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Plotting your chart is free and needs no account. Sign in with Google only if you want to save your chart and history." } },
+      { "@type": "Question", "name": "What if I don't know my birth time?", "acceptedAnswer": { "@type": "Answer", "text": "Tick \"Time unknown\". You still get your Year, Month and Day pillars, including your Day Master. Only the Hour pillar is left out." } },
+      { "@type": "Question", "name": "Can I enter a lunar (农历) birthday?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Choose Lunar on the form, leap months included, and Wobazi converts it to the solar date before plotting." } },
+      { "@type": "Question", "name": "How accurate is the chart?", "acceptedAnswer": { "@type": "Answer", "text": "It follows classical 排盘 rules: the year turns at 立春 (Start of Spring), months follow the 12 solar terms, and the day changes at midnight. It uses your local clock time, not true solar time." } },
+      { "@type": "Question", "name": "Who is behind Wobazi?", "acceptedAnswer": { "@type": "Answer", "text": "Master Alice, a Bangkok-based BaZi and Feng Shui master with 15+ years of practice. Wobazi is her reading, from U Destiny." } },
+      { "@type": "Question", "name": "Is my birth data private?", "acceptedAnswer": { "@type": "Answer", "text": "As a guest, your chart stays in your browser. If you sign in, it is saved to your account so you can come back to it. Share cards show your Day Master only, never your birth date." } }
+    ]
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=50">
+  <link rel="stylesheet" href="/app/style.css?v=51">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
     html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
@@ -179,7 +193,13 @@
             <span class="en">New reading</span><span class="zh hide">新的解读</span><span class="th hide">ดูดวงใหม่</span>
           </button>
         </div>
-        <p class="splash-google-hint"><span class="en">Free · No account needed · Sign in to save your chart &amp; history</span><span class="zh hide">免费 · 无需账号 · 登录即可保存命盘与记录</span><span class="th hide">ฟรี · ไม่ต้องมีบัญชี · เข้าสู่ระบบเพื่อบันทึกดวงและประวัติ</span></p>
+        <div class="usp-row" role="note">
+          <span class="usp-item"><span class="en">Free, no account needed</span><span class="zh hide">免费，无需账号</span><span class="th hide">ฟรี ไม่ต้องมีบัญชี</span></span>
+          <span class="usp-item"><span class="en">Your chart in seconds</span><span class="zh hide">几秒出盘</span><span class="th hide">ได้แผนภูมิในไม่กี่วินาที</span></span>
+          <span class="usp-item"><span class="en">Solar or lunar birth dates</span><span class="zh hide">公历或农历生日</span><span class="th hide">วันเกิดสุริยคติหรือจันทรคติ</span></span>
+          <span class="usp-item"><a href="/Master-Alice.html"><span class="en">Read by Master Alice</span><span class="zh hide">Master Alice 解读</span><span class="th hide">อ่านโดยมาสเตอร์อลิซ</span></a></span>
+        </div>
+        <p class="splash-google-hint"><span class="en">Sign in to save your chart &amp; history</span><span class="zh hide">登录即可保存命盘与记录</span><span class="th hide">เข้าสู่ระบบเพื่อบันทึกดวงและประวัติ</span></p>
       </section>
 
       <!-- Returning user (authed only) -->
@@ -312,6 +332,35 @@
         </blockquote>
 
         <p class="splash-learn"><a href="/what-is-bazi" class="btn-about-link"><span class="en">Read the full guide →</span><span class="zh hide">阅读完整指南 →</span><span class="th hide">อ่านคู่มือฉบับเต็ม →</span></a></p>
+      </section>
+
+      <!-- FAQ (mirrors the FAQPage JSON-LD in <head>) -->
+      <section class="splash-faq" aria-labelledby="splash-faq-title">
+        <h2 id="splash-faq-title"><span class="en">Questions</span><span class="zh hide">常见问题</span><span class="th hide">คำถามที่พบบ่อย</span></h2>
+        <details>
+          <summary><span class="en">Is Wobazi free?</span><span class="zh hide">Wobazi 免费吗？</span><span class="th hide">Wobazi ฟรีไหม?</span></summary>
+          <p><span class="en">Yes. Plotting your chart is free and needs no account. Sign in with Google only if you want to save your chart and history.</span><span class="zh hide">是的。排盘免费，无需账号。只有想保存命盘与记录时，才需要用 Google 登录。</span><span class="th hide">ฟรี จัดแผนภูมิได้โดยไม่ต้องมีบัญชี ล็อกอินด้วย Google เฉพาะเมื่ออยากบันทึกดวงและประวัติ</span></p>
+        </details>
+        <details>
+          <summary><span class="en">What if I don’t know my birth time?</span><span class="zh hide">不知道出生时间怎么办？</span><span class="th hide">ไม่รู้เวลาเกิดทำอย่างไร?</span></summary>
+          <p><span class="en">Tick “Time unknown”. You still get your Year, Month and Day pillars, including your Day Master. Only the Hour pillar is left out.</span><span class="zh hide">勾选“时间未知”。你仍会得到年、月、日三柱，包括你的日主；只有时柱会空着。</span><span class="th hide">ติ๊ก “ไม่ทราบเวลา” คุณยังได้เสาปี เดือน และวัน รวมถึงวันมาสเตอร์ มีเพียงเสายามที่เว้นไว้</span></p>
+        </details>
+        <details>
+          <summary><span class="en">Can I enter a lunar (农历) birthday?</span><span class="zh hide">可以用农历生日吗？</span><span class="th hide">ใช้วันเกิดจันทรคติได้ไหม?</span></summary>
+          <p><span class="en">Yes. Choose Lunar on the form, leap months included, and Wobazi converts it to the solar date before plotting.</span><span class="zh hide">可以。在表单选择农历（含闰月），Wobazi 会先换算成公历再排盘。</span><span class="th hide">ได้ เลือกจันทรคติในฟอร์ม (รวมเดือนอธิกมาส) Wobazi จะแปลงเป็นวันสุริยคติก่อนจัดแผนภูมิ</span></p>
+        </details>
+        <details>
+          <summary><span class="en">How accurate is the chart?</span><span class="zh hide">命盘准确吗？</span><span class="th hide">แผนภูมิแม่นแค่ไหน?</span></summary>
+          <p><span class="en">It follows classical 排盘 rules: the year turns at 立春 (Start of Spring), months follow the 12 solar terms, and the day changes at midnight. It uses your local clock time, not true solar time.</span><span class="zh hide">按传统排盘规则：年柱以立春为界，月柱按十二节，日柱以子夜为界。使用当地钟表时间，不做真太阳时校正。</span><span class="th hide">ใช้กฎจัดดวงแบบดั้งเดิม: ปีเปลี่ยนที่ลี่ชุน (立春) เดือนตาม 12 สารท และวันเปลี่ยนตอนเที่ยงคืน ใช้เวลานาฬิกาท้องถิ่น ไม่ใช่เวลาสุริยะจริง</span></p>
+        </details>
+        <details>
+          <summary><span class="en">Who is behind Wobazi?</span><span class="zh hide">Wobazi 背后是谁？</span><span class="th hide">ใครอยู่เบื้องหลัง Wobazi?</span></summary>
+          <p><span class="en"><a href="/Master-Alice.html">Master Alice</a>, a Bangkok-based BaZi and Feng Shui master with 15+ years of practice. Wobazi is her reading, from U Destiny.</span><span class="zh hide"><a href="/Master-Alice.html">Master Alice</a>，曼谷的八字与风水老师，执业 15 年以上。Wobazi 是她的解读，来自 U Destiny。</span><span class="th hide"><a href="/Master-Alice.html">มาสเตอร์อลิซ</a> ซินแสปาจื้อและฮวงจุ้ยในกรุงเทพฯ ประสบการณ์กว่า 15 ปี Wobazi คือการอ่านของเธอ จาก U Destiny</span></p>
+        </details>
+        <details>
+          <summary><span class="en">Is my birth data private?</span><span class="zh hide">我的出生资料安全吗？</span><span class="th hide">ข้อมูลวันเกิดปลอดภัยไหม?</span></summary>
+          <p><span class="en">As a guest, your chart stays in your browser. If you sign in, it’s saved to your account so you can come back to it. Share cards show your Day Master only, never your birth date. See our <a href="/privacy">Privacy Policy</a>.</span><span class="zh hide">未登录时，命盘只保存在你的浏览器里。登录后会存进你的账号，方便下次回来。分享卡只显示日主，绝不显示生日。详见<a href="/privacy">隐私政策</a>。</span><span class="th hide">ถ้าไม่ล็อกอิน แผนภูมิจะอยู่ในเบราว์เซอร์ของคุณเท่านั้น ถ้าล็อกอินจะบันทึกไว้ในบัญชีเพื่อกลับมาดูได้ การ์ดแชร์แสดงแค่วันมาสเตอร์ ไม่เคยแสดงวันเกิด ดู<a href="/privacy">นโยบายความเป็นส่วนตัว</a></span></p>
+        </details>
       </section>
 
       <!-- Final CTA -->
@@ -1591,6 +1640,12 @@
     </div>
   </div>
 
+  <!-- Sticky mobile CTA for the landing (shown by the script at the end of <body>) -->
+  <button type="button" id="landing-sticky-cta" class="sticky-cta" onclick="haptic(12); onLandingPrimary()">
+    <span class="en">Plot Your Chart</span><span class="zh hide">排出你的命盘</span><span class="th hide">จัดแผนภูมิของคุณ</span>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </button>
+
   <!-- SHARE OVERLAY (legacy shell kept for closeShare) -->
   <div id="share-overlay" class="share-overlay hide"></div>
 
@@ -1687,7 +1742,29 @@
 
   <script src="/bazi-engine.js?v=2"></script>
   <script src="/verdict.js?v=2"></script>
-  <script src="/app/script.js?v=29"></script>
+  <script src="/app/script.js?v=30"></script>
   <script src="/app/share-viral.js?v=4"></script>
+  <script>
+    // Landing sticky CTA: appears once the hero CTA scrolls away, hides at the final CTA and off the landing.
+    (function () {
+      const splash = document.getElementById('splash');
+      const cta = document.getElementById('landing-sticky-cta');
+      const hero = document.getElementById('splash-cta-wrap');
+      const fin = document.querySelector('.splash-final-cta');
+      if (!splash || !cta || !hero || !('IntersectionObserver' in window)) return;
+      const seen = new Map();
+      function update() {
+        const on = splash.classList.contains('active') && seen.get(hero) === false && seen.get(fin) !== true;
+        cta.classList.toggle('is-on', on);
+      }
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => seen.set(e.target, e.isIntersecting));
+        update();
+      }, { root: splash });
+      io.observe(hero);
+      if (fin) io.observe(fin);
+      new MutationObserver(update).observe(splash, { attributes: true, attributeFilter: ['class'] });
+    })();
+  </script>
 </body>
 </html>
