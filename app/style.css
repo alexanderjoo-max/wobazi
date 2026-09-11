@@ -5671,47 +5671,65 @@ a.footer-udestiny span {
 .viral-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.72); backdrop-filter: blur(10px); }
 .viral-sheet {
   position: relative; z-index: 1;
-  max-height: 92dvh;
+  width: 100%; max-width: 520px; margin: 0 auto;
+  max-height: 94dvh;
   overflow-y: auto;
-  background: #120e1c;
-  border-top: 1px solid rgba(240,192,64,0.28);
-  border-radius: 24px 24px 0 0;
-  padding: 12px 18px 32px;
-  display: flex; flex-direction: column; gap: 10px;
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(123,58,140,0.35), transparent 60%),
+    linear-gradient(180deg, #1d0f2a, #0e0718 55%, #07030d);
+  border: 1px solid rgba(232,194,106,0.28);
+  border-bottom: 0;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -30px 80px rgba(0,0,0,0.6);
+  padding: 12px 20px calc(28px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: 12px;
+  animation: viralRise 0.42s cubic-bezier(.2,.8,.2,1);
 }
+@keyframes viralRise { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 .viral-handle { width: 40px; height: 4px; border-radius: 4px; background: var(--w2); margin: 4px auto 8px; }
 .viral-top { display: flex; align-items: center; justify-content: space-between; }
 .viral-kicker { font-size: 11px; letter-spacing: 0.16em; color: var(--gold); font-weight: 700; }
 .viral-x { width: 36px; height: 36px; border-radius: 50%; background: var(--w08); color: var(--text); font-size: 22px; }
-.viral-tones, .viral-kinds { display: flex; gap: 6px; }
+.viral-tones, .viral-kinds {
+  display: flex; gap: 4px; padding: 4px;
+  border-radius: 999px;
+  background: rgba(7,3,13,0.6);
+  border: 1px solid rgba(232,194,106,0.16);
+}
 .viral-chip {
   flex: 1;
-  padding: 8px 10px;
+  padding: 9px 10px;
   border-radius: 999px;
-  border: 1px solid var(--w12);
-  background: var(--w05);
-  color: var(--muted);
+  border: 0;
+  background: transparent;
+  color: var(--m6);
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: background 0.2s, color 0.2s;
 }
+.viral-chip:focus-visible { outline: 2px solid #e8c26a; outline-offset: 2px; }
 .viral-chip.is-on {
   color: #1a0a00;
-  background: linear-gradient(135deg, #f0c040, #e08020);
-  border-color: transparent;
+  background: linear-gradient(135deg, #f0d080, #e8a040);
+  box-shadow: 0 4px 16px rgba(232,194,106,0.3);
 }
 .viral-preview {
-  width: min(210px, 54vw);
+  width: min(250px, 60vw);
   aspect-ratio: 9 / 16;
   height: auto;
-  max-height: 40vh;
-  margin: 0 auto;
+  max-height: 46vh;
+  margin: 6px auto 4px;
   flex-shrink: 0;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(240,192,64,0.22);
+  border: 1px solid rgba(232,194,106,0.35);
   background: #07030f;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 60px rgba(232,194,106,0.14);
+  transform: rotate(-1.5deg);
 }
+@media (prefers-reduced-motion: reduce) { .viral-sheet { animation: none; } .viral-preview { transform: none; } }
 .viral-preview-canvas {
   display: block;
   width: 100%;
@@ -5726,16 +5744,19 @@ a.footer-udestiny span {
   color: var(--text); padding: 10px 12px; font-family: inherit; font-size: 13px;
 }
 .viral-disc { font-size: 11px; color: var(--muted); }
-.viral-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.viral-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .viral-actions button {
-  padding: 8px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--w12);
-  background: var(--w05);
+  padding: 11px 6px;
+  border-radius: 12px;
+  border: 1px solid rgba(232,194,106,0.16);
+  background: rgba(246,236,216,0.04);
   color: var(--text);
   font-family: inherit;
   font-size: 12px;
+  font-weight: 600;
+  transition: border-color 0.2s, background 0.2s;
 }
+.viral-actions button:hover, .viral-actions button:focus-visible { border-color: rgba(232,194,106,0.6); background: rgba(232,194,106,0.08); outline: none; }
 .viral-toast {
   position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
   background: #f0c040; color: #1a0a00; padding: 10px 16px; border-radius: 999px;

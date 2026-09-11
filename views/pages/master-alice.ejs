@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Noto+Serif+SC:wght@600;700&family=Noto+Serif+Thai:wght@500;700&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Master Alice",
+    "alternateName": ["Anthika Limpiananchai", "ซินแสมาสเตอร์อลิซ", "อันธิกา ลิมพ์อนันต์ชัย"],
+    "jobTitle": "Chinese Metaphysics & Destiny Master",
+    "url": "https://wobazi.com/Master-Alice.html",
+    "image": "https://wobazi.com/app/assets/brand/master-alice.jpg",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Ultimate Destiny / U Destiny",
+      "url": "https://www.udestinyglobal.com/en"
+    },
+    "address": { "@type": "PostalAddress", "addressLocality": "Bangkok", "addressCountry": "TH" },
+    "sameAs": [
+      "https://www.masteralice.com",
+      "https://www.udestinyglobal.com/en"
+    ]
+  }
+  </script>
+</head>
+<body class="seo-page ma-page">
+  <%- include('../partials/nav') %>
+<%
+  // Luopan ring: 12 earthly branches, 120 ticks. Drawn once, server-side.
+  const BR = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const C = 250;
+  function pt(r, deg) { const a = (deg - 90) * Math.PI / 180; return [(C + r * Math.cos(a)).toFixed(1), (C + r * Math.sin(a)).toFixed(1)]; }
+%>
+  <main class="ma">
+    <!-- Hero: moon gate portrait inside a luopan ring -->
+    <header class="ma-hero">
+      <div class="ma-gate">
+        <svg class="ma-ring" viewBox="0 0 500 500" aria-hidden="true">
+          <circle cx="250" cy="250" r="246" class="ma-ring-line"/>
+          <circle cx="250" cy="250" r="226" class="ma-ring-line faint"/>
+          <circle cx="250" cy="250" r="190" class="ma-ring-line"/>
+          <% for (let i = 0; i < 120; i++) { const long = i % 10 === 0; const a = pt(246, i * 3), b = pt(long ? 230 : 239, i * 3); %>
+          <line x1="<%= a[0] %>" y1="<%= a[1] %>" x2="<%= b[0] %>" y2="<%= b[1] %>" class="<%= long ? 'ma-tick long' : 'ma-tick' %>"/>
+          <% } %>
+          <% BR.forEach((ch, i) => { const p = pt(208, i * 30); %>
+          <text x="<%= p[0] %>" y="<%= p[1] %>" class="ma-branch" transform="rotate(<%= i * 30 %> <%= p[0] %> <%= p[1] %>)"><%= ch %></text>
+          <% }) %>
+        </svg>
+        <div class="ma-portrait">
+          <img src="/app/assets/brand/master-alice.jpg" alt="Master Alice — ซินแสมาสเตอร์อลิซ" width="989" height="1400">
+        </div>
+        <div class="ma-seal" aria-hidden="true"><span>八</span><span>字</span></div>
+      </div>
+
+      <div class="ma-intro">
+        <p class="ma-kicker"><span class="en">The face and engine of Wobazi</span><span class="zh hide">Wobazi 的面孔与引擎</span><span class="th hide">ใบหน้าและพลังของ Wobazi</span></p>
+        <h1 class="ma-name"><em>Master</em> Alice</h1>
+        <p class="ma-thai">ซินแสมาสเตอร์อลิซ</p>
+        <p class="ma-legal">Anthika Limpiananchai · อันธิกา ลิมพ์อนันต์ชัย · Bangkok</p>
+        <blockquote class="ma-quote">
+          <span class="en">“BaZi is a weather forecast, not a prison sentence. The chart shows the terrain — you still choose how to walk it.”</span>
+          <span class="zh hide">“八字是天气预报，不是无期徒刑。盘显示地形——怎么走，仍由你选。”</span>
+          <span class="th hide">“ปาจื้อคือพยากรณ์อากาศ ไม่ใช่คำพิพากษา แผนภูมิชี้ภูมิประเทศ — คุณยังเลือกวิธีเดินเอง”</span>
+        </blockquote>
+      </div>
+    </header>
+
+    <!-- Why -->
+    <section class="ma-why">
+      <h2 class="ma-h2"><span class="en">Why Wobazi exists</span><span class="zh hide">Wobazi 为何存在</span><span class="th hide">ทำไม Wobazi ถึงมีอยู่</span></h2>
+      <p class="ma-lede">
+        <span class="en">Master Alice is a Bangkok-based Chinese metaphysics teacher, destiny consultant, and corporate trainer. Wobazi is her BaZi reading — the Four Pillars, drawn from the moment you were born, rendered so you can actually use them.</span>
+        <span class="zh hide">Master Alice 是曼谷的中国玄学导师、命理顾问与企业培训师。Wobazi 是她的八字解读——从你诞生的那一刻排出四柱，写成你可以真正使用的东西。</span>
+        <span class="th hide">ซินแสมาสเตอร์อลิซเป็นวิทยากรศาสตร์จีน ที่ปรึกษาโชคชะตา และวิทยากรองค์กรในกรุงเทพฯ Wobazi คือการอ่านปาจื้อของเธอ — สี่เสาจากวินาทีที่คุณเกิด เขียนให้นำไปใช้ได้จริง</span>
+      </p>
+    </section>
+
+    <!-- Credentials as a Four Pillars chart -->
+    <section class="ma-chart-wrap" aria-labelledby="ma-chart-title">
+      <h2 class="ma-h2" id="ma-chart-title"><span class="en">Her path, read as a chart</span><span class="zh hide">把她的路，排成一张盘</span><span class="th hide">เส้นทางของเธอ อ่านเป็นแผนภูมิ</span></h2>
+      <p class="ma-chart-note">
+        <span class="en">In BaZi the Year pillar holds your roots, Month your working life, Day your self, and Hour what you leave behind. Read right to left, the way a chart is written.</span>
+        <span class="zh hide">八字中，年柱是根，月柱是事业，日柱是自己，时柱是你留下的。像命盘一样，由右往左读。</span>
+        <span class="th hide">ในปาจื้อ เสาปีคือราก เสาเดือนคือชีวิตการงาน เสาวันคือตัวตน เสายามคือสิ่งที่ทิ้งไว้ อ่านจากขวาไปซ้ายแบบแผนภูมิจริง</span>
+      </p>
+
+      <ol class="ma-chart">
+        <li class="ma-pillar">
+          <div class="ma-pillar-head"><span class="ma-han">年</span><span class="ma-pillar-name"><span class="en">Year · Roots</span><span class="zh hide">年柱 · 根</span><span class="th hide">ปี · ราก</span></span></div>
+          <ul>
+            <li><span class="en">M.A. Communication Arts, Bangkok University</span><span class="zh hide">曼谷大学传播艺术硕士</span><span class="th hide">ปริญญาโทนิเทศศาสตร์ มหาวิทยาลัยกรุงเทพ</span></li>
+            <li><span class="en">B.A. Mass Communication, Kasetsart University</span><span class="zh hide">农业大学大众传播学士</span><span class="th hide">ปริญญาตรีสื่อสารมวลชน มหาวิทยาลัยเกษตรศาสตร์</span></li>
+            <li><span class="en">MSc Marketing (semester), Leeds Metropolitan University</span><span class="zh hide">英国利兹城市大学市场营销硕士课程（一学期）</span><span class="th hide">MSc Marketing (ภาคเรียน) Leeds Metropolitan University</span></li>
+          </ul>
+        </li>
+        <li class="ma-pillar">
+          <div class="ma-pillar-head"><span class="ma-han">月</span><span class="ma-pillar-name"><span class="en">Month · Career</span><span class="zh hide">月柱 · 事业</span><span class="th hide">เดือน · การงาน</span></span></div>
+          <ul>
+            <li><span class="en">Former marketing communications executive</span><span class="zh hide">曾任市场传播高管</span><span class="th hide">อดีตผู้บริหารงานสื่อสารการตลาด</span></li>
+            <li class="ma-brands">Huawei · JobsDB · Samsung · Lenovo · Canon · Toshiba · Grab</li>
+          </ul>
+        </li>
+        <li class="ma-pillar is-self">
+          <div class="ma-pillar-head"><span class="ma-han">日</span><span class="ma-pillar-name"><span class="en">Day · Self</span><span class="zh hide">日柱 · 自己</span><span class="th hide">วัน · ตัวตน</span></span></div>
+          <ul>
+            <li><span class="en">15+ years in Chinese metaphysics, Feng Shui, BaZi, face reading, and destiny consulting</span><span class="zh hide">15 年以上中国玄学、风水、八字、面相与命理咨询经验</span><span class="th hide">ประสบการณ์กว่า 15 ปีในศาสตร์จีน ฮวงจุ้ย ปาจื้อ การอ่านใบหน้า และที่ปรึกษาโชคชะตา</span></li>
+            <li><span class="en">43+ professional certificates; studies in Hong Kong, Singapore, and Malaysia</span><span class="zh hide">43 余张专业证书；曾于香港、新加坡、马来西亚研修</span><span class="th hide">ประกาศนียบัตรวิชาชีพกว่า 43 ใบ ศึกษาที่ฮ่องกง สิงคโปร์ และมาเลเซีย</span></li>
+            <li><span class="en">Certified Thai Birkman practitioner; certified Sound Healing trainer</span><span class="zh hide">认证 Thai Birkman 解读与咨询师；认证声音疗愈导师</span><span class="th hide">Certified Thai Birkman Practitioner และ Sound Healing Trainer</span></li>
+          </ul>
+        </li>
+        <li class="ma-pillar">
+          <div class="ma-pillar-head"><span class="ma-han">时</span><span class="ma-pillar-name"><span class="en">Hour · Legacy</span><span class="zh hide">时柱 · 传承</span><span class="th hide">ยาม · สิ่งที่ส่งต่อ</span></span></div>
+          <ul>
+            <li><span class="en">10,000+ students and clients across 35+ countries</span><span class="zh hide">学员与客户逾一万人，遍及 35 余国</span><span class="th hide">นักเรียนและลูกค้ากว่า 10,000 คน ใน 35+ ประเทศ</span></li>
+            <li><span class="en">Trainer and speaker for 70+ organizations; guest lecturer at Thai universities</span><span class="zh hide">为 70 余家机构培训与演讲；泰国大学客座讲师</span><span class="th hide">วิทยากรให้กว่า 70 องค์กร และอาจารย์พิเศษในมหาวิทยาลัยไทย</span></li>
+            <li><span class="en">Wobazi — her reading, in your pocket</span><span class="zh hide">Wobazi——她的解读，在你口袋里</span><span class="th hide">Wobazi — การอ่านของเธอ อยู่ในกระเป๋าคุณ</span></li>
+          </ul>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Ultimate Destiny -->
+    <section class="ma-house">
+      <img src="/app/assets/brand/udestiny-logo.png" alt="U Destiny" class="ma-house-logo">
+      <div>
+        <h2 class="ma-h2">Ultimate Destiny</h2>
+        <p>
+          <span class="en">Wobazi is a product of Ultimate Destiny — Master Alice’s Bangkok practice for human potential and organizational development through BaZi and Eastern metaphysics. U Destiny is the AI astrology platform in that family; Wobazi is the BaZi chart you hold in your hand.</span>
+          <span class="zh hide">Wobazi 是 Ultimate Destiny 旗下产品——Master Alice 在曼谷以八字与东方玄学做潜能与组织发展的实践。U Destiny 是这一体系中的 AI 占星平台；Wobazi 是你手里的八字命盘。</span>
+          <span class="th hide">Wobazi เป็นผลิตภัณฑ์ของ Ultimate Destiny — งานของมาสเตอร์อลิซในกรุงเทพฯ ด้านศักยภาพมนุษย์และการพัฒนาองค์กรด้วยปาจื้อและอภิปรัชญาตะวันออก U Destiny คือแพลตฟอร์มโหราศาสตร์ AI ในครอบครัวนั้น Wobazi คือแผนปาจื้อที่คุณถืออยู่</span>
+        </p>
+        <p class="ma-links">
+          <a href="https://www.udestinyglobal.com/en" target="_blank" rel="noopener">udestinyglobal.com ↗</a>
+          <a href="https://www.masteralice.com" target="_blank" rel="noopener">masteralice.com ↗</a>
+        </p>
+      </div>
+    </section>
+
+    <div class="ma-cta">
+      <p class="ma-cta-line"><span class="en">Your four pillars are waiting.</span><span class="zh hide">你的四柱在等你。</span><span class="th hide">สี่เสาของคุณรออยู่</span></p>
+      <a href="/?begin=1" class="btn-primary" data-i18n="cta.begin">Plot Your Chart</a>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

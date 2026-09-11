@@ -82,7 +82,7 @@
       state.comboYear = null;
     }
     drawPreview();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawPreview);
+    ensureFonts(state.verdict).then(drawPreview);
     const cap = document.getElementById('viral-caption');
     if (cap) cap.value = WobaziVerdict.caption(state.verdict, shareUrl());
   }
@@ -95,125 +95,336 @@
     return location.origin + '/s/' + id;
   }
 
-  function drawCard(ctx, w, h, v, y0) {
-    const accent = EL_HEX[v.accentEl] || '#f0c040';
-    y0 = y0 || 0;
-    const pad = Math.round(w * 0.08);
-    ctx.fillStyle = '#07030f';
-    ctx.fillRect(0, y0, w, h);
-    const g = ctx.createLinearGradient(0, y0, w * 0.2, y0 + h * 0.55);
-    g.addColorStop(0, '#1a1028');
-    g.addColorStop(0.45, '#0c0814');
-    g.addColorStop(1, '#07030f');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, y0, w, h);
-    ctx.fillStyle = accent;
-    ctx.globalAlpha = 0.14;
-    ctx.beginPath();
-    ctx.arc(w * 0.92, y0 + h * 0.08, w * 0.42, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
+  /* ── Oracle-slip card: luopan dial, cinnabar seal, serif verdict ── */
+  const GOLD = '#e8c26a';
+  const PAPER = '#f6ecd8';
+  const CINNABAR = '#c8412c';
+  const DISPLAY = '"Bodoni Moda", "Noto Serif SC", "Noto Serif Thai", Georgia, serif';
+  const HAN = '"Noto Serif SC", "Noto Sans SC", serif';
+  const SANS = 'Outfit, "Noto Sans SC", "Noto Sans Thai", sans-serif';
+  const BRANCH_CHARS = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const SEAL_ZH = { Peak: ['巅', '峰'], Open: ['开', '运'], Friction: ['冲'], Hidden: ['暗', '助'] };
+  const TONE_LABEL = { oracle: 'Oracle', roast: 'Roast', power: 'Power' };
+  const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
-    let y = y0 + Math.round(h * 0.055);
-    ctx.fillStyle = '#f0c040';
-    ctx.font = '700 26px Outfit, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('WOBAZI ✦', pad, y);
-    ctx.fillStyle = 'rgba(240,240,255,0.42)';
-    ctx.font = '600 20px Outfit, sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText((v.kind === 'year' ? (v.yearLabel || 'YEAR') : 'TODAY').toUpperCase(), w - pad, y);
-    ctx.textAlign = 'left';
-
-    y += Math.round(h * 0.09);
-    const glyph = Math.round(h * 0.13);
-    ctx.fillStyle = accent;
-    ctx.font = '700 ' + glyph + 'px "Noto Serif SC", "Noto Sans SC", serif';
-    ctx.fillText(v.dmChar || '八', pad, y + glyph * 0.82);
-    const metaX = pad + Math.round(glyph * 1.15);
-    ctx.fillStyle = 'rgba(240,240,255,0.45)';
-    ctx.font = '600 18px Outfit, sans-serif';
-    ctx.fillText('DAY MASTER', metaX, y + glyph * 0.28);
-    ctx.fillStyle = '#f0f0ff';
-    ctx.font = '700 40px "Noto Serif SC", "Noto Sans SC", serif';
-    const strip = v.kind === 'year' ? (v.flowYearChars || v.yearChars) : (v.todayChars || v.dayChars);
-    ctx.fillText(strip || '', metaX, y + glyph * 0.55);
-    if (v.name) {
-      ctx.fillStyle = 'rgba(240,240,255,0.45)';
-      ctx.font = '500 22px Outfit, sans-serif';
-      ctx.fillText(v.name, metaX, y + glyph * 0.74);
-    }
-
-    y += glyph + Math.round(h * 0.045);
-    const weather = (v.weatherLabel || v.weather || '').toUpperCase();
-    ctx.font = '700 18px Outfit, sans-serif';
-    const ww = ctx.measureText(weather).width + 32;
-    ctx.strokeStyle = accent;
-    ctx.lineWidth = 2;
-    ctx.strokeRect(pad, y, ww, 40);
-    ctx.fillStyle = accent;
-    ctx.fillText(weather, pad + 16, y + 27);
-    y += 72;
-
-    ctx.fillStyle = '#fff8e8';
-    ctx.font = '700 48px Outfit, "Noto Serif SC", sans-serif';
-    y = wrapText(ctx, v.hook, pad, y, w - pad * 2, 56);
-    y += 22;
-    ctx.fillStyle = '#f0c040';
-    ctx.globalAlpha = 0.7;
-    ctx.fillRect(pad, y, 72, 3);
-    ctx.globalAlpha = 1;
-    y += 36;
-    ctx.fillStyle = 'rgba(240,240,255,0.8)';
-    ctx.font = '400 28px Outfit, sans-serif';
-    y = wrapText(ctx, v.body, pad, y, w - pad * 2, 38);
-    y += 28;
-    ctx.fillStyle = accent;
-    ctx.font = '700 28px Outfit, sans-serif';
-    wrapText(ctx, v.dare, pad, y, w - pad * 2, 38);
-
-    const foot = y0 + h - Math.round(h * 0.07);
-    if (v.luckPhase && v.kind === 'year') {
-      ctx.fillStyle = 'rgba(240,240,255,0.4)';
-      ctx.font = '500 20px Outfit, sans-serif';
-      ctx.fillText('大运 · ' + v.luckPhase, pad, foot - 48);
-    }
-    ctx.fillStyle = '#f0c040';
-    ctx.font = '700 22px Outfit, sans-serif';
-    ctx.fillText('wobazi.com  ·  Plot your chart', pad, foot);
-    ctx.fillStyle = 'rgba(240,240,255,0.32)';
-    ctx.font = '400 16px Outfit, sans-serif';
-    ctx.fillText('Terrain, not a prison sentence.', pad, foot + 28);
+  function rgba(hex, a) {
+    const n = parseInt(String(hex).slice(1), 16);
+    return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')';
   }
 
-  function wrapText(ctx, text, x, y, maxW, lh) {
+  function isCJK(s) { return /[฀-๿　-鿿]/.test(String(s || '')); }
+
+  /* Letter-spaced text (canvas letterSpacing is not universal yet). */
+  function spaced(ctx, text, x, y, gap, align) {
+    const chars = Array.from(String(text || ''));
+    const widths = chars.map(c => ctx.measureText(c).width);
+    const total = widths.reduce((a, b) => a + b, 0) + gap * Math.max(0, chars.length - 1);
+    let cx = align === 'center' ? x - total / 2 : (align === 'right' ? x - total : x);
+    const prev = ctx.textAlign;
+    ctx.textAlign = 'left';
+    chars.forEach((c, i) => { ctx.fillText(c, cx, y); cx += widths[i] + gap; });
+    ctx.textAlign = prev;
+    return total;
+  }
+
+  function wrapLines(ctx, text, maxW) {
     const src = String(text || '');
-    let yy = y;
-    const isCJK = /[\u0E00-\u0E7F\u4e00-\u9fff]/.test(src);
-    if (isCJK) {
-      let buf = '';
-      for (const ch of src) {
-        const test = buf + ch;
-        if (ctx.measureText(test).width > maxW && buf) {
-          ctx.fillText(buf, x, yy);
-          buf = ch;
-          yy += lh;
-        } else buf = test;
-      }
-      if (buf) { ctx.fillText(buf, x, yy); yy += lh; }
-      return yy;
-    }
+    const units = isCJK(src) && !/\s/.test(src.trim()) ? Array.from(src) : src.split(/\s+/);
+    const joiner = isCJK(src) && !/\s/.test(src.trim()) ? '' : ' ';
+    const lines = [];
     let line = '';
-    for (const word of src.split(/\s+/)) {
-      const test = line ? line + ' ' + word : word;
-      if (ctx.measureText(test).width > maxW && line) {
-        ctx.fillText(line, x, yy);
-        line = word;
-        yy += lh;
-      } else line = test;
+    units.forEach(u => {
+      const test = line ? line + joiner + u : u;
+      if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = u; }
+      else line = test;
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function grain(ctx, w, h, seed) {
+    let s = seed || 7;
+    const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 2600; i++) {
+      ctx.fillStyle = rnd() > 0.5 ? 'rgba(246,236,216,' + (0.02 + rnd() * 0.05) + ')' : 'rgba(0,0,0,' + (0.1 + rnd() * 0.15) + ')';
+      ctx.fillRect(rnd() * w, rnd() * h, 1 + rnd() * 1.6, 1 + rnd() * 1.6);
     }
-    if (line) { ctx.fillText(line, x, yy); yy += lh; }
-    return yy;
+  }
+
+  function frame(ctx, w, h) {
+    ctx.strokeStyle = rgba(GOLD, 0.55);
+    ctx.lineWidth = 2;
+    ctx.strokeRect(40, 40, w - 80, h - 80);
+    ctx.strokeStyle = rgba(GOLD, 0.2);
+    ctx.lineWidth = 1;
+    ctx.strokeRect(54, 54, w - 108, h - 108);
+    [[40, 40], [w - 40, 40], [40, h - 40], [w - 40, h - 40]].forEach(([x, y]) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = '#0e0718';
+      ctx.fillRect(-11, -11, 22, 22);
+      ctx.strokeStyle = GOLD;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(-11, -11, 22, 22);
+      ctx.fillStyle = GOLD;
+      ctx.fillRect(-4, -4, 8, 8);
+      ctx.restore();
+    });
+  }
+
+  /* Luopan: tick ring + 12 branches, the day's (or year's) branch lit in the element colour. */
+  function dial(ctx, cx, cy, R, accent, litBranch) {
+    ctx.save();
+    ctx.strokeStyle = rgba(GOLD, 0.6);
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = rgba(GOLD, 0.22);
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, R - 28, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = rgba(GOLD, 0.55);
+    ctx.beginPath(); ctx.arc(cx, cy, R * 0.66, 0, Math.PI * 2); ctx.stroke();
+    for (let i = 0; i < 120; i++) {
+      const a = (i * 3 - 90) * Math.PI / 180;
+      const long = i % 10 === 0;
+      const r2 = R - (long ? 22 : 11);
+      ctx.strokeStyle = rgba(GOLD, long ? 0.95 : 0.4);
+      ctx.lineWidth = long ? 2.4 : 1.2;
+      ctx.beginPath();
+      ctx.moveTo(cx + R * Math.cos(a), cy + R * Math.sin(a));
+      ctx.lineTo(cx + r2 * Math.cos(a), cy + r2 * Math.sin(a));
+      ctx.stroke();
+    }
+    const rb = R * 0.83;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    BRANCH_CHARS.forEach((ch, i) => {
+      const a = (i * 30 - 90) * Math.PI / 180;
+      const x = cx + rb * Math.cos(a);
+      const y = cy + rb * Math.sin(a);
+      const lit = ch === litBranch;
+      if (lit) {
+        ctx.fillStyle = accent;
+        ctx.shadowColor = accent;
+        ctx.shadowBlur = 30;
+        ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate((i * 30) * Math.PI / 180);
+      ctx.fillStyle = lit ? '#0e0718' : rgba(GOLD, 0.82);
+      ctx.font = '700 34px ' + HAN;
+      ctx.fillText(ch, 0, 2);
+      ctx.restore();
+    });
+    const disc = ctx.createRadialGradient(cx, cy - R * 0.2, 0, cx, cy, R * 0.66);
+    disc.addColorStop(0, rgba(accent, 0.18));
+    disc.addColorStop(1, 'rgba(14,7,24,0.2)');
+    ctx.fillStyle = disc;
+    ctx.beginPath(); ctx.arc(cx, cy, R * 0.66 - 1, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function seal(ctx, x, y, size, weather) {
+    const chars = SEAL_ZH[weather] || SEAL_ZH.Open;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(-7 * Math.PI / 180);
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 24;
+    ctx.shadowOffsetY = 10;
+    ctx.fillStyle = CINNABAR;
+    ctx.fillRect(-size / 2, -size / 2, size, size);
+    ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = rgba(PAPER, 0.88);
+    ctx.lineWidth = 4;
+    ctx.strokeRect(-size / 2 + 9, -size / 2 + 9, size - 18, size - 18);
+    ctx.fillStyle = PAPER;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    if (chars.length === 1) {
+      ctx.font = '700 ' + Math.round(size * 0.6) + 'px ' + HAN;
+      ctx.fillText(chars[0], 0, 4);
+    } else {
+      ctx.font = '700 ' + Math.round(size * 0.34) + 'px ' + HAN;
+      ctx.fillText(chars[0], 0, -size * 0.2);
+      ctx.fillText(chars[1], 0, size * 0.22);
+    }
+    ctx.restore();
+  }
+
+  function pillarStrip(ctx, cx, y, blocks) {
+    const live = blocks.filter(b => b.chars);
+    if (!live.length) return;
+    const colW = 260;
+    const x0 = cx - (colW * live.length) / 2 + colW / 2;
+    live.forEach((b, i) => {
+      const x = x0 + i * colW;
+      ctx.fillStyle = rgba(PAPER, 0.5);
+      ctx.font = '600 17px ' + SANS;
+      ctx.textBaseline = 'alphabetic';
+      spaced(ctx, b.label, x, y, 5, 'center');
+      ctx.fillStyle = PAPER;
+      ctx.font = '700 50px ' + HAN;
+      ctx.textAlign = 'center';
+      spaced(ctx, b.chars, x, y + 64, 10, 'center');
+      if (i > 0) {
+        ctx.fillStyle = rgba(GOLD, 0.35);
+        ctx.fillRect(x - colW / 2, y - 14, 1, 88);
+      }
+    });
+  }
+
+  function drawCard(ctx, w, h, v, y0) {
+    const accent = EL_HEX[v.accentEl] || GOLD;
+    const isYear = v.kind === 'year';
+    const cjk = isCJK(v.hook);
+    ctx.save();
+    ctx.translate(0, y0 || 0);
+
+    // Ground: plum night, element glow behind the dial, film grain.
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#1d0f2a');
+    g.addColorStop(0.5, '#0e0718');
+    g.addColorStop(1, '#07030d');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    const cx = w / 2;
+    const cy = 590;
+    const R = 318;
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 1.7);
+    glow.addColorStop(0, rgba(accent, 0.34));
+    glow.addColorStop(0.45, rgba(accent, 0.08));
+    glow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, w, h);
+    grain(ctx, w, h, (v.dmChar || '八').charCodeAt(0));
+    frame(ctx, w, h);
+
+    // Header
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = GOLD;
+    ctx.font = '700 24px ' + SANS;
+    spaced(ctx, 'WOBAZI', 104, 136, 9, 'left');
+    const now = new Date();
+    const kindLabel = isYear ? (v.yearLabel || 'THIS YEAR').toUpperCase() : 'TODAY · ' + MONTHS[now.getMonth()] + ' ' + now.getDate();
+    ctx.fillStyle = rgba(PAPER, 0.55);
+    ctx.font = '600 19px ' + SANS;
+    spaced(ctx, kindLabel, w - 104, 136, 5, 'right');
+
+    // Dial + Day Master
+    const strip = isYear ? (v.flowYearChars || v.yearChars) : (v.todayChars || v.dayChars);
+    dial(ctx, cx, cy, R, accent, strip ? Array.from(strip)[1] : '');
+    ctx.textAlign = 'center';
+    if (v.name) {
+      ctx.fillStyle = rgba(PAPER, 0.72);
+      ctx.font = 'italic 400 32px ' + DISPLAY;
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(v.name, cx, cy - 128);
+    }
+    ctx.save();
+    ctx.fillStyle = accent;
+    ctx.shadowColor = accent;
+    ctx.shadowBlur = 60;
+    ctx.font = '700 196px ' + HAN;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(v.dmChar || '八', cx, cy + 6);
+    ctx.restore();
+    ctx.fillStyle = rgba(PAPER, 0.55);
+    ctx.font = '600 16px ' + SANS;
+    ctx.textBaseline = 'alphabetic';
+    spaced(ctx, 'DAY MASTER', cx, cy + 150, 6, 'center');
+    seal(ctx, cx + R * 0.78, cy + R * 0.74, 132, v.weather);
+
+    // Pillar strip
+    const stripY = cy + R + 96;
+    pillarStrip(ctx, cx, stripY, isYear
+      ? [{ label: '流年 FLOW YEAR', chars: v.flowYearChars }, { label: 'YOUR DAY', chars: v.dayChars }]
+      : [{ label: 'TODAY', chars: v.todayChars }, { label: 'YOUR DAY', chars: v.dayChars }]);
+
+    // Verdict block, fitted between the strip and the footer.
+    const top = stripY + 120;
+    const bottom = h - 250;
+    const maxW = w - 220;
+    let layout = null;
+    for (let s = 1; s >= 0.6; s -= 0.05) {
+      const hookSize = Math.round(84 * s);
+      ctx.font = (cjk ? '700 ' : 'italic 500 ') + hookSize + 'px ' + DISPLAY;
+      const hook = wrapLines(ctx, v.hook, maxW);
+      const hookLh = Math.round(hookSize * (cjk ? 1.3 : 1.12));
+      const bodySize = Math.round(32 * Math.max(s, 0.8));
+      ctx.font = '400 ' + bodySize + 'px ' + SANS;
+      const body = wrapLines(ctx, v.body, maxW - 60);
+      const bodyLh = Math.round(bodySize * 1.45);
+      const dareSize = Math.round(32 * Math.max(s, 0.8));
+      ctx.font = '700 ' + dareSize + 'px ' + SANS;
+      const dare = wrapLines(ctx, '「 ' + v.dare + ' 」', maxW - 60);
+      const dareLh = Math.round(dareSize * 1.4);
+      const total = 36 + hook.length * hookLh + 64 + body.length * bodyLh + 40 + dare.length * dareLh;
+      layout = { hookSize, hook, hookLh, bodySize, body, bodyLh, dareSize, dare, dareLh, total };
+      if (total <= bottom - top && hook.length <= 4) break;
+    }
+    let y = top + Math.max(0, (bottom - top - layout.total) / 2);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = accent;
+    ctx.font = '700 18px ' + SANS;
+    spaced(ctx, (v.weatherLabel || v.weather || '').toUpperCase() + '  ·  ' + (TONE_LABEL[v.tone] || 'Oracle').toUpperCase(), cx, y, 6, 'center');
+    y += 36 + layout.hookSize * 0.9;
+    ctx.fillStyle = PAPER;
+    ctx.font = (cjk ? '700 ' : 'italic 500 ') + layout.hookSize + 'px ' + DISPLAY;
+    layout.hook.forEach(l => { ctx.fillText(l, cx, y); y += layout.hookLh; });
+    y += 4 - layout.hookLh * 0.1;
+    ctx.fillStyle = rgba(GOLD, 0.6);
+    ctx.fillRect(cx - 120, y, 100, 1.5);
+    ctx.fillRect(cx + 20, y, 100, 1.5);
+    ctx.save();
+    ctx.translate(cx, y + 1);
+    ctx.rotate(Math.PI / 4);
+    ctx.fillStyle = GOLD;
+    ctx.fillRect(-6, -6, 12, 12);
+    ctx.restore();
+    y += 60;
+    ctx.fillStyle = rgba(PAPER, 0.74);
+    ctx.font = '400 ' + layout.bodySize + 'px ' + SANS;
+    layout.body.forEach(l => { ctx.fillText(l, cx, y); y += layout.bodyLh; });
+    y += 30;
+    ctx.fillStyle = accent;
+    ctx.font = '700 ' + layout.dareSize + 'px ' + SANS;
+    layout.dare.forEach(l => { ctx.fillText(l, cx, y); y += layout.dareLh; });
+
+    // Footer
+    const fy = h - 170;
+    if (v.luckPhase && isYear) {
+      ctx.fillStyle = rgba(PAPER, 0.45);
+      ctx.font = '500 20px ' + SANS;
+      ctx.fillText('大运 · ' + v.luckPhase, cx, fy - 44);
+    }
+    ctx.fillStyle = GOLD;
+    ctx.font = 'italic 500 44px ' + DISPLAY;
+    ctx.fillText('wobazi.com', cx, fy);
+    ctx.fillStyle = rgba(PAPER, 0.55);
+    ctx.font = '600 17px ' + SANS;
+    spaced(ctx, 'PLOT YOUR CHART  ·  BY MASTER ALICE', cx, fy + 44, 4, 'center');
+    ctx.fillStyle = rgba(PAPER, 0.3);
+    ctx.font = '400 17px ' + SANS;
+    ctx.fillText('Terrain, not a prison sentence.', cx, fy + 78);
+    ctx.restore();
+  }
+
+  function fontSample(v) {
+    return [v.hook, v.body, v.dare, v.dmChar, v.name, v.todayChars, v.dayChars, v.flowYearChars,
+      BRANCH_CHARS.join(''), '巅峰开运冲暗助流年大运八「」'].join('');
+  }
+
+  function ensureFonts(v) {
+    if (!document.fonts || !document.fonts.load || !v) return Promise.resolve();
+    const text = fontSample(v);
+    return Promise.all([
+      'italic 500 80px "Bodoni Moda"', 'italic 400 32px "Bodoni Moda"', '700 80px "Noto Serif SC"',
+      '400 32px Outfit', '600 18px Outfit', '700 32px Outfit', '700 32px "Noto Serif Thai"'
+    ].map(f => document.fonts.load(f, text).catch(() => null)));
   }
 
   function canvasFor(v, combo) {
@@ -236,7 +447,9 @@
     host.appendChild(c);
   }
 
-  function pngFile() {
+  async function pngFile() {
+    await ensureFonts(state.verdict);
+    if (state.comboYear) await ensureFonts(state.comboYear);
     return new Promise(resolve => {
       const c = canvasFor(state.verdict, state.kind === 'both');
       c.toBlob(blob => {

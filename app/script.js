@@ -1477,7 +1477,7 @@ function renderNobleCard(pillars) {
       </div>
       ${extra.length ? `<ul class="noble-extra">${extra.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
       <p class="noble-qm">${_t('Qi Men Dunjia locates helpful direction in time — Chief Deity 值符, and the Three Wonders 乙 (Sun Noble), 丙 (Moon Noble), 丁 (Jade Maiden). Wobazi shows natal stars; a full Qi Men plate is a later map.', '奇门遁甲在时间里找贵人方位——值符，以及三奇：乙（日奇）、丙（月奇）、丁（星奇 / 玉女）。Wobazi 先呈现本命星；完整奇门盘是下一张地图。', '奇门遁甲 หาทิศผู้เอื้อในเวลา — 值符 และสามอัศจรรย์ 乙 丙 丁 Wobazi โชว์ดาวกำเนิดก่อน')}</p>
-      <a class="noble-more" href="/about">${_t('About Master Alice →', '关于 Master Alice →', 'เกี่ยวกับมาสเตอร์อลิซ →')}</a>
+      <a class="noble-more" href="/Master-Alice.html">${_t('About Master Alice →', '关于 Master Alice →', 'เกี่ยวกับมาสเตอร์อลิซ →')}</a>
     </div>`;
 }
 

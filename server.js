@@ -110,7 +110,7 @@ app.get('/apple-touch-icon.png', (req, res) => {
 app.get('/sitemap.xml', (req, res) => {
   const pages = [
     { loc: '/', priority: '1.0', changefreq: 'weekly' },
-    { loc: '/about', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/Master-Alice.html', priority: '0.8', changefreq: 'monthly' },
     { loc: '/what-is-bazi', priority: '0.9', changefreq: 'monthly' },
     { loc: '/four-pillars-of-destiny', priority: '0.8', changefreq: 'monthly' },
     { loc: '/chinese-astrology', priority: '0.8', changefreq: 'monthly' },
@@ -196,14 +196,15 @@ app.get('/s/:id', (req, res) => {
   });
 });
 
-app.get('/about', (req, res) => {
-  res.render('pages/about', {
+app.get('/Master-Alice.html', (req, res) => {
+  res.render('pages/master-alice', {
     ...seoBase,
-    title: 'About Master Alice | Wobazi — A U Destiny Product',
+    title: 'Master Alice — BaZi & Destiny Master | Wobazi',
     description: 'Master Alice (ซินแสมาสเตอร์อลิซ) is the face and engine of Wobazi. Bangkok-based BaZi, Feng Shui, and destiny consulting — a U Destiny product.',
-    canonical: '/about',
+    canonical: '/Master-Alice.html',
   });
 });
+app.get('/about', (req, res) => res.redirect(301, '/Master-Alice.html'));
 
 app.get('/what-is-bazi', (req, res) => {
   res.render('pages/what-is-bazi', {

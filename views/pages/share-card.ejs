@@ -2,20 +2,27 @@
 <html lang="<%= verdict.lang === 'zh' ? 'zh-CN' : verdict.lang %>">
 <head>
   <%- include('../partials/head') %>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@1,6..96,400..600&display=swap" rel="stylesheet">
 </head>
-<body class="seo-page share-landing">
+<% const accent = {Wood:'#22c55e',Fire:'#ef4444',Earth:'#f59e0b',Metal:'#c0c8d4',Water:'#3b82f6'}[verdict.dmEl] || '#e8c26a'; %>
+<body class="seo-page share-landing" style="--sl-accent: <%= accent %>">
   <%- include('../partials/nav') %>
-  <main class="seo-main share-landing-main">
-    <p class="alice-kicker">WOBAZI ✦ <%= verdict.weatherLabel %></p>
-    <div class="share-land-glyph" style="color:<%= {Wood:'#22c55e',Fire:'#ef4444',Earth:'#f59e0b',Metal:'#c0c8d4',Water:'#3b82f6'}[verdict.dmEl] || '#f0c040' %>"><%= verdict.dmChar %></div>
-    <h1 class="share-land-hook"><%= verdict.hook %></h1>
-    <p class="share-land-body"><%= verdict.body %></p>
-    <p class="share-land-dare"><%= verdict.dare %></p>
-    <p class="share-land-disc">Terrain, not a prison sentence.</p>
-    <div class="alice-cta">
-      <a href="/?begin=1" class="btn-primary">Plot your chart</a>
+  <main class="sl">
+    <figure class="sl-card">
+      <img src="/api/share-viral?p=<%= encodeURIComponent(shareId) %>" alt="<%= verdict.hook %>" width="1080" height="1920">
+    </figure>
+    <div class="sl-copy">
+      <p class="sl-kicker">WOBAZI · <%= verdict.weatherLabel %> · <%= verdict.kind === 'year' ? (verdict.yearLabel || 'Year') : 'Today' %></p>
+      <h1 class="sl-hook"><%= verdict.hook %></h1>
+      <p class="sl-body"><%= verdict.body %></p>
+      <p class="sl-dare">「 <%= verdict.dare %> 」</p>
+      <div class="sl-cta">
+        <a href="/?begin=1" class="btn-primary">
+          <span class="en">Get your own verdict</span><span class="zh hide">生成你的判词</span><span class="th hide">รับคำตัดสินของคุณ</span>
+        </a>
+        <p class="sl-disc"><span class="en">Free. Your Day Master in under a minute. Terrain, not a prison sentence.</span><span class="zh hide">免费。一分钟内知道你的日主。地形，不是徒刑。</span><span class="th hide">ฟรี รู้วันมาสเตอร์ในไม่ถึงนาที ภูมิประเทศ ไม่ใช่คุก</span></p>
+      </div>
     </div>
-    <p class="share-land-meta"><%= verdict.kind === 'year' ? (verdict.yearLabel || 'Year') : 'Today' %> · <%= verdict.tone %></p>
   </main>
   <%- include('../partials/footer') %>
 </body>
