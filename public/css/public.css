@@ -6,11 +6,13 @@
 html:has(body.seo-page),
 html:has(body.seo-page) body {
   height: auto;
-  overflow: auto;
 }
+/* Only <html> scrolls. If <body> also had overflow:auto it would become a scroll
+   container that never scrolls, and every position:sticky (nav, chip bar) would pin to it. */
+html:has(body.seo-page) { overflow: auto; }
 body.seo-page {
   position: static;
-  overflow: auto;
+  overflow: visible;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -463,47 +465,62 @@ html[lang="zh-CN"] .sl-hook, html[lang="th"] .sl-hook { font-style: normal; }
   font-weight: 300;
 }
 
+/* Section chips: one floating pill track; the current section fills gold.
+   Edges fade only on the side that has more to scroll (classes set by the page script). */
 .seo-main .about-toc-bar {
+  --fade-l: 0px;
+  --fade-r: 0px;
   position: sticky;
-  top: 58px;
+  top: 66px;
   z-index: 50;
-  background: linear-gradient(180deg, rgba(7,7,15,0.82), rgba(7,7,15,0.55));
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  padding: 8px 0 10px;
-  margin: 0 0 24px;
+  /* Centered on the column but allowed to grow past it, so all chips fit on desktop. */
+  width: fit-content;
+  max-width: calc(100vw - 32px);
+  margin: 0 0 24px 50%;
+  transform: translateX(-50%);
+  padding: 5px;
+  border: 1px solid rgba(240, 192, 64, 0.16);
+  border-radius: 999px;
+  background: rgba(12, 8, 22, 0.8);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border: none;
   scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
 }
+.seo-main .about-toc-bar.more-left { --fade-l: 36px; }
+.seo-main .about-toc-bar.more-right { --fade-r: 36px; }
 .seo-main .about-toc-bar::-webkit-scrollbar { display: none; }
 .seo-main .about-toc-inner {
   display: flex;
-  gap: 8px;
-  padding: 2px 4px 6px;
-  padding-right: 40px;
+  gap: 2px;
   min-width: max-content;
 }
 .seo-main .about-toc-chip {
-  background: rgba(12, 10, 22, 0.72);
-  color: rgba(240, 240, 255, 0.72);
-  border: 1px solid rgba(240, 192, 64, 0.18);
+  background: transparent;
+  color: rgba(240, 240, 255, 0.62);
+  border: 0;
   border-radius: 999px;
-  padding: 7px 14px;
-  font-size: 12px;
+  padding: 8px 14px;
+  font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s, color 0.2s;
   font-family: inherit;
 }
-.seo-main .about-toc-chip:hover,
+.seo-main .about-toc-chip:hover { color: var(--text, #f0f0ff); background: rgba(255, 255, 255, 0.06); }
 .seo-main .about-toc-chip.active {
-  background: rgba(240, 192, 64, 0.12);
-  color: var(--gold, #f0c040);
-  border-color: rgba(240, 192, 64, 0.35);
+  color: #1a0a00;
+  font-weight: 600;
+  background: linear-gradient(135deg, #f0d080, #e8a040);
+  box-shadow: 0 4px 14px rgba(232, 194, 106, 0.3);
 }
+.seo-main .about-toc-chip:focus-visible { outline: 2px solid var(--gold, #f0c040); outline-offset: -2px; }
+.seo-main .about-section { scroll-margin-top: 130px; }
 
 .seo-main .about-section {
   background: rgba(10, 8, 20, 0.68);
