@@ -402,7 +402,8 @@ function scrollResults(id) {
 
 function switchTab(tab, opts) {
   opts = opts || {};
-  ['you', 'luck', 'today', 'actions', 'relationships'].forEach(t => {
+  if (tab === 'luck') tab = 'you';   // Luck Cycle now lives under Your Chart; old #luck links still land.
+  ['you', 'today', 'actions', 'relationships'].forEach(t => {
     const btn = document.getElementById('tab-btn-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
     const toc = document.getElementById('toc-' + t);
@@ -422,10 +423,10 @@ function switchTab(tab, opts) {
   }
 
   // Render prev/next tab navigation
-  const TAB_ORDER = ['you', 'luck', 'today', 'actions', 'relationships'];
-  const TAB_LABELS = { you: 'Your Chart', luck: 'Luck Cycle', today: 'Today', actions: 'Actions', relationships: 'Relationships' };
-  const TAB_LABELS_ZH = { you: '你的命盘', luck: '大运', today: '今日', actions: '行动', relationships: '关系' };
-  const TAB_LABELS_TH = { you: 'แผนภูมิของคุณ', luck: '大运 · รอบโชค', today: 'วันนี้', actions: 'การกระทำ', relationships: 'ความสัมพันธ์' };
+  const TAB_ORDER = ['you', 'today', 'actions', 'relationships'];
+  const TAB_LABELS = { you: 'Your Chart', today: 'Today', actions: 'Actions', relationships: 'Relationships' };
+  const TAB_LABELS_ZH = { you: '你的命盘', today: '今日', actions: '行动', relationships: '关系' };
+  const TAB_LABELS_TH = { you: 'แผนภูมิของคุณ', today: 'วันนี้', actions: 'การกระทำ', relationships: 'ความสัมพันธ์' };
   const idx = TAB_ORDER.indexOf(tab);
   const prev = idx > 0 ? TAB_ORDER[idx - 1] : null;
   const next = idx < TAB_ORDER.length - 1 ? TAB_ORDER[idx + 1] : null;
@@ -447,6 +448,7 @@ function switchTab(tab, opts) {
 /* ═══════════════════════════════════════
    Hash routing + birth persistence
 ═══════════════════════════════════════ */
+// 'luck' is kept so bookmarked #luck links still route; switchTab sends them to 'you'.
 const RESULT_TABS = ['you', 'luck', 'today', 'actions', 'relationships'];
 const CHART_STORE_KEY = 'wobazi_chart_v1';
 let _birthMeta = { calendarType: 'solar', leapMonth: false, minute: 0 };
@@ -3981,7 +3983,7 @@ function renderAuspiciousDates(animal, dominantEl) {
 
   const legendHTML = `
     <div class="cal-legend">
-      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power" style="background:${elColor}"></div> ${_t('Power Day', '吉日', 'วันพลัง')}</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power"></div> ${_t('Power Day', '吉日', 'วันพลัง')}</div>
       <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-good"></div> ${_t('Good Day', '吉', 'วันดี')}</div>
       <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-avoid"></div> ${_t('Avoid', '忌', 'ควรเลี่ยง')}</div>
       ${partnerScored.length ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-both"></div> ${_t('Works for both charts', '两盘皆宜', 'เหมาะทั้งสองแผน')}</div>` : ''}

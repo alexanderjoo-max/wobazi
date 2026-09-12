@@ -72,7 +72,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=54">
+  <link rel="stylesheet" href="/app/style.css?v=56">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
     html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
@@ -1020,7 +1020,6 @@
     <div class="results-tab-bar">
       <div class="tab-bar-inner">
         <button class="tab-btn active" id="tab-btn-you" onclick="haptic(6); switchTab('you')"><span class="en">Your Chart</span><span class="zh hide">你的命盘</span><span class="th hide">แผนภูมิของคุณ</span></button>
-        <button class="tab-btn" id="tab-btn-luck" onclick="haptic(6); switchTab('luck')"><span class="en">Luck Cycle</span><span class="zh hide">大运</span><span class="th hide">大运 · รอบโชค</span></button>
         <button class="tab-btn" id="tab-btn-today" onclick="haptic(6); switchTab('today')"><span class="en">Today</span><span class="zh hide">今日</span><span class="th hide">วันนี้</span></button>
         <button class="tab-btn" id="tab-btn-actions" onclick="haptic(6); switchTab('actions')"><span class="en">Actions</span><span class="zh hide">行动</span><span class="th hide">การกระทำ</span></button>
         <button class="tab-btn" id="tab-btn-relationships" onclick="haptic(6); switchTab('relationships')"><span class="en">Relationships</span><span class="zh hide">关系</span><span class="th hide">ความสัมพันธ์</span></button>
@@ -1051,6 +1050,7 @@
     <div class="results-toc-bar hide" id="toc-you">
       <div class="results-toc-inner">
         <button class="results-toc-chip" onclick="scrollResults('res-pillars')"><span class="en">Pillars</span><span class="zh hide">四柱</span><span class="th hide">เสา</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-decades')"><span class="en">Luck Cycle</span><span class="zh hide">大运</span><span class="th hide">รอบโชค</span></button>
         <button class="results-toc-chip" onclick="scrollResults('you-profile-section')"><span class="en">Profile</span><span class="zh hide">档案</span><span class="th hide">โปรไฟล์</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-elements')"><span class="en">Elements</span><span class="zh hide">五行</span><span class="th hide">ธาตุ</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-tengods')"><span class="en">Ten Gods</span><span class="zh hide">十神</span><span class="th hide">สิบเทพ</span></button>
@@ -1059,11 +1059,6 @@
         <button class="results-toc-chip" onclick="scrollResults('res-career')"><span class="en">Talent</span><span class="zh hide">天赋</span><span class="th hide">พรสวรรค์</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-season')"><span class="en">Season</span><span class="zh hide">旺季</span><span class="th hide">ฤดู</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-yinyang')"><span class="en">Yin Yang</span><span class="zh hide">阴阳</span><span class="th hide">หยินหยาง</span></button>
-      </div>
-    </div>
-    <div class="results-toc-bar hide" id="toc-luck">
-      <div class="results-toc-inner">
-        <button class="results-toc-chip" onclick="scrollResults('res-decades')"><span class="en">Life Decades</span><span class="zh hide">人生大运</span><span class="th hide">ทศวรรษชีวิต</span></button>
       </div>
     </div>
     <div class="results-toc-bar hide" id="toc-relationships">
@@ -1130,6 +1125,19 @@
         </div>
         <div class="pillars-row" id="pillars-row"></div>
         <p class="pillar-disclaimer" id="pillar-disclaimer"></p>
+      </section>
+
+      <section class="section" data-tab="you" data-tip="decades" id="res-decades">
+        <div class="section-head">
+          <h3 class="en">Luck Cycle 大运</h3>
+          <h3 class="zh hide">人生大运</h3>
+          <h3 class="th hide">รอบโชค 大运</h3>
+          <span class="section-sub"><span class="en">Your 10-Year Cycles</span><span class="zh hide">十年大运周期</span><span class="th hide">รอบสิบปีของคุณ</span></span>
+        </div>
+        <div id="decades-card"></div>
+        <button type="button" class="viral-share-pill" onclick="haptic(8); openViralShare('year')">
+          <span class="en">Share this year’s verdict</span><span class="zh hide">分享今年判词</span><span class="th hide">แชร์คำตัดสินปีนี้</span>
+        </button>
       </section>
 
       <section class="section" data-tab="you" id="you-profile-section">
@@ -1424,18 +1432,6 @@
       </section>
 
       <!-- Luck Cycle 大运 -->
-      <section class="section" data-tab="luck" data-tip="decades" id="res-decades">
-        <div class="section-head">
-          <h3 class="en">Luck Cycle 大运</h3>
-          <h3 class="zh hide">人生大运</h3>
-          <h3 class="th hide">รอบโชค 大运</h3>
-          <span class="section-sub"><span class="en">Your 10-Year Cycles</span><span class="zh hide">十年大运周期</span><span class="th hide">รอบสิบปีของคุณ</span></span>
-        </div>
-        <div id="decades-card"></div>
-        <button type="button" class="viral-share-pill" onclick="haptic(8); openViralShare('year')">
-          <span class="en">Share this year’s verdict</span><span class="zh hide">分享今年判词</span><span class="th hide">แชร์คำตัดสินปีนี้</span>
-        </button>
-      </section>
 
       <!-- Reading -->
       <section class="section" data-tab="you">
@@ -1768,7 +1764,7 @@
 
   <script src="/bazi-engine.js?v=4"></script>
   <script src="/verdict.js?v=2"></script>
-  <script src="/app/script.js?v=32"></script>
+  <script src="/app/script.js?v=34"></script>
   <script src="/app/share-viral.js?v=4"></script>
   <script>
     // Landing sticky CTA: appears once the hero CTA scrolls away, hides at the final CTA and off the landing.
