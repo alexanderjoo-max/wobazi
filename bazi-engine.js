@@ -1152,6 +1152,216 @@
     };
   }
 
+  /* ═══════════════════════════════════════════════════════════════
+     择日 — personal date selection.
+     A date is judged the way a practitioner would, in order:
+       1. It must not clash the natal YEAR branch (冲太岁) — hard exclusion.
+       2. It must be sound in general — 建除十二神 day officer.
+       3. It must suit THIS chart — 六合/三合 with natal branches, 天乙贵人,
+          and whether the day's element is favourable for the Day Master.
+  ═══════════════════════════════════════════════════════════════ */
+  const DAY_OFFICERS = [
+    { char: '建', pinyin: 'Jiàn',  en: 'Establish', zh: '建日', th: 'วันเริ่ม',   quality: 'mixed' },
+    { char: '除', pinyin: 'Chú',   en: 'Remove',    zh: '除日', th: 'วันขจัด',   quality: 'good'  },
+    { char: '满', pinyin: 'Mǎn',   en: 'Full',      zh: '满日', th: 'วันเต็ม',   quality: 'mixed' },
+    { char: '平', pinyin: 'Píng',  en: 'Balance',   zh: '平日', th: 'วันสมดุล',  quality: 'mixed' },
+    { char: '定', pinyin: 'Dìng',  en: 'Settle',    zh: '定日', th: 'วันตกลง',   quality: 'good'  },
+    { char: '执', pinyin: 'Zhí',   en: 'Hold',      zh: '执日', th: 'วันยึด',    quality: 'good'  },
+    { char: '破', pinyin: 'Pò',    en: 'Break',     zh: '破日', th: 'วันแตก',    quality: 'bad'   },
+    { char: '危', pinyin: 'Wēi',   en: 'Careful',   zh: '危日', th: 'วันระวัง',  quality: 'good'  },
+    { char: '成', pinyin: 'Chéng', en: 'Complete',  zh: '成日', th: 'วันสำเร็จ', quality: 'good'  },
+    { char: '收', pinyin: 'Shōu',  en: 'Receive',   zh: '收日', th: 'วันรับ',    quality: 'mixed' },
+    { char: '开', pinyin: 'Kāi',   en: 'Open',      zh: '开日', th: 'วันเปิด',   quality: 'good'  },
+    { char: '闭', pinyin: 'Bì',    en: 'Close',     zh: '闭日', th: 'วันปิด',    quality: 'bad'   },
+  ];
+
+  /* 宜 — the officers each undertaking favours. */
+  const PURPOSE_OFFICERS = {
+    business: [10, 8, 4, 2],          // 开 成 定 满
+    contract: [4, 5, 8],              // 定 执 成
+    travel:   [10, 1, 8],             // 开 除 成
+    personal: [1, 4, 5, 7, 8, 10],    // 除 定 执 危 成 开
+  };
+
+  const PURPOSE_LABEL = {
+    business: { en: 'opening a business', zh: '开业', th: 'เปิดกิจการ' },
+    contract: { en: 'signing',            zh: '签约', th: 'เซ็นสัญญา' },
+    travel:   { en: 'travel',             zh: '出行', th: 'เดินทาง' },
+    personal: { en: 'personal matters',   zh: '个人之事', th: 'เรื่องส่วนตัว' },
+  };
+
+  function dayOfficer(dayBranchIdx, monthBranchIdx) {
+    if (dayBranchIdx < 0 || monthBranchIdx < 0) return null;
+    const idx = (((dayBranchIdx - monthBranchIdx) % 12) + 12) % 12;
+    const o = DAY_OFFICERS[idx];
+    return { idx: idx, char: o.char, pinyin: o.pinyin, en: o.en, zh: o.zh, th: o.th, quality: o.quality };
+  }
+
+  /* Weak Day Master wants support (self + resource); strong wants draining
+     (output, wealth, power). Mirrors batch/bazi-helpers so both agree. */
+  function favorableElements(pillars) {
+    const day = pillars && pillars[2];
+    if (!day || !day.known || !day.stem) return { favorable: [], unfavorable: [], strong: false };
+    const dmEl = day.stem.element;
+    const counts = calcElementsDetailed(pillars);
+    let total = 0;
+    for (const k in counts) total += counts[k];
+    if (!total) total = 1;
+    const i = PRODUCTION_CYCLE.indexOf(dmEl);
+    const resourceEl = PRODUCTION_CYCLE[(i + 4) % 5];
+    const outputEl = PRODUCTION_CYCLE[(i + 1) % 5];
+    const wealthEl = CONTROL_CYCLE[dmEl];
+    let powerEl = null;
+    for (const k in CONTROL_CYCLE) if (CONTROL_CYCLE[k] === dmEl) powerEl = k;
+    const strong = ((counts[dmEl] || 0) + (counts[resourceEl] || 0)) / total >= 0.4;
+    return strong
+      ? { favorable: [outputEl, wealthEl, powerEl].filter(Boolean), unfavorable: [dmEl, resourceEl], strong: true }
+      : { favorable: [dmEl, resourceEl], unfavorable: [outputEl, wealthEl, powerEl].filter(Boolean), strong: false };
+  }
+
+  function inThreeHarmony(a, b) {
+    for (let g = 0; g < THREE_HARMONY.length; g++) {
+      const grp = THREE_HARMONY[g];
+      if (grp.indexOf(a) >= 0 && grp.indexOf(b) >= 0 && a !== b) return true;
+    }
+    return false;
+  }
+
+  /* Score one calendar date against a natal chart. */
+  function scoreDayForChart(opts) {
+    opts = opts || {};
+    const natal = opts.pillars || [];
+    const purpose = PURPOSE_OFFICERS[opts.purpose] ? opts.purpose : 'personal';
+    const r = calcBaziAccurate({
+      year: opts.year, month: opts.month, day: opts.day, hour: 12,
+      tzOffsetMinutes: opts.tzOffsetMinutes,
+    });
+    const dayP = r.pillars[2];
+    const monthP = r.pillars[1];
+    const dIdx = branchIdxOf(dayP.branch);
+    const officer = dayOfficer(dIdx, branchIdxOf(monthP.branch));
+    const natalYearIdx = (natal[0] && natal[0].known && natal[0].branch) ? branchIdxOf(natal[0].branch) : -1;
+    const natalDayIdx  = (natal[2] && natal[2].known && natal[2].branch) ? branchIdxOf(natal[2].branch) : -1;
+    const fav = favorableElements(natal);
+    const nobles = getNatalNobles(natal);
+    const dm = (natal[2] && natal[2].known) ? natal[2].stem : null;
+    const nobleBranches = dm ? (TIANYI_BY_STEM[stemIdxOf(dm)] || []) : [];
+
+    const reasons = [];
+    let score = 50;
+
+    const clashYear = natalYearIdx >= 0 && CLASH[natalYearIdx] === dIdx;
+    const clashDay  = natalDayIdx  >= 0 && CLASH[natalDayIdx]  === dIdx;
+
+    if (clashYear) {
+      score -= 45;
+      reasons.push({ code: 'clash-year', good: false,
+        en: 'Clashes your year animal (冲太岁)', zh: '冲你的生肖太岁', th: 'ชงปีนักษัตรของคุณ (冲太岁)' });
+    }
+    if (clashDay) {
+      score -= 30;
+      reasons.push({ code: 'clash-day', good: false,
+        en: 'Clashes your Day pillar', zh: '冲你的日柱', th: 'ชงเสาวันของคุณ' });
+    }
+    if (officer && officer.quality === 'bad') {
+      score -= officer.idx === 6 ? 25 : 12;
+      reasons.push({ code: 'officer-bad', good: false,
+        en: officer.char + ' ' + officer.en + ' day — poor for starting things',
+        zh: officer.zh + '——不宜起事', th: 'วัน' + officer.char + ' — ไม่เหมาะเริ่มงาน' });
+    } else if (officer && officer.quality === 'good') {
+      score += 12;
+      reasons.push({ code: 'officer-good', good: true,
+        en: officer.char + ' ' + officer.en + ' day — sound in the almanac',
+        zh: officer.zh + '——黄历吉日', th: 'วัน' + officer.char + ' — เป็นวันดีตามปฏิทิน' });
+    }
+    if (officer && PURPOSE_OFFICERS[purpose].indexOf(officer.idx) >= 0 && officer.quality !== 'bad') {
+      score += 10;
+      const lbl = PURPOSE_LABEL[purpose] || PURPOSE_LABEL.personal;
+      reasons.push({ code: 'purpose-fit', good: true,
+        en: 'Suits ' + lbl.en, zh: '宜' + lbl.zh, th: 'เหมาะกับ' + lbl.th });
+    }
+
+    [[natalYearIdx, 'year'], [natalDayIdx, 'day']].forEach(function (pair) {
+      const idx = pair[0];
+      if (idx < 0) return;
+      if (COMBINE[idx] === dIdx) {
+        score += 12;
+        reasons.push({ code: 'combine-' + pair[1], good: true,
+          en: 'Six Harmony with your ' + pair[1] + ' branch (六合)',
+          zh: '与你的' + (pair[1] === 'year' ? '年' : '日') + '支六合',
+          th: 'เข้ากับเสา' + (pair[1] === 'year' ? 'ปี' : 'วัน') + 'ของคุณ (六合)' });
+      } else if (inThreeHarmony(idx, dIdx)) {
+        score += 9;
+        reasons.push({ code: 'harmony-' + pair[1], good: true,
+          en: 'Three Harmony with your ' + pair[1] + ' branch (三合)',
+          zh: '与你的' + (pair[1] === 'year' ? '年' : '日') + '支三合',
+          th: 'สามประสานกับเสา' + (pair[1] === 'year' ? 'ปี' : 'วัน') + 'ของคุณ (三合)' });
+      }
+      if (HARM[idx] === dIdx) {
+        score -= 8;
+        reasons.push({ code: 'harm-' + pair[1], good: false,
+          en: 'Harm with your ' + pair[1] + ' branch (六害)', zh: '与你的支相害', th: 'เป็นโทษกับเสาของคุณ (六害)' });
+      }
+      if (isPunish(idx, dIdx)) {
+        score -= 8;
+        reasons.push({ code: 'punish-' + pair[1], good: false,
+          en: 'Punishment with your ' + pair[1] + ' branch (相刑)', zh: '与你的支相刑', th: 'ต้องโทษกับเสาของคุณ (相刑)' });
+      }
+    });
+
+    if (nobleBranches.indexOf(dIdx) >= 0) {
+      score += 14;
+      reasons.push({ code: 'noble', good: true,
+        en: 'Nobleman day (天乙贵人) — helpful people', zh: '天乙贵人日——贵人相助', th: 'วันกุ้ยเหริน (天乙贵人) — มีคนช่วย' });
+    }
+
+    const dayEl = dayP.stem ? dayP.stem.element : null;
+    if (dayEl && fav.favorable.indexOf(dayEl) >= 0) {
+      score += 12;
+      reasons.push({ code: 'element-good', good: true,
+        en: dayEl + ' day — your favourable element', zh: (EL_ZH[dayEl] || dayEl) + '日——正是你的喜用', th: 'วันธาตุ' + dayEl + ' — ธาตุที่คุณต้องการ' });
+    } else if (dayEl && fav.unfavorable.indexOf(dayEl) >= 0) {
+      score -= 8;
+      reasons.push({ code: 'element-bad', good: false,
+        en: dayEl + ' day — works against your balance', zh: (EL_ZH[dayEl] || dayEl) + '日——于你不宜', th: 'วันธาตุ' + dayEl + ' — ไม่เข้ากับสมดุลของคุณ' });
+    }
+
+    score = Math.max(0, Math.min(100, Math.round(score)));
+    const blocked = clashYear || clashDay || (officer && officer.idx === 6);
+    const tier = blocked ? 'avoid' : score >= 72 ? 'power' : score >= 60 ? 'good' : 'plain';
+
+    return {
+      year: opts.year, month: opts.month, day: opts.day,
+      pillar: dayP.stem.char + dayP.branch.char,
+      animal: dayP.branch.animal,
+      element: dayEl,
+      officer: officer,
+      score: score,
+      tier: tier,
+      clashYear: clashYear,
+      clashDay: clashDay,
+      noble: nobleBranches.indexOf(dIdx) >= 0,
+      reasons: reasons,
+    };
+  }
+
+  /* Score every day of a calendar month for one chart. */
+  function bestDatesInMonth(opts) {
+    opts = opts || {};
+    const year = opts.year;
+    const month = opts.month;
+    const days = new Date(year, month, 0).getDate();
+    const out = [];
+    for (let d = 1; d <= days; d++) {
+      out.push(scoreDayForChart({
+        year: year, month: month, day: d,
+        pillars: opts.pillars, purpose: opts.purpose,
+        tzOffsetMinutes: opts.tzOffsetMinutes,
+      }));
+    }
+    return out;
+  }
+
   return {
     STEMS, BRANCHES, ZODIAC, EL_COLOR, EL_ZH, ANIMAL_ZH,
     MONTH_BRANCH, hourToBranch,
@@ -1168,5 +1378,6 @@
     getNatalNobles, getPeachBlossom, analyzeNowOverlay,
     pairBranchRelations, scoreLovePair, branchRelation, elementLink,
     THREE_HARMONY,
+    DAY_OFFICERS, dayOfficer, favorableElements, scoreDayForChart, bestDatesInMonth,
   };
 }));

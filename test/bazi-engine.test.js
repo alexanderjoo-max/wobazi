@@ -237,3 +237,45 @@ describe('natal nobles, peach blossom, overlay', () => {
     assert.ok(now.monthLine && now.monthLine.kind);
   });
 });
+
+describe('择日 — personal date selection', () => {
+  // 1995-04-29 08:45 → 乙亥 庚辰 庚寅 庚辰 (year branch 亥 Pig, Day Master 庚)
+  const natal = bazi.calcBaziAccurate({ year: 1995, month: 4, day: 29, hour: 8, minute: 45 }).pillars;
+
+  it('day officer starts at 建 when the day branch equals the month branch', () => {
+    const o = bazi.dayOfficer(4, 4);
+    assert.equal(o.char, '建');
+    assert.equal(bazi.dayOfficer(5, 4).char, '除');
+    assert.equal(bazi.dayOfficer(4 + 6, 4).char, '破');
+  });
+
+  it('never recommends a day that clashes the natal year branch (冲太岁)', () => {
+    const days = bazi.bestDatesInMonth({ year: 2026, month: 10, pillars: natal });
+    const clashing = days.filter(d => d.clashYear);
+    assert.ok(clashing.length > 0, 'expected some clash days in a month');
+    // 亥 clashes 巳 — every flagged day must be a Snake day, and never recommended
+    for (const d of clashing) {
+      assert.equal(d.animal, 'Snake');
+      assert.equal(d.tier, 'avoid');
+      assert.ok(d.reasons.some(r => r.code === 'clash-year'));
+    }
+  });
+
+  it('scores a full calendar month', () => {
+    assert.equal(bazi.bestDatesInMonth({ year: 2026, month: 2, pillars: natal }).length, 28);
+    assert.equal(bazi.bestDatesInMonth({ year: 2024, month: 2, pillars: natal }).length, 29);
+  });
+
+  it('treats 破 days as avoid even when nothing clashes', () => {
+    const days = bazi.bestDatesInMonth({ year: 2026, month: 10, pillars: natal });
+    const po = days.filter(d => d.officer.char === '破');
+    assert.ok(po.length > 0);
+    for (const d of po) assert.equal(d.tier, 'avoid');
+  });
+
+  it('reads favourable elements from the Day Master balance', () => {
+    const fav = bazi.favorableElements(natal);
+    assert.ok(Array.isArray(fav.favorable) && fav.favorable.length > 0);
+    for (const el of fav.favorable) assert.ok(!fav.unfavorable.includes(el));
+  });
+});

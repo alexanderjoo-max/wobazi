@@ -72,7 +72,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=51">
+  <link rel="stylesheet" href="/app/style.css?v=54">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
     html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
@@ -193,13 +193,7 @@
             <span class="en">New reading</span><span class="zh hide">新的解读</span><span class="th hide">ดูดวงใหม่</span>
           </button>
         </div>
-        <div class="usp-row" role="note">
-          <span class="usp-item"><span class="en">Free, no account needed</span><span class="zh hide">免费，无需账号</span><span class="th hide">ฟรี ไม่ต้องมีบัญชี</span></span>
-          <span class="usp-item"><span class="en">Your chart in seconds</span><span class="zh hide">几秒出盘</span><span class="th hide">ได้แผนภูมิในไม่กี่วินาที</span></span>
-          <span class="usp-item"><span class="en">Solar or lunar birth dates</span><span class="zh hide">公历或农历生日</span><span class="th hide">วันเกิดสุริยคติหรือจันทรคติ</span></span>
-          <span class="usp-item"><a href="/Master-Alice.html"><span class="en">Read by Master Alice</span><span class="zh hide">Master Alice 解读</span><span class="th hide">อ่านโดยมาสเตอร์อลิซ</span></a></span>
-        </div>
-        <p class="splash-google-hint"><span class="en">Sign in to save your chart &amp; history</span><span class="zh hide">登录即可保存命盘与记录</span><span class="th hide">เข้าสู่ระบบเพื่อบันทึกดวงและประวัติ</span></p>
+        <p class="splash-google-hint"><span class="en">Free · No account needed · Sign in to save your chart &amp; history</span><span class="zh hide">免费 · 无需账号 · 登录即可保存命盘与记录</span><span class="th hide">ฟรี · ไม่ต้องมีบัญชี · เข้าสู่ระบบเพื่อบันทึกดวงและประวัติ</span></p>
       </section>
 
       <!-- Returning user (authed only) -->
@@ -218,23 +212,29 @@
       <section class="splash-features">
 
         <article class="feat-card">
-          <div class="sigil sigil-self" aria-hidden="true">
+          <div class="sigil" aria-hidden="true">
             <svg viewBox="0 0 96 96">
               <defs>
-                <radialGradient id="sg-self" cx="40%" cy="35%" r="65%">
-                  <stop offset="0%" stop-color="#fff6ff"/>
-                  <stop offset="45%" stop-color="#d56bff"/>
-                  <stop offset="100%" stop-color="#3a1a6a"/>
+                <radialGradient id="sg1-bloom" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#fff4d8" stop-opacity="0.5"/>
+                  <stop offset="42%" stop-color="#f0c040" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="#f0c040" stop-opacity="0"/>
                 </radialGradient>
-                <filter id="sg-blur"><feGaussianBlur stdDeviation="1.4"/></filter>
+                <filter id="sg1-soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.6"/></filter>
               </defs>
-              <ellipse class="sigil-halo" cx="48" cy="48" rx="38" ry="38" fill="none" stroke="rgba(213,107,255,0.35)"/>
-              <path class="sigil-swirl" d="M48 16 C 72 16, 80 40, 48 48 C 16 56, 24 80, 48 80 C 70 80, 74 62, 58 54" fill="none" stroke="url(#sg-self)" stroke-width="3.2" stroke-linecap="round"/>
-              <circle class="sigil-core" cx="48" cy="48" r="6.5" fill="#fff" filter="url(#sg-blur)"/>
-              <circle cx="48" cy="48" r="3.2" fill="#f6e6ff"/>
-              <circle class="sigil-mote a" cx="48" cy="16" r="2.2" fill="#ff8ad8"/>
-              <circle class="sigil-mote b" cx="76" cy="60" r="1.8" fill="#7ce7ff"/>
-              <circle class="sigil-mote c" cx="22" cy="58" r="1.6" fill="#c4a2ff"/>
+              <circle class="sg-veil" cx="48" cy="48" r="42" fill="url(#sg1-bloom)"/>
+              <g class="sg-halo" filter="url(#sg1-soft)" fill="none" stroke="#f0c040">
+                <circle cx="48" cy="48" r="29" stroke-opacity="0.2" stroke-width="2.4"/>
+                <circle cx="48" cy="48" r="19" stroke-opacity="0.14" stroke-width="3.4"/>
+              </g>
+              <circle cx="48" cy="48" r="32" fill="none" stroke="#e8c26a" stroke-opacity="0.22" stroke-width="0.7"/>
+              <circle class="sg-orbit" cx="48" cy="48" r="39" fill="none" stroke="#e8c26a" stroke-opacity="0.3" stroke-width="0.8" stroke-dasharray="1 7" stroke-linecap="round"/>
+              <g class="sg-motes" fill="#f6ecd8">
+                <circle cx="48" cy="9" r="1.4" fill-opacity="0.45"/>
+                <circle cx="83" cy="60" r="1.1" fill-opacity="0.35"/>
+                <circle cx="16" cy="62" r="0.9" fill-opacity="0.3"/>
+              </g>
+              <text class="sg-char" x="48" y="48" text-anchor="middle" dominant-baseline="central">日</text>
             </svg>
           </div>
           <div class="feat-copy">
@@ -244,16 +244,30 @@
         </article>
 
         <article class="feat-card">
-          <div class="sigil sigil-time" aria-hidden="true">
+          <div class="sigil" aria-hidden="true">
             <svg viewBox="0 0 96 96">
-              <ellipse class="sigil-orbit" cx="48" cy="48" rx="30" ry="18" fill="none" stroke="rgba(124,231,255,0.4)" stroke-width="1.2"/>
-              <ellipse class="sigil-orbit alt" cx="48" cy="48" rx="18" ry="30" fill="none" stroke="rgba(196,162,255,0.35)" stroke-width="1"/>
-              <circle class="sigil-core" cx="48" cy="48" r="5" fill="#7ce7ff"/>
-              <circle class="sigil-node n1" cx="48" cy="18" r="3.4" fill="#ff8ad8"/>
-              <circle class="sigil-node n2" cx="78" cy="48" r="3" fill="#7ce7ff"/>
-              <circle class="sigil-node n3" cx="48" cy="78" r="3.4" fill="#c4a2ff"/>
-              <circle class="sigil-node n4" cx="18" cy="48" r="3" fill="#ffb4a2"/>
-              <path class="sigil-comet" d="M18 30 C 30 22, 40 28, 46 40" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>
+              <defs>
+                <radialGradient id="sg2-bloom" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#ffe9c0" stop-opacity="0.42"/>
+                  <stop offset="45%" stop-color="#f0c040" stop-opacity="0.15"/>
+                  <stop offset="100%" stop-color="#f0c040" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="sg2-soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.2"/></filter>
+              </defs>
+              <circle class="sg-veil" cx="48" cy="48" r="42" fill="url(#sg2-bloom)"/>
+              <g class="sg-halo" filter="url(#sg2-soft)" fill="none" stroke="#f0c040" stroke-width="2.2">
+                <ellipse cx="48" cy="48" rx="33" ry="17" stroke-opacity="0.18" transform="rotate(-18 48 48)"/>
+                <ellipse cx="48" cy="48" rx="17" ry="33" stroke-opacity="0.12" transform="rotate(-18 48 48)"/>
+              </g>
+              <g class="sg-orbit">
+                <ellipse cx="48" cy="48" rx="35" ry="18" fill="none" stroke="#e8c26a" stroke-opacity="0.3" stroke-width="0.8" transform="rotate(-18 48 48)"/>
+              </g>
+              <g class="sg-drift">
+                <circle cx="48" cy="14" r="2.2" fill="#f6ecd8" fill-opacity="0.55"/>
+                <circle cx="48" cy="14" r="5" fill="#f0c040" fill-opacity="0.16" filter="url(#sg2-soft)"/>
+              </g>
+              <circle class="sg-motes" cx="72" cy="26" r="1.6" fill="#c8412c" fill-opacity="0.5"/>
+              <text class="sg-char" x="48" y="48" text-anchor="middle" dominant-baseline="central">时</text>
             </svg>
           </div>
           <div class="feat-copy">
@@ -263,12 +277,24 @@
         </article>
 
         <article class="feat-card">
-          <div class="sigil sigil-bond" aria-hidden="true">
+          <div class="sigil" aria-hidden="true">
             <svg viewBox="0 0 96 96">
-              <path class="sigil-thread" d="M22 58 C 36 20, 60 76, 74 38" fill="none" stroke="#c4a2ff" stroke-width="1.6" stroke-linecap="round"/>
-              <circle class="sigil-soul s-a" cx="30" cy="50" r="13" fill="rgba(255,138,216,0.22)" stroke="#ff8ad8" stroke-width="1.2"/>
-              <circle class="sigil-soul s-b" cx="66" cy="46" r="13" fill="rgba(124,231,255,0.2)" stroke="#7ce7ff" stroke-width="1.2"/>
-              <circle class="sigil-core" cx="48" cy="48" r="3.4" fill="#fff"/>
+              <defs>
+                <radialGradient id="sg3-bloom" cx="50%" cy="50%" r="52%">
+                  <stop offset="0%" stop-color="#ffeccd" stop-opacity="0.34"/>
+                  <stop offset="100%" stop-color="#f0c040" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="sg3-soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
+              </defs>
+              <circle class="sg-veil" cx="48" cy="48" r="42" fill="url(#sg3-bloom)"/>
+              <g filter="url(#sg3-soft)">
+                <circle class="sg-disc a" cx="37" cy="48" r="21" fill="#f0c040" fill-opacity="0.12"/>
+                <circle class="sg-disc b" cx="59" cy="48" r="21" fill="#c8412c" fill-opacity="0.14"/>
+              </g>
+              <circle class="sg-disc a" cx="37" cy="48" r="21" fill="none" stroke="#e8c26a" stroke-opacity="0.38" stroke-width="0.9"/>
+              <circle class="sg-disc b" cx="59" cy="48" r="21" fill="none" stroke="#e8916a" stroke-opacity="0.34" stroke-width="0.9"/>
+              <circle class="sg-orbit" cx="48" cy="48" r="39" fill="none" stroke="#e8c26a" stroke-opacity="0.24" stroke-width="0.8" stroke-dasharray="1 8" stroke-linecap="round"/>
+              <text class="sg-char" x="48" y="48" text-anchor="middle" dominant-baseline="central">合</text>
             </svg>
           </div>
           <div class="feat-copy">
@@ -905,7 +931,7 @@
           <span class="submit-recalc hide">
             <span class="en">Recalculate</span><span class="zh hide">重新排盘</span><span class="th hide">คำนวณใหม่</span>
           </span>
-          <span class="btn-char">龙</span>
+          <span class="btn-char">八</span>
         </button>
       </form>
     </div>
@@ -1740,9 +1766,9 @@
     </div>
   </div>
 
-  <script src="/bazi-engine.js?v=2"></script>
+  <script src="/bazi-engine.js?v=4"></script>
   <script src="/verdict.js?v=2"></script>
-  <script src="/app/script.js?v=30"></script>
+  <script src="/app/script.js?v=32"></script>
   <script src="/app/share-viral.js?v=4"></script>
   <script>
     // Landing sticky CTA: appears once the hero CTA scrolls away, hides at the final CTA and off the landing.

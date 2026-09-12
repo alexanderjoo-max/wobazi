@@ -665,7 +665,30 @@ function setCalendarType(type, opts) {
   updateLunarPreview();
   if (!opts.silent) persistBirthIfValid();
 }
+/* Glyph on the submit button: the year animal of the date entered, via the engine so the
+   立春 cutoff applies (a January birthday belongs to the previous animal year). 八 until a date is set. */
+function updateSubmitGlyph() {
+  const el = document.querySelector('#submit-reading .btn-char');
+  if (!el) return;
+  let char = '八';
+  const p = collectBirthPayload();
+  if (p && window.BaziEngine) {
+    const y = p.calendarType === 'lunar' ? p.lunarYear : p.year;
+    const m = p.calendarType === 'lunar' ? p.lunarMonth : p.month;
+    const d = p.calendarType === 'lunar' ? p.lunarDay : p.day;
+    if (isValidBirthDate(y, m, d)) {
+      try {
+        const r = BaziEngine.calcBaziAccurate({ year: p.year, month: p.month, day: p.day, hour: 12 });
+        const animal = r.pillars[0] && r.pillars[0].branch && r.pillars[0].branch.animal;
+        if (animal && ANIMAL_ZH[animal]) char = ANIMAL_ZH[animal];
+      } catch (e) {}
+    }
+  }
+  el.textContent = char;
+}
+
 function updateLunarPreview() {
+  updateSubmitGlyph();
   const eq = document.getElementById('solar-equivalent');
   const leapWrap = document.getElementById('leap-month-wrap');
   if (!eq) return;
@@ -3730,21 +3753,17 @@ function getLuckyNumbers(year, month, day, animal, dominantEl) {
 }
 
 /* ── Get power days for current + next month ── */
-function getAuspiciousDays(animal, dominantEl) {
-  // Element-based lucky day numbers (by Five Element theory)
-  const elDays = {
-    Wood:  [3, 4, 8, 13, 18, 23, 28],
-    Fire:  [2, 7, 9, 14, 17, 22, 27],
-    Earth: [5, 10, 15, 19, 20, 25, 29],
-    Metal: [4, 9, 16, 21, 24, 26, 30],
-    Water: [1, 6, 11, 16, 21, 26, 28],
-  };
-  // Animal-based power days (branch index modulo 6)
-  const branchIdx = BRANCHES.findIndex(b => b.animal === animal);
-  const animalDays = [1, 2, 3, 4, 5, 6, 7].map(w => ((branchIdx * 2 + w * 3) % 28) + 1);
-  const power = elDays[dominantEl] || [5, 10, 15, 20, 25];
-  const good  = animalDays.filter(d => !power.includes(d)).slice(0, 5);
-  return { power, good };
+/* Personal date selection. Every day is scored against THIS chart by the engine:
+   sound in the almanac (建除十二神), in harmony with the natal pillars, and never
+   clashing the year animal (冲太岁). See BaziEngine.scoreDayForChart. */
+function getPersonalDates(pillars, year, month, purpose) {
+  if (!pillars || !window.BaziEngine || !BaziEngine.bestDatesInMonth) return [];
+  try {
+    return BaziEngine.bestDatesInMonth({ year: year, month: month, pillars: pillars, purpose: purpose });
+  } catch (e) {
+    console.error('[power days]', e);
+    return [];
+  }
 }
 
 /* ═══════════════════════════════════════
@@ -3885,65 +3904,91 @@ function setCalFilter(key) {
 }
 
 function renderAuspiciousDates(animal, dominantEl) {
-  const elColor = EL_COLOR[dominantEl];
-  const { power, good } = getAuspiciousDays(animal, dominantEl);
+  const card = document.getElementById('power-days-card');
+  if (!card) return;
+  const elColor = EL_COLOR[dominantEl] || '#f0c040';
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth(); // 0-indexed
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
   const today = now.getDate();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
   const MNAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const partnerDays = (_lastPartner && _lastPartner.animal)
-    ? getAuspiciousDays(_lastPartner.animal, _lastPartner.dominant).power
+  const purpose = _calFilter === 'all' ? 'personal' : _calFilter;
+  const pillars = _shareData && _shareData.pillars;
+  const scored = getPersonalDates(pillars, year, month + 1, purpose);
+  const byDay = {};
+  scored.forEach(s => { byDay[s.day] = s; });
+
+  const partnerScored = (_lastPartner && _lastPartner.pillars)
+    ? getPersonalDates(_lastPartner.pillars, year, month + 1, purpose)
     : [];
-  const both = power.filter(d => partnerDays.includes(d));
-  const purpose = {
-    all: d => true,
-    business: d => power.includes(d) || [1, 6, 8, 15, 16, 23].includes(d),
-    contract: d => power.includes(d) || good.includes(d) || [4, 9, 14, 21, 27].includes(d),
-    travel: d => good.includes(d) || [3, 7, 12, 18, 22, 28].includes(d),
-    personal: d => power.includes(d) || good.includes(d),
-  };
-  const match = purpose[_calFilter] || purpose.all;
+  const partnerOk = {};
+  partnerScored.forEach(s => { if (s.tier === 'power' || s.tier === 'good') partnerOk[s.day] = true; });
 
-  const dayHeaders = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d =>
-    `<div class="cal-header">${d}</div>`
-  ).join('');
-
+  const dayHeaders = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-header">${d}</div>`).join('');
   const blanks = Array(firstDay).fill('<div class="cal-day cal-blank"></div>').join('');
-  const days = Array.from({length: daysInMonth}, (_, i) => {
+  const days = Array.from({ length: daysInMonth }, (_, i) => {
     const d = i + 1;
-    const isPower = power.includes(d);
-    const isGood  = good.includes(d);
-    const isToday = d === today;
-    const isBoth = both.includes(d);
-    const on = match(d);
+    const s = byDay[d];
     let cls = 'cal-day';
-    if (!on) cls += ' cal-dim';
-    if (isPower) cls += ' cal-power';
-    else if (isGood) cls += ' cal-good';
-    if (isBoth) cls += ' cal-both';
-    if (isToday) cls += ' cal-today';
-    return `<div class="${cls}" style="${isPower ? `--el-c:${elColor}` : ''}">${d}</div>`;
+    if (s) {
+      if (s.tier === 'power') cls += ' cal-power';
+      else if (s.tier === 'good') cls += ' cal-good';
+      else if (s.tier === 'avoid') cls += ' cal-avoid';
+      else cls += ' cal-plain';
+      if (partnerOk[d] && (s.tier === 'power' || s.tier === 'good')) cls += ' cal-both';
+    }
+    if (d === today) cls += ' cal-today';
+    const title = s ? `${s.pillar} · ${s.officer ? s.officer.char + s.officer.en : ''} · ${s.score}/100` : '';
+    return `<div class="${cls}" style="${s && s.tier === 'power' ? `--el-c:${elColor}` : ''}" title="${title}">${d}</div>`;
   }).join('');
+
+  // Top picks: best remaining days this month, else the best of the month.
+  let picks = scored.filter(s => s.tier !== 'avoid' && s.day >= today);
+  if (picks.length < 3) picks = scored.filter(s => s.tier !== 'avoid');
+  picks = picks.sort((a, b) => b.score - a.score || a.day - b.day).slice(0, 3).sort((a, b) => a.day - b.day);
+
+  const picksHTML = picks.map(p => {
+    const why = p.reasons.filter(r => r.good).slice(0, 2).map(r => _t(r.en, r.zh, r.th)).join(' · ')
+      || _t('Clear, uncomplicated day', '平稳无碍之日', 'วันราบรื่น ไม่มีอุปสรรค');
+    return `
+      <div class="pick-row">
+        <div class="pick-when">
+          <span class="pick-date" style="color:${elColor}">${MNAMES[month].slice(0, 3)} ${p.day}</span>
+          <span class="pick-gz">${p.pillar}${p.officer ? ' · ' + p.officer.char : ''}</span>
+        </div>
+        <div class="pick-why">${why}</div>
+      </div>`;
+  }).join('');
+
+  const clashDays = scored.filter(s => s.clashYear).map(s => s.day);
+  const animalName = _t(animal, ANIMAL_ZH[animal] || animal, ANIMAL_TH[animal] || animal);
+  const clashHTML = clashDays.length
+    ? `<div class="cal-clash-note">${_t(
+        `Avoid ${clashDays.join(', ')} — these days clash your ${animalName} year (冲太岁).`,
+        `避开 ${clashDays.join('、')} 日——冲你的${animalName}年太岁。`,
+        `เลี่ยงวันที่ ${clashDays.join(', ')} — ชงปี${animalName}ของคุณ (冲太岁)`)}</div>`
+    : '';
+
+  const purposeNote = {
+    all:      _t('Dates are read from your own four pillars: sound in the almanac (建除), in harmony with your chart, and never clashing your year animal.', '这些日子由你的四柱推出：黄历建除吉、与你本命相合、且绝不冲你的生肖太岁。', 'วันเหล่านี้อ่านจากสี่เสาของคุณ: ดีตามปฏิทินจีน (建除) เข้ากับดวงคุณ และไม่ชงปีนักษัตรของคุณ'),
+    business: _t('Opening dates favour 开 Open and 成 Complete days that also support your Day Master.', '开业宜取开日、成日，并要生扶你的日主。', 'วันเปิดกิจการเน้นวันเปิด (开) และวันสำเร็จ (成) ที่เสริมวันมาสเตอร์ของคุณ'),
+    contract: _t('Signing dates favour 定 Settle and 执 Hold days in harmony with your pillars.', '签约宜取定日、执日，且与你四柱相合。', 'วันเซ็นสัญญาเน้นวันตกลง (定) และวันยึด (执) ที่เข้ากับเสาของคุณ'),
+    travel:   _t('Travel dates favour 开 Open and 除 Remove days, clear of clashes with your chart.', '出行宜取开日、除日，且不冲你的命盘。', 'วันเดินทางเน้นวันเปิด (开) และวันขจัด (除) ที่ไม่ชงกับดวงคุณ'),
+    personal: _t('Personal dates weigh your favourable element, your 天乙贵人 days, and harmony with your pillars.', '个人吉日看你的喜用神、天乙贵人日，以及与四柱的合。', 'วันมงคลส่วนตัวดูจากธาตุที่คุณต้องการ วันกุ้ยเหริน และความเข้ากันกับเสาของคุณ'),
+  };
 
   const legendHTML = `
     <div class="cal-legend">
-      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power" style="background:${elColor}"></div> ${_t('Power Day', '吉日')}</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-good"></div> ${_t('Lucky Day', '幸运日')}</div>
-      ${partnerDays.length ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-both"></div> ${_t('Works for both charts', '两盘皆宜', 'เหมาะทั้งสองแผน')}</div>` : ''}
+      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power" style="background:${elColor}"></div> ${_t('Power Day', '吉日', 'วันพลัง')}</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-good"></div> ${_t('Good Day', '吉', 'วันดี')}</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-avoid"></div> ${_t('Avoid', '忌', 'ควรเลี่ยง')}</div>
+      ${partnerScored.length ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-both"></div> ${_t('Works for both charts', '两盘皆宜', 'เหมาะทั้งสองแผน')}</div>` : ''}
     </div>
   `;
-  const purposeNote = {
-    all: _t('Power Days align your dominant element with the most supportive monthly qi. Use the filters to plan opening, contracts, travel, or a personal lucky date — all free.', '吉日是你主导五行与月度气场最契合之时。用筛选安排开业、签约、出行或个人吉日——全部免费。', 'วันพลังคือวันที่ธาตุคุณสอดคล้องกับลมเดือน ใช้ตัวกรองวางแผนเปิดกิจการ เซ็นสัญญา เดินทาง หรือวันมงคลส่วนตัว — ฟรีทั้งหมด'),
-    business: _t('Open-business dates favor starts, launches, and first customers.', '开业日宜启动、上线、迎来第一批客人。', 'วันเปิดกิจการเหมาะเริ่มต้น เปิดตัว และลูกค้าแรก'),
-    contract: _t('Contract dates favor signing, sealing, and making it binding.', '签约日宜落笔、盖章、把事情说定。', 'วันเซ็นสัญญาเหมาะลงนาม ปิด และทำให้ผูกพัน'),
-    travel: _t('Travel dates favor movement, visits, and leaving the house with a clean wind.', '出行日宜动身、拜访、带着清风出门。', 'วันเดินทางเหมาะเคลื่อนที่ เยี่ยม และออกจากบ้านด้วยลมดี'),
-    personal: _t('Personal lucky dates are your Power and Lucky days — asks, rituals, and private beginnings.', '个人吉日即你的吉日与幸运日——开口、仪式、私下的开始。', 'วันมงคลส่วนตัวคือวันพลังและวันโชค — คำขอ พิธี และจุดเริ่มส่วนตัว'),
-  };
 
-  document.getElementById('power-days-card').innerHTML = `
+  card.innerHTML = `
     <div class="power-days-card">
       <div class="cal-month-label">${MNAMES[month]} ${year}</div>
       <div class="cal-grid">
@@ -3952,6 +3997,11 @@ function renderAuspiciousDates(animal, dominantEl) {
         ${days}
       </div>
       ${legendHTML}
+      ${clashHTML}
+      ${picksHTML ? `<div class="cal-picks">
+        <div class="cal-picks-head">${_t('Best dates for you', '为你择的日子', 'วันที่ดีที่สุดสำหรับคุณ')}</div>
+        ${picksHTML}
+      </div>` : ''}
       <div class="cal-note">${purposeNote[_calFilter] || purposeNote.all}</div>
     </div>
   `;

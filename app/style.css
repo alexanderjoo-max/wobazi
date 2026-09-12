@@ -2946,6 +2946,53 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
   padding-top: 12px;
 }
 
+/* Days that clash the natal year branch (冲太岁) are struck through, never merely dimmed. */
+.cal-avoid {
+  border: 1px solid rgba(239,68,68,0.38);
+  background: rgba(239,68,68,0.08);
+  color: rgba(248,180,180,0.92);
+  text-decoration: line-through;
+  text-decoration-color: rgba(239,68,68,0.65);
+}
+.cal-plain { color: var(--w35); }
+.cal-legend-avoid { border: 1.5px solid rgba(239,68,68,0.55); background: rgba(239,68,68,0.15); }
+.cal-clash-note {
+  font-size: 11px;
+  line-height: 1.6;
+  color: rgba(248,180,180,0.92);
+  background: rgba(239,68,68,0.08);
+  border-left: 2px solid rgba(239,68,68,0.5);
+  border-radius: 0 8px 8px 0;
+  padding: 8px 10px;
+}
+.cal-picks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.cal-picks-head {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.pick-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  background: var(--w03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.pick-when { display: flex; align-items: baseline; gap: 10px; }
+.pick-date { font-size: 14px; font-weight: 800; }
+.pick-gz { font-family: 'Noto Sans SC', sans-serif; font-size: 12px; color: var(--muted); }
+.pick-why { font-size: 12px; line-height: 1.55; color: var(--w6); }
+
 /* ── LUCKY FOODS ── */
 .foods-card {
   display: flex;
@@ -4641,7 +4688,7 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
   text-align: left;
   padding: 20px 18px;
   background: rgba(10,8,20,0.68);
-  border: 1px solid rgba(196,162,255,0.22);
+  border: 1px solid rgba(240,192,64,0.18);
   border-radius: 22px;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -4665,63 +4712,58 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 .feat-card:nth-child(2) { transition-delay: 0.07s; }
 .feat-card:nth-child(3) { transition-delay: 0.14s; }
 .feat-card:hover {
-  border-color: rgba(196,162,255,0.35);
-  background: rgba(15,15,28,0.62);
+  border-color: rgba(240,192,64,0.38);
+  background: rgba(15,12,26,0.66);
 }
 
+/* Feature sigils: veils of light around a character (日 self, 时 timing, 合 harmony).
+   Everything is translucent and blurred; nothing reads as a hard UI shape. */
 .sigil {
   flex: 0 0 auto;
   width: 92px;
   height: 92px;
-  filter: drop-shadow(0 0 14px rgba(196,162,255,0.35));
+  filter: drop-shadow(0 0 20px rgba(240,192,64,0.16));
 }
 .sigil svg { width: 100%; height: 100%; overflow: visible; }
-.sigil-swirl,
-.sigil-orbit,
-.sigil-mote,
-.sigil-node,
-.sigil-soul {
+.sg-veil,
+.sg-halo,
+.sg-orbit,
+.sg-motes,
+.sg-drift,
+.sg-disc {
   transform-box: view-box;
   transform-origin: 48px 48px;
 }
-.sigil-halo { animation: sigil-breathe 5.5s ease-in-out infinite; }
-.sigil-swirl {
-  transform-origin: 48px 48px;
-  animation: orbit-cw 18s linear infinite;
+.sg-veil { animation: sigil-breathe 7s ease-in-out infinite; }
+.sg-halo { animation: sg-bloom 9s ease-in-out infinite; }
+.sg-orbit { animation: orbit-cw 90s linear infinite; }
+.sg-motes { animation: orbit-ccw 52s linear infinite; }
+.sg-drift { animation: orbit-cw 26s linear infinite; }
+.sg-char {
+  font-family: 'Noto Sans SC', 'Noto Serif SC', serif;
+  font-size: 25px;
+  font-weight: 700;
+  fill: #fff4d8;
+  fill-opacity: 0.62;
 }
-.sigil-core { animation: sigil-breathe 3.2s ease-in-out infinite; }
-.sigil-mote.a { transform-origin: 48px 48px; animation: orbit-cw 10s linear infinite; }
-.sigil-mote.b { transform-origin: 48px 48px; animation: orbit-ccw 14s linear infinite; }
-.sigil-mote.c { transform-origin: 48px 48px; animation: orbit-cw 16s linear infinite reverse; }
-.sigil-orbit { transform-origin: 48px 48px; animation: orbit-cw 22s linear infinite; }
-.sigil-orbit.alt { animation: orbit-ccw 28s linear infinite; }
-.sigil-node { transform-origin: 48px 48px; }
-.sigil-node.n1 { animation: orbit-cw 12s linear infinite; }
-.sigil-node.n2 { animation: orbit-cw 12s linear infinite; }
-.sigil-node.n3 { animation: orbit-cw 12s linear infinite; }
-.sigil-node.n4 { animation: orbit-cw 12s linear infinite; }
-.sigil-comet {
-  stroke-dasharray: 6 10;
-  animation: thread-flow 3.2s linear infinite;
-}
-.sigil-thread {
-  stroke-dasharray: 5 9;
-  animation: thread-flow 4s linear infinite;
-}
-.sigil-soul.s-a { animation: soul-a 4.6s ease-in-out infinite; }
-.sigil-soul.s-b { animation: soul-b 4.6s ease-in-out infinite; }
+.sg-disc.a { animation: soul-a 9s ease-in-out infinite; }
+.sg-disc.b { animation: soul-b 9s ease-in-out infinite; }
 @keyframes sigil-breathe {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.95; }
+}
+@keyframes sg-bloom {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
 }
 @keyframes thread-flow { to { stroke-dashoffset: -40; } }
 @keyframes soul-a {
   0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(3px, -2px); }
+  50% { transform: translate(2.5px, -1.5px); }
 }
 @keyframes soul-b {
   0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-3px, 2px); }
+  50% { transform: translate(-2.5px, 1.5px); }
 }
 .feat-copy { min-width: 0; }
 .feat-copy h2 {
@@ -4936,15 +4978,12 @@ body.light-mode .splash-authed {
   .star-drift,
   .star-dust,
   .splash-cta,
-  .sigil-swirl,
-  .sigil-halo,
-  .sigil-core,
-  .sigil-mote,
-  .sigil-orbit,
-  .sigil-node,
-  .sigil-comet,
-  .sigil-thread,
-  .sigil-soul {
+  .sg-veil,
+  .sg-halo,
+  .sg-orbit,
+  .sg-motes,
+  .sg-drift,
+  .sg-disc {
     animation: none !important;
   }
   .feat-card,
@@ -5788,12 +5827,6 @@ a.footer-udestiny span {
   color: rgba(240,240,255,0.8);
   background: rgba(10,6,18,0.88);
   border-bottom: 1px solid rgba(240,192,64,0.14);
-}
-.usp-row {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px;
-  max-width: 540px; margin: 16px auto 0;
-  font-size: 12px; letter-spacing: 0.02em;
-  color: rgba(255,248,255,0.85);
 }
 .usp-item { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
 .usp-item::before { content: '✦'; color: var(--gold); font-size: 9px; }
