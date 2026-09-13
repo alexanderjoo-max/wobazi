@@ -56,6 +56,9 @@ ensureColumn('readings', 'lunar_month', 'INTEGER');
 ensureColumn('readings', 'lunar_day', 'INTEGER');
 ensureColumn('readings', 'minute', 'INTEGER');
 ensureColumn('readings', 'monthly_forecasts', 'TEXT');
+ensureColumn('readings', 'twin', 'INTEGER DEFAULT 0');
+ensureColumn('readings', 'twin_order', 'TEXT');
+ensureColumn('readings', 'twin_method', 'TEXT');
 
 /* ── Cookie-based Session (survives Render deploys — no server-side store needed) ── */
 const isProduction = process.env.NODE_ENV === 'production' || (process.env.BASE_URL || '').startsWith('https');
@@ -415,24 +418,30 @@ app.post('/api/save-reading', (req, res) => {
   const {
     name, year, month, day, hour, minute, birthplace, bloodType, gender,
     calendarType, leapMonth, lunarYear, lunarMonth, lunarDay, monthlyForecasts,
+    twin, twinOrder, twinMethod,
   } = req.body;
   db.prepare(`
     INSERT INTO readings (
       google_id, name, year, month, day, hour, birthplace, blood_type, gender,
-      calendar_type, leap_month, lunar_year, lunar_month, lunar_day, minute, monthly_forecasts, updated_at
+      calendar_type, leap_month, lunar_year, lunar_month, lunar_day, minute, monthly_forecasts,
+      twin, twin_order, twin_method, updated_at
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
     ON CONFLICT(google_id) DO UPDATE SET
       name=excluded.name, year=excluded.year, month=excluded.month, day=excluded.day,
       hour=excluded.hour, birthplace=excluded.birthplace, blood_type=excluded.blood_type,
       gender=excluded.gender, calendar_type=excluded.calendar_type, leap_month=excluded.leap_month,
       lunar_year=excluded.lunar_year, lunar_month=excluded.lunar_month, lunar_day=excluded.lunar_day,
-      minute=excluded.minute, monthly_forecasts=excluded.monthly_forecasts, updated_at=datetime('now')
+      minute=excluded.minute, monthly_forecasts=excluded.monthly_forecasts,
+      twin=excluded.twin, twin_order=excluded.twin_order, twin_method=excluded.twin_method, updated_at=datetime('now')
   `).run(
     req.session.user.googleId, name, year, month, day, hour || null, birthplace || null, bloodType || null, gender || null,
     calendarType || 'solar', leapMonth ? 1 : 0, lunarYear || null, lunarMonth || null, lunarDay || null,
     minute != null ? minute : null,
-    monthlyForecasts ? JSON.stringify(monthlyForecasts) : null
+    monthlyForecasts ? JSON.stringify(monthlyForecasts) : null,
+    twin ? 1 : 0,
+    twin && twinOrder === 'younger' ? 'younger' : (twin ? 'elder' : null),
+    twin && ['luck', 'hour'].includes(twinMethod) ? twinMethod : null
   );
   res.json({ ok: true });
 });

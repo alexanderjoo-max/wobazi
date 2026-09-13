@@ -924,6 +924,32 @@
           </div>
         </div>
 
+        <div class="field twin-field">
+          <label class="twin-check">
+            <input type="checkbox" id="is-twin" onchange="onTwinToggle()">
+            <span class="en">I’m a twin</span><span class="zh hide">我是双胞胎</span><span class="th hide">ฉันเป็นฝาแฝด</span>
+            <span class="label-opt">双胞胎</span>
+          </label>
+          <div class="twin-options hide" id="twin-options">
+            <div class="gender-row twin-order" role="radiogroup" aria-label="Twin birth order">
+              <label class="gender-opt"><input type="radio" name="twin-order" value="elder" checked onchange="updateTwinHint()"> <span class="en">Born first</span><span class="zh hide">先出生</span><span class="th hide">เกิดก่อน</span></label>
+              <label class="gender-opt"><input type="radio" name="twin-order" value="younger" onchange="updateTwinHint()"> <span class="en">Born second</span><span class="zh hide">后出生</span><span class="th hide">เกิดทีหลัง</span></label>
+            </div>
+            <div class="twin-method-wrap hide" id="twin-method-wrap">
+              <label for="twin-method"><span class="en">Method</span><span class="zh hide">取法</span><span class="th hide">วิธี</span></label>
+              <select id="twin-method" class="select-input">
+                <option value="luck">大运法 — month from first luck pillar</option>
+                <option value="hour">时柱法 — hour moves one 时辰</option>
+              </select>
+            </div>
+            <p class="field-hint">
+              <span class="en">Twins born in the same two-hour 时辰 share one chart. The first-born keeps it; the second-born is read with one of two methods. Boy–girl twins usually need no change, since gender already reverses the luck cycle.</span>
+              <span class="zh hide">同一时辰出生的双胞胎八字相同。先出生者用原命盘，后出生者按两种取法之一推算。龙凤胎通常无需调整，性别已使大运顺逆不同。</span>
+              <span class="th hide">ฝาแฝดที่เกิดในยามเดียวกันมีแผนภูมิเดียวกัน คนที่เกิดก่อนใช้แผนภูมินี้ คนที่เกิดทีหลังอ่านด้วยหนึ่งในสองวิธี แฝดชาย-หญิงมักไม่ต้องปรับ เพราะเพศทำให้วัยจรเดินต่างทางอยู่แล้ว</span>
+            </p>
+          </div>
+        </div>
+
         <button type="submit" class="btn-primary btn-full" id="submit-reading">
           <span class="submit-reveal">
             <span class="en">Reveal My Destiny</span><span class="zh hide">揭示我的命运</span><span class="th hide">เปิดเผยโชคชะตา</span>
@@ -1123,6 +1149,7 @@
           <h3 class="th hide">สี่เสา</h3>
           <span class="section-sub">八字 Bāzì</span>
         </div>
+        <p class="chart-basis" id="chart-basis"></p>
         <div class="pillars-row" id="pillars-row"></div>
         <p class="pillar-disclaimer" id="pillar-disclaimer"></p>
       </section>

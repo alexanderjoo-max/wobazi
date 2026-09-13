@@ -126,7 +126,24 @@ require('./share').mount(app);
 - **Hour convention (夜子时)**: 子时 = 23:00–00:59. Early 子 (23:00–23:59) keeps today’s day pillar but takes the **next civil day’s hour stem**. Late 子 (00:00–00:59) uses the current day’s stem.
 - **藏干** are attached to each branch. Ten Gods weight visible stem 1.0 / main hidden 0.5 / mid 0.3 / residual 0.2.
 
-API: `calcBaziAccurate({ year, month, day, hour, calendar, leapMonth, tzOffsetMinutes, minute })` — `month` is **1-indexed**. Legacy `calcBazi(y, month0, d, h)` still uses 0-indexed month.
+API: `calcBaziAccurate({ year, month, day, hour, calendar, leapMonth, tzOffsetMinutes, minute, gender, twin })` — `month` is **1-indexed**. Legacy `calcBazi(y, month0, d, h)` still uses 0-indexed month.
+
+### Display order
+The Four Pillars row renders **Hour → Day → Month → Year** (traditional right-to-left 命盘, matches FengshuiX). The `pillars` array stays `[Year, Month, Day, Hour]` everywhere in code. A "Chart for 29 Apr 1995 · 08:45 · Solar" line sits above it so a Lunar/Solar mix-up is visible (a lunar 1995-04-29 gives 乙亥 辛巳 己未 戊辰, not 乙亥 庚辰 庚寅 庚辰).
+
+### 大运 Luck Pillars (added 2026-09-13)
+- Returned as `result.luck` when `gender` is `'M'|'F'` (null otherwise).
+- Yang year + male or Yin year + female → forward from the month pillar; else backward.
+- Start age = days to next 节 (forward) / since previous 节 (backward) ÷ 3 (1 day = 4 months). 9 pillars (~90 years).
+- Reference: 1995-04-29 08:45 female → starts 2 yrs 4 mo, 辛巳 1997, 壬午 2007, 癸未 2017, 甲申 2027 (FengshuiX).
+- `luckPillarAt(luck, age)` returns the running pillar. Batch prompts use it (gender defaults to M there).
+
+### Twins 双胞胎 (added 2026-09-13)
+- `twin: { enabled, order: 'elder'|'younger', method: 'luck'|'hour' }`. Elder keeps the natal chart.
+- Younger, `luck` 大运法: month pillar ← first luck pillar; luck list starts one step later, same start age. Needs gender.
+- Younger, `hour` 时柱法: hour pillar → next in the 60 cycle. Needs birth time.
+- Shifted pillars carry `twinShifted: true` and `natal`; `result.twin` records `applied` / `reason`.
+- Stored in `readings.twin`, `twin_order`, `twin_method`; localStorage payload `twin`.
 
 Fixtures: `npm test` (`test/bazi-engine.test.js`) vs lunar-javascript / BaZi Lab 排盘 (no true solar time).
 

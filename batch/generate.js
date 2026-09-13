@@ -48,6 +48,8 @@ function buildChartContext(user, today) {
     hour,
     minute: user.minute || 0,
     calendar: 'solar',
+    gender: gender || 'M', // Default to Male if gender unknown (luck direction)
+    twin: user.twin ? { enabled: true, order: user.twin_order, method: user.twin_method } : null,
   });
   const pillars = accurate.pillars;
   const elements = bazi.calcElements(pillars);
@@ -63,18 +65,13 @@ function buildChartContext(user, today) {
   // Favorable / unfavorable elements
   const { favorable, unfavorable } = helpers.analyzeFavorableElements(dmEl, elements);
 
-  // Luck pillar
-  const birthDate = new Date(year, month, day);
-  const userAge = Math.floor((today - birthDate) / (365.25 * 86400000));
-  const monthStemIdx = bazi.STEMS.indexOf(pillars[1].stem);
-  const monthBranchIdx = bazi.BRANCHES.indexOf(pillars[1].branch);
-  const luckPillar = helpers.calcLuckPillar(
-    gender || 'M', // Default to Male if gender unknown
-    pillars[0].stem.polarity,
-    monthStemIdx >= 0 ? monthStemIdx : 0,
-    monthBranchIdx >= 0 ? monthBranchIdx : 0,
-    Math.max(0, userAge)
-  );
+  // Luck pillar (大运 from the engine: real start age from the 节 boundary)
+  const birthDate = new Date(year, month - 1, day);
+  const userAge = Math.max(0, (today - birthDate) / (365.25 * 86400000));
+  const running = bazi.luckPillarAt(accurate.luck, userAge);
+  const luckPillar = running
+    ? { stem: running.stem, branch: running.branch, startAge: Math.floor(running.ageFrom), endAge: Math.floor(running.ageTo) }
+    : { stem: pillars[1].stem, branch: pillars[1].branch, startAge: 0, endAge: Math.floor(accurate.luck.startAge) };
 
   // Clashes & combinations
   const clashes = helpers.findClashes(pillars, todayBranch.animal);
@@ -338,7 +335,8 @@ async function generateDailyReadings(db, targetDate) {
 
   // Get all active users who have birth data but no reading for today
   const users = db.prepare(`
-    SELECT r.google_id, r.name, r.year, r.month, r.day, r.hour, r.gender
+    SELECT r.google_id, r.name, r.year, r.month, r.day, r.hour, r.minute, r.gender,
+           r.twin, r.twin_order, r.twin_method
     FROM readings r
     INNER JOIN users u ON u.google_id = r.google_id
     WHERE r.google_id NOT IN (

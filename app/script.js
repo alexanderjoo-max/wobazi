@@ -551,6 +551,7 @@ function collectBirthPayload() {
   const birthplace = document.getElementById('birthplace')?.value.trim() || '';
   const bloodType = document.getElementById('blood-type')?.value || null;
   const gender = document.querySelector('input[name="gender"]:checked')?.value || null;
+  const twin = collectTwin();
   if (!y || !m || !d) return null;
   let solarY = y, solarM = m, solarD = d;
   if (calendarType === 'lunar' && window.BaziEngine) {
@@ -565,8 +566,42 @@ function collectBirthPayload() {
     lunarYear: calendarType === 'lunar' ? y : null,
     lunarMonth: calendarType === 'lunar' ? m : null,
     lunarDay: calendarType === 'lunar' ? d : null,
-    birthplace, bloodType, gender,
+    birthplace, bloodType, gender, twin,
   };
+}
+
+/* Twin option → { enabled, order: 'elder'|'younger', method: 'luck'|'hour' } or null */
+function collectTwin() {
+  if (!document.getElementById('is-twin')?.checked) return null;
+  return {
+    enabled: true,
+    order: document.querySelector('input[name="twin-order"]:checked')?.value || 'elder',
+    method: document.getElementById('twin-method')?.value || 'luck',
+  };
+}
+function onTwinToggle() {
+  const on = !!document.getElementById('is-twin')?.checked;
+  document.getElementById('twin-options')?.classList.toggle('hide', !on);
+  updateTwinHint();
+}
+function updateTwinHint() {
+  const younger = document.querySelector('input[name="twin-order"]:checked')?.value === 'younger';
+  document.getElementById('twin-method-wrap')?.classList.toggle('hide', !younger);
+}
+function fillTwin(t) {
+  const box = document.getElementById('is-twin');
+  if (box) box.checked = !!(t && t.enabled);
+  const order = (t && t.order) || 'elder';
+  const radio = document.querySelector(`input[name="twin-order"][value="${order}"]`);
+  if (radio) radio.checked = true;
+  const method = document.getElementById('twin-method');
+  if (method) method.value = (t && t.method) || 'luck';
+  onTwinToggle();
+}
+/* Server row → twin object */
+function twinFromRow(r) {
+  if (!r || !r.twin) return null;
+  return { enabled: true, order: r.twin_order || 'elder', method: r.twin_method || 'luck' };
 }
 
 function persistBirthIfValid() {
@@ -620,6 +655,7 @@ function fillFormFromPayload(p) {
     const radio = document.querySelector(`input[name="gender"][value="${p.gender}"]`);
     if (radio) radio.checked = true;
   }
+  fillTwin(p.twin);
   updateLunarPreview();
   onTimeUnknownToggle();
 }
@@ -760,6 +796,7 @@ function restoreResults(p, opts) {
     leapMonth: !!p.leapMonth,
     minute: p.minute || 0,
     lunarYear: p.lunarYear, lunarMonth: p.lunarMonth, lunarDay: p.lunarDay,
+    twin: p.twin || null,
   };
   const go = () => {
     renderResults(p.name || '', p.year, p.month - 1, p.day, hour, p.birthplace || '', p.bloodType || p.blood_type || null, p.gender || null, {
@@ -790,6 +827,7 @@ function continueReading() {
         lunarYear: _savedReading.lunar_year,
         lunarMonth: _savedReading.lunar_month,
         lunarDay: _savedReading.lunar_day,
+        twin: twinFromRow(_savedReading),
       })
     : local;
   if (!p) { goToInput(); return; }
@@ -820,6 +858,9 @@ function applyRoute(hash) {
       name: _savedReading.name, year: _savedReading.year, month: _savedReading.month, day: _savedReading.day,
       hour: _savedReading.hour, birthplace: _savedReading.birthplace, bloodType: _savedReading.blood_type, gender: _savedReading.gender,
       calendarType: _savedReading.calendar_type || 'solar',
+      leapMonth: !!_savedReading.leap_month, minute: _savedReading.minute || 0,
+      lunarYear: _savedReading.lunar_year, lunarMonth: _savedReading.lunar_month, lunarDay: _savedReading.lunar_day,
+      twin: twinFromRow(_savedReading),
     } : null);
     if (!p || !p.year) {
       goHash('input', { replace: true });
@@ -1066,6 +1107,7 @@ function handleSubmit(e) {
     lunarYear: payload.lunarYear,
     lunarMonth: payload.lunarMonth,
     lunarDay: payload.lunarDay,
+    twin: payload.twin || null,
   };
   saveLocalChart(payload);
 
@@ -1096,6 +1138,8 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
       hour,
       minute,
       calendar: 'solar',
+      gender,
+      twin: (opts && opts.twin) || _birthMeta.twin || null,
     });
     pillars = accurate.pillars;
     _lastAccurate = accurate;
@@ -1343,7 +1387,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     document.getElementById('kua-section').classList.remove('data-hidden');
     renderKuaSection(kua, dominantEl);
   }
-  renderLifeDecades(year, dominantEl);
+  renderLifeDecades(year, dominantEl, accurate && accurate.luck, month, day);
 
   // Oracle deep read (includes career timing)
   renderOracleTab(animal, elements, fortune, pillars, forecast2026, dominantEl);
@@ -1367,10 +1411,13 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
 }
 
 /* ── Four Pillars ── */
+/* Displayed Hour → Day → Month → Year, the way a 命盘 is written (right to left).
+   The pillars array itself stays Year, Month, Day, Hour everywhere else. */
 function renderPillars(pillars) {
   const labels = ['Year','Month','Day','Hour'];
   const row = document.getElementById('pillars-row');
-  row.innerHTML = pillars.map((p, i) => {
+  row.innerHTML = [3, 2, 1, 0].map(i => {
+    const p = pillars[i];
     if (!p.known) {
       return `<div class="pillar-card dimmed">
         <div class="pillar-label">${_t(labels[i], {Year:'年',Month:'月',Day:'日',Hour:'时'}[labels[i]], {Year:'ปี',Month:'เดือน',Day:'วัน',Hour:'ชั่วโมง'}[labels[i]])}</div>
@@ -1378,7 +1425,10 @@ function renderPillars(pillars) {
       </div>`;
     }
     const elColor = EL_COLOR[p.stem.element];
-    return `<div class="pillar-card">
+    const twinTag = p.twinShifted
+      ? `<div class="pillar-twin-tag" title="${p.natal ? p.natal.stem.char + p.natal.branch.char : ''}">${_t('Twin', '双胞', 'แฝด')}</div>`
+      : '';
+    return `<div class="pillar-card${i === 2 ? ' pillar-self' : ''}${p.twinShifted ? ' pillar-twin' : ''}">
       <div class="pillar-label">${_t(labels[i], {Year:'年',Month:'月',Day:'日',Hour:'时'}[labels[i]], {Year:'ปี',Month:'เดือน',Day:'วัน',Hour:'ชั่วโมง'}[labels[i]])}</div>
       <div class="pillar-stem-char" style="color:${elColor}">${p.stem.char}</div>
       <div class="pillar-stem-name">${p.stem.pinyin}</div>
@@ -1387,8 +1437,10 @@ function renderPillars(pillars) {
       ${makeMedallion(p.branch.animal, EL_COLOR[p.branch.element], 'pillar-med')}
       <div class="pillar-animal-name">${_t(p.branch.animal, ANIMAL_ZH[p.branch.animal])}</div>
       <div class="pillar-el-dot" style="background:${EL_COLOR[p.branch.element]}"></div>
+      ${twinTag}
     </div>`;
   }).join('');
+  renderChartBasis();
   const disc = document.getElementById('pillar-disclaimer');
   if (disc) {
     disc.innerHTML = _t(
@@ -1397,6 +1449,38 @@ function renderPillars(pillars) {
       'แผนใช้เวลาตามนาฬิกาท้องถิ่น (ไม่ใช่สุริยคติแท้) ปีเปลี่ยนที่立春 เดือนเปลี่ยนที่节气'
     );
   }
+}
+
+/* "Chart for 29 Apr 1995 · 08:45 · Solar" — so a lunar/solar mix-up is visible at a glance. */
+function renderChartBasis() {
+  const el = document.getElementById('chart-basis');
+  const a = _lastAccurate;
+  if (!el) return;
+  if (!a || !a.solar) { el.innerHTML = ''; return; }
+  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const pad = n => String(n).padStart(2, '0');
+  const s = a.solar;
+  const dateEn = `${s.day} ${MON[s.month - 1]} ${s.year}`;
+  const dateZh = `${s.year}年${s.month}月${s.day}日`;
+  const time = s.hour == null ? '' : ` · ${pad(s.hour)}:${pad(s.minute || 0)}`;
+  const timeUnk = s.hour == null ? _t(' · time unknown', ' · 时辰未知', ' · ไม่ทราบเวลา') : '';
+  let cal = _t('Solar', '阳历', 'สุริยคติ');
+  const m = _birthMeta || {};
+  if (m.calendarType === 'lunar' && m.lunarYear) {
+    const lunarStr = `${m.lunarYear}-${pad(m.lunarMonth)}-${pad(m.lunarDay)}${m.leapMonth ? ' 闰' : ''}`;
+    cal = _t('from Lunar ' + lunarStr, '农历 ' + lunarStr + ' 换算', 'จากจันทรคติ ' + lunarStr);
+  }
+  let twin = '';
+  if (a.twin) {
+    const order = a.twin.order === 'younger' ? _t('younger twin', '双胞胎（后出生）', 'แฝดคนน้อง') : _t('older twin', '双胞胎（先出生）', 'แฝดคนพี่');
+    let how = '';
+    if (a.twin.applied && a.twin.method === 'luck') how = _t(' · month from 1st luck pillar', ' · 月柱取第一步大运', ' · เสาเดือนจากวัยจรแรก');
+    else if (a.twin.applied && a.twin.method === 'hour') how = _t(' · hour moved one 时辰', ' · 时柱后移一位', ' · เลื่อนเสายามหนึ่งช่วง');
+    else if (a.twin.reason === 'needs_gender') how = _t(' · add gender to apply', ' · 需填写性别', ' · กรุณาระบุเพศ');
+    else if (a.twin.reason === 'needs_time') how = _t(' · add birth time to apply', ' · 需填写出生时间', ' · กรุณาระบุเวลาเกิด');
+    twin = ` · ${order}${how}`;
+  }
+  el.innerHTML = `${_t('Chart for', '命盘', 'แผนภูมิของ')} <strong>${_t(dateEn, dateZh, dateEn)}${time}</strong>${timeUnk} · ${cal}${twin}`;
 }
 
 function renderTenGods(profile, pillars) {
@@ -4134,8 +4218,16 @@ function renderKuaSection(kua, dominantEl) {
   `;
 }
 
-/* ── Render Life Decades 大运 ── */
-function renderLifeDecades(year, dominantEl) {
+/* ── Render Luck Cycle 大运 ──
+   Real 10-year luck pillars from the engine when gender is known (direction depends on it).
+   Without gender, fall back to the element-theme life phases and ask for it. */
+function renderLifeDecades(year, dominantEl, luck, month0, day) {
+  const host = document.getElementById('decades-card');
+  if (!host) return;
+  if (luck && luck.pillars && luck.pillars.length) {
+    renderLuckPillars(host, luck, year, month0, day);
+    return;
+  }
   const elColor = EL_COLOR[dominantEl];
   const themes = DECADE_THEMES[dominantEl] || DECADE_THEMES.Water;
   const currentYear = new Date().getFullYear();
@@ -4160,15 +4252,79 @@ function renderLifeDecades(year, dominantEl) {
     _shareData.luckPhase = themes[currentDecadeIdx].phase;
     window._shareData = _shareData;
   }
-  document.getElementById('decades-card').innerHTML = `
+  host.innerHTML = `
     <div class="decades-card">
       <div class="decades-bar">${blocks}</div>
       <div class="decade-current-detail">
         <span style="color:${elColor}">${_t('You are in the', '你正处于')} <strong>${_t(themes[currentDecadeIdx].phase, themes[currentDecadeIdx].phase_zh)}</strong> ${_t('phase', '阶段')}</span> (${_t('age','年龄')} ~${currentDecadeIdx*14}–${currentDecadeIdx*14+13}).
         <span class="decade-note-text">${_t(themes[currentDecadeIdx].note, themes[currentDecadeIdx].note_zh)}</span>
+        <span class="decade-note-text">${_t('Add your gender on the birth form to see your real 10-year luck pillars — their direction depends on it.', '在出生信息中填写性别，即可查看真实的十年大运（顺逆排取决于性别）。', 'ระบุเพศในฟอร์มวันเกิดเพื่อดูเสาโชค 10 ปีจริง (ทิศทางขึ้นกับเพศ)')}</span>
       </div>
     </div>
   `;
+}
+
+function renderLuckPillars(host, luck, year, month0, day) {
+  const now = new Date();
+  const birth = new Date(year, month0 || 0, day || 1);
+  const age = Math.max(0, (now - birth) / (365.25 * 86400000));
+  const current = BaziEngine.luckPillarAt(luck, age);
+  const curIdx = current ? current.index : -1;
+  const fmtAge = a => Math.floor(a);
+  const startLabel = _t(
+    `${luck.startYears} yrs ${luck.startMonths} mo`,
+    `${luck.startYears}岁${luck.startMonths}个月`,
+    `${luck.startYears} ปี ${luck.startMonths} เดือน`
+  );
+
+  const pre = `
+    <div class="luck-block luck-pre${curIdx === -1 ? ' is-current' : ''}">
+      <div class="luck-age">0–${fmtAge(luck.startAge)}</div>
+      <div class="luck-chars luck-pre-mark">童限</div>
+      <div class="luck-god">${_t('Before luck', '起运前', 'ก่อนเข้าวัยจร')}</div>
+      <div class="luck-years">${year}</div>
+    </div>`;
+  const blocks = luck.pillars.map(p => {
+    const isCur = p.index === curIdx;
+    return `
+      <div class="luck-block${isCur ? ' is-current' : ''}${p.startYear > now.getFullYear() ? ' is-future' : ''}"${isCur ? ' aria-current="true"' : ''}>
+        <div class="luck-age">${fmtAge(p.ageFrom)}–${fmtAge(p.ageTo) - 1}</div>
+        <div class="luck-chars">
+          <span style="color:${EL_COLOR[p.stem.element]}">${p.stem.char}</span><span style="color:${EL_COLOR[p.branch.element]}">${p.branch.char}</span>
+        </div>
+        <div class="luck-god">${godLabel(p.stemGod)}</div>
+        <div class="luck-years">${p.startYear}–${p.endYear - 1}</div>
+      </div>`;
+  }).join('');
+
+  let detail;
+  if (current) {
+    const branchGod = current.branchGod ? godLabel(current.branchGod) : '';
+    detail = `${_t('You are in', '当前大运', 'ตอนนี้อยู่ในวัยจร')} <strong>${current.stem.char}${current.branch.char}</strong>
+      (${_t('age', '年龄', 'อายุ')} ${fmtAge(current.ageFrom)}–${fmtAge(current.ageTo) - 1}, ${current.startYear}–${current.endYear - 1}).
+      <span class="decade-note-text">${_t('Stem', '天干', 'ก้าน')} ${current.stem.char} ${current.stem.element}: ${godLabel(current.stemGod)}${branchGod ? ` · ${_t('Branch', '地支', 'กิ่ง')} ${current.branch.char} ${current.branch.animal}: ${branchGod}` : ''}</span>`;
+  } else {
+    detail = _t(`Your first luck pillar starts at ${startLabel}.`, `${startLabel}起运。`, `วัยจรแรกเริ่มที่ ${startLabel}`);
+  }
+  const dirNote = _t(
+    `Starts at ${startLabel} · runs ${luck.forward ? 'forward' : 'backward'} from the month pillar (${luck.jie}).`,
+    `${startLabel}起运 · 由月柱${luck.forward ? '顺' : '逆'}排（${luck.jie}）。`,
+    `เริ่มที่ ${startLabel} · นับ${luck.forward ? 'เดินหน้า' : 'ถอยหลัง'}จากเสาเดือน (${luck.jie})`
+  );
+
+  if (_shareData) {
+    _shareData.luckPhase = current ? current.stem.char + current.branch.char : '';
+    window._shareData = _shareData;
+  }
+  host.innerHTML = `
+    <div class="decades-card">
+      <div class="luck-bar">${pre}${blocks}</div>
+      <p class="luck-dir">${dirNote}</p>
+      <div class="decade-current-detail">${detail}</div>
+    </div>`;
+  const cur = host.querySelector('.luck-block.is-current');
+  const bar = host.querySelector('.luck-bar');
+  if (cur && bar) requestAnimationFrame(() => { bar.scrollLeft = Math.max(0, cur.offsetLeft - bar.clientWidth / 2 + cur.clientWidth / 2); });
 }
 
 /* ── Add TIPS entries for new sections ── */
@@ -4697,6 +4853,7 @@ async function loadUserData() {
         calendarType: r.calendar_type || local.calendarType || 'solar',
         leapMonth: !!r.leap_month,
         lunarYear: r.lunar_year, lunarMonth: r.lunar_month, lunarDay: r.lunar_day,
+        twin: twinFromRow(r),
         monthlyForecasts: same ? local.monthlyForecasts : local.monthlyForecasts,
       });
     }
@@ -4727,6 +4884,7 @@ handleSubmit = function(e) {
         minute: p.minute, birthplace: p.birthplace, bloodType: p.bloodType, gender: p.gender,
         calendarType: p.calendarType, leapMonth: p.leapMonth,
         lunarYear: p.lunarYear, lunarMonth: p.lunarMonth, lunarDay: p.lunarDay,
+        twin: !!p.twin, twinOrder: p.twin ? p.twin.order : null, twinMethod: p.twin ? p.twin.method : null,
       }),
     }).catch(() => {});
   }

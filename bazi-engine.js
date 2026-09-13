@@ -478,11 +478,26 @@
       makePillar('Hour',  hStemIdx,       hBranchIdx,       hour != null),
     ];
 
+    const gender = (opts.gender === 'M' || opts.gender === 'F') ? opts.gender : null;
+    let luck = gender ? calcLuckPillars({
+      utcJd, tzOffsetMinutes, gender,
+      birth: { year, month, day },
+      yearStemIdx: yInfo.yStemIdx,
+      monthStemIdx: mInfo.mStemIdx, monthBranchIdx: mInfo.mBranchIdx,
+      dayStemIdx: dInfo.stemIdx,
+    }) : null;
+
+    const twin = applyTwin(pillars, luck, opts.twin);
+    luck = twin.luck;
+
     const dayMaster = pillars[2].stem;
     const tenGods = calcTenGodsProfile(pillars, dayMaster);
 
     return {
       pillars,
+      luck,
+      twin: twin.info,
+      gender,
       solar: { year, month, day, hour, minute: hour == null ? null : minute },
       lunar,
       dayMaster,
@@ -505,6 +520,142 @@
       calendar: 'solar',
     });
     return result.pillars;
+  }
+
+  /* ── 大运 Luck Pillars ──
+     Yang year + male, or Yin year + female → forward from the month pillar; otherwise backward.
+     Start age: days from birth to the next 节 (forward) or back to the previous 节 (backward),
+     3 days = 1 year (1 day = 4 months). Each pillar lasts 10 years. */
+  function jieBounds(utcJd, gYear) {
+    let prev = -Infinity, next = Infinity, prevT = null, nextT = null;
+    for (let yy = gYear - 1; yy <= gYear + 1; yy++) {
+      for (let t = 0; t < 24; t += 2) {
+        const jd = jieqiJD(yy, t);
+        if (jd <= utcJd && jd > prev) { prev = jd; prevT = t; }
+        if (jd > utcJd && jd < next) { next = jd; nextT = t; }
+      }
+    }
+    return { prev, next, prevName: JIE_NAMES[prevT], nextName: JIE_NAMES[nextT] };
+  }
+
+  function luckStep(stemIdx, branchIdx, n) {
+    return {
+      stemIdx: ((stemIdx + n) % 10 + 10) % 10,
+      branchIdx: ((branchIdx + n) % 12 + 12) % 12,
+    };
+  }
+
+  /**
+   * @param {object} o
+   * @param {number} o.utcJd  birth moment
+   * @param {'M'|'F'} o.gender
+   * @param {{year,month,day}} o.birth  solar civil date
+   * @param {number} o.yearStemIdx, o.monthStemIdx, o.monthBranchIdx, o.dayStemIdx
+   * @param {number} [o.count]  pillars to list (default 9 → covers ~90 years)
+   */
+  function calcLuckPillars(o) {
+    const yangYear = o.yearStemIdx % 2 === 0;
+    const forward = (yangYear && o.gender === 'M') || (!yangYear && o.gender === 'F');
+    const bounds = jieBounds(o.utcJd, o.birth.year);
+    const days = forward ? bounds.next - o.utcJd : o.utcJd - bounds.prev;
+    const totalMonths = Math.round(days * 4);
+    const startYears = Math.floor(totalMonths / 12);
+    const startMonths = totalMonths % 12;
+    const startAge = totalMonths / 12;
+    const count = o.count || 9;
+    const dmStem = STEMS[o.dayStemIdx];
+    const pillars = [];
+    for (let i = 0; i < count; i++) {
+      const g = luckStep(o.monthStemIdx, o.monthBranchIdx, forward ? i + 1 : -(i + 1));
+      const pillar = makePillar('Luck', g.stemIdx, g.branchIdx, true);
+      const ageFrom = startAge + i * 10;
+      const startDate = new Date(Date.UTC(o.birth.year, o.birth.month - 1 + totalMonths + i * 120, 1));
+      const mainHidden = pillar.hidden[0] && pillar.hidden[0].stem;
+      pillars.push({
+        index: i,
+        stem: pillar.stem,
+        branch: pillar.branch,
+        hidden: pillar.hidden,
+        ageFrom,
+        ageTo: ageFrom + 10,
+        startYear: startDate.getUTCFullYear(),
+        endYear: startDate.getUTCFullYear() + 10,
+        stemGod: calcTenGod(dmStem.element, dmStem.polarity, pillar.stem.element, pillar.stem.polarity),
+        branchGod: mainHidden ? calcTenGod(dmStem.element, dmStem.polarity, mainHidden.element, mainHidden.polarity) : null,
+      });
+    }
+    return {
+      forward,
+      startAge,
+      startYears,
+      startMonths,
+      jie: forward ? bounds.nextName : bounds.prevName,
+      daysToJie: days,
+      pillars,
+    };
+  }
+
+  /* Which luck pillar is running at a given age (years, fractional). null = before the first 大运. */
+  function luckPillarAt(luck, age) {
+    if (!luck || !luck.pillars || age < luck.startAge) return null;
+    const i = Math.floor((age - luck.startAge) / 10);
+    return luck.pillars[Math.min(i, luck.pillars.length - 1)] || null;
+  }
+
+  /* ── Twins (双胞胎) ──
+     Twins born in the same 时辰 share one chart, so the younger twin is read differently.
+     The older twin keeps the natal chart. Methods for the younger twin:
+       'luck' 大运法 — the first luck pillar becomes the month pillar; luck starts one step later.
+       'hour' 时柱法 — the hour pillar moves to the next 时辰 in the sexagenary cycle.
+     Boy–girl twins already differ by luck direction, so this is usually left off for them.
+     Mutates `pillars` in place; returns the (possibly shifted) luck and a metadata record. */
+  const TWIN_METHODS = ['luck', 'hour'];
+
+  function applyTwin(pillars, luck, twinOpts) {
+    if (!twinOpts || !twinOpts.enabled) return { luck, info: null };
+    const order = twinOpts.order === 'younger' ? 'younger' : 'elder';
+    const method = TWIN_METHODS.indexOf(twinOpts.method) >= 0 ? twinOpts.method : 'luck';
+    const info = { order, method, applied: false, reason: null, shifted: null };
+    if (order === 'elder') { info.reason = 'elder_keeps_natal'; return { luck, info }; }
+
+    if (method === 'luck') {
+      if (!luck || !luck.pillars.length) { info.reason = 'needs_gender'; return { luck, info }; }
+      const first = luck.pillars[0];
+      const m = pillars[1];
+      pillars[1] = makePillar('Month', STEMS.indexOf(first.stem), BRANCHES.indexOf(first.branch), true);
+      pillars[1].twinShifted = true;
+      pillars[1].natal = { stem: m.stem, branch: m.branch };
+      /* Drop the pillar now used as the month, add the next one, keep the same start age. */
+      const dir = luck.forward ? 1 : -1;
+      const last = luck.pillars[luck.pillars.length - 1];
+      const g = luckStep(STEMS.indexOf(last.stem), BRANCHES.indexOf(last.branch), dir);
+      const extra = makePillar('Luck', g.stemIdx, g.branchIdx, true);
+      const dm = pillars[2].stem;
+      const shiftedPillars = luck.pillars.map((p, i) => {
+        const src = i + 1 < luck.pillars.length ? luck.pillars[i + 1] : Object.assign({}, p, {
+          stem: extra.stem, branch: extra.branch, hidden: extra.hidden,
+          stemGod: calcTenGod(dm.element, dm.polarity, extra.stem.element, extra.stem.polarity),
+          branchGod: extra.hidden[0] ? calcTenGod(dm.element, dm.polarity, extra.hidden[0].stem.element, extra.hidden[0].stem.polarity) : null,
+        });
+        return Object.assign({}, p, {
+          stem: src.stem, branch: src.branch, hidden: src.hidden,
+          stemGod: src.stemGod, branchGod: src.branchGod,
+        });
+      });
+      luck = Object.assign({}, luck, { pillars: shiftedPillars });
+      info.applied = true;
+      info.shifted = 'Month';
+    } else if (method === 'hour') {
+      const h = pillars[3];
+      if (!h.known) { info.reason = 'needs_time'; return { luck, info }; }
+      const g = luckStep(STEMS.indexOf(h.stem), BRANCHES.indexOf(h.branch), 1);
+      pillars[3] = makePillar('Hour', g.stemIdx, g.branchIdx, true);
+      pillars[3].twinShifted = true;
+      pillars[3].natal = { stem: h.stem, branch: h.branch };
+      info.applied = true;
+      info.shifted = 'Hour';
+    }
+    return { luck, info };
   }
 
   function calcElements(pillars) {
@@ -1365,7 +1516,7 @@
   return {
     STEMS, BRANCHES, ZODIAC, EL_COLOR, EL_ZH, ANIMAL_ZH,
     MONTH_BRANCH, hourToBranch,
-    calcBazi, calcBaziAccurate, calcElements, calcElementsDetailed,
+    calcBazi, calcBaziAccurate, calcLuckPillars, luckPillarAt, TWIN_METHODS, calcElements, calcElementsDetailed,
     calcFortune, getDominant,
     PRODUCTION_CYCLE, CONTROL_CYCLE,
     HIDDEN_STEMS, HIDDEN_WEIGHT, TEN_GODS, TEN_GOD_MEANING, TEN_GOD_BY_ID,

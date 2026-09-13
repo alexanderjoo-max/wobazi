@@ -3280,6 +3280,49 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
   border-radius: var(--radius-md);
   padding: 14px 16px;
 }
+/* 大运 luck pillars */
+.luck-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+  scroll-snap-type: x proximity;
+}
+.luck-block {
+  flex-shrink: 0;
+  width: 84px;
+  background: var(--w03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  scroll-snap-align: center;
+}
+.luck-block.is-future { opacity: 0.72; }
+.luck-block.is-current {
+  border: 2px solid var(--gold);
+  background: var(--gold-dim);
+  opacity: 1;
+}
+.luck-age { font-size: 12px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.luck-chars {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.15;
+  display: flex;
+  flex-direction: column;
+}
+.luck-pre-mark { font-size: 15px; color: var(--muted); padding: 7px 0; }
+.luck-god { font-size: 10px; color: var(--w6); line-height: 1.3; min-height: 26px; }
+.luck-years { font-size: 9px; color: var(--muted); font-weight: 600; letter-spacing: 0.3px; font-variant-numeric: tabular-nums; }
+.luck-dir { font-size: 11px; color: var(--muted); margin: -6px 0 0; line-height: 1.45; }
+
 .decade-note-text {
   color: var(--w4);
   font-style: italic;
@@ -5616,6 +5659,37 @@ a.footer-udestiny span {
   margin: 0;
   font-weight: 600;
 }
+.chart-basis {
+  font-size: 12px;
+  color: var(--w6);
+  text-align: center;
+  margin: 0 0 10px;
+  line-height: 1.45;
+}
+.chart-basis strong { color: var(--text); font-weight: 700; }
+.pillar-card { position: relative; }
+.pillar-card.pillar-twin { border-color: var(--gold); }
+.pillar-twin-tag {
+  position: absolute;
+  top: 6px; right: 6px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.twin-field .twin-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+}
+.twin-field .twin-check input { width: 18px; height: 18px; accent-color: var(--gold); }
+.twin-options { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.twin-method-wrap { display: flex; flex-direction: column; gap: 6px; }
 .pillar-disclaimer {
   font-size: 11px;
   color: var(--muted);

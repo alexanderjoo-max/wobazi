@@ -279,3 +279,75 @@ describe('择日 — personal date selection', () => {
     for (const el of fav.favorable) assert.ok(!fav.unfavorable.includes(el));
   });
 });
+
+describe('FengshuiX reference — 1995-04-29 08:45', () => {
+  const opts = { year: 1995, month: 4, day: 29, hour: 8, minute: 45 };
+
+  it('natal pillars: 乙亥 庚辰 庚寅 庚辰', () => {
+    assert.deepEqual(chart(opts), ['乙亥', '庚辰', '庚寅', '庚辰']);
+  });
+
+  it('read as a lunar date it becomes a different chart (solar 1995-05-28)', () => {
+    assert.deepEqual(chart(Object.assign({}, opts, { calendar: 'lunar' })), ['乙亥', '辛巳', '己未', '戊辰']);
+  });
+
+  it('female 大运 runs forward from 2 yrs 4 mo: 辛巳 1997, 壬午 2007, 癸未 2017, 甲申 2027', () => {
+    const r = bazi.calcBaziAccurate(Object.assign({}, opts, { gender: 'F' }));
+    assert.equal(r.luck.forward, true);
+    assert.equal(r.luck.startYears, 2);
+    assert.equal(r.luck.startMonths, 4);
+    assert.equal(r.luck.pillars.length, 9);
+    assert.deepEqual(
+      r.luck.pillars.slice(0, 4).map(p => p.stem.char + p.branch.char + ' ' + p.startYear),
+      ['辛巳 1997', '壬午 2007', '癸未 2017', '甲申 2027']
+    );
+    assert.equal(r.luck.pillars[0].stemGod, 'rob_wealth');
+  });
+
+  it('male 大运 runs backward from the month pillar', () => {
+    const r = bazi.calcBaziAccurate(Object.assign({}, opts, { gender: 'M' }));
+    assert.equal(r.luck.forward, false);
+    assert.deepEqual(r.luck.pillars.slice(0, 2).map(p => p.stem.char + p.branch.char), ['己卯', '戊寅']);
+  });
+
+  it('no gender → no luck pillars', () => {
+    assert.equal(bazi.calcBaziAccurate(opts).luck, null);
+  });
+});
+
+describe('Twins (双胞胎)', () => {
+  const base = { year: 1995, month: 4, day: 29, hour: 8, minute: 45, gender: 'F' };
+
+  it('older twin keeps the natal chart', () => {
+    const r = bazi.calcBaziAccurate(Object.assign({}, base, { twin: { enabled: true, order: 'elder', method: 'luck' } }));
+    assert.deepEqual(gz(r), ['乙亥', '庚辰', '庚寅', '庚辰']);
+    assert.equal(r.twin.applied, false);
+  });
+
+  it('younger twin, 大运法: first luck pillar becomes the month; luck starts one step on', () => {
+    const r = bazi.calcBaziAccurate(Object.assign({}, base, { twin: { enabled: true, order: 'younger', method: 'luck' } }));
+    assert.deepEqual(gz(r), ['乙亥', '辛巳', '庚寅', '庚辰']);
+    assert.equal(r.twin.applied, true);
+    assert.equal(r.pillars[1].twinShifted, true);
+    assert.equal(r.luck.pillars[0].stem.char + r.luck.pillars[0].branch.char, '壬午');
+    assert.equal(r.luck.pillars[8].stem.char + r.luck.pillars[8].branch.char, '庚寅');
+    assert.equal(r.luck.startYears, 2);
+  });
+
+  it('younger twin, 时柱法: hour moves to the next 时辰', () => {
+    const r = bazi.calcBaziAccurate(Object.assign({}, base, { twin: { enabled: true, order: 'younger', method: 'hour' } }));
+    assert.deepEqual(gz(r), ['乙亥', '庚辰', '庚寅', '辛巳']);
+  });
+
+  it('大运法 without gender is not applied', () => {
+    const r = bazi.calcBaziAccurate({ year: 1995, month: 4, day: 29, hour: 8, twin: { enabled: true, order: 'younger', method: 'luck' } });
+    assert.deepEqual(gz(r), ['乙亥', '庚辰', '庚寅', '庚辰']);
+    assert.equal(r.twin.reason, 'needs_gender');
+  });
+
+  it('Ten Gods follow the adjusted chart', () => {
+    const natal = bazi.calcBaziAccurate(base).tenGods;
+    const younger = bazi.calcBaziAccurate(Object.assign({}, base, { twin: { enabled: true, order: 'younger', method: 'luck' } })).tenGods;
+    assert.notDeepEqual(natal.list.map(g => g.percent), younger.list.map(g => g.percent));
+  });
+});

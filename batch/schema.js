@@ -41,6 +41,15 @@ function migrate(db) {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_daily_readings_user_date
       ON daily_readings(user_id, date);
   `);
+
+  /* Birth-data columns the batch reads; server.js adds them too, but the standalone worker may run first. */
+  const cols = db.prepare('PRAGMA table_info(readings)').all().map(c => c.name);
+  if (cols.length) {
+    const want = { minute: 'INTEGER', twin: 'INTEGER DEFAULT 0', twin_order: 'TEXT', twin_method: 'TEXT' };
+    Object.keys(want).forEach(name => {
+      if (cols.indexOf(name) < 0) db.exec(`ALTER TABLE readings ADD COLUMN ${name} ${want[name]}`);
+    });
+  }
 }
 
 module.exports = { migrate };
