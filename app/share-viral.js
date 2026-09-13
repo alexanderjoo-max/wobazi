@@ -107,7 +107,7 @@
   const DISPLAY = 'Outfit, "Noto Sans SC", "Noto Sans Thai", sans-serif';
   const HAN = '"Noto Sans SC", sans-serif';
   const LOGO = new Image();
-  LOGO.src = '/app/assets/logo-horiz.png?v=5';
+  LOGO.src = '/app/assets/logo-horiz.png?v=6';
   const logoReady = (LOGO.decode ? LOGO.decode() : Promise.resolve()).catch(() => null);
   const SANS = 'Outfit, "Noto Sans SC", "Noto Sans Thai", sans-serif';
   const BRANCH_CHARS = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
@@ -595,6 +595,7 @@
   function openViralShare(kind) {
     if (!(window._shareData && _shareData.pillars)) return;
     state.kind = kind === 'year' ? 'year' : (kind === 'both' ? 'both' : 'today');
+    if (typeof window.track === 'function') window.track('share', { method: 'verdict', content_type: state.kind });
     state.tone = 'oracle';
     const overlay = document.getElementById('viral-overlay');
     overlay.classList.remove('hide');

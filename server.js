@@ -90,6 +90,12 @@ app.use('/app', express.static(path.join(__dirname, 'app'), {
 app.use('/Logos', express.static(path.join(__dirname, 'Logos')));
 app.use('/app/Logos', express.static(path.join(__dirname, 'Logos')));
 app.use('/og-card.png', express.static(path.join(__dirname, 'og-card.png')));
+app.use('/og-card.jpg', express.static(path.join(__dirname, 'og-card.jpg'), { maxAge: '7d' }));
+app.get('/site.webmanifest', (req, res) => {
+  res.type('application/manifest+json');
+  res.set('Cache-Control', 'public, max-age=86400');
+  res.sendFile(path.join(__dirname, 'public', 'site.webmanifest'));
+});
 app.get('/bazi-engine.js', (req, res) => {
   res.set('Cache-Control', 'public, max-age=3600');
   res.type('application/javascript');
@@ -777,6 +783,34 @@ app.post('/api/oracle', async (req, res) => {
 
 // ── Share image generation ──
 require('./share').mount(app);
+
+/* ── 404 + error pages (must stay after every route) ── */
+function wantsJson(req) {
+  return req.path.startsWith('/api/') || req.path.startsWith('/auth/') || (req.get('accept') || '').indexOf('text/html') === -1;
+}
+app.use((req, res) => {
+  if (wantsJson(req)) return res.status(404).json({ error: 'Not found' });
+  res.status(404).render('pages/404', {
+    ...seoBase,
+    title: 'Page not found | Wobazi',
+    description: 'This page could not be found. Plot your free BaZi chart instead.',
+    canonical: req.path,
+    noindex: true,
+  });
+});
+app.use((err, req, res, next) => {
+  console.error('[Unhandled error]', req.method, req.path, err && err.stack || err);
+  if (res.headersSent) return next(err);
+  if (wantsJson(req)) return res.status(500).json({ error: 'Something went wrong' });
+  res.status(500).render('pages/404', {
+    ...seoBase,
+    title: 'Something went wrong | Wobazi',
+    description: 'Something went wrong on our side. Please try again.',
+    canonical: req.path,
+    noindex: true,
+    errorPage: true,
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`Wobazi server running on ${BASE_URL}`);

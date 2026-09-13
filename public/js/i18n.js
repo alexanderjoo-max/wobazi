@@ -39,6 +39,9 @@
       th: 'ถอดรหัสโชคชะตาด้วยศาสตร์โบราณแห่งสี่เสา.',
       zh: '以四柱古法解码你的命运。'
     },
+    'footer.cookies': { en: 'Cookie settings', th: 'ตั้งค่าคุกกี้', zh: 'Cookie 设置' },
+    'footer.contact': { en: 'Contact', th: 'ติดต่อ', zh: '联系' },
+    'footer.location': { en: 'Bangkok, Thailand', th: 'กรุงเทพฯ ประเทศไทย', zh: '泰国曼谷' },
     'footer.copy': { en: 'All rights reserved.', th: 'สงวนลิขสิทธิ์', zh: '保留所有权利。' },
     'cta.begin': { en: 'Plot Your Chart', th: 'จัดแผนภูมิของคุณ', zh: '排出你的命盘' },
     'legal.binding': {

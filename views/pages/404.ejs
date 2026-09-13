@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+</head>
+<body class="seo-page notfound-page">
+  <%- include('../partials/nav') %>
+
+  <main class="seo-main notfound-main">
+    <% const isError = typeof errorPage !== 'undefined' && errorPage; %>
+    <p class="notfound-han" aria-hidden="true"><%= isError ? '稍候' : '空亡' %></p>
+    <p class="legal-kicker"><%= isError ? '500' : '404' %></p>
+    <% if (isError) { %>
+    <h1>
+      <span class="en">Something went wrong on our side</span><span class="zh hide">我们这边出了点问题</span><span class="th hide">เกิดข้อผิดพลาดจากฝั่งเรา</span>
+    </h1>
+    <p class="notfound-lead">
+      <span class="en">Please try again in a moment. If it keeps happening, email <a href="mailto:hello@wobazi.com">hello@wobazi.com</a>.</span>
+      <span class="zh hide">请稍后再试。如果问题持续，请发邮件至 <a href="mailto:hello@wobazi.com">hello@wobazi.com</a>。</span>
+      <span class="th hide">โปรดลองอีกครั้งในอีกสักครู่ หากยังเกิดขึ้น อีเมลถึง <a href="mailto:hello@wobazi.com">hello@wobazi.com</a></span>
+    </p>
+    <% } else { %>
+    <h1>
+      <span class="en">This page isn’t in the chart</span><span class="zh hide">命盘里没有这一页</span><span class="th hide">ไม่พบหน้านี้ในแผนภูมิ</span>
+    </h1>
+    <p class="notfound-lead">
+      <span class="en">The link may be old or mistyped. Your reading is still one tap away.</span>
+      <span class="zh hide">链接可能已过期或输入有误。你的命盘仍然只差一步。</span>
+      <span class="th hide">ลิงก์อาจเก่าหรือพิมพ์ผิด การอ่านดวงของคุณยังอยู่ห่างแค่แตะเดียว</span>
+    </p>
+    <% } %>
+    <div class="notfound-cta">
+      <a href="/?begin=1" class="btn-primary"><span class="en">Plot your chart</span><span class="zh hide">排出你的命盘</span><span class="th hide">จัดแผนภูมิของคุณ</span></a>
+      <a href="/" class="btn-secondary"><span class="en">Go home</span><span class="zh hide">返回首页</span><span class="th hide">กลับหน้าแรก</span></a>
+    </div>
+    <nav class="notfound-links" aria-label="Popular pages">
+      <a href="/what-is-bazi"><span class="en">What is BaZi?</span><span class="zh hide">什么是八字？</span><span class="th hide">ปาจื้อคืออะไร?</span></a>
+      <a href="/day-master"><span class="en">Day Master guide</span><span class="zh hide">日主指南</span><span class="th hide">คู่มือเจ้าวัน</span></a>
+      <a href="/bazi-compatibility"><span class="en">Compatibility</span><span class="zh hide">合盘</span><span class="th hide">ความเข้ากัน</span></a>
+      <a href="/Master-Alice.html"><span class="en">Master Alice</span><span class="zh hide">Master Alice</span><span class="th hide">มาสเตอร์อลิซ</span></a>
+    </nav>
+  </main>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

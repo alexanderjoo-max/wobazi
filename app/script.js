@@ -459,6 +459,11 @@ let _savedReading = null;
 let _lastPartner = null;
 let _calFilter = 'all';
 
+/* GA4 event; a no-op when analytics is blocked. Consent Mode decides what is stored. */
+function track(name, params) {
+  try { if (typeof window.gtag === 'function') window.gtag('event', name, params || {}); } catch (e) {}
+}
+
 function currentHash() {
   return (location.hash || '').replace(/^#/, '');
 }
@@ -614,10 +619,12 @@ function persistBirthIfValid() {
   saveLocalChart(p);
 }
 
+/* The form always opens on Solar. A chart first entered as Lunar is prefilled with its
+   solar-equivalent date (p.year/month/day are always solar), so the same chart comes out,
+   and Lunar is only used when someone taps it again. */
 function fillFormFromPayload(p) {
   if (!p) return;
-  const lunar = p.calendarType === 'lunar';
-  setCalendarType(lunar ? 'lunar' : 'solar', { silent: true });
+  setCalendarType('solar', { silent: true });
   const nameEl = document.getElementById('name');
   const dayEl = document.getElementById('birth-day');
   const monthEl = document.getElementById('birth-month');
@@ -628,17 +635,10 @@ function fillFormFromPayload(p) {
   const leapEl = document.getElementById('leap-month');
   const unkEl = document.getElementById('time-unknown');
   if (nameEl) nameEl.value = p.name || '';
-  if (lunar) {
-    if (dayEl) dayEl.value = p.lunarDay || '';
-    if (monthEl) monthEl.value = p.lunarMonth || '';
-    if (yearEl) yearEl.value = p.lunarYear || '';
-    if (leapEl) leapEl.checked = !!p.leapMonth;
-  } else {
-    if (dayEl) dayEl.value = p.day || '';
-    if (monthEl) monthEl.value = p.month || '';
-    if (yearEl) yearEl.value = p.year || '';
-    if (leapEl) leapEl.checked = false;
-  }
+  if (dayEl) dayEl.value = p.day || '';
+  if (monthEl) monthEl.value = p.month || '';
+  if (yearEl) yearEl.value = p.year || '';
+  if (leapEl) leapEl.checked = false;
   if (unkEl) unkEl.checked = p.hour == null;
   if (timeEl) {
     if (p.hour != null) {
@@ -1110,6 +1110,12 @@ function handleSubmit(e) {
     twin: payload.twin || null,
   };
   saveLocalChart(payload);
+  track('chart_calculated', {
+    calendar: payload.calendarType,
+    has_time: payload.hour != null,
+    has_gender: !!payload.gender,
+    twin: payload.twin ? payload.twin.order : 'no',
+  });
 
   runLoader(() => {
     try {
@@ -2407,7 +2413,7 @@ function showShareCard() {
       </div>
     </div>
     <div class="share-footer-logo">
-      <img src="/app/assets/logo-horiz.png?v=5" class="share-logo-img" alt="WoBazi">
+      <img src="/app/assets/logo-horiz.png?v=6" class="share-logo-img" alt="WoBazi">
       <span class="share-footer-dot">.com</span>
     </div>`;
 
@@ -2427,6 +2433,7 @@ function closeShare() {
 
 async function doShare() {
   haptic(15);
+  track('share', { method: 'card', content_type: 'reading' });
   const o       = _shareData;
   const cn      = genChineseName(o.name, o.animal, o.dominantEl);
   const cnFull  = cn.surname.char + cn.elChar.char + cn.anChar.char;
@@ -4637,6 +4644,7 @@ async function sendOracleMessage() {
   const input = document.getElementById('oracle-input');
   const msg = input.value.trim();
   if (!msg) return;
+  track('oracle_question', { surface: 'tab' });
 
   // Rate limit
   if (!checkOracleRateLimit()) {
@@ -4778,6 +4786,7 @@ async function sendOracleMessage() {
    GOOGLE AUTH & DATA PERSISTENCE
 ═══════════════════════════════════════ */
 function loginWithGoogle() {
+  track('login', { method: 'Google' });
   window.location.href = '/auth/google';
 }
 
@@ -4983,6 +4992,7 @@ async function sendOracleDrawerMessage() {
   const input = document.getElementById('oracle-drawer-input');
   const msg = input.value.trim();
   if (!msg) return;
+  track('oracle_question', { surface: 'drawer' });
 
   if (!checkOracleRateLimit()) {
     const messagesEl = document.getElementById('oracle-drawer-messages');
@@ -5302,8 +5312,15 @@ function checkCompatibility() {
   const lunar = document.getElementById('partner-cal-lunar')?.classList.contains('active');
   const leap = !!document.getElementById('partner-leap-month')?.checked;
 
-  if (!day || !month || !year || year < 1900 || year > 2100) {
-    resultEl.innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:16px;font-size:13px">Please enter a valid birth date.</p>';
+  const partnerError = (en, zh, th) => {
+    resultEl.innerHTML = `<p class="field-error compat-error" role="alert">${_t(en, zh, th)}</p>`;
+  };
+  const solarDateOk = !lunar && day && month && year && (() => {
+    const dt = new Date(year, month - 1, day);
+    return dt.getFullYear() === year && dt.getMonth() === month - 1 && dt.getDate() === day;
+  })();
+  if (!day || !month || !year || year < 1900 || year > 2100 || (!lunar && !solarDateOk)) {
+    partnerError('Please enter a valid birth date.', '请输入有效的出生日期。', 'กรุณากรอกวันเกิดที่ถูกต้อง');
     return;
   }
 
@@ -5312,14 +5329,14 @@ function checkCompatibility() {
       const conv = BaziEngine.lunarToSolar(year, month, day, leap);
       year = conv.year; month = conv.month; day = conv.day;
     } catch (e) {
-      resultEl.innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:16px;font-size:13px">Could not convert that lunar date.</p>';
+      partnerError('Could not convert that lunar date. Check the month, day, and leap month.', '无法换算该农历日期，请检查月、日与闰月。', 'แปลงวันจันทรคตินี้ไม่ได้ ตรวจสอบเดือน วัน และเดือนอธิกมาส');
       return;
     }
   }
 
   const userAnimal = _shareData ? _shareData.animal : null;
   if (!userAnimal) {
-    resultEl.innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:16px;font-size:13px">Complete your reading first.</p>';
+    partnerError('Complete your own reading first.', '请先完成你自己的命盘。', 'กรุณาดูดวงของคุณก่อน');
     return;
   }
 

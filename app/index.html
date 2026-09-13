@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-688FXVYVJS"></script>
+  <!-- Google tag (gtag.js) with Consent Mode v2: analytics and ads storage are denied until the visitor allows analytics -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    (function () {
+      var c = null;
+      try { c = localStorage.getItem('wobazi-consent'); } catch (e) {}
+      gtag('consent', 'default', {
+        analytics_storage: c === 'granted' ? 'granted' : 'denied',
+        ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied',
+        wait_for_update: 500
+      });
+    })();
     gtag('js', new Date());
     gtag('config', 'G-688FXVYVJS');
   </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-688FXVYVJS"></script>
+  <script defer src="/public/js/consent.js?v=1"></script>
 
   <script>
     (function () {
@@ -35,16 +45,19 @@
   <!-- Primary meta -->
   <meta name="description" content="Discover your Chinese destiny. Bāzì reading, zodiac fortune, lucky numbers, auspicious dates, and your Chinese destiny name — all from your birth date.">
   <meta name="theme-color" content="#0f0f1c">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" href="/public/favicon.svg?v=1" type="image/svg+xml">
   <link rel="icon" href="/public/favicon-32.png?v=1" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="/public/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="canonical" href="https://wobazi.com/">
 
   <!-- Open Graph (Facebook, iMessage, WhatsApp, etc.) -->
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="https://wobazi.com">
   <meta property="og:title"       content="Wobazi ✦ Your Chinese Destiny">
   <meta property="og:description" content="Discover your Bāzì chart, zodiac animal, Chinese destiny name, and fortune reading. What does your birth date reveal?">
-  <meta property="og:image"       content="https://wobazi.com/og-card.png">
+  <meta property="og:image"       content="https://wobazi.com/og-card.jpg">
   <meta property="og:image:width"  content="1200">
   <meta property="og:image:height" content="630">
 
@@ -53,7 +66,7 @@
   <meta name="twitter:site"        content="@wobazi">
   <meta name="twitter:title"       content="Wobazi ✦ Your Chinese Destiny">
   <meta name="twitter:description" content="Discover your Bāzì chart, zodiac animal, Chinese destiny name, and fortune reading. What does your birth date reveal?">
-  <meta name="twitter:image"       content="https://wobazi.com/og-card.png">
+  <meta name="twitter:image"       content="https://wobazi.com/og-card.jpg">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -72,7 +85,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=56">
+  <link rel="stylesheet" href="/app/style.css?v=57">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
     html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
@@ -101,7 +114,7 @@
     <!-- Top navigation -->
     <header class="site-nav app-nav">
       <a href="/" class="site-nav-logo" onclick="if(!event.metaKey&&!event.ctrlKey){event.preventDefault();haptic(6);closeAppNav();goToLanding();}">
-        <img src="/app/assets/logo-horiz.png?v=5" class="nav-logo" alt="Wobazi">
+        <img src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi">
       </a>
       <nav class="site-nav-links" aria-label="Primary">
         <a href="/what-is-bazi"><span class="en">BaZi Explainer</span><span class="zh hide">八字讲解</span><span class="th hide">คู่มือปาจื้อ</span></a>
@@ -402,7 +415,10 @@
           <a href="/Master-Alice.html"><span class="en">Master Alice</span><span class="zh hide">Master Alice</span><span class="th hide">มาสเตอร์อลิซ</span></a>
           <a href="/privacy"><span class="en">Privacy Policy</span><span class="zh hide">隐私政策</span><span class="th hide">นโยบายความเป็นส่วนตัว</span></a>
           <a href="/terms"><span class="en">Terms of Service</span><span class="zh hide">服务条款</span><span class="th hide">ข้อกำหนดการให้บริการ</span></a>
+          <a href="/privacy#cookies" data-cookie-settings><span class="en">Cookie settings</span><span class="zh hide">Cookie 设置</span><span class="th hide">ตั้งค่าคุกกี้</span></a>
+          <a href="mailto:hello@wobazi.com">hello@wobazi.com</a>
         </div>
+        <p class="splash-foot-address"><span class="en">Bangkok, Thailand</span><span class="zh hide">泰国曼谷</span><span class="th hide">กรุงเทพฯ ประเทศไทย</span></p>
         <a class="footer-udestiny splash-udestiny" href="https://www.udestinyglobal.com/en" target="_blank" rel="noopener">
           <img src="/app/assets/brand/udestiny-logo.png" alt="U Destiny" class="udestiny-logo">
           <span class="en">A U Destiny product</span><span class="zh hide">U Destiny 旗下产品</span><span class="th hide">ผลิตภัณฑ์จาก U Destiny</span>
@@ -418,7 +434,7 @@
       <button class="btn-back" onclick="haptic(8); showScreen(_prevAboutFrom || 'splash')">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
-      <img src="/app/assets/logo-horiz.png?v=5" class="nav-logo" alt="Wobazi">
+      <img src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi">
       <div style="width:40px"></div>
     </div>
 
@@ -811,7 +827,7 @@
       <button class="btn-back" onclick="haptic(8); closeAppNav(); backFromInput()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
-      <img src="/app/assets/logo-horiz.png?v=5" class="nav-logo" alt="Wobazi">
+      <img src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi">
       <button type="button" class="site-nav-toggle" aria-label="Menu" aria-expanded="false" onclick="toggleSiteNav(this, event)">
         <span class="nav-burger" aria-hidden="true"><span></span><span></span><span></span></span>
       </button>
@@ -842,7 +858,7 @@
         <div class="intro-icon">✦</div>
         <p id="input-intro-copy"><span class="en">Enter your details to unlock your<br><strong>Four Pillars of Destiny</strong></span><span class="zh hide">输入出生信息，解锁<br><strong>四柱命盘</strong></span><span class="th hide">กรอกข้อมูลเพื่อปลดล็อก<br><strong>สี่เสาแห่งโชคชะตา</strong></span></p>
       </div>
-      <form id="bazi-form" onsubmit="handleSubmit(event)">
+      <form id="bazi-form" onsubmit="handleSubmit(event)" novalidate>
         <div class="field">
           <label><span class="en">Name <span class="label-opt">personalize your reading</span></span><span class="zh hide">姓名 <span class="label-opt">个性化你的命理</span></span><span class="th hide">ชื่อ <span class="label-opt">ปรับการอ่านให้เป็นของคุณ</span></span></label>
           <input type="text" id="name" placeholder="What do we call you?" data-i18n-placeholder="form.name.ph" autocomplete="off" spellcheck="false" data-1p-ignore data-lpignore="true">
@@ -992,7 +1008,7 @@
   <div id="results" class="screen">
     <div class="results-header app-nav">
       <div class="header-left">
-        <img src="/app/assets/logo-horiz.png?v=5" class="nav-logo" alt="Wobazi" onclick="haptic(6); closeAppNav(); goToLanding()">
+        <img src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi" onclick="haptic(6); closeAppNav(); goToLanding()">
         <div id="greeting" class="greeting"></div>
         <button type="button" class="btn-edit-birth" id="btn-edit-birth" onclick="haptic(6); goToInput()">
           <span class="en">Edit birth data</span><span class="zh hide">修改出生资料</span><span class="th hide">แก้ข้อมูลเกิด</span>
@@ -1633,11 +1649,14 @@
           <a href="/privacy" class="footer-link"><span class="en">Privacy</span><span class="zh hide">隐私</span><span class="th hide">ความเป็นส่วนตัว</span></a>
           <span class="footer-dot">·</span>
           <a href="/terms" class="footer-link"><span class="en">Terms</span><span class="zh hide">条款</span><span class="th hide">ข้อกำหนด</span></a>
+          <span class="footer-dot">·</span>
+          <a href="/privacy#cookies" class="footer-link" data-cookie-settings><span class="en">Cookies</span><span class="zh hide">Cookie</span><span class="th hide">คุกกี้</span></a>
         </div>
         <div class="footer-brand">
-          <img src="/app/assets/logo-horiz.png?v=5" class="footer-logo" alt="Wobazi">
+          <img src="/app/assets/logo-horiz.png?v=6" class="footer-logo" alt="Wobazi">
           <p class="footer-tagline"><span class="en">Ancient wisdom, modern clarity</span><span class="zh hide">古老智慧，现代洞见</span><span class="th hide">ภูมิปัญญาโบราณ ความชัดเจนสมัยใหม่</span></p>
         </div>
+        <p class="footer-contact"><a href="mailto:hello@wobazi.com">hello@wobazi.com</a> · <span class="en">Bangkok, Thailand</span><span class="zh hide">泰国曼谷</span><span class="th hide">กรุงเทพฯ ประเทศไทย</span></p>
         <p class="footer-copy">© 2026 Wobazi. <span class="en">All rights reserved.</span><span class="zh hide">保留所有权利。</span><span class="th hide">สงวนลิขสิทธิ์</span></p>
         <p class="footer-disclaimer"><span class="en">For entertainment &amp; self-reflection purposes only. Not a substitute for professional advice.</span><span class="zh hide">仅供娱乐与自我反思。不能替代专业建议。</span><span class="th hide">เพื่อความบันเทิงและการใคร่ครวญเท่านั้น ไม่ใช่คำแนะนำจากผู้เชี่ยวชาญ</span></p>
         <a class="footer-udestiny results-udestiny" href="https://www.udestinyglobal.com/en" target="_blank" rel="noopener">
@@ -1789,10 +1808,10 @@
     </div>
   </div>
 
-  <script src="/bazi-engine.js?v=4"></script>
+  <script src="/bazi-engine.js?v=5"></script>
   <script src="/verdict.js?v=2"></script>
-  <script src="/app/script.js?v=34"></script>
-  <script src="/app/share-viral.js?v=4"></script>
+  <script src="/app/script.js?v=35"></script>
+  <script src="/app/share-viral.js?v=5"></script>
   <script>
     // Landing sticky CTA: appears once the hero CTA scrolls away, hides at the final CTA and off the landing.
     (function () {

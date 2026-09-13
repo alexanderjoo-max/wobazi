@@ -679,3 +679,28 @@ html[lang="zh-CN"] .sl-hook, html[lang="th"] .sl-hook { font-style: normal; }
   background: rgba(240, 192, 64, 0.06) !important;
   border-color: rgba(240, 192, 64, 0.14) !important;
 }
+
+/* 404 */
+.notfound-main { text-align: center; padding-top: 48px; padding-bottom: 72px; max-width: 560px; margin: 0 auto; }
+.notfound-han {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0 0 18px;
+  color: rgba(240, 192, 64, 0.22);
+  letter-spacing: 0.08em;
+}
+.notfound-main h1 { font-size: 32px; font-weight: 500; letter-spacing: -0.03em; margin: 0 0 12px; color: var(--text); }
+.notfound-lead { color: var(--muted); font-size: 15px; line-height: 1.6; margin: 0 0 28px; }
+.notfound-cta { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+.notfound-cta a { text-decoration: none; min-width: 160px; justify-content: center; }
+.notfound-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; font-size: 14px; }
+.notfound-links a { color: var(--gold, #f0c040); text-decoration: none; }
+.notfound-links a:hover { text-decoration: underline; }
+@media (max-width: 480px) { .notfound-main h1 { font-size: 26px; } .notfound-han { font-size: 56px; } }
+
+/* Footer contact */
+.seo-footer-contact { font-size: 13px; line-height: 1.6; color: var(--muted); margin-top: 10px; }
+.seo-footer-contact a { color: var(--gold, #f0c040); text-decoration: none; }
+.footer-cookie-btn { background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; text-align: left; }
