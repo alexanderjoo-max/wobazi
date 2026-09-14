@@ -6008,3 +6008,86 @@ a.footer-udestiny span {
 .cd-el-bar i { display: block; height: 100%; border-radius: 4px; }
 .cd-el-bar.is-them i { opacity: 0.45; }
 .cd-el-num { font-size: 11px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ── Your Chart hero: Wǒ Bāzì profile first ── */
+.you-hero {
+  --hero-el: var(--gold);
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--hero-el) 45%, transparent);
+  background: linear-gradient(160deg, rgba(255,255,255,0.05), rgba(10,8,20,0.6));
+  padding: 20px 20px 16px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.you-hero-glow { position: absolute; inset: 0; pointer-events: none; animation: hero-shift 8s ease-in-out infinite alternate; }
+.you-hero > :not(.you-hero-glow):not(.you-hero-mote) { position: relative; z-index: 1; }
+.you-hero-mote { position: absolute; z-index: 0; color: var(--hero-el); opacity: 0.5; font-size: 12px; animation: float 4s ease-in-out infinite; pointer-events: none; }
+.you-hero-mote.m1 { top: 18%; right: 14%; }
+.you-hero-mote.m2 { top: 52%; right: 6%; font-size: 9px; animation-delay: 1.2s; }
+.you-hero-mote.m3 { bottom: 16%; right: 26%; font-size: 8px; animation-delay: 2.1s; }
+.you-hero-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.you-hero-kicker { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.you-hero-gz {
+  font-family: 'Noto Sans SC', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px;
+  color: var(--hero-el); padding: 4px 12px; border-radius: 100px;
+  border: 1px solid color-mix(in srgb, var(--hero-el) 50%, transparent);
+  background: color-mix(in srgb, var(--hero-el) 12%, transparent);
+}
+.you-hero-main { display: flex; align-items: center; gap: 16px; }
+.you-hero-emoji {
+  flex-shrink: 0; width: 76px; height: 76px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px; line-height: 1; cursor: pointer;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--hero-el) 35%, transparent), rgba(255,255,255,0.03) 70%);
+  border: 1px solid color-mix(in srgb, var(--hero-el) 40%, transparent);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--hero-el) 30%, transparent);
+  animation: float 5s ease-in-out infinite;
+}
+.you-hero-emoji.is-hop { animation: you-hero-hop 0.6s cubic-bezier(.2,.8,.3,1.4); }
+@keyframes you-hero-hop {
+  0% { transform: translateY(0) rotate(0); }
+  35% { transform: translateY(-14px) rotate(-8deg) scale(1.08); }
+  70% { transform: translateY(0) rotate(4deg); }
+  100% { transform: translateY(0) rotate(0); }
+}
+.you-hero-names { min-width: 0; }
+.you-hero-title { font-size: 34px; font-weight: 800; line-height: 1.05; letter-spacing: -0.5px; color: var(--hero-el); margin: 0; }
+.you-hero-sub { font-size: 13px; color: var(--m7); margin-top: 6px; }
+.you-hero-traits { display: flex; flex-wrap: wrap; gap: 6px; }
+.you-hero-trait { font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 100px; background: var(--w07); border: 1px solid var(--border); color: var(--text); }
+.you-hero-reading { font-size: 14px; line-height: 1.7; color: var(--w8); margin: 0; }
+.you-hero-basis { text-align: left; margin: 0; padding-top: 12px; border-top: 1px solid var(--border); }
+@media (prefers-reduced-motion: reduce) {
+  .you-hero-glow, .you-hero-mote, .you-hero-emoji { animation: none; }
+}
+
+/* ── Power Days: explain, tap a date, purpose marks ── */
+.cal-intro { font-size: 13px; line-height: 1.6; color: var(--m7); margin: 0 0 12px; }
+.cal-intro strong { color: var(--text); }
+:where(button.cal-day) { font-family: inherit; cursor: pointer; padding: 0; border: 0; }
+.cal-day.cal-fit { position: relative; }
+.cal-day.cal-fit::after {
+  content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+  width: 5px; height: 5px; border-radius: 50%; background: #60a5fa; box-shadow: 0 0 6px rgba(96,165,250,0.8);
+}
+.cal-day.cal-selected { outline: 2px solid var(--text); outline-offset: 2px; }
+.cal-legend-fit { width: 7px !important; height: 7px !important; background: #60a5fa; box-shadow: 0 0 6px rgba(96,165,250,0.8); }
+.cal-detail { background: var(--w03); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; }
+.cal-detail:empty { display: none; }
+.cal-detail-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 10px; margin-bottom: 8px; }
+.cal-detail-tier { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 100px; background: var(--w07); color: var(--muted); }
+.cal-detail-tier.is-power { background: linear-gradient(135deg, #f0d080, #e8a040); color: #1a0a00; }
+.cal-detail-tier.is-good { background: rgba(34,197,94,0.14); color: #86e6ad; }
+.cal-detail-tier.is-avoid { background: rgba(239,68,68,0.17); color: #ff9f9f; }
+.cal-reasons { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.cal-reasons li { display: flex; gap: 8px; font-size: 13px; line-height: 1.5; color: var(--m75); }
+.cal-reasons li span { flex-shrink: 0; width: 14px; font-weight: 700; }
+.cal-reasons li.is-good span { color: #4ade80; }
+.cal-reasons li.is-bad span { color: #f87171; }
+.cal-detail-empty { font-size: 13px; color: var(--muted); margin: 0; }
+.pick-row { cursor: pointer; }
+.pick-row:hover { border-color: var(--w2); }

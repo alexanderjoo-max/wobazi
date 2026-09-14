@@ -458,6 +458,8 @@ let _currentUser = null;
 let _savedReading = null;
 let _lastPartner = null;
 let _calFilter = 'all';
+let _powerDay = null;     // selected date in the Power Days calendar
+let _powerScored = [];    // last scored month, for the day detail panel
 
 /* GA4 event; a no-op when analytics is blocked. Consent Mode decides what is stored. */
 function track(name, params) {
@@ -1253,10 +1255,10 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
   // Compact context strip (Today, You, Relationships tabs)
   const csTodayPillar = calcTodayPillar();
   const csTodayEmoji = BRANCHES.find(b => b.animal === csTodayPillar.animal)?.emoji || '';
-  const csScore = Math.round(50 + (heroIsCompat ? 25 : heroIsClash ? -20 : 0));
-  const csVerdictEn = heroIsCompat ? 'AUSPICIOUS' : heroIsClash ? 'CAUTION' : 'BALANCED';
-  const csVerdictZh = heroIsCompat ? '吉' : heroIsClash ? '慎' : '平';
-  const csVerdictTh = heroIsCompat ? 'มงคล' : heroIsClash ? 'ระวัง' : 'สมดุล';
+  const csScore = dailyFortuneScore(heroIsCompat, heroIsClash);
+  const csVerdictEn = heroIsCompat ? 'AUSPICIOUS' : heroIsClash ? 'CHALLENGING' : 'BALANCED';
+  const csVerdictZh = heroIsCompat ? '大吉' : heroIsClash ? '冲煞' : '平稳';
+  const csVerdictTh = heroIsCompat ? 'มงคล' : heroIsClash ? 'ท้าทาย' : 'สมดุล';
   document.getElementById('cs-bg').style.background =
     `linear-gradient(135deg, ${elColor}28, ${elColor}55, #0f0f1c)`;
   document.getElementById('cs-date').textContent = heroDateStr;
@@ -1301,7 +1303,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
           nobleman: isNoblemanDay(animal, todayPillar.animal),
           isClash: heroIsClash,
           isCompat: heroIsCompat,
-          score: Math.round(50 + (heroIsCompat ? 25 : heroIsClash ? -20 : 0)),
+          score: csScore,
         },
         tenGods: accurate && accurate.tenGods ? accurate.tenGods.list.map(g => ({
           id: g.id, en: g.en, zh: g.zh, percent: g.percent,
@@ -1334,6 +1336,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     if (window.WobaziPortal) WobaziPortal.captureToday({ dominantEl });
   })();
   renderYouProfile(animal, yearPillar, elColor);
+  renderYouHero(animal, yearPillar, elColor);
   renderTenGods(accurate && accurate.tenGods, pillars);
   renderNowOverlays(pillars, accurate && accurate.dayMaster);
   renderNobleCard(pillars);
@@ -1602,7 +1605,6 @@ function renderNobleCard(pillars) {
       </div>
       ${extra.length ? `<ul class="noble-extra">${extra.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
       <p class="noble-qm">${_t('Qi Men Dunjia locates helpful direction in time — Chief Deity 值符, and the Three Wonders 乙 (Sun Noble), 丙 (Moon Noble), 丁 (Jade Maiden). Wobazi shows natal stars; a full Qi Men plate is a later map.', '奇门遁甲在时间里找贵人方位——值符，以及三奇：乙（日奇）、丙（月奇）、丁（星奇 / 玉女）。Wobazi 先呈现本命星；完整奇门盘是下一张地图。', '奇门遁甲 หาทิศผู้เอื้อในเวลา — 值符 และสามอัศจรรย์ 乙 丙 丁 Wobazi โชว์ดาวกำเนิดก่อน')}</p>
-      <a class="noble-more" href="/Master-Alice.html">${_t('About Master Alice →', '关于 Master Alice →', 'เกี่ยวกับมาสเตอร์อลิซ →')}</a>
     </div>`;
 }
 
@@ -2150,19 +2152,19 @@ function renderDailyFortune(userAnimal) {
 
   let score, color, levelLabel, levelLabel_zh, levelLabel_th, msg_en, msg_zh, msg_th;
   if (userZodiac.compat.includes(todayAnimal)) {
-    score = 85 + Math.floor(chartUnit('daily|' + todayKey()) * 12);
+    score = dailyFortuneScore(true, false);
     color = '#22c55e'; levelLabel = 'Auspicious'; levelLabel_zh = '大吉'; levelLabel_th = 'มงคล';
     msg_en = `Today's energy flows with you. The ${todayAnimal} day amplifies your natural power — make your boldest moves now.`;
     msg_zh = `今日能量与你同频。${ANIMAL_ZH[todayAnimal]}日增强你的天赋能量，大胆出击，正当时。`;
     msg_th = `พลังวันนี้ไหลไปกับคุณ วัน${ANIMAL_TH[todayAnimal]}เสริมพลังธรรมชาติ — กล้าได้เลย`;
   } else if (userZodiac.clash.includes(todayAnimal)) {
-    score = 38 + Math.floor(chartUnit('daily|' + todayKey()) * 18);
+    score = dailyFortuneScore(false, true);
     color = '#ef4444'; levelLabel = 'Challenging'; levelLabel_zh = '冲煞'; levelLabel_th = 'ท้าทาย';
     msg_en = `The ${todayAnimal} day creates friction with your chart. Navigate slowly, hold decisions until tomorrow, and protect your energy.`;
     msg_zh = `今日${ANIMAL_ZH[todayAnimal]}日与你的命盘有冲突。放缓节奏，重要决定推迟到明天，注意保护自己的能量。`;
     msg_th = `วัน${ANIMAL_TH[todayAnimal]}เสียดกับแผนภูมิ ช้าลง เลื่อนตัดสินใจไปพรุ่งนี้ และปกป้องพลัง`;
   } else {
-    score = 60 + Math.floor(chartUnit('daily|' + todayKey()) * 22);
+    score = dailyFortuneScore(false, false);
     color = '#f0c040'; levelLabel = 'Balanced'; levelLabel_zh = '平稳'; levelLabel_th = 'สมดุล';
     msg_en = `A steady ${todayAnimal} day — neither tailwind nor headwind. Focus on consistency, refine the details, and trust the process.`;
     msg_zh = `今日${ANIMAL_ZH[todayAnimal]}日平稳，无明显顺逆之风。专注于一致性，打磨细节，相信过程。`;
@@ -3470,6 +3472,15 @@ function todayKey() {
   return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
 }
 
+/* Today's score for this chart. The context strip, Today's Fortune card, Oracle panel and
+   guidance prompts all read this, so the app never shows two different numbers for one day. */
+function dailyFortuneScore(isCompat, isClash) {
+  const u = chartUnit('daily|' + todayKey());
+  if (isCompat) return 85 + Math.floor(u * 12);
+  if (isClash) return 38 + Math.floor(u * 18);
+  return 60 + Math.floor(u * 22);
+}
+
 function calc2026Fortune(animal, elements) {
   // 2026 = 丙午 Fire Horse
   const HORSE_COMPAT = ['Tiger', 'Dog', 'Goat'];
@@ -4049,6 +4060,9 @@ function renderAuspiciousDates(animal, dominantEl) {
 
   const dayHeaders = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-header">${d}</div>`).join('');
   const blanks = Array(firstDay).fill('<div class="cal-day cal-blank"></div>').join('');
+  const fits = s => _calFilter !== 'all' && s && s.tier !== 'avoid' && s.reasons.some(r => r.code === 'purpose-fit');
+  _powerScored = scored;
+  if (!_powerDay || _powerDay > daysInMonth) _powerDay = today;
   const days = Array.from({ length: daysInMonth }, (_, i) => {
     const d = i + 1;
     const s = byDay[d];
@@ -4061,20 +4075,24 @@ function renderAuspiciousDates(animal, dominantEl) {
       if (partnerOk[d] && (s.tier === 'power' || s.tier === 'good')) cls += ' cal-both';
     }
     if (d === today) cls += ' cal-today';
+    if (fits(s)) cls += ' cal-fit';
+    if (d === _powerDay) cls += ' cal-selected';
     const title = s ? `${s.pillar} · ${s.officer ? s.officer.char + s.officer.en : ''} · ${s.score}/100` : '';
-    return `<div class="${cls}" style="${s && s.tier === 'power' ? `--el-c:${elColor}` : ''}" title="${title}">${d}</div>`;
+    return `<button type="button" class="${cls}" data-day="${d}" style="${s && s.tier === 'power' ? `--el-c:${elColor}` : ''}" title="${title}" aria-pressed="${d === _powerDay}" onclick="haptic(6); showPowerDay(${d})">${d}</button>`;
   }).join('');
 
   // Top picks: best remaining days this month, else the best of the month.
-  let picks = scored.filter(s => s.tier !== 'avoid' && s.day >= today);
-  if (picks.length < 3) picks = scored.filter(s => s.tier !== 'avoid');
+  let pool = scored.filter(s => s.tier !== 'avoid');
+  if (_calFilter !== 'all' && pool.some(fits)) pool = pool.filter(fits);
+  let picks = pool.filter(s => s.day >= today);
+  if (picks.length < 3) picks = pool;
   picks = picks.sort((a, b) => b.score - a.score || a.day - b.day).slice(0, 3).sort((a, b) => a.day - b.day);
 
   const picksHTML = picks.map(p => {
     const why = p.reasons.filter(r => r.good).slice(0, 2).map(r => _t(r.en, r.zh, r.th)).join(' · ')
       || _t('Clear, uncomplicated day', '平稳无碍之日', 'วันราบรื่น ไม่มีอุปสรรค');
     return `
-      <div class="pick-row">
+      <div class="pick-row" role="button" tabindex="0" onclick="haptic(6); showPowerDay(${p.day})">
         <div class="pick-when">
           <span class="pick-date" style="color:${elColor}">${MNAMES[month].slice(0, 3)} ${p.day}</span>
           <span class="pick-gz">${p.pillar}${p.officer ? ' · ' + p.officer.char : ''}</span>
@@ -4100,12 +4118,22 @@ function renderAuspiciousDates(animal, dominantEl) {
     personal: _t('Personal dates weigh your favourable element, your 天乙贵人 days, and harmony with your pillars.', '个人吉日看你的喜用神、天乙贵人日，以及与四柱的合。', 'วันมงคลส่วนตัวดูจากธาตุที่คุณต้องการ วันกุ้ยเหริน และความเข้ากันกับเสาของคุณ'),
   };
 
+  const purposeLabel = {
+    business: _t('opening a business', '开业', 'เปิดกิจการ'),
+    contract: _t('signing a contract', '签约', 'เซ็นสัญญา'),
+    travel:   _t('travel', '出行', 'เดินทาง'),
+    personal: _t('personal plans', '个人事务', 'เรื่องส่วนตัว'),
+  };
+  const picksHead = _calFilter === 'all'
+    ? _t('Best dates for you', '为你择的日子', 'วันที่ดีที่สุดสำหรับคุณ')
+    : _t(`Best dates for ${purposeLabel[_calFilter]}`, `最宜${purposeLabel[_calFilter]}的日子`, `วันที่ดีที่สุดสำหรับ${purposeLabel[_calFilter]}`);
   const legendHTML = `
     <div class="cal-legend">
       <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power"></div> ${_t('Power Day', '吉日', 'วันพลัง')}</div>
       <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-good"></div> ${_t('Good Day', '吉', 'วันดี')}</div>
       <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-avoid"></div> ${_t('Avoid', '忌', 'ควรเลี่ยง')}</div>
       ${partnerScored.length ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-both"></div> ${_t('Works for both charts', '两盘皆宜', 'เหมาะทั้งสองแผน')}</div>` : ''}
+      ${_calFilter !== 'all' ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-fit"></div> ${_t(`Suits ${purposeLabel[_calFilter]}`, `宜${purposeLabel[_calFilter]}`, `เหมาะกับ${purposeLabel[_calFilter]}`)}</div>` : ''}
     </div>
   `;
 
@@ -4118,14 +4146,55 @@ function renderAuspiciousDates(animal, dominantEl) {
         ${days}
       </div>
       ${legendHTML}
+      <div class="cal-detail" id="power-day-detail" aria-live="polite">${powerDayDetailHTML(byDay[_powerDay], month, year, elColor)}</div>
       ${clashHTML}
       ${picksHTML ? `<div class="cal-picks">
-        <div class="cal-picks-head">${_t('Best dates for you', '为你择的日子', 'วันที่ดีที่สุดสำหรับคุณ')}</div>
+        <div class="cal-picks-head">${picksHead}</div>
         ${picksHTML}
       </div>` : ''}
       <div class="cal-note">${purposeNote[_calFilter] || purposeNote.all}</div>
     </div>
   `;
+}
+
+/* Tap a date: what that day is for your chart, and why (reasons come straight from the engine). */
+function powerDayDetailHTML(s, month, year, elColor) {
+  if (!s) return '';
+  const date = new Date(year, month, s.day).toLocaleDateString(dateLocale(), { weekday: 'short', day: 'numeric', month: 'short' });
+  const tier = {
+    power: _t('Power Day', '吉日', 'วันพลัง'),
+    good:  _t('Good Day', '吉', 'วันดี'),
+    avoid: _t('Avoid', '忌', 'ควรเลี่ยง'),
+    plain: _t('Ordinary day', '平日', 'วันธรรมดา'),
+  }[s.tier] || '';
+  const officer = s.officer ? ` · ${s.officer.char} ${_t(s.officer.en, s.officer.zh, s.officer.th)}` : '';
+  const reasons = (s.reasons || []).map(r =>
+    `<li class="${r.good ? 'is-good' : 'is-bad'}"><span aria-hidden="true">${r.good ? '✓' : '✕'}</span>${_t(r.en, r.zh, r.th)}</li>`).join('');
+  return `
+    <div class="cal-detail-head">
+      <span class="pick-date" style="color:${elColor}">${date}</span>
+      <span class="pick-gz">${s.pillar}${officer}</span>
+      <span class="cal-detail-tier is-${s.tier}">${tier} · ${s.score}</span>
+    </div>
+    ${reasons ? `<ul class="cal-reasons">${reasons}</ul>` : `<p class="cal-detail-empty">${_t('Nothing for or against your chart — a neutral day.', '于你命盘无特别吉凶——平常之日。', 'ไม่มีข้อดีข้อเสียต่อดวงคุณ — วันกลางๆ')}</p>`}`;
+}
+
+function showPowerDay(day) {
+  _powerDay = day;
+  const card = document.getElementById('power-days-card');
+  if (!card) return;
+  card.querySelectorAll('.cal-day[data-day]').forEach(b => {
+    const on = Number(b.dataset.day) === day;
+    b.classList.toggle('cal-selected', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  const s = _powerScored.find(x => x.day === day);
+  const now = new Date();
+  const detail = document.getElementById('power-day-detail');
+  if (detail) {
+    detail.innerHTML = powerDayDetailHTML(s, now.getMonth(), now.getFullYear(), EL_COLOR[_shareData && _shareData.dominantEl] || '#f0c040');
+    if (typeof applyI18n === 'function') applyI18n();
+  }
 }
 
 /* ── Render Lucky Foods ── */
@@ -4382,8 +4451,8 @@ const NEW_TIPS = {
     icon: '📅',
     title_en: 'Power Days',
     title_zh: '吉日',
-    body_en: 'Power Days are dates when your dominant element\'s qi aligns most strongly with the monthly energy flow. Schedule your most important actions — negotiations, launches, proposals — on these days for maximum momentum.',
-    body_zh: '吉日是你主导五行与月度气场最为契合之时。将重要事项——谈判、启动、求婚——安排在这些日子，以获最大气场支持。',
+    body_en: 'Each date this month is scored against your own four pillars: is it sound in the Chinese almanac (建除 day officers), does it harmonise with your year and day branches, is it a Nobleman 天乙贵人 day, and is its element one your chart needs? Days that clash your year animal (冲太岁) are always marked Avoid. Pick what you are planning to highlight the dates that suit it, and tap any date to see its reasons.',
+    body_zh: '本月每一天都按你的四柱打分：黄历建除是否吉、是否与你的年支日支相合、是否天乙贵人日、当日五行是否为你所喜。冲你生肖太岁的日子一律标为忌。选择你要做的事即可标出合适的日子，点任意日期查看原因。',
   },
   'foods': {
     icon: '🥗',
@@ -4503,6 +4572,29 @@ function renderActionsPreview(heroDo, heroAvoidEn, heroAvoidZh, heroWatchEn, her
     </div>`).join('');
 }
 
+/* ── You tab hero: the year animal first (e.g. "Earth Horse"), with traits and chart basis ── */
+function renderYouHero(animal, yearPillar, elColor) {
+  const card = document.getElementById('you-hero-card');
+  if (!card) return;
+  const stem = yearPillar.stem;
+  const zData = ZODIAC[animal] || { traits: [] };
+  const emoji = BRANCHES.find(b => b.animal === animal)?.emoji || '✦';
+  card.style.setProperty('--hero-el', elColor);
+  document.getElementById('you-hero-glow').style.background =
+    `radial-gradient(120% 90% at 85% 0%, ${elColor}55, transparent 60%), radial-gradient(90% 80% at 0% 100%, ${elColor}22, transparent 70%)`;
+  document.getElementById('you-hero-gz').textContent = stem.char + yearPillar.branch.char;
+  document.getElementById('you-hero-emoji').textContent = emoji;
+  document.getElementById('you-hero-title').innerHTML =
+    _t(`${stem.element} ${animal}`, `${EL_ZH[stem.element]}${ANIMAL_ZH[animal]}`, `${EL_TH[stem.element]} ${ANIMAL_TH[animal]}`);
+  document.getElementById('you-hero-sub').innerHTML = _t(
+    `${stem.polarity} ${stem.element} · Year of the ${animal}`,
+    `${stem.polarity === 'Yang' ? '阳' : '阴'}${EL_ZH[stem.element]} · ${ANIMAL_ZH[animal]}年`,
+    `${stem.polarity === 'Yang' ? 'หยาง' : 'หยิน'} ${EL_TH[stem.element]} · ปี${ANIMAL_TH[animal]}`
+  );
+  document.getElementById('you-hero-traits').innerHTML =
+    (zData.traits || []).map(t => `<span class="you-hero-trait">${_t(t, TRAIT_ZH[t] || t)}</span>`).join('');
+}
+
 /* ── You Profile Header (You tab) ── */
 function renderYouProfile(animal, yearPillar, elColor) {
   const el = document.getElementById('you-profile-header');
@@ -4580,10 +4672,7 @@ function showOracle() {
   const isCompat = zData.compat.includes(today.animal);
   const nobleman = isNoblemanDay(userAnimal, today.animal);
 
-  let score;
-  if (isCompat) score = 85 + Math.floor(chartUnit('daily|' + todayKey()) * 12);
-  else if (isClash) score = 38 + Math.floor(chartUnit('daily|' + todayKey()) * 18);
-  else score = 60 + Math.floor(chartUnit('daily|' + todayKey()) * 22);
+  const score = dailyFortuneScore(isCompat, isClash);
 
   const clashColor = isClash ? '#ef4444' : isCompat ? '#22c55e' : '#f0c040';
   const clashLabel = isClash ? 'Clash' : isCompat ? 'Harmony' : 'Neutral';
@@ -4973,10 +5062,7 @@ function openOracleDrawer() {
   const isCompat = zData.compat.includes(today.animal);
   const nobleman = isNoblemanDay(userAnimal, today.animal);
 
-  let score;
-  if (isCompat) score = 85 + Math.floor(chartUnit('daily|' + todayKey()) * 12);
-  else if (isClash) score = 38 + Math.floor(chartUnit('daily|' + todayKey()) * 18);
-  else score = 60 + Math.floor(chartUnit('daily|' + todayKey()) * 22);
+  const score = dailyFortuneScore(isCompat, isClash);
 
   const clashColor = isClash ? '#ef4444' : isCompat ? '#22c55e' : '#f0c040';
   const clashLabel = isClash ? 'Clash' : isCompat ? 'Harmony' : 'Neutral';

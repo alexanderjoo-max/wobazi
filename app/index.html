@@ -85,7 +85,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=59">
+  <link rel="stylesheet" href="/app/style.css?v=60">
   <link rel="stylesheet" href="/app/portal.css?v=5">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
@@ -1205,7 +1205,31 @@
         <div id="trait-pills" style="display:none"></div>
       </section>
 
-      <!-- Your Chart: Pillars first -->
+      <!-- Your Chart: Wǒ Bāzì profile hero first (year animal + chart basis), filled by renderYouHero -->
+      <section class="section" data-tab="you" id="res-you-hero">
+        <div class="you-hero" id="you-hero-card">
+          <div class="you-hero-glow" id="you-hero-glow" aria-hidden="true"></div>
+          <span class="you-hero-mote m1" aria-hidden="true">✦</span>
+          <span class="you-hero-mote m2" aria-hidden="true">✦</span>
+          <span class="you-hero-mote m3" aria-hidden="true">✦</span>
+          <div class="you-hero-top">
+            <span class="you-hero-kicker"><span class="en">Wǒ Bāzì Profile</span><span class="zh hide">我的八字命盘</span><span class="th hide">โปรไฟล์ปาจื้อ</span></span>
+            <span class="you-hero-gz" id="you-hero-gz"></span>
+          </div>
+          <div class="you-hero-main">
+            <button type="button" class="you-hero-emoji" id="you-hero-emoji" aria-label="Year animal" onclick="haptic(8); this.classList.remove('is-hop'); void this.offsetWidth; this.classList.add('is-hop')"></button>
+            <div class="you-hero-names">
+              <h2 class="you-hero-title" id="you-hero-title"></h2>
+              <div class="you-hero-sub" id="you-hero-sub"></div>
+            </div>
+          </div>
+          <div class="you-hero-traits" id="you-hero-traits"></div>
+          <p class="you-hero-reading en" id="reading-en"></p>
+          <p class="you-hero-reading zh hide" id="reading-zh"></p>
+          <p class="chart-basis you-hero-basis" id="chart-basis"></p>
+        </div>
+      </section>
+
       <section class="section" data-tab="you" id="res-pillars">
         <div class="section-head" data-tip="four-pillars">
           <h3 class="en">Four Pillars</h3>
@@ -1213,22 +1237,18 @@
           <h3 class="th hide">สี่เสา</h3>
           <span class="section-sub">八字 Bāzì</span>
         </div>
-        <p class="chart-basis" id="chart-basis"></p>
         <div class="pillars-row" id="pillars-row"></div>
         <p class="pillar-disclaimer" id="pillar-disclaimer"></p>
       </section>
 
-      <section class="section" data-tab="you" data-tip="decades" id="res-decades">
-        <div class="section-head">
+      <section class="section" data-tab="you" id="res-decades">
+        <div class="section-head" data-tip="decades">
           <h3 class="en">Luck Cycle 大运</h3>
           <h3 class="zh hide">人生大运</h3>
           <h3 class="th hide">รอบโชค 大运</h3>
           <span class="section-sub"><span class="en">Your 10-Year Cycles</span><span class="zh hide">十年大运周期</span><span class="th hide">รอบสิบปีของคุณ</span></span>
         </div>
         <div id="decades-card"></div>
-        <button type="button" class="viral-share-pill" onclick="haptic(8); openViralShare('year')">
-          <span class="en">Share this year’s verdict</span><span class="zh hide">分享今年判词</span><span class="th hide">แชร์คำตัดสินปีนี้</span>
-        </button>
       </section>
 
       <section class="section" data-tab="you" id="you-profile-section">
@@ -1281,9 +1301,6 @@
           <span class="section-sub" id="today-date-label"></span>
         </div>
         <div id="daily-card"></div>
-        <button type="button" class="viral-share-pill" onclick="haptic(8); openViralShare('today')">
-          <span class="en">Share today’s verdict</span><span class="zh hide">分享今日判词</span><span class="th hide">แชร์คำตัดสินวันนี้</span>
-        </button>
         <button class="oracle-cta-btn" onclick="haptic(10); showOracle()">
           <div class="oracle-cta-inner">
             <span class="oracle-cta-icon">✦</span>
@@ -1340,9 +1357,6 @@
           <span class="section-sub">丙午 · Fire Horse</span>
         </div>
         <div id="forecast-card"></div>
-        <button type="button" class="viral-share-pill" onclick="haptic(8); openViralShare('year')">
-          <span class="en">Share this year’s verdict</span><span class="zh hide">分享今年判词</span><span class="th hide">แชร์คำตัดสินปีนี้</span>
-        </button>
       </section>
 
       <!-- Today's Action Plan (compact summary) -->
@@ -1390,8 +1404,8 @@
       </section>
 
       <!-- Feng Shui Outfit Guide -->
-      <section class="section" data-tab="actions" data-tip="outfit" id="res-outfit">
-        <div class="section-head">
+      <section class="section" data-tab="actions" id="res-outfit">
+        <div class="section-head" data-tip="outfit">
           <h3 class="en">Feng Shui Outfit Guide</h3>
           <h3 class="zh hide">风水穿搭指南</h3>
           <h3 class="th hide">คู่มือชุดฮวงจุ้ย</h3>
@@ -1401,8 +1415,8 @@
       </section>
 
       <!-- Lucky Numbers -->
-      <section class="section" data-tab="actions" data-tip="lucky-nums" id="res-lucky-nums">
-        <div class="section-head">
+      <section class="section" data-tab="actions" id="res-lucky-nums">
+        <div class="section-head" data-tip="lucky-nums">
           <h3 class="en">Lucky Numbers</h3>
           <h3 class="zh hide">幸运数字</h3>
           <h3 class="th hide">เลขมงคล</h3>
@@ -1412,13 +1426,14 @@
       </section>
 
       <!-- Auspicious Power Days -->
-      <section class="section" data-tab="actions" data-tip="power-days" id="res-power-days">
-        <div class="section-head">
+      <section class="section" data-tab="actions" id="res-power-days">
+        <div class="section-head" data-tip="power-days">
           <h3 class="en">Power Days</h3>
           <h3 class="zh hide">吉日</h3>
           <h3 class="th hide">วันมงคล</h3>
           <span class="section-sub">2026 · 吉日</span>
         </div>
+        <p class="cal-intro"><span class="en">Power Days are this month’s dates that fit <strong>your</strong> chart: sound in the Chinese almanac, in harmony with your pillars, never clashing your year animal. Pick what you’re planning, then tap any date to see why.</span><span class="zh hide">吉日是本月与<strong>你</strong>命盘相合的日子：黄历吉、与四柱相合、不冲生肖太岁。先选你要做的事，再点任意日期看原因。</span><span class="th hide">วันพลังคือวันในเดือนนี้ที่เข้ากับดวง<strong>ของคุณ</strong>: ดีตามปฏิทินจีน เข้ากับเสา และไม่ชงปีนักษัตร เลือกสิ่งที่วางแผน แล้วแตะวันที่เพื่อดูเหตุผล</span></p>
         <div class="cal-filters" id="cal-filters" role="group" aria-label="Date filters">
           <button type="button" class="cal-filter is-on" data-cal-filter="all" onclick="setCalFilter('all')"><span class="en">All</span><span class="zh hide">全部</span><span class="th hide">ทั้งหมด</span></button>
           <button type="button" class="cal-filter" data-cal-filter="business" onclick="setCalFilter('business')"><span class="en">Open business</span><span class="zh hide">开业</span><span class="th hide">เปิดกิจการ</span></button>
@@ -1481,8 +1496,8 @@
       </section>
 
       <!-- Lucky Foods -->
-      <section class="section" data-tab="actions" data-tip="foods" id="res-foods">
-        <div class="section-head">
+      <section class="section" data-tab="actions" id="res-foods">
+        <div class="section-head" data-tip="foods">
           <h3 class="en">Lucky Foods</h3>
           <h3 class="zh hide">幸运食物</h3>
           <h3 class="th hide">อาหารมงคล</h3>
@@ -1492,8 +1507,8 @@
       </section>
 
       <!-- Morning Ritual (includes Crystals) -->
-      <section class="section" data-tab="actions" data-tip="ritual" id="res-ritual">
-        <div class="section-head">
+      <section class="section" data-tab="actions" id="res-ritual">
+        <div class="section-head" data-tip="ritual">
           <h3 class="en">Morning Ritual</h3>
           <h3 class="zh hide">晨间仪式</h3>
           <h3 class="th hide">พิธียามเช้า</h3>
@@ -1512,8 +1527,8 @@
       </section>
 
       <!-- Feng Shui Direction (Kua) — hidden if no gender -->
-      <section class="section data-hidden" id="kua-section" data-tab="actions" data-tip="kua">
-        <div class="section-head">
+      <section class="section data-hidden" id="kua-section" data-tab="actions">
+        <div class="section-head" data-tip="kua">
           <h3 class="en">Sleep Direction</h3>
           <h3 class="zh hide">睡眠方位</h3>
           <h3 class="th hide">ทิศการนอน</h3>
@@ -1523,19 +1538,6 @@
       </section>
 
       <!-- Luck Cycle 大运 -->
-
-      <!-- Reading -->
-      <section class="section" data-tab="you">
-        <div class="section-head" data-tip="zodiac">
-          <h3 class="en">Your Reading</h3>
-          <h3 class="zh hide">您的命理</h3>
-          <h3 class="th hide">การอ่านของคุณ</h3>
-        </div>
-        <div class="reading-card">
-          <p class="en" id="reading-en"></p>
-          <p class="zh hide" id="reading-zh"></p>
-        </div>
-      </section>
 
       <!-- Compatibility (moved to Relationships tab) -->
       <section class="section" data-tab="relationships">
@@ -1883,7 +1885,7 @@
   <script src="/bazi-engine.js?v=5"></script>
   <script src="/verdict.js?v=2"></script>
   <script src="/app/portal.js?v=5"></script>
-  <script src="/app/script.js?v=37"></script>
+  <script src="/app/script.js?v=38"></script>
   <script src="/app/share-viral.js?v=5"></script>
   <script>
     // Landing sticky CTA: appears once the hero CTA scrolls away, hides at the final CTA and off the landing.
