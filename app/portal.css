@@ -1,0 +1,86 @@
+/* ═══════════════════════════════════════
+   WOBAZI — Registered User Portal
+   Layout only. Reuses .nav-bar, .results-toc-*, .scroll-body,
+   .section-head, .context-strip and .hero-compact from style.css,
+   and only existing tokens/values.
+═══════════════════════════════════════ */
+
+#portal { background: rgba(7,7,15,0.86); overflow: hidden; }
+
+#portal .results-toc-chip { cursor: pointer; }
+#portal .results-toc-chip.is-on {
+  background: var(--w12);
+  color: var(--text);
+  border-color: var(--w2);
+}
+#portal .portal-day.is-read {
+  background: var(--gold-dim);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+#portal .portal-day:disabled,
+#portal .portal-day:disabled:hover {
+  background: var(--w06);
+  border-color: var(--border);
+  color: var(--m4);
+  cursor: default;
+}
+
+.portal-month-head { margin-top: 16px; }
+
+.portal-more {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 32px;
+}
+
+.portal-empty {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+  padding: 48px 24px;
+}
+
+/* ── Portal home, journal, account (existing tokens/values only) ── */
+#portal .scroll-body > div > .section:first-child { margin-top: 16px; }
+.portal-card { border-color: var(--border); }
+.portal-keep { margin-top: 16px; }
+.portal-id-row { display: flex; align-items: center; gap: 10px; }
+.portal-id-name { font-size: 16px; font-weight: 700; }
+.portal-copy { font-size: 14px; line-height: 1.6; color: var(--muted); margin: 0 0 14px; }
+.portal-card .portal-copy { margin: 0; }
+.portal-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.portal-actions a.btn-secondary { text-decoration: none; }
+
+.portal-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.portal-stat {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: var(--w04); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 14px 10px; text-align: center;
+}
+.portal-stat-num { font-size: 24px; font-weight: 700; color: var(--gold); line-height: 1; }
+.portal-stat-lbl { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+.portal-row-wrap .context-strip { margin-bottom: 8px; }
+.portal-row-wrap { margin-bottom: 14px; }
+.portal-note-line { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; font-size: 13px; color: var(--muted); line-height: 1.5; margin: 0 4px; }
+.portal-reaction-tag { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 100px; background: var(--w07); border: 1px solid var(--border); color: var(--text); }
+.portal-reaction-tag.is-accurate { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+.portal-note-snippet { font-style: italic; }
+#portal .portal-day.is-noted { box-shadow: inset 0 -2px 0 var(--gold); }
+
+.portal-reactions { display: flex; gap: 8px; margin-bottom: 16px; }
+#portal .portal-reaction-btn { flex: 1; justify-content: center; padding: 10px 12px; }
+#portal .portal-reaction-btn.is-on { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+.portal-note-label { display: block; margin-bottom: 8px; }
+#portal .portal-note-input,
+#portal .portal-input { display: block; width: 100%; max-height: none; border-radius: var(--radius-md); }
+#portal .portal-note-input { min-height: 110px; }
+#portal .portal-input { margin-bottom: 14px; }
+.portal-save-state { min-height: 1.5em; font-size: 12px; color: var(--muted); margin: 8px 4px; }
+.portal-private { font-size: 12px; line-height: 1.6; color: var(--muted); margin: 12px 0 0; }
+
+#portal .portal-link { width: 100%; justify-content: space-between; }
+#portal .portal-danger { background: rgba(239,68,68,0.10); border-color: rgba(239,68,68,0.25); color: #f87171; }
+#portal .portal-danger:disabled { opacity: 0.4; cursor: default; }

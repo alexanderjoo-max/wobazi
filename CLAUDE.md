@@ -104,6 +104,18 @@ require('./share').mount(app);
 ### Frontend integration
 `doShare()` in `script.js` calls `generateShareImage()` which fetches the PNG, creates a File object, and passes it to `navigator.share({ files: [...] })` for native image sharing on mobile.
 
+## Registered User Portal (added 2026-09-14)
+
+Google sign-in only. Mounted in `server.js` via `require('./portal').mount(app, db)`. Client: `app/portal.js` (loaded before `script.js`) + `app/portal.css`, one `#portal` screen in `app/index.html`, reached from the header menu ("My Wobazi", signed-in only). No new env vars.
+
+- **Routes (hash)**: `#portal` home · `#history` · `#history/YYYY-MM-DD` · `#account`
+- **Snapshots** (`reading_snapshots`): after the Today reading renders for a signed-in user, `WobaziPortal.captureToday()` stores the context strip + hero card markup and a text summary (incl. luck pillar as rendered). One per user per local day; `INSERT OR IGNORE`, never regenerated.
+- **Journal** (`journal_entries`): note + reaction (`accurate|off|unsure`) per snapshot day. Private; never used for training or aggregate.
+- **Continuity**: days read, of last 30 days, days noted — no streak resets.
+- **Account**: export `/api/portal/export?format=json|md`; `POST /api/portal/delete-account {confirm:"DELETE"}` wipes users, readings, oracle_chats, snapshots, journal, daily_readings, legacy sessions.
+- **Guest conversion**: one dismissible "Keep this chart" card per device (`localStorage wobazi_keep_prompt_v1`). After sign-in, `onAuth()` saves the browser's chart to `readings` only if the account has none.
+- Hooks in `script.js`: `captureToday` at the end of the daily-guidance IIFE, `onAuth` in `checkAuth`, `isRoute/route` in `applyRoute`.
+
 ## API Conventions
 - Routes: kebab-case (`/api/daily-reading`)
 - Auth check: `if (!req.session.user)` → 401

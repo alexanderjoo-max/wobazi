@@ -675,6 +675,11 @@ function updateLandingCtas() {
   const has = hasStoredChart() || !!(typeof _savedReading !== 'undefined' && _savedReading);
   const primary = document.getElementById('splash-cta-primary');
   const secondary = document.getElementById('splash-cta-secondary');
+  /* Signed-in users get the #splash-authed block instead of the guest CTAs + sign-in hint. */
+  const authed = !!_currentUser;
+  const wrap = document.getElementById('splash-cta-wrap');
+  if (wrap) wrap.classList.toggle('hide', authed);
+  document.querySelectorAll('.splash-hero .splash-google-hint').forEach(el => el.classList.toggle('hide', authed));
   if (primary) {
     primary.querySelectorAll('.cta-begin').forEach(el => el.classList.toggle('hide', has));
     primary.querySelectorAll('.cta-continue').forEach(el => el.classList.toggle('hide', !has));
@@ -873,6 +878,10 @@ function applyRoute(hash) {
       showScreen('results');
       switchTab(h, { skipHash: true });
     }
+    return;
+  }
+  if (window.WobaziPortal && WobaziPortal.isRoute(h)) {
+    WobaziPortal.route(h);
     return;
   }
   showScreen('splash');
@@ -1322,6 +1331,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
         <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span>${_t(fallbackWatchEn, fallbackWatchZh)}</span></div>`;
       renderActionsPreview(fallbackDo, fallbackAvoidEn, fallbackAvoidZh, fallbackWatchEn, fallbackWatchZh);
     }
+    if (window.WobaziPortal) WobaziPortal.captureToday({ dominantEl });
   })();
   renderYouProfile(animal, yearPillar, elColor);
   renderTenGods(accurate && accurate.tenGods, pillars);
@@ -4802,6 +4812,7 @@ async function checkAuth() {
       _currentUser = data.user;
       showAuthState();
       await loadUserData();
+      if (window.WobaziPortal) WobaziPortal.onAuth();
       updateLandingCtas();
       const h = currentHash();
       if (RESULT_TABS.indexOf(h) >= 0 || h === 'input') applyRoute(h);

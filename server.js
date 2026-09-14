@@ -784,6 +784,9 @@ app.post('/api/oracle', async (req, res) => {
 // ── Share image generation ──
 require('./share').mount(app);
 
+// ── Registered user portal ──
+require('./portal').mount(app, db);
+
 /* ── 404 + error pages (must stay after every route) ── */
 function wantsJson(req) {
   return req.path.startsWith('/api/') || req.path.startsWith('/auth/') || (req.get('accept') || '').indexOf('text/html') === -1;
