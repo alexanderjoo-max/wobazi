@@ -238,7 +238,23 @@
     } catch (e) { /* stays local; the next form submit saves it */ }
   }
 
+  /* Header menu: show who is signed in above the member links. */
+  function fillMemberMenu() {
+    if (!signedIn()) return;
+    document.body.classList.add('is-authed');
+    document.querySelectorAll('.drawer-member').forEach(m => {
+      m.querySelector('.drawer-member-name').textContent = _currentUser.name || '';
+      m.querySelector('.drawer-member-email').textContent = _currentUser.email || '';
+      const img = m.querySelector('.drawer-member-avatar');
+      if (img && _currentUser.avatar) {
+        img.src = _currentUser.avatar;
+        img.classList.remove('hide');
+      }
+    });
+  }
+
   async function onAuth() {
+    fillMemberMenu();
     const card = el('portal-keep');
     if (card) card.remove();
     await attachGuestChart();
@@ -405,7 +421,8 @@
                 <div class="section-sub">${member ? _t(`Member since ${member}`, `${member} 加入`, `สมาชิกตั้งแต่ ${member}`) : ''}</div>
               </div>
             </div>
-            ${chart ? `<div class="you-profile-identity">${chart.html}</div>` : ''}
+            ${chart ? `<div class="you-profile-identity">${chart.html}</div>
+            <div class="portal-actions"><button type="button" class="btn-secondary" onclick="haptic(6); goToInput()">${_t('Edit birth data', '修改出生资料', 'แก้ข้อมูลเกิด')}</button></div>` : ''}
           </div>
         </section>`;
 

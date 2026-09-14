@@ -84,3 +84,16 @@
 #portal .portal-link { width: 100%; justify-content: space-between; }
 #portal .portal-danger { background: rgba(239,68,68,0.10); border-color: rgba(239,68,68,0.25); color: #f87171; }
 #portal .portal-danger:disabled { opacity: 0.4; cursor: default; }
+
+/* ── Signed-in menu: member items first, site links next, language last ── */
+.drawer-member.drawer-authed {
+  display: flex; flex-direction: column; gap: 10px;
+  text-decoration: none; text-align: left; font-size: inherit; color: inherit; padding: 0;
+}
+.drawer-member-head { display: flex; align-items: center; gap: 10px; padding: 0 4px; }
+.drawer-member-avatar { width: 36px; height: 36px; flex-shrink: 0; }
+.drawer-member-id { min-width: 0; }
+.drawer-member-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.drawer-member-email { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.drawer-member .drawer-logout { color: var(--muted); }
+body.is-authed .drawer-card > .drawer-lang-block { order: 2; }

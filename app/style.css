@@ -3285,16 +3285,12 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 }
 /* 大运 luck pillars */
 .luck-bar {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
   gap: 8px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 4px;
-  scroll-snap-type: x proximity;
 }
 .luck-block {
-  flex-shrink: 0;
-  width: 84px;
+  min-width: 0;
   background: var(--w03);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -3304,7 +3300,6 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
   align-items: center;
   gap: 4px;
   text-align: center;
-  scroll-snap-align: center;
 }
 .luck-block.is-future { opacity: 0.72; }
 .luck-block.is-current {
