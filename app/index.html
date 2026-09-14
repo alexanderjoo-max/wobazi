@@ -86,7 +86,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/app/style.css?v=58">
-  <link rel="stylesheet" href="/app/portal.css?v=4">
+  <link rel="stylesheet" href="/app/portal.css?v=5">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
     html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
@@ -140,8 +140,8 @@
           </button>
         </div>
         <div id="nav-authed" class="nav-authed hide">
-          <img id="nav-authed-avatar" class="nav-authed-avatar" alt="" referrerpolicy="no-referrer">
-          <button class="nav-logout" onclick="haptic(6); logout()"><span class="en">Logout</span><span class="zh hide">退出</span><span class="th hide">ออกจากระบบ</span></button>
+          <button type="button" class="nav-logout" onclick="haptic(6); closeAppNav(); goHash('portal')"><span class="en">My Wobazi</span><span class="zh hide">我的 Wobazi</span><span class="th hide">Wobazi ของฉัน</span></button>
+          <button type="button" class="nav-member-btn" aria-label="Account menu" aria-expanded="false" onclick="toggleSiteNav(this, event)"><svg class="nav-member-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><img id="nav-authed-avatar" class="nav-authed-avatar" alt="" referrerpolicy="no-referrer"></button>
         </div>
         <a href="/#input" class="btn-primary site-nav-cta" onclick="if(!event.metaKey&&!event.ctrlKey){event.preventDefault();haptic(12);goToInput();}">
           <span class="cta-full"><span class="en">Plot Your Chart</span><span class="zh hide">排出你的命盘</span><span class="th hide">จัดแผนภูมิของคุณ</span></span>
@@ -1048,6 +1048,10 @@
         <button class="btn-share-icon" id="share-btn" onclick="haptic(8); showShareCard()" title="Share">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         </button>
+        <div class="nav-authed nav-member hide">
+          <button type="button" class="nav-logout" onclick="haptic(6); closeAppNav(); goHash('portal')"><span class="en">My Wobazi</span><span class="zh hide">我的 Wobazi</span><span class="th hide">Wobazi ของฉัน</span></button>
+          <button type="button" class="nav-member-btn" aria-label="Account menu" aria-expanded="false" onclick="toggleSiteNav(this, event)"><svg class="nav-member-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><img class="nav-authed-avatar nav-member-avatar" alt="" referrerpolicy="no-referrer"></button>
+        </div>
         <div class="lang-switch" data-lang-switch>
           <button type="button" class="lang-switch-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Language" onclick="toggleLangMenu(this, event)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 3.5 6 3.5 9s-1 6-3.5 9c-2.5-3-3.5-6-3.5-9S9.5 6 12 3z"/></svg>
@@ -1878,7 +1882,7 @@
 
   <script src="/bazi-engine.js?v=5"></script>
   <script src="/verdict.js?v=2"></script>
-  <script src="/app/portal.js?v=4"></script>
+  <script src="/app/portal.js?v=5"></script>
   <script src="/app/script.js?v=35"></script>
   <script src="/app/share-viral.js?v=5"></script>
   <script>

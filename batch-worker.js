@@ -22,7 +22,7 @@ async function main() {
   console.log(`[Worker] Starting batch-worker at ${new Date().toISOString()}`);
 
   // Connect to the same database
-  const db = new Database(path.join(__dirname, 'wobazi.db'));
+  const db = new Database(process.env.DB_PATH || path.join(__dirname, 'wobazi.db'));
   db.pragma('journal_mode = WAL');
 
   // Ensure table exists

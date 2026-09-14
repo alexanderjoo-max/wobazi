@@ -27,6 +27,7 @@ node batch-worker.js  # Run daily reading batch manually
 - `BATCH_SECRET` — Protects the manual batch trigger endpoint
 - `BASE_URL` — Server URL (defaults to http://localhost:3000)
 - `PORT` — Server port (defaults to 3000)
+- `DB_PATH` — SQLite file path (defaults to `./wobazi.db`). On Render, point it at a persistent disk (e.g. `/var/data/wobazi.db`) or every deploy starts with an empty database while cookie sessions survive.
 
 ## Project Structure
 ```

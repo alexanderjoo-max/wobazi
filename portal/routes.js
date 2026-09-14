@@ -24,14 +24,6 @@ const MAX_NOTE = 2000;
 const PAGE_MAX = 50;
 const REACTIONS = ['accurate', 'off', 'unsure'];
 
-function requireUser(req, res) {
-  if (!req.session || !req.session.user) {
-    res.status(401).json({ error: 'Not logged in' });
-    return null;
-  }
-  return req.session.user.googleId;
-}
-
 function utcMidnight(now) {
   const d = new Date(now);
   return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
@@ -105,6 +97,19 @@ function toMarkdown(data) {
 function createRoutes(db) {
   const router = express.Router();
 
+  /* Cookie sessions outlive the SQLite file (a fresh disk after a deploy leaves a signed-in
+     cookie with no users row). Restore the row from the session instead of bouncing the user. */
+  const restoreUser = db.prepare('INSERT OR IGNORE INTO users (google_id, name, email, avatar) VALUES (?, ?, ?, ?)');
+  function requireUser(req, res) {
+    const u = req.session && req.session.user;
+    if (!u || !u.googleId) {
+      res.status(401).json({ error: 'Not logged in' });
+      return null;
+    }
+    restoreUser.run(u.googleId, u.name || null, u.email || null, u.avatar || null);
+    return u.googleId;
+  }
+
   const insertSnapshot = db.prepare(`
     INSERT OR IGNORE INTO reading_snapshots (google_id, date, summary, strip_html, hero_html)
     VALUES (?, ?, ?, ?, ?)
@@ -128,10 +133,6 @@ function createRoutes(db) {
     }
     const summaryStr = JSON.stringify(summary && typeof summary === 'object' ? summary : {});
     if (summaryStr.length > MAX_SUMMARY) return res.status(400).json({ error: 'Invalid reading' });
-
-    // users row is created at sign-in; guard against a stale cookie for a deleted user.
-    const user = db.prepare('SELECT 1 FROM users WHERE google_id = ?').get(gid);
-    if (!user) return res.status(401).json({ error: 'Not logged in' });
 
     const info = insertSnapshot.run(gid, date, summaryStr, stripHtml, heroHtml);
     res.json({ ok: true, created: info.changes > 0 });

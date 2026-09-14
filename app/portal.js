@@ -242,6 +242,8 @@
   function fillMemberMenu() {
     if (!signedIn()) return;
     document.body.classList.add('is-authed');
+    document.querySelectorAll('.nav-member').forEach(n => n.classList.remove('hide'));
+    document.querySelectorAll('.nav-member-avatar').forEach(img => { if (_currentUser.avatar) img.src = _currentUser.avatar; });
     document.querySelectorAll('.drawer-member').forEach(m => {
       m.querySelector('.drawer-member-name').textContent = _currentUser.name || '';
       m.querySelector('.drawer-member-email').textContent = _currentUser.email || '';

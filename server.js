@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
 /* ── SQLite Database ── */
-const db = new Database(path.join(__dirname, 'wobazi.db'));
+const db = new Database(process.env.DB_PATH || path.join(__dirname, 'wobazi.db'));
 db.pragma('journal_mode = WAL');
 
 db.exec(`

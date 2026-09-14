@@ -97,3 +97,19 @@
 .drawer-member-email { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .drawer-member .drawer-logout { color: var(--muted); }
 body.is-authed .drawer-card > .drawer-lang-block { order: 2; }
+
+/* Desktop header (no hamburger above 860px): My Wobazi + avatar button opening the member menu */
+.nav-member-btn {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--w07);
+  border: 1px solid var(--border);
+  color: var(--text);
+  overflow: hidden;
+}
+.nav-member-btn .nav-authed-avatar { position: absolute; inset: 0; width: 100%; height: 100%; }
+.nav-member-btn .nav-authed-avatar:not([src]),
+.nav-member-btn .nav-authed-avatar[src=""] { display: none; }
+.nav-member-btn:hover { border-color: var(--gold); }
