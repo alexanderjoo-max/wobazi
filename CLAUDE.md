@@ -172,7 +172,7 @@ Fixtures: `npm test` (`test/bazi-engine.test.js`) vs lunar-javascript / BaZi Lab
 - Monthly love + career strips are deterministic: `hash(userId, birthChartKey, domain, year)` + 流月 pillar / 十神 / clash-combine. Cached with the chart; recalc when year or birth data changes.
 
 ## UI: Tab Banner System (updated 2026-03-18)
-- **Today tab only**: Shows a compact context strip (`#context-strip`) — single row with date, day pillar emoji+name+Chinese, overall score, and verdict. Tapping expands to show hero_text summary.
+- **Context strip** (`#context-strip`) is rendered but hidden on every tab; Today's Fortune (`#daily-card`) shows the day pillar + the single daily score on the strip's gradient. The strip markup is still captured for portal history snapshots. Previously it showed a compact context strip (`#context-strip`) — single row with date, day pillar emoji+name+Chinese, overall score, and verdict. Tapping expands to show hero_text summary.
 - **Actions tab**: Shows the full hero banner (`#hero-card`) with date, title, hero_text, and DO/AVOID/WATCH items.
 - The rabbit circle medallion (`hc-med`) was removed from all tabs.
 - `switchTab()` toggles visibility between `#context-strip` and `#hero-card` based on active tab.

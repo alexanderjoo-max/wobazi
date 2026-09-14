@@ -85,7 +85,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=60">
+  <link rel="stylesheet" href="/app/style.css?v=61">
   <link rel="stylesheet" href="/app/portal.css?v=5">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
@@ -1301,16 +1301,6 @@
           <span class="section-sub" id="today-date-label"></span>
         </div>
         <div id="daily-card"></div>
-        <button class="oracle-cta-btn" onclick="haptic(10); showOracle()">
-          <div class="oracle-cta-inner">
-            <span class="oracle-cta-icon">✦</span>
-            <div class="oracle-cta-text">
-              <span class="oracle-cta-title"><span class="en">Ask the Oracle</span><span class="zh hide">问神谕</span><span class="th hide">ถามเทพพยากรณ์</span></span>
-              <span class="oracle-cta-sub"><span class="en">AI-powered BaZi guidance</span><span class="zh hide">AI 八字指引</span><span class="th hide">คำแนะนำปาจื้อจาก AI</span></span>
-            </div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </div>
-        </button>
       </section>
 
       <!-- Today: Life Areas -->
@@ -1759,10 +1749,6 @@
   </div>
 
   <!-- Sticky mobile CTA for the landing (shown by the script at the end of <body>) -->
-  <button type="button" id="landing-sticky-cta" class="sticky-cta" onclick="haptic(12); onLandingPrimary()">
-    <span class="en">Plot Your Chart</span><span class="zh hide">排出你的命盘</span><span class="th hide">จัดแผนภูมิของคุณ</span>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-  </button>
 
   <!-- SHARE OVERLAY (legacy shell kept for closeShare) -->
   <div id="share-overlay" class="share-overlay hide"></div>
@@ -1885,29 +1871,7 @@
   <script src="/bazi-engine.js?v=5"></script>
   <script src="/verdict.js?v=2"></script>
   <script src="/app/portal.js?v=5"></script>
-  <script src="/app/script.js?v=38"></script>
+  <script src="/app/script.js?v=39"></script>
   <script src="/app/share-viral.js?v=5"></script>
-  <script>
-    // Landing sticky CTA: appears once the hero CTA scrolls away, hides at the final CTA and off the landing.
-    (function () {
-      const splash = document.getElementById('splash');
-      const cta = document.getElementById('landing-sticky-cta');
-      const hero = document.getElementById('splash-cta-wrap');
-      const fin = document.querySelector('.splash-final-cta');
-      if (!splash || !cta || !hero || !('IntersectionObserver' in window)) return;
-      const seen = new Map();
-      function update() {
-        const on = splash.classList.contains('active') && seen.get(hero) === false && seen.get(fin) !== true;
-        cta.classList.toggle('is-on', on);
-      }
-      const io = new IntersectionObserver(entries => {
-        entries.forEach(e => seen.set(e.target, e.isIntersecting));
-        update();
-      }, { root: splash });
-      io.observe(hero);
-      if (fin) io.observe(fin);
-      new MutationObserver(update).observe(splash, { attributes: true, attributeFilter: ['class'] });
-    })();
-  </script>
 </body>
 </html>

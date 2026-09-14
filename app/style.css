@@ -1630,11 +1630,17 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
    DAILY FORTUNE CARD
 ──────────────────────── */
 .daily-fortune-card {
+  position: relative;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   overflow: hidden;
   background: var(--w04);
 }
+/* Today's Fortune carries the context strip's element gradient (the strip itself is no longer shown) */
+.daily-fortune-bg { position: absolute; inset: 0; pointer-events: none; animation: hero-shift 8s ease-in-out infinite alternate; }
+.daily-fortune-card > :not(.daily-fortune-bg) { position: relative; }
+.daily-kicker { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--m7); margin-bottom: 8px; }
+.daily-pillar-cn { font-family: 'Noto Sans SC', sans-serif; color: var(--w6); font-weight: 400; margin-left: 2px; }
 .daily-top {
   display: flex; align-items: center; gap: 16px;
   padding: 20px;
@@ -4421,10 +4427,15 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  /* Own compositor layer: the drifting image under blurred panels otherwise repaints (flickers) on scroll */
+  transform: translateZ(0);
+  contain: strict;
 }
 .site-galaxy-img {
   position: absolute;
   inset: -14%;
+  will-change: transform;
+  backface-visibility: hidden;
   background: url('assets/galaxy.jpg?v=2') center 40% / cover no-repeat;
   animation: galaxy-drift 42s ease-in-out infinite alternate;
   filter: saturate(1.2) contrast(1.06);
@@ -5945,25 +5956,6 @@ a.footer-udestiny span {
 .splash-faq details a { color: var(--gold); }
 
 /* ── Sticky mobile CTA (landing + SEO pages) ── */
-.sticky-cta { display: none; }
-@media (max-width: 860px) {
-  .sticky-cta {
-    position: fixed; left: 16px; right: 16px; bottom: calc(14px + env(safe-area-inset-bottom));
-    z-index: 350;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    padding: 15px 24px;
-    border: 0; border-radius: 100px;
-    background: linear-gradient(135deg, #f0c040, #e08020);
-    color: #1a0a00; font-family: inherit; font-size: 16px; font-weight: 700; text-decoration: none;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 4px 24px rgba(240,192,64,0.35);
-    transform: translateY(160%); opacity: 0; pointer-events: none;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-  }
-  .sticky-cta.is-on { transform: none; opacity: 1; pointer-events: auto; }
-  .sticky-cta:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-  body.seo-page { padding-bottom: 84px; }
-}
-@media (prefers-reduced-motion: reduce) { .sticky-cta { transition: opacity 0.2s; } }
 
 /* ── Compatibility deep dive (Relationships → Check Compatibility) ── */
 .cd { text-align: left; margin-top: 16px; display: flex; flex-direction: column; gap: 18px; }
@@ -6091,3 +6083,4 @@ a.footer-udestiny span {
 .cal-detail-empty { font-size: 13px; color: var(--muted); margin: 0; }
 .pick-row { cursor: pointer; }
 .pick-row:hover { border-color: var(--w2); }
+#res-daily { padding-top: 16px; }

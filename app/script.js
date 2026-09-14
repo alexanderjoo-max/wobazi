@@ -416,7 +416,7 @@ function switchTab(tab, opts) {
   const heroCard = document.getElementById('hero-card');
   const ctxStrip = document.getElementById('context-strip');
   if (heroCard) heroCard.classList.toggle('hide', tab !== 'actions');
-  if (ctxStrip) ctxStrip.classList.toggle('hide', tab !== 'today');
+  if (ctxStrip) ctxStrip.classList.add('hide'); // Today's Fortune card shows the day pillar + score now; strip is kept for history snapshots
   document.querySelector('#results .scroll-body').scrollTop = 0;
   if (!opts.skipHash && typeof currentHash === 'function' && currentHash() !== tab) {
     history.pushState({ wobazi: tab }, '', location.pathname + location.search + '#' + tab);
@@ -2175,13 +2175,19 @@ function renderDailyFortune(userAnimal) {
   document.getElementById('today-date-label').textContent = dateLabel;
 
   const card = document.getElementById('daily-card');
+  const tp = calcTodayPillar();
+  const tpEl = tp.stem.element;
+  const cardEl = EL_COLOR[(_shareData && _shareData.element) || tpEl] || color;
+  const shortDate = now.toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short' });
   card.innerHTML = `<div class="daily-fortune-card">
+    <div class="daily-fortune-bg" style="background:linear-gradient(135deg, ${cardEl}28, ${cardEl}55, #0f0f1c)"></div>
     <div class="daily-top">
       <div>
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${_t("Today's Day Animal",'今日日柱','สัตว์ประจำวันนี้')}</div>
+        <div class="daily-kicker">${_t('Today · ' + shortDate, '今日 · ' + shortDate, 'วันนี้ · ' + shortDate)}</div>
         <div class="daily-animal-chip">
           <svg viewBox="0 0 100 100" width="22" height="22" style="color:${color}">${ANIMAL_SVGS[todayAnimal]||''}</svg>
-          ${_t(todayAnimal, ANIMAL_ZH[todayAnimal], ANIMAL_TH[todayAnimal])}
+          ${_t(`${tpEl} ${todayAnimal}`, `${EL_ZH[tpEl]}${ANIMAL_ZH[todayAnimal]}`, `${EL_TH[tpEl]} ${ANIMAL_TH[todayAnimal]}`)}
+          <span class="daily-pillar-cn">${tp.stem.char}${tp.branch.char}</span>
         </div>
       </div>
       <div class="daily-score-wrap">
