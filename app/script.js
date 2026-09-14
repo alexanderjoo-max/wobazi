@@ -416,7 +416,7 @@ function switchTab(tab, opts) {
   const heroCard = document.getElementById('hero-card');
   const ctxStrip = document.getElementById('context-strip');
   if (heroCard) heroCard.classList.toggle('hide', tab !== 'actions');
-  if (ctxStrip) ctxStrip.classList.toggle('hide', tab === 'actions');
+  if (ctxStrip) ctxStrip.classList.toggle('hide', tab !== 'today');
   document.querySelector('#results .scroll-body').scrollTop = 0;
   if (!opts.skipHash && typeof currentHash === 'function' && currentHash() !== tab) {
     history.pushState({ wobazi: tab }, '', location.pathname + location.search + '#' + tab);
@@ -639,14 +639,14 @@ function fillFormFromPayload(p) {
   if (monthEl) monthEl.value = p.month || '';
   if (yearEl) yearEl.value = p.year || '';
   if (leapEl) leapEl.checked = false;
-  if (unkEl) unkEl.checked = p.hour == null;
+  if (unkEl) unkEl.checked = false;
   if (timeEl) {
     if (p.hour != null) {
       timeEl.value = String(p.hour).padStart(2, '0') + ':' + String(p.minute || 0).padStart(2, '0');
       timeEl.disabled = false;
     } else {
       timeEl.value = '';
-      if (unkEl && unkEl.checked) timeEl.disabled = true;
+      timeEl.disabled = false;
     }
   }
   if (placeEl) placeEl.value = p.birthplace || '';
@@ -2150,19 +2150,19 @@ function renderDailyFortune(userAnimal) {
 
   let score, color, levelLabel, levelLabel_zh, levelLabel_th, msg_en, msg_zh, msg_th;
   if (userZodiac.compat.includes(todayAnimal)) {
-    score = 85 + Math.floor(Math.random() * 12);
+    score = 85 + Math.floor(chartUnit('daily|' + todayKey()) * 12);
     color = '#22c55e'; levelLabel = 'Auspicious'; levelLabel_zh = '大吉'; levelLabel_th = 'มงคล';
     msg_en = `Today's energy flows with you. The ${todayAnimal} day amplifies your natural power — make your boldest moves now.`;
     msg_zh = `今日能量与你同频。${ANIMAL_ZH[todayAnimal]}日增强你的天赋能量，大胆出击，正当时。`;
     msg_th = `พลังวันนี้ไหลไปกับคุณ วัน${ANIMAL_TH[todayAnimal]}เสริมพลังธรรมชาติ — กล้าได้เลย`;
   } else if (userZodiac.clash.includes(todayAnimal)) {
-    score = 38 + Math.floor(Math.random() * 18);
+    score = 38 + Math.floor(chartUnit('daily|' + todayKey()) * 18);
     color = '#ef4444'; levelLabel = 'Challenging'; levelLabel_zh = '冲煞'; levelLabel_th = 'ท้าทาย';
     msg_en = `The ${todayAnimal} day creates friction with your chart. Navigate slowly, hold decisions until tomorrow, and protect your energy.`;
     msg_zh = `今日${ANIMAL_ZH[todayAnimal]}日与你的命盘有冲突。放缓节奏，重要决定推迟到明天，注意保护自己的能量。`;
     msg_th = `วัน${ANIMAL_TH[todayAnimal]}เสียดกับแผนภูมิ ช้าลง เลื่อนตัดสินใจไปพรุ่งนี้ และปกป้องพลัง`;
   } else {
-    score = 60 + Math.floor(Math.random() * 22);
+    score = 60 + Math.floor(chartUnit('daily|' + todayKey()) * 22);
     color = '#f0c040'; levelLabel = 'Balanced'; levelLabel_zh = '平稳'; levelLabel_th = 'สมดุล';
     msg_en = `A steady ${todayAnimal} day — neither tailwind nor headwind. Focus on consistency, refine the details, and trust the process.`;
     msg_zh = `今日${ANIMAL_ZH[todayAnimal]}日平稳，无明显顺逆之风。专注于一致性，打磨细节，相信过程。`;
@@ -3452,6 +3452,24 @@ function initTooltips() {
 /* ═══════════════════════════════════════
    2026 ANNUAL FORECAST
 ═══════════════════════════════════════ */
+/* Stable 0–1 value for this chart + label (FNV-1a → mulberry32). Same birth data gives the same
+   scores on every render: yearly labels hold all year, daily labels hold all day. */
+function chartUnit(label) {
+  const pillars = (_shareData && _shareData.pillars) || [];
+  const chart = pillars.map(p => (p && p.known !== false && p.stem && p.branch) ? p.stem.char + p.branch.char : '-').join('');
+  const key = chart + '|' + label;
+  let h = 2166136261;
+  for (let i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619); }
+  h = (h + 0x6D2B79F5) | 0;
+  h = Math.imul(h ^ (h >>> 15), h | 1);
+  h ^= h + Math.imul(h ^ (h >>> 7), h | 61);
+  return ((h ^ (h >>> 14)) >>> 0) / 4294967296;
+}
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+}
+
 function calc2026Fortune(animal, elements) {
   // 2026 = 丙午 Fire Horse
   const HORSE_COMPAT = ['Tiger', 'Dog', 'Goat'];
@@ -3468,12 +3486,12 @@ function calc2026Fortune(animal, elements) {
   base = Math.min(95, Math.max(28, base + (elMod[dominant] || 0)));
 
   // Aspect scores with small variance
-  const v = () => Math.floor(Math.random() * 10) - 5;
+  const v = k => Math.floor(chartUnit('2026|' + k) * 10) - 5;
   const aspects = {
-    career: Math.min(95, Math.max(25, base + v() + (dominant === 'Fire'  ? 5 : 0))),
-    love:   Math.min(95, Math.max(25, base + v() + (dominant === 'Wood'  ? 4 : 0))),
-    wealth: Math.min(95, Math.max(25, base + v() + (dominant === 'Earth' ? 5 : 0))),
-    health: Math.min(95, Math.max(25, base + v() + (dominant === 'Metal' ? 4 : 0))),
+    career: Math.min(95, Math.max(25, base + v('career') + (dominant === 'Fire'  ? 5 : 0))),
+    love:   Math.min(95, Math.max(25, base + v('love') + (dominant === 'Wood'  ? 4 : 0))),
+    wealth: Math.min(95, Math.max(25, base + v('wealth') + (dominant === 'Earth' ? 5 : 0))),
+    health: Math.min(95, Math.max(25, base + v('health') + (dominant === 'Metal' ? 4 : 0))),
   };
   return { overall: base, aspects };
 }
@@ -3481,8 +3499,8 @@ function calc2026Fortune(animal, elements) {
 function gen2026Monthly(base) {
   // Fire Horse peaks in summer; dips in winter
   const boost = [-6, -8, -2, 4, 8, 14, 12, 9, 4, 0, -4, -5];
-  return boost.map(b => Math.min(98, Math.max(22,
-    Math.round(base + b + (Math.random() * 8 - 4))
+  return boost.map((b, i) => Math.min(98, Math.max(22,
+    Math.round(base + b + (chartUnit('2026|month' + i) * 8 - 4))
   )));
 }
 
@@ -4563,9 +4581,9 @@ function showOracle() {
   const nobleman = isNoblemanDay(userAnimal, today.animal);
 
   let score;
-  if (isCompat) score = 85 + Math.floor(Math.random() * 12);
-  else if (isClash) score = 38 + Math.floor(Math.random() * 18);
-  else score = 60 + Math.floor(Math.random() * 22);
+  if (isCompat) score = 85 + Math.floor(chartUnit('daily|' + todayKey()) * 12);
+  else if (isClash) score = 38 + Math.floor(chartUnit('daily|' + todayKey()) * 18);
+  else score = 60 + Math.floor(chartUnit('daily|' + todayKey()) * 22);
 
   const clashColor = isClash ? '#ef4444' : isCompat ? '#22c55e' : '#f0c040';
   const clashLabel = isClash ? 'Clash' : isCompat ? 'Harmony' : 'Neutral';
@@ -4956,9 +4974,9 @@ function openOracleDrawer() {
   const nobleman = isNoblemanDay(userAnimal, today.animal);
 
   let score;
-  if (isCompat) score = 85 + Math.floor(Math.random() * 12);
-  else if (isClash) score = 38 + Math.floor(Math.random() * 18);
-  else score = 60 + Math.floor(Math.random() * 22);
+  if (isCompat) score = 85 + Math.floor(chartUnit('daily|' + todayKey()) * 12);
+  else if (isClash) score = 38 + Math.floor(chartUnit('daily|' + todayKey()) * 18);
+  else score = 60 + Math.floor(chartUnit('daily|' + todayKey()) * 22);
 
   const clashColor = isClash ? '#ef4444' : isCompat ? '#22c55e' : '#f0c040';
   const clashLabel = isClash ? 'Clash' : isCompat ? 'Harmony' : 'Neutral';
@@ -5312,6 +5330,180 @@ function renderBusinessCompat(animal, dominantEl, elements) {
   </div>`;
 }
 
+/* ── Compatibility deep dive ──
+   Presentation of engine outputs only (pairBranchRelations, calcTenGod, calcElements,
+   favorableElements, getNatalNobles, getPeachBlossom). Scores are untouched. */
+const COMPAT_PILLAR_AREA = {
+  Year:  { en: 'Family & social circles', zh: '家庭与社交', th: 'ครอบครัวและสังคม' },
+  Month: { en: 'Daily life & work rhythm', zh: '日常与工作节奏', th: 'ชีวิตประจำวันและจังหวะงาน' },
+  Day:   { en: 'The relationship itself · spouse palace 夫妻宫', zh: '感情本身 · 夫妻宫', th: 'ตัวความสัมพันธ์ · วังคู่ครอง 夫妻宫' },
+  Hour:  { en: 'Long-term plans & later years', zh: '长远规划与晚年', th: 'แผนระยะยาวและบั้นปลาย' },
+};
+const COMPAT_PILLAR_NAME = {
+  Year: ['Year', '年', 'ปี'], Month: ['Month', '月', 'เดือน'], Day: ['Day', '日', 'วัน'], Hour: ['Hour', '时', 'ยาม'],
+};
+const COMPAT_REL = {
+  combine: { mark: '合', tone: 'good', en: 'Combine 六合', zh: '六合', th: 'รวม 六合',
+    note: ['A natural bond — you pull toward each other here.', '天然相合，这一处彼此靠拢。', 'สายสัมพันธ์ธรรมชาติ — ดึงเข้าหากันตรงนี้'] },
+  harmony: { mark: '三合', tone: 'good', en: 'Three Harmony 三合', zh: '三合', th: 'สามประสาน 三合',
+    note: ['Shared direction — it’s easy to agree on where this goes.', '方向一致，容易对未来达成共识。', 'ทิศทางเดียวกัน — ตกลงเรื่องอนาคตได้ง่าย'] },
+  same: { mark: '同', tone: 'neutral', en: 'Same branch', zh: '同支', th: 'กิ่งเดียวกัน',
+    note: ['A mirror — familiar and easy, sometimes too alike.', '像照镜子——熟悉自在，有时太像。', 'เหมือนกระจก — คุ้นเคย บางทีเหมือนกันเกินไป'] },
+  clash: { mark: '冲', tone: 'bad', en: 'Clash 六冲', zh: '六冲', th: 'ปะทะ 六冲',
+    note: ['Push-pull — real chemistry and real friction. Give each other room.', '一推一拉——有火花也有摩擦，彼此留出空间。', 'ผลักดึง — มีเคมีและมีแรงเสียดทาน ให้พื้นที่กัน'] },
+  harm: { mark: '害', tone: 'bad', en: 'Harm 六害', zh: '六害', th: 'ทำร้าย 六害',
+    note: ['Small hurts and misread signals — say things plainly.', '小伤小误会，话要说清楚。', 'แผลเล็กและสัญญาณผิด — พูดให้ตรง'] },
+  punish: { mark: '刑', tone: 'bad', en: 'Punishment 刑', zh: '相刑', th: 'ลงโทษ 刑',
+    note: ['Friction that tests you — patience matters most here.', '考验型的摩擦，这一处最需要耐心。', 'แรงเสียดทานที่ทดสอบ — ความอดทนสำคัญที่สุด'] },
+  neutral: { mark: '·', tone: 'neutral', en: 'Neutral', zh: '平', th: 'กลาง',
+    note: ['No strong pull either way.', '无明显牵引。', 'ไม่มีแรงดึงชัดเจน'] },
+};
+const COMPAT_GOD_NOTE = {
+  friend:            ['An equal — they feel like a peer and a teammate.', '平起平坐——像同伴，也像队友。', 'คนเท่าเทียม — เหมือนเพื่อนร่วมทีม'],
+  rob_wealth:        ['A magnetic rival — attraction with a streak of competition.', '有吸引力的对手——心动里带点较劲。', 'คู่แข่งที่มีเสน่ห์ — ดึงดูดแต่มีการแข่งกัน'],
+  eating_god:        ['Someone you nurture easily — warmth and play come naturally.', '你自然想照顾的人——温暖与玩乐都很自然。', 'คนที่คุณดูแลได้ง่าย — อบอุ่นและสนุกโดยธรรมชาติ'],
+  hurting_officer:   ['They bring out your candid side — lively, honest, sometimes prickly.', '激发你直率的一面——热闹、坦白，偶尔带刺。', 'ดึงด้านตรงไปตรงมาของคุณ — มีชีวิตชีวา บางทีแหลมคม'],
+  direct_wealth:     ['Steady devotion — someone you want to take care of and build with.', '稳定的投入——想照顾、想一起经营的人。', 'ความทุ่มเทมั่นคง — คนที่อยากดูแลและสร้างด้วยกัน'],
+  indirect_wealth:   ['Excitement and desire — a thrilling, less predictable pull.', '兴奋与渴望——刺激、难以预料的吸引。', 'ความตื่นเต้นและปรารถนา — แรงดึงที่คาดเดายาก'],
+  direct_officer:    ['A stabiliser — they bring structure, commitment and standards.', '稳定器——带来规矩、承诺与标准。', 'ตัวสร้างความมั่นคง — นำโครงสร้างและพันธะมา'],
+  seven_killings:    ['Intensity — they challenge you and push you to grow. Keep respect high.', '强烈——挑战你、推你成长，需要彼此尊重。', 'ความเข้มข้น — ท้าทายและผลักให้โต ต้องเคารพกัน'],
+  direct_resource:   ['Care and support — they look after you and make you feel safe.', '照顾与支持——让你被照顾、有安全感。', 'การดูแลและแรงหนุน — ทำให้รู้สึกปลอดภัย'],
+  indirect_resource: ['An unconventional ally — quiet insight and understanding.', '非典型的支持——安静的洞察与理解。', 'พันธมิตรไม่ธรรมดา — ความเข้าใจอย่างเงียบๆ'],
+};
+function compatElLabel(el) { return _t(el, EL_ZH[el] + ' ' + el, (EL_TH[el] || el)); }
+
+function renderCompatDeep(userPillars, partnerPillars, userDominant, partnerDominant, partnerElements) {
+  if (!window.BaziEngine || !userPillars || !partnerPillars) return '';
+  const E = BaziEngine;
+  const labels = ['Year', 'Month', 'Day', 'Hour'];
+  const known = p => p && p.known !== false && p.stem && p.branch;
+  const rels = {};
+  (E.pairBranchRelations(userPillars, partnerPillars) || []).forEach(r => { rels[r.pillar] = r.relation; });
+
+  /* 1 · Side by side (Hour → Day → Month → Year, as on Your Chart) */
+  const order = [3, 2, 1, 0];
+  const cell = p => known(p)
+    ? `<div class="cd-cell"><span style="color:${EL_COLOR[p.stem.element]}">${p.stem.char}</span><span style="color:${EL_COLOR[p.branch.element]}">${p.branch.char}</span><small>${_t(p.branch.animal, ANIMAL_ZH[p.branch.animal], ANIMAL_TH[p.branch.animal])}</small></div>`
+    : `<div class="cd-cell is-unknown"><span>?</span><small>${_t('Unknown', '未知', 'ไม่ทราบ')}</small></div>`;
+  const grid = `
+    <div class="cd-grid">
+      <div></div>${order.map(i => `<div class="cd-col-h">${_t(...COMPAT_PILLAR_NAME[labels[i]])}</div>`).join('')}
+      <div class="cd-row-h">${_t('You', '你', 'คุณ')}</div>${order.map(i => cell(userPillars[i])).join('')}
+      <div></div>${order.map(i => {
+        const rel = COMPAT_REL[rels[labels[i]]];
+        return rel ? `<div class="cd-rel is-${rel.tone}" title="${rel.en}">${rel.mark}</div>` : '<div class="cd-rel"></div>';
+      }).join('')}
+      <div class="cd-row-h">${_t('Them', '对方', 'เขา')}</div>${order.map(i => cell(partnerPillars[i])).join('')}
+    </div>`;
+
+  /* 2 · Pillar by pillar, spouse palace first */
+  const pillarRows = ['Day', 'Year', 'Month', 'Hour'].filter(l => rels[l]).map(l => {
+    const rel = COMPAT_REL[rels[l]] || COMPAT_REL.neutral;
+    const a = COMPAT_PILLAR_AREA[l];
+    return `<li class="cd-item">
+      <span class="cd-tag is-${rel.tone}">${rel.mark}</span>
+      <div><div class="cd-item-t">${_t(a.en, a.zh, a.th)} — ${_t(rel.en, rel.zh, rel.th)}</div>
+      <div class="cd-item-s">${_t(...rel.note)}</div></div>
+    </li>`;
+  }).join('');
+  const missing = labels.filter(l => !rels[l]).map(l => _t(...COMPAT_PILLAR_NAME[l]));
+  const pillarSection = pillarRows ? `
+    <div class="cd-sec">
+      <div class="cd-h">${_t('Pillar by pillar', '逐柱对照', 'เทียบทีละเสา')}</div>
+      <ul class="cd-list">${pillarRows}</ul>
+      ${missing.length ? `<p class="cd-foot">${_t(`Both birth times are needed to compare the ${missing.join(', ')} pillar.`, `需双方出生时间才能对照${missing.join('、')}柱。`, `ต้องมีเวลาเกิดของทั้งสองคนจึงเทียบเสา ${missing.join(', ')} ได้`)}</p>` : ''}
+    </div>` : '';
+
+  /* 3 · Day Masters: what each of you is to the other */
+  const uDM = known(userPillars[2]) ? userPillars[2].stem : null;
+  const pDM = known(partnerPillars[2]) ? partnerPillars[2].stem : null;
+  let godSection = '';
+  if (uDM && pDM) {
+    const theyAre = E.calcTenGod(uDM.element, uDM.polarity, pDM.element, pDM.polarity);
+    const youAre = E.calcTenGod(pDM.element, pDM.polarity, uDM.element, uDM.polarity);
+    const dm = s => `<span class="cd-dm" style="color:${EL_COLOR[s.element]}">${s.char}</span> ${_t(`${s.polarity} ${s.element}`, `${s.polarity === 'Yang' ? '阳' : '阴'}${EL_ZH[s.element]}`, `${s.polarity === 'Yang' ? 'หยาง' : 'หยิน'} ${EL_TH[s.element] || s.element}`)}`;
+    godSection = `
+      <div class="cd-sec">
+        <div class="cd-h">${_t('Day Master to Day Master', '日主对日主', 'วันมาสเตอร์ต่อวันมาสเตอร์')}</div>
+        <div class="cd-dm-row"><div>${_t('You', '你', 'คุณ')} ${dm(uDM)}</div><div>${_t('Them', '对方', 'เขา')} ${dm(pDM)}</div></div>
+        <ul class="cd-list">
+          <li class="cd-item"><span class="cd-tag">→</span><div>
+            <div class="cd-item-t">${_t(`They are your ${godLabel(theyAre)}`, `对方是你的${godLabel(theyAre)}`, `เขาคือ ${godLabel(theyAre)} ของคุณ`)}</div>
+            <div class="cd-item-s">${_t(...(COMPAT_GOD_NOTE[theyAre] || ['', '', '']))}</div></div></li>
+          <li class="cd-item"><span class="cd-tag">←</span><div>
+            <div class="cd-item-t">${_t(`You are their ${godLabel(youAre)}`, `你是对方的${godLabel(youAre)}`, `คุณคือ ${godLabel(youAre)} ของเขา`)}</div>
+            <div class="cd-item-s">${_t(...(COMPAT_GOD_NOTE[youAre] || ['', '', '']))}</div></div></li>
+        </ul>
+      </div>`;
+  }
+
+  /* 4 · Element balance */
+  const uEls = calcElements(userPillars);
+  const pEls = partnerElements || calcElements(partnerPillars);
+  const uTot = Object.values(uEls).reduce((a, b) => a + b, 0) || 1;
+  const pTot = Object.values(pEls).reduce((a, b) => a + b, 0) || 1;
+  const elRows = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'].map(el => `
+    <div class="cd-el-row">
+      <span class="cd-el-name" style="color:${EL_COLOR[el]}">${EL_ZH[el]} ${_t(el, el, EL_TH[el] || el)}</span>
+      <div class="cd-el-bars">
+        <div class="cd-el-bar"><i style="width:${Math.round(uEls[el] / uTot * 100)}%;background:${EL_COLOR[el]}"></i></div>
+        <div class="cd-el-bar is-them"><i style="width:${Math.round(pEls[el] / pTot * 100)}%;background:${EL_COLOR[el]}"></i></div>
+      </div>
+      <span class="cd-el-num">${uEls[el]} · ${pEls[el]}</span>
+    </div>`).join('');
+  const favU = E.favorableElements(userPillars);
+  const favP = E.favorableElements(partnerPillars);
+  const elLines = [];
+  if (partnerDominant && favU.favorable.indexOf(partnerDominant) >= 0) {
+    elLines.push(_t(`Their strongest element, ${partnerDominant}, is one your chart needs — they tend to restore you.`, `对方最旺的${EL_ZH[partnerDominant]}正是你命盘所喜——对方容易让你回血。`, `ธาตุเด่นของเขา (${EL_TH[partnerDominant] || partnerDominant}) คือธาตุที่แผนภูมิคุณต้องการ — เขามักช่วยเติมพลังให้คุณ`));
+  } else if (partnerDominant && favU.unfavorable.indexOf(partnerDominant) >= 0) {
+    elLines.push(_t(`Their strongest element, ${partnerDominant}, is one your chart already has plenty of — protect your own recharge time.`, `对方最旺的${EL_ZH[partnerDominant]}是你命盘已偏多的——记得留给自己充电的时间。`, `ธาตุเด่นของเขา (${EL_TH[partnerDominant] || partnerDominant}) แผนภูมิคุณมีมากพอแล้ว — รักษาเวลาชาร์จพลังของตัวเอง`));
+  }
+  if (userDominant && favP.favorable.indexOf(userDominant) >= 0) {
+    elLines.push(_t(`Your strongest element, ${userDominant}, is one their chart needs — you steady them.`, `你最旺的${EL_ZH[userDominant]}正是对方所喜——你能稳住对方。`, `ธาตุเด่นของคุณ (${EL_TH[userDominant] || userDominant}) คือธาตุที่เขาต้องการ — คุณช่วยให้เขามั่นคง`));
+  } else if (userDominant && favP.unfavorable.indexOf(userDominant) >= 0) {
+    elLines.push(_t(`Your strongest element, ${userDominant}, is one they already have plenty of — don’t overdo it.`, `你最旺的${EL_ZH[userDominant]}对方已偏多——别用力过猛。`, `ธาตุเด่นของคุณ (${EL_TH[userDominant] || userDominant}) เขามีมากแล้ว — อย่ามากเกินไป`));
+  }
+  const elSection = `
+    <div class="cd-sec">
+      <div class="cd-h">${_t('Element balance', '五行对照', 'สมดุลธาตุ')}</div>
+      <div class="cd-el-legend"><span><i class="cd-key"></i>${_t('You', '你', 'คุณ')}</span><span><i class="cd-key is-them"></i>${_t('Them', '对方', 'เขา')}</span></div>
+      ${elRows}
+      ${elLines.map(l => `<p class="cd-foot">${l}</p>`).join('')}
+    </div>`;
+
+  /* 5 · Stars between you */
+  const starLines = [];
+  const branchHits = (pillars, chars) => labels.filter((l, i) => known(pillars[i]) && chars.indexOf(pillars[i].branch.char) >= 0).map(l => _t(...COMPAT_PILLAR_NAME[l]));
+  const nobU = E.getNatalNobles(userPillars);
+  const nobP = E.getNatalNobles(partnerPillars);
+  const theyNoble = branchHits(partnerPillars, (nobU.tianyiBranches || []).map(b => b.char));
+  const youNoble = branchHits(userPillars, (nobP.tianyiBranches || []).map(b => b.char));
+  if (theyNoble.length) starLines.push(_t(`They carry your Nobleman 天乙贵人 (their ${theyNoble.join(', ')} pillar) — they tend to show up as help when it counts.`, `对方命带你的天乙贵人（${theyNoble.join('、')}柱）——关键时刻容易成为助力。`, `เขามีดาวอุปถัมภ์ 天乙贵人 ของคุณ (เสา ${theyNoble.join(', ')}) — มักช่วยในยามสำคัญ`));
+  if (youNoble.length) starLines.push(_t(`You carry their Nobleman 天乙贵人 (your ${youNoble.join(', ')} pillar) — you’re a helper in their story.`, `你命带对方的天乙贵人（${youNoble.join('、')}柱）——你是对方故事里的贵人。`, `คุณมีดาวอุปถัมภ์ 天乙贵人 ของเขา (เสา ${youNoble.join(', ')}) — คุณคือผู้ช่วยในเรื่องราวของเขา`));
+  const peachU = E.getPeachBlossom(userPillars);
+  const peachP = E.getPeachBlossom(partnerPillars);
+  const theyPeach = peachU.branch ? branchHits(partnerPillars, [peachU.branch]) : [];
+  const youPeach = peachP.branch ? branchHits(userPillars, [peachP.branch]) : [];
+  if (theyPeach.length) starLines.push(_t(`They carry your Peach Blossom 桃花 branch (${peachU.branch} ${peachU.animal}) — a strong romantic spark.`, `对方带着你的桃花支（${peachU.branch}）——浪漫火花明显。`, `เขามีกิ่งดอกท้อ 桃花 ของคุณ (${peachU.branch}) — ประกายโรแมนติกชัด`));
+  if (youPeach.length) starLines.push(_t(`You carry their Peach Blossom 桃花 branch (${peachP.branch} ${peachP.animal}) — you read as attractive to them.`, `你带着对方的桃花支（${peachP.branch}）——在对方眼里很有吸引力。`, `คุณมีกิ่งดอกท้อ 桃花 ของเขา (${peachP.branch}) — เขามองว่าคุณมีเสน่ห์`));
+  if (peachU.present) starLines.push(_t(`Peach Blossom sits in your own ${peachU.pillars.join(', ')} pillar — you draw attention easily.`, `你自己的${peachU.pillars.join('、')}柱带桃花——天生容易吸引目光。`, `ดอกท้ออยู่ในเสา ${peachU.pillars.join(', ')} ของคุณ — ดึงดูดความสนใจง่าย`));
+  if (peachP.present) starLines.push(_t(`Peach Blossom sits in their ${peachP.pillars.join(', ')} pillar — they draw attention easily.`, `对方的${peachP.pillars.join('、')}柱带桃花——对方也很吸睛。`, `ดอกท้ออยู่ในเสา ${peachP.pillars.join(', ')} ของเขา — เขาดึงดูดความสนใจง่าย`));
+  const starSection = starLines.length ? `
+    <div class="cd-sec">
+      <div class="cd-h">${_t('Stars between you', '你们之间的神煞', 'ดาวระหว่างคุณ')}</div>
+      <ul class="cd-list">${starLines.map(l => `<li class="cd-item"><span class="cd-tag is-good">✦</span><div class="cd-item-s">${l}</div></li>`).join('')}</ul>
+    </div>` : '';
+
+  return `<div class="cd">
+    <div class="cd-sec">
+      <div class="cd-h">${_t('Your charts side by side', '双方命盘对照', 'แผนภูมิเทียบกัน')}</div>
+      ${grid}
+    </div>
+    ${pillarSection}${godSection}${elSection}${starSection}
+  </div>`;
+}
+
 function checkCompatibility() {
   let day = parseInt(document.getElementById('partner-day').value);
   let month = parseInt(document.getElementById('partner-month').value);
@@ -5437,19 +5629,6 @@ function checkCompatibility() {
     try { renderBusinessCompat(_shareData.animal, _shareData.dominantEl, _shareData.elements); } catch (e) {}
   }
 
-  const peach = scored && scored.peach;
-  const peachLine = peach
-    ? (peach.present
-      ? _t(`Peach Blossom 桃花 is present in your ${peach.pillars.join(', ')} pillar(s) (${peach.branch} ${peach.animal}).`, `桃花在你的${peach.pillars.join('、')}柱（${peach.branch}${peach.animal}）。`, `桃花อยู่ในเสา ${peach.pillars.join(', ')} (${peach.branch} ${peach.animal})`)
-      : _t(`Peach Blossom 桃花 for your chart is ${peach.branch} ${peach.animal} — not sitting in the four pillars.`, `你盘桃花在${peach.branch}${peach.animal}——未入四柱。`, `桃花ของแผนคุณคือ ${peach.branch} ${peach.animal} — ไม่ได้อยู่ในสี่เสา`))
-    : '';
-  const godLine = scored && scored.betweenGod
-    ? _t(`Their Day Master is your ${godLabel(scored.betweenGod)} 十神.`, `对方日主对你是${godLabel(scored.betweenGod)}。`, `วันมาสเตอร์เขาเป็น ${godLabel(scored.betweenGod)} ของคุณ`)
-    : '';
-  const dmLine = scored && scored.dmLink && scored.dmLink !== 'none'
-    ? _t(`Day Masters: ${userEl} ${scored.dmLink.replace('_', ' ')} ${pEl}.`, `日主：${EL_ZH[userEl] || userEl} 与 ${EL_ZH[pEl] || pEl}（${scored.dmLink}）。`, `วันมาสเตอร์: ${userEl} ${scored.dmLink} ${pEl}`)
-    : '';
-
   const scoreKeys = [
     ['love', 'Love compatibility', '感情合盘', 'ความเข้ากันทางรัก'],
     ['attraction', 'Attraction', '吸引', 'แรงดึงดูด'],
@@ -5471,9 +5650,7 @@ function checkCompatibility() {
       <div style="font-size:15px;font-weight:700;color:${color};margin-bottom:10px">${_t(verdict, verdict)}</div>
       ${scoreHtml}
       ${details.map(d => `<p style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px">${d}</p>`).join('')}
-      ${dmLine ? `<p style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px">${dmLine}</p>` : ''}
-      ${godLine ? `<p style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px">${godLine}</p>` : ''}
-      ${peachLine ? `<p style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px">${peachLine}</p>` : ''}
+      ${renderCompatDeep(_shareData.pillars || [], partnerPillars, userEl, pEl, partnerElements)}
     </div>
   `;
 }
