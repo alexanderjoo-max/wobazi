@@ -208,7 +208,7 @@ body.ma-page::before {
 .ma-quote {
   margin: 0; padding: 0 0 0 22px;
   border-left: 2px solid var(--ma-cinnabar);
-  font-family: var(--ma-display); font-weight: 300; font-size: 21px; line-height: 1.55;
+  font-family: var(--ma-display); font-weight: 400; font-size: 21px; line-height: 1.55;
   color: var(--ma-paper);
 }
 
@@ -226,8 +226,8 @@ html[data-lang="zh"] .ma-quote, html[data-lang="th"] .ma-quote { font-style: nor
 
 /* Shared section heading */
 .ma-h2 {
-  font-family: var(--ma-display); font-weight: 500; font-size: clamp(28px, 3.6vw, 40px);
-  line-height: 1.1; color: var(--ma-paper); margin: 0 0 16px;
+  font-family: var(--ma-display); font-weight: 700; font-size: clamp(28px, 3.6vw, 40px);
+  line-height: 1.1; letter-spacing: -0.02em; color: var(--ma-paper); margin: 0 0 16px;
 }
 .ma-why { max-width: 720px; margin: 0 auto 88px; text-align: center; }
 .ma-lede { font-size: 19px; line-height: 1.7; color: var(--ma-ink); margin: 0; }
@@ -269,7 +269,7 @@ html[data-lang="zh"] .ma-quote, html[data-lang="th"] .ma-quote { font-style: nor
 .ma-links a:hover, .ma-links a:focus-visible { border-bottom-color: var(--ma-gold); }
 
 .ma-cta { text-align: center; max-width: 720px; margin: 0 auto; }
-.ma-cta-line { font-family: var(--ma-display); font-weight: 600; font-size: 26px; margin: 0 0 20px; }
+.ma-cta-line { font-family: var(--ma-display); font-weight: 700; font-size: 26px; margin: 0 0 20px; }
 html[data-lang="zh"] .ma-cta-line, html[data-lang="th"] .ma-cta-line { font-style: normal; }
 .ma a:focus-visible, .ma .btn-primary:focus-visible { outline: 2px solid var(--ma-gold); outline-offset: 4px; }
 
@@ -704,3 +704,36 @@ html[lang="zh-CN"] .sl-hook, html[lang="th"] .sl-hook { font-style: normal; }
 .seo-footer-contact { font-size: 13px; line-height: 1.6; color: var(--muted); margin-top: 10px; }
 .seo-footer-contact a { color: var(--gold, #f0c040); text-decoration: none; }
 .footer-cookie-btn { background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; text-align: left; }
+
+/* ── What is BaZi: readable body copy + folding sections (JS adds .is-collapsible; no JS = all open) ── */
+.wib-page .seo-main .about-section p { color: rgba(255, 248, 255, 0.82); font-weight: 400; }
+.wib-page .seo-main .about-faq-a { color: rgba(255, 248, 255, 0.78); font-weight: 400; }
+.wib-page .seo-main .about-section.is-collapsible h3 { cursor: pointer; }
+.wib-page .seo-main .about-section.is-collapsible:not(.is-open) .wib-more { display: none; }
+.wib-page .seo-main .about-section.is-collapsible:not(.is-open) > p { margin-bottom: 0; }
+.wib-page .wib-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--gold, #f0c040);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.wib-page .wib-toggle::after { content: '+'; font-size: 18px; font-weight: 300; line-height: 1; }
+.wib-page .about-section.is-open .wib-toggle::after { content: '−'; }
+.wib-page .wib-toggle .wib-close-label,
+.wib-page .about-section.is-open .wib-toggle .wib-open-label { display: none; }
+.wib-page .about-section.is-open .wib-toggle .wib-close-label { display: inline; }
+.wib-page .wib-toggle:focus-visible,
+.wib-page .about-section.is-collapsible h3:focus-visible { outline: 2px solid var(--gold, #f0c040); outline-offset: 4px; border-radius: 6px; }
+.wib-page .wib-expand-all { display: flex; justify-content: flex-end; margin: 0 4px 12px; }
+.wib-page .wib-expand-all .wib-toggle { margin-top: 0; font-size: 13px; }
+.wib-page .wib-expand-all.is-all-open .wib-toggle::after { content: '−'; }
+.wib-page .wib-expand-all.is-all-open .wib-open-label { display: none; }
+.wib-page .wib-expand-all.is-all-open .wib-close-label { display: inline; }

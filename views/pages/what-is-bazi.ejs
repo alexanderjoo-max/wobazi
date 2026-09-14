@@ -53,7 +53,7 @@
   </script>
 </head>
 
-<body class="seo-page">
+<body class="seo-page wib-page">
   <%- include('../partials/nav') %>
 
   <main class="seo-main">
@@ -412,9 +412,87 @@
       q.addEventListener('click', () => q.closest('.about-faq-item').classList.toggle('open'));
     });
     function scrollToSection(id) {
+      if (window.wibOpen) wibOpen(id);
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+
+    // Long sections fold: heading + first paragraph stay visible, the rest sits behind "Read more".
+    // All copy stays in the DOM for search; without JS every section renders open.
+    (function () {
+      const L = (en, zh, th) => '<span class="en">' + en + '</span><span class="zh hide">' + zh + '</span><span class="th hide">' + th + '</span>';
+      const toggleHtml = (openEn, openZh, openTh, closeEn, closeZh, closeTh) =>
+        '<span class="wib-open-label">' + L(openEn, openZh, openTh) + '</span><span class="wib-close-label">' + L(closeEn, closeZh, closeTh) + '</span>';
+      const sections = Array.from(document.querySelectorAll('.about-section[id]'))
+        .filter(s => s.id !== 'overview' && s.id !== 'faq');
+      if (!sections.length) return;
+
+      function setOpen(sec, open) {
+        sec.classList.toggle('is-open', open);
+        const btn = sec.querySelector('.wib-toggle');
+        if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        syncAll();
+      }
+
+      sections.forEach(sec => {
+        const h = sec.querySelector('h3');
+        const first = sec.querySelector(':scope > p');
+        const start = first || h;
+        if (!start || !start.nextElementSibling) return;
+        const more = document.createElement('div');
+        more.className = 'wib-more';
+        more.id = sec.id + '-more';
+        let node = start.nextSibling;
+        while (node) { const next = node.nextSibling; more.appendChild(node); node = next; }
+        sec.appendChild(more);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'wib-toggle';
+        btn.setAttribute('aria-controls', more.id);
+        btn.setAttribute('aria-expanded', 'false');
+        btn.innerHTML = toggleHtml('Read more', '展开阅读', 'อ่านต่อ', 'Show less', '收起', 'ย่อ');
+        sec.appendChild(btn);
+        sec.classList.add('is-collapsible');
+
+        const flip = () => {
+          const open = !sec.classList.contains('is-open');
+          setOpen(sec, open);
+          if (!open && sec.getBoundingClientRect().top < 0) sec.scrollIntoView({ block: 'start' });
+        };
+        btn.addEventListener('click', flip);
+        if (h) {
+          h.setAttribute('role', 'button');
+          h.setAttribute('tabindex', '0');
+          h.setAttribute('aria-controls', more.id);
+          h.addEventListener('click', flip);
+          h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+        }
+      });
+
+      const bar = document.querySelector('.about-toc-bar');
+      const all = document.createElement('div');
+      all.className = 'wib-expand-all';
+      all.innerHTML = '<button type="button" class="wib-toggle">' + toggleHtml('Expand all', '全部展开', 'ขยายทั้งหมด', 'Collapse all', '全部收起', 'ย่อทั้งหมด') + '</button>';
+      if (bar) bar.insertAdjacentElement('afterend', all);
+      all.querySelector('button').addEventListener('click', () => {
+        const open = !all.classList.contains('is-all-open');
+        document.querySelectorAll('.about-section.is-collapsible').forEach(s => s.classList.toggle('is-open', open));
+        document.querySelectorAll('.about-section.is-collapsible .wib-toggle').forEach(b => b.setAttribute('aria-expanded', open ? 'true' : 'false'));
+        syncAll();
+      });
+      function syncAll() {
+        const list = document.querySelectorAll('.about-section.is-collapsible');
+        all.classList.toggle('is-all-open', list.length > 0 && Array.from(list).every(s => s.classList.contains('is-open')));
+      }
+
+      window.wibOpen = function (id) {
+        const sec = document.getElementById(id);
+        if (sec && sec.classList.contains('is-collapsible') && !sec.classList.contains('is-open')) setOpen(sec, true);
+      };
+      if (location.hash) window.wibOpen(location.hash.slice(1));
+      if (window.WoBaziI18n) WoBaziI18n.apply(WoBaziI18n.get());
+    })();
 
     // Chip bar: highlight the section being read, keep that chip in view, fade edges that can scroll.
     (function () {
