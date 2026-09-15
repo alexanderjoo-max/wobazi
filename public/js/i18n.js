@@ -43,6 +43,13 @@
     'footer.contact': { en: 'Contact', th: 'ติดต่อ', zh: '联系' },
     'footer.location': { en: 'Bangkok, Thailand', th: 'กรุงเทพฯ ประเทศไทย', zh: '泰国曼谷' },
     'footer.copy': { en: 'All rights reserved.', th: 'สงวนลิขสิทธิ์', zh: '保留所有权利。' },
+    'footer.member': { en: 'My Wobazi', th: 'Wobazi ของฉัน', zh: '我的 Wobazi' },
+    'footer.portal': { en: 'My Wobazi', th: 'Wobazi ของฉัน', zh: '我的 Wobazi' },
+    'footer.history': { en: 'Reading History', th: 'ประวัติการดูดวง', zh: '解读记录' },
+    'footer.account': { en: 'Account', th: 'บัญชี', zh: '账户' },
+    'footer.logout': { en: 'Log out', th: 'ออกจากระบบ', zh: '退出登录' },
+    'footer.disclaimer': { en: 'For entertainment & self-reflection purposes only. Not a substitute for professional advice.', th: 'เพื่อความบันเทิงและการใคร่ครวญเท่านั้น ไม่ใช่คำแนะนำจากผู้เชี่ยวชาญ', zh: '仅供娱乐与自我反思。不能替代专业建议。' },
+    'nav.myWobazi': { en: 'My Wobazi', th: 'Wobazi ของฉัน', zh: '我的 Wobazi' },
     'cta.begin': { en: 'Plot Your Chart', th: 'จัดแผนภูมิของคุณ', zh: '排出你的命盘' },
     'legal.binding': {
       en: 'The English version of this document is the binding agreement. Other languages are provided for convenience only.',

@@ -117,6 +117,10 @@ Google sign-in only. Mounted in `server.js` via `require('./portal').mount(app, 
 - **Guest conversion**: one dismissible "Keep this chart" card per device (`localStorage wobazi_keep_prompt_v1`). After sign-in, `onAuth()` saves the browser's chart to `readings` only if the account has none.
 - Hooks in `script.js`: `captureToday` at the end of the daily-guidance IIFE, `onAuth` in `checkAuth`, `isRoute/route` in `applyRoute`.
 
+## Shared nav + footer (updated 2026-09-15)
+- `views/partials/footer.ejs` is the one site footer. EJS pages include it; `sendApp` in `server.js` renders it into every `<!-- SITE_FOOTER -->` marker in `app/index.html` (landing + results). Footer CSS lives in `app/style.css` (`.seo-footer*`).
+- `res.locals.user` (from the cookie session) drives signed-in state server-side: `nav.ejs` shows "My Wobazi" + avatar menu, the footer's My Wobazi column shows My Wobazi / Reading History / Account / Log out (guests: Sign in / Plot Your Chart). Links go to `/#portal`, `/#history`, `/#account`, `/auth/logout`.
+
 ## API Conventions
 - Routes: kebab-case (`/api/daily-reading`)
 - Auth check: `if (!req.session.user)` → 401
@@ -163,7 +167,7 @@ Fixtures: `npm test` (`test/bazi-engine.test.js`) vs lunar-javascript / BaZi Lab
 ### Power Days 择日 (updated 2026-09-15)
 - Engine: `DATE_OBJECTIVE_GROUPS` (For you · Business · Career · Love & family · Home & travel · Wellbeing) → `DATE_OBJECTIVES` (pitch, negotiate, contract, launch, business, job, startjob, raise, study, date, propose, wedding, reconcile, travel, move, renovate, purchase, health, declutter, newlook, personal). Each lists the 建除 officers it favours; `noble: true` objectives weight 天乙贵人 days +20 instead of +14.
 - `scoreDayForChart` reasons carry `short` and `hint` ({en,zh,th}) so the UI can explain each ✓/✕ in plain words. `personal` never earns `purpose-fit`.
-- UI (Actions tab, right after Today's Action Plan): category tabs → objective chips → "Best dates for X" (top 3 in the next 8 weeks, as columns) → explained date card → pageable month grid (12 months). Outfit guide sits last on the Actions tab.
+- UI (Actions tab, right after Today's Action Plan): "Best dates for [grouped dropdown ▾]" → top 3 in the next 8 weeks as compact columns → pageable month grid (12 months) → explained date card (side by side when the card is ≥680px). Outfit guide sits last on the Actions tab.
 
 ### Hash routing (SPA)
 - `/` landing

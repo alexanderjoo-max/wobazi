@@ -85,8 +85,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=63">
-  <link rel="stylesheet" href="/app/portal.css?v=5">
+  <link rel="stylesheet" href="/app/style.css?v=65">
+  <link rel="stylesheet" href="/app/portal.css?v=6">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
     html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
@@ -96,7 +96,7 @@
     html[data-lang="zh"] .en:has(~ .zh) { display: none !important; }
     html[data-lang="zh"] .zh { display: revert !important; }
   </style>
-  <script src="/public/js/i18n.js?v=11"></script>
+  <script src="/public/js/i18n.js?v=12"></script>
   <script src="/public/js/i18n-ui.js?v=3"></script>
   <script src="/public/js/i18n-copy.js?v=2"></script>
   <script src="/public/js/i18n-copy-more.js?v=2"></script>
@@ -425,20 +425,7 @@
         </button>
       </div>
 
-      <div class="splash-foot">
-        <div class="splash-foot-links">
-          <a href="/Master-Alice.html"><span class="en">Master Alice</span><span class="zh hide">Master Alice</span><span class="th hide">มาสเตอร์อลิซ</span></a>
-          <a href="/privacy"><span class="en">Privacy Policy</span><span class="zh hide">隐私政策</span><span class="th hide">นโยบายความเป็นส่วนตัว</span></a>
-          <a href="/terms"><span class="en">Terms of Service</span><span class="zh hide">服务条款</span><span class="th hide">ข้อกำหนดการให้บริการ</span></a>
-          <a href="/privacy#cookies" data-cookie-settings><span class="en">Cookie settings</span><span class="zh hide">Cookie 设置</span><span class="th hide">ตั้งค่าคุกกี้</span></a>
-          <a href="mailto:hello@wobazi.com">hello@wobazi.com</a>
-        </div>
-        <p class="splash-foot-address"><span class="en">Bangkok, Thailand</span><span class="zh hide">泰国曼谷</span><span class="th hide">กรุงเทพฯ ประเทศไทย</span></p>
-        <a class="footer-udestiny splash-udestiny" href="https://www.udestinyglobal.com/en" target="_blank" rel="noopener">
-          <img src="/app/assets/brand/udestiny-logo.png" alt="U Destiny" class="udestiny-logo">
-          <span class="en">A U Destiny product</span><span class="zh hide">U Destiny 旗下产品</span><span class="th hide">ผลิตภัณฑ์จาก U Destiny</span>
-        </a>
-      </div>
+      <!-- SITE_FOOTER -->
 
     </div>
   </div>
@@ -1368,7 +1355,6 @@
           <h3 class="th hide">วันมงคล</h3>
           <span class="section-sub"><span class="en">Pick your date · 择日</span><span class="zh hide">择日</span><span class="th hide">เลือกวัน · 择日</span></span>
         </div>
-        <p class="cal-intro"><span class="en">Tell us what you’re planning and we’ll find the dates that fit <strong>your</strong> chart, and explain why.</span><span class="zh hide">告诉我们你要做什么，我们按<strong>你</strong>的命盘找出合适的日子，并说明原因。</span><span class="th hide">บอกเราว่าคุณวางแผนอะไร เราจะหาวันที่เข้ากับดวง<strong>ของคุณ</strong> พร้อมอธิบายเหตุผล</span></p>
         <div id="power-days-card"></div>
       </section>
 
@@ -1672,32 +1658,7 @@
       <!-- Tab navigation (prev/next) -->
       <div class="tab-nav" id="tab-nav"></div>
 
-      <footer class="results-footer">
-        <div class="footer-actions">
-          <button class="footer-link" onclick="haptic(8); goToInput()">
-            <span class="en">New Reading</span><span class="zh hide">重新算命</span><span class="th hide">ดูดวงใหม่</span>
-          </button>
-          <span class="footer-dot">·</span>
-          <a href="/Master-Alice.html" class="footer-link"><span class="en">Master Alice</span><span class="zh hide">Master Alice</span><span class="th hide">มาสเตอร์อลิซ</span></a>
-          <span class="footer-dot">·</span>
-          <a href="/privacy" class="footer-link"><span class="en">Privacy</span><span class="zh hide">隐私</span><span class="th hide">ความเป็นส่วนตัว</span></a>
-          <span class="footer-dot">·</span>
-          <a href="/terms" class="footer-link"><span class="en">Terms</span><span class="zh hide">条款</span><span class="th hide">ข้อกำหนด</span></a>
-          <span class="footer-dot">·</span>
-          <a href="/privacy#cookies" class="footer-link" data-cookie-settings><span class="en">Cookies</span><span class="zh hide">Cookie</span><span class="th hide">คุกกี้</span></a>
-        </div>
-        <div class="footer-brand">
-          <img src="/app/assets/logo-horiz.png?v=6" class="footer-logo" alt="Wobazi">
-          <p class="footer-tagline"><span class="en">Ancient wisdom, modern clarity</span><span class="zh hide">古老智慧，现代洞见</span><span class="th hide">ภูมิปัญญาโบราณ ความชัดเจนสมัยใหม่</span></p>
-        </div>
-        <p class="footer-contact"><a href="mailto:hello@wobazi.com">hello@wobazi.com</a> · <span class="en">Bangkok, Thailand</span><span class="zh hide">泰国曼谷</span><span class="th hide">กรุงเทพฯ ประเทศไทย</span></p>
-        <p class="footer-copy">© 2026 Wobazi. <span class="en">All rights reserved.</span><span class="zh hide">保留所有权利。</span><span class="th hide">สงวนลิขสิทธิ์</span></p>
-        <p class="footer-disclaimer"><span class="en">For entertainment &amp; self-reflection purposes only. Not a substitute for professional advice.</span><span class="zh hide">仅供娱乐与自我反思。不能替代专业建议。</span><span class="th hide">เพื่อความบันเทิงและการใคร่ครวญเท่านั้น ไม่ใช่คำแนะนำจากผู้เชี่ยวชาญ</span></p>
-        <a class="footer-udestiny results-udestiny" href="https://www.udestinyglobal.com/en" target="_blank" rel="noopener">
-          <img src="/app/assets/brand/udestiny-logo.png" alt="U Destiny" class="udestiny-logo">
-          <span class="en">A U Destiny product</span><span class="zh hide">U Destiny 旗下产品</span><span class="th hide">ผลิตภัณฑ์จาก U Destiny</span>
-        </a>
-      </footer>
+      <!-- SITE_FOOTER -->
     </div>
   </div>
 
@@ -1865,7 +1826,7 @@
   <script src="/bazi-engine.js?v=6"></script>
   <script src="/verdict.js?v=2"></script>
   <script src="/app/portal.js?v=5"></script>
-  <script src="/app/script.js?v=41"></script>
+  <script src="/app/script.js?v=42"></script>
   <script src="/app/share-viral.js?v=5"></script>
 </body>
 </html>

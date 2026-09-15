@@ -1,3 +1,4 @@
+<% const member = typeof user !== 'undefined' && user; %>
 <footer class="seo-footer">
   <div class="seo-footer-inner">
     <div class="seo-footer-brand">
@@ -10,7 +11,20 @@
     </div>
     <div class="seo-footer-links">
       <div class="seo-footer-col">
+        <h4 data-i18n="footer.member">My Wobazi</h4>
+        <% if (member) { %>
+        <a href="/#portal" data-i18n="footer.portal">My Wobazi</a>
+        <a href="/#history" data-i18n="footer.history">Reading History</a>
+        <a href="/#account" data-i18n="footer.account">Account</a>
+        <a href="/auth/logout" data-i18n="footer.logout">Log out</a>
+        <% } else { %>
+        <a href="/auth/google" data-i18n="nav.signin">Sign in</a>
+        <a href="/?begin=1" data-i18n="nav.begin">Plot Your Chart</a>
+        <% } %>
+      </div>
+      <div class="seo-footer-col">
         <h4 data-i18n="footer.learn">Learn</h4>
+        <a href="/what-is-bazi" data-i18n="nav.explainer">BaZi Explainer</a>
         <a href="/four-pillars-of-destiny" data-i18n="footer.pillars">Four Pillars of Destiny</a>
         <a href="/chinese-astrology" data-i18n="footer.astrology">Chinese Astrology</a>
         <a href="/day-master" data-i18n="footer.daymaster">Day Master Guide</a>
@@ -26,7 +40,6 @@
         <a href="/privacy" data-i18n="nav.privacy">Privacy Policy</a>
         <a href="/terms" data-i18n="nav.terms">Terms of Service</a>
         <a href="/privacy#cookies" data-cookie-settings data-i18n="footer.cookies">Cookie settings</a>
-        <a href="/?begin=1" data-i18n="nav.begin">Plot Your Chart</a>
       </div>
     </div>
   </div>
@@ -36,6 +49,6 @@
       <span data-i18n="footer.udestiny">A U Destiny product</span>
     </a>
     <p>&copy; <%= new Date().getFullYear() %> WoBazi. <span data-i18n="footer.copy">All rights reserved.</span></p>
+    <p class="seo-footer-disclaimer" data-i18n="footer.disclaimer">For entertainment &amp; self-reflection purposes only. Not a substitute for professional advice.</p>
   </div>
 </footer>
-

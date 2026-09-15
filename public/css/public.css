@@ -39,91 +39,6 @@ body.seo-page .seo-main {
   width: 100%;
 }
 
-/* ═══════════════════════════════════════
-   FOOTER
-═══════════════════════════════════════ */
-.seo-footer {
-  position: relative;
-  z-index: 1;
-  background: rgba(10, 8, 20, 0.72);
-  border-top: 1px solid rgba(240, 192, 64, 0.10);
-  padding: 48px 24px 24px;
-  margin-top: 40px;
-  backdrop-filter: blur(16px);
-}
-
-.seo-footer-inner {
-  max-width: 760px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 40px;
-}
-
-.seo-footer-brand img {
-  display: block;
-  height: 24px;
-  margin-bottom: 12px;
-}
-
-.seo-footer-brand p {
-  color: var(--muted, #888a9e);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.seo-footer-links {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.seo-footer-col h4 {
-  color: var(--gold, #f0c040);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.4px;
-  margin-bottom: 12px;
-  font-weight: 600;
-}
-
-.seo-footer-col a {
-  display: block;
-  color: var(--muted, #888a9e);
-  text-decoration: none;
-  font-size: 13px;
-  padding: 4px 0;
-  transition: color 0.2s;
-}
-.seo-footer-col a:hover { color: var(--text, #f0f0ff); }
-
-.seo-footer-col a.footer-udestiny,
-.footer-udestiny {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  margin: 0 0 14px;
-  padding-bottom: 0;
-  border-bottom: none;
-  text-decoration: none !important;
-  color: inherit;
-}
-.udestiny-logo {
-  display: block;
-  height: 40px;
-  width: auto;
-  max-width: 160px;
-  object-fit: contain;
-  filter: drop-shadow(0 0 8px rgba(255,255,255,0.12));
-}
-.footer-udestiny span {
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--muted, #888a9e);
-  text-decoration: none !important;
-  border-bottom: none;
-}
 
 /* ═══════════════════════════════════════
    MASTER ALICE — /Master-Alice.html
@@ -403,30 +318,6 @@ html[lang="zh-CN"] .sl-hook, html[lang="th"] .sl-hook { font-style: normal; }
   .sl-card { max-width: 260px; margin: 0 auto; }
 }
 
-.seo-footer-bottom {
-  max-width: 760px;
-  margin: 32px auto 0;
-  padding-top: 20px;
-  border-top: 1px solid rgba(240, 192, 64, 0.08);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-.seo-footer-bottom .footer-udestiny {
-  align-items: center;
-  margin: 0;
-}
-.seo-footer-bottom p {
-  color: var(--muted, #888a9e);
-  font-size: 12px;
-}
-
-@media (max-width: 600px) {
-  .seo-footer-inner { grid-template-columns: 1fr; gap: 32px; }
-  .seo-footer-links { grid-template-columns: repeat(2, 1fr); }
-}
 
 /* ═══════════════════════════════════════
    INNER PAGE CONTENT (structure unchanged)
@@ -700,10 +591,6 @@ html[lang="zh-CN"] .sl-hook, html[lang="th"] .sl-hook { font-style: normal; }
 .notfound-links a:hover { text-decoration: underline; }
 @media (max-width: 480px) { .notfound-main h1 { font-size: 26px; } .notfound-han { font-size: 56px; } }
 
-/* Footer contact */
-.seo-footer-contact { font-size: 13px; line-height: 1.6; color: var(--muted); margin-top: 10px; }
-.seo-footer-contact a { color: var(--gold, #f0c040); text-decoration: none; }
-.footer-cookie-btn { background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; text-align: left; }
 
 /* ── What is BaZi: readable body copy + folding sections (JS adds .is-collapsible; no JS = all open) ── */
 .wib-page .seo-main .about-section p { color: rgba(255, 248, 255, 0.82); font-weight: 400; }

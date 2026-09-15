@@ -10,6 +10,7 @@ const Database = require('better-sqlite3');
 const OpenAI = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 const bazi = require('./bazi-engine');
 
@@ -76,11 +77,18 @@ app.use(cookieSession({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+/* Signed-in user for server-rendered pages (nav + footer member links). */
+app.use((req, res, next) => {
+  res.locals.user = (req.session && req.session.user) || null;
+  next();
+});
+
 /* ── EJS Templating ── */
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 /* ── Static Files ── */
+app.get('/app/index.html', (req, res, next) => sendApp(req, res, next));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/app', express.static(path.join(__dirname, 'app'), {
   index: false,
@@ -172,9 +180,21 @@ function checkRateLimit(ip) {
 ═══════════════════════════════════════ */
 const seoBase = { baseUrl: 'https://wobazi.com' };
 
-function sendApp(req, res) {
+/* The SPA shell gets the same footer partial as the EJS pages: every
+   <!-- SITE_FOOTER --> marker in app/index.html is replaced at request time. */
+const APP_INDEX = path.join(__dirname, 'app', 'index.html');
+let appIndexCache = { mtime: 0, html: '' };
+function appIndexHtml() {
+  const mtime = fs.statSync(APP_INDEX).mtimeMs;
+  if (mtime !== appIndexCache.mtime) appIndexCache = { mtime, html: fs.readFileSync(APP_INDEX, 'utf8') };
+  return appIndexCache.html;
+}
+function sendApp(req, res, next) {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-  res.sendFile(path.join(__dirname, 'app', 'index.html'));
+  res.render('partials/footer', { user: res.locals.user }, (err, footer) => {
+    if (err) return next(err);
+    res.type('html').send(appIndexHtml().split('<!-- SITE_FOOTER -->').join(footer));
+  });
 }
 app.get(['/', '/index.html', '/index'], sendApp);
 
@@ -294,7 +314,7 @@ app.get('/tos', (req, res) => res.redirect(301, '/terms'));
 app.get(['/app', '/app/'], sendApp);
 app.get('/app/*', (req, res, next) => {
   if (path.extname(req.path)) return next();
-  sendApp(req, res);
+  sendApp(req, res, next);
 });
 
 /* ═══════════════════════════════════════

@@ -457,7 +457,6 @@ let _appNavigating = false;
 let _currentUser = null;
 let _savedReading = null;
 let _lastPartner = null;
-let _calGroup = 'you';    // Power Days category (engine DATE_OBJECTIVE_GROUPS)
 let _calFilter = 'personal'; // objective within it (engine DATE_OBJECTIVES)
 let _calView = 0;         // month grid offset from the current month
 let _powerSel = null;     // selected date { y, m (0-indexed), d }
@@ -1857,6 +1856,9 @@ function applyLangSpans(lang) {
 
 document.addEventListener('wobazi:lang', (e) => {
   applyLangSpans(e.detail && e.detail.lang ? e.detail.lang : 'en');
+  if (_shareData && _shareData.animal && document.querySelector('#power-days-card .pd-select')) {
+    try { renderAuspiciousDates(_shareData.animal, _shareData.dominantEl); } catch (err) {}
+  }
 });
 
 /* ── Bilingual text helper ── */
@@ -4092,15 +4094,6 @@ function _powerPicks(pillars) {
   return { picks, classic };
 }
 
-function setCalGroup(key) {
-  const g = _powerGroups().find(x => x.key === key);
-  if (!g) return;
-  _calGroup = key;
-  _calFilter = g.objectives[0];
-  _powerSel = null;
-  if (_shareData && _shareData.animal) renderAuspiciousDates(_shareData.animal, _shareData.dominantEl, { selectBest: true });
-}
-
 function setCalFilter(key) {
   _calFilter = (window.BaziEngine && BaziEngine.DATE_OBJECTIVES && BaziEngine.DATE_OBJECTIVES[key]) ? key : 'personal';
   _powerSel = null;
@@ -4147,43 +4140,41 @@ function renderAuspiciousDates(animal, dominantEl, opts) {
   }
   const hasPartner = Object.keys(partnerOk).length > 0;
 
-  /* Category tabs + objective chips */
+  /* One grouped dropdown: category → what you're planning. Plain text, so it is
+     rebuilt in the current language (see the wobazi:lang listener below). */
   const groups = _powerGroups();
-  const group = groups.find(g => g.key === _calGroup) || groups[0];
-  const groupsHTML = groups.map(g => `
-    <button type="button" class="pd-group${g.key === group.key ? ' is-on' : ''}" aria-pressed="${g.key === group.key}" onclick="haptic(6); setCalGroup('${g.key}')">
-      <span class="pd-group-ico" aria-hidden="true">${g.icon}</span>${_loc(g)}
-    </button>`).join('');
-  const objectivesHTML = group.objectives.length > 1 ? `
-    <div class="pd-objectives" role="group" aria-label="What are you planning?">
-      ${group.objectives.map(k => {
-        const o = _powerObjective(k);
-        return `<button type="button" class="cal-filter${k === _calFilter ? ' is-on' : ''}" aria-pressed="${k === _calFilter}" onclick="haptic(6); setCalFilter('${k}')">${_loc(o.label)}</button>`;
-      }).join('')}
-    </div>` : '';
+  const optionText = k => {
+    const o = _powerObjective(k);
+    return (k === 'personal' ? '✦ ' : '') + _plainLoc(o.label);
+  };
+  const selectHTML = `
+    <select class="pd-select" aria-label="What are you planning?" onchange="haptic(6); setCalFilter(this.value)">
+      ${groups.map(g => g.objectives.length === 1
+        ? `<option value="${g.objectives[0]}"${g.objectives[0] === _calFilter ? ' selected' : ''}>${optionText(g.objectives[0])}</option>`
+        : `<optgroup label="${g.icon} ${_plainLoc(g)}">${g.objectives.map(k =>
+            `<option value="${k}"${k === _calFilter ? ' selected' : ''}>${optionText(k)}</option>`).join('')}</optgroup>`).join('')}
+    </select>`;
 
   /* Next best dates — short content, so columns */
   const purposeFit = s => s.reasons.some(r => r.code === 'purpose-fit');
   const picksHTML = picks.map(p => {
     const dt = new Date(p.year, p.month - 1, p.day);
     const on = _powerSel && _powerSel.y === p.year && _powerSel.m === p.month - 1 && _powerSel.d === p.day;
-    const why = p.reasons.filter(r => r.good && r.code !== 'purpose-fit').slice(0, 2)
-      .map(r => `<span>${_loc(r.short)}</span>`).join('');
+    const why = p.reasons.filter(r => r.good && r.code !== 'purpose-fit').slice(0, 1)
+      .map(r => _loc(r.short)).join('');
     return `
       <button type="button" class="pick-col${on ? ' is-on' : ''}" onclick="haptic(6); selectPowerDate(${p.year}, ${p.month - 1}, ${p.day})">
-        <span class="pick-dow">${dt.toLocaleDateString(dateLocale(), { weekday: 'short' })}</span>
+        <span class="pick-top">
+          <span class="pick-dow">${dt.toLocaleDateString(dateLocale(), { weekday: 'short' })}</span>
+          <span class="pick-score is-${p.tier}">${p.score}</span>
+        </span>
         <span class="pick-date" style="color:${elColor}">${dt.toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short' })}</span>
-        <span class="pick-gz">${p.pillar}${p.officer ? ' · ' + p.officer.char : ''}</span>
-        <span class="pick-score is-${p.tier}">${p.score}</span>
         <span class="pick-why">${why || _t('Steady day', '平稳之日', 'วันราบรื่น')}</span>
       </button>`;
   }).join('');
   const personal = _calFilter === 'personal';
-  const picksHead = personal
-    ? _t('Your next best dates', '你近期最好的日子', 'วันที่ดีที่สุดของคุณเร็วๆ นี้')
-    : _t(`Best dates for ${obj.en}`, `最宜${obj.zh}的日子`, `วันที่ดีที่สุดสำหรับ${obj.th}`);
   const picksSub = classic
-    ? _t('Next 8 weeks · tap a date to see why', '未来 8 周 · 点日期看原因', '8 สัปดาห์ข้างหน้า · แตะวันที่เพื่อดูเหตุผล')
+    ? _t('Top 3 in the next 8 weeks · tap any date to see why', '未来 8 周最佳 3 天 · 点任意日期看原因', '3 วันดีสุดใน 8 สัปดาห์ · แตะวันที่เพื่อดูเหตุผล')
     : _t(`No classic ${obj.en} date in the next 8 weeks — these are your strongest days instead`, `未来 8 周没有宜${obj.zh}的正日，以下是你最强的日子`, `ไม่มีวันหลักสำหรับ${obj.th}ใน 8 สัปดาห์ — นี่คือวันที่แข็งแรงที่สุดของคุณแทน`);
 
   /* Month grid */
@@ -4241,26 +4232,25 @@ function renderAuspiciousDates(animal, dominantEl, opts) {
 
   card.innerHTML = `
     <div class="power-days-card">
-      <div class="pd-groups" role="group" aria-label="Category">${groupsHTML}</div>
-      ${objectivesHTML}
+      <div class="pd-ask">
+        <span class="pd-ask-lbl">${_t('Best dates for', '最宜', 'วันที่ดีที่สุดสำหรับ')}</span>
+        <span class="pd-select-wrap">${selectHTML}</span>
+      </div>
       ${picksHTML ? `<div class="cal-picks">
-        <div class="cal-picks-top">
-          <div class="cal-picks-head">${picksHead}</div>
-          <div class="cal-picks-sub">${picksSub}</div>
-        </div>
+        <div class="cal-picks-sub">${picksSub}</div>
         <div class="pick-cols">${picksHTML}</div>
       </div>` : ''}
       <div class="pd-split">
-      <div class="cal-detail" id="power-day-detail" aria-live="polite">${powerDayDetailHTML(_powerDetailScore(), elColor)}</div>
-      <div class="cal-month">
-        <div class="cal-month-bar">
-          <button type="button" class="cal-nav" onclick="haptic(6); shiftPowerMonth(-1)" ${_calView === 0 ? 'disabled' : ''} aria-label="Previous month">‹</button>
-          <div class="cal-month-label">${monthLabel}</div>
-          <button type="button" class="cal-nav" onclick="haptic(6); shiftPowerMonth(1)" ${_calView >= POWER_MAX_MONTHS - 1 ? 'disabled' : ''} aria-label="Next month">›</button>
+        <div class="cal-month">
+          <div class="cal-month-bar">
+            <button type="button" class="cal-nav" onclick="haptic(6); shiftPowerMonth(-1)" ${_calView === 0 ? 'disabled' : ''} aria-label="Previous month">‹</button>
+            <div class="cal-month-label">${monthLabel}</div>
+            <button type="button" class="cal-nav" onclick="haptic(6); shiftPowerMonth(1)" ${_calView >= POWER_MAX_MONTHS - 1 ? 'disabled' : ''} aria-label="Next month">›</button>
+          </div>
+          <div class="cal-grid">${dayHeaders}${blanks}${days}</div>
+          ${legendHTML}
         </div>
-        <div class="cal-grid">${dayHeaders}${blanks}${days}</div>
-        ${legendHTML}
-      </div>
+        <div class="cal-detail" id="power-day-detail" aria-live="polite">${powerDayDetailHTML(_powerDetailScore(), elColor)}</div>
       </div>
       ${clashHTML}
       <div class="cal-note">${methodNote}</div>
@@ -4339,6 +4329,11 @@ function selectPowerDate(y, m, d) {
   if (detail) {
     detail.innerHTML = powerDayDetailHTML(_powerDetailScore(), EL_COLOR[_shareData && _shareData.dominantEl] || '#f0c040');
     if (typeof applyI18n === 'function') applyI18n();
+    // Stacked layout: bring the verdict up under the calendar if it is off-screen.
+    const head = detail.querySelector('.cal-detail-head');
+    if (head && head.getBoundingClientRect().top > window.innerHeight - 90) {
+      head.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    }
   }
 }
 
