@@ -85,7 +85,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=61">
+  <link rel="stylesheet" href="/app/style.css?v=63">
   <link rel="stylesheet" href="/app/portal.css?v=5">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
@@ -1130,11 +1130,11 @@
     <div class="results-toc-bar hide" id="toc-actions">
       <div class="results-toc-inner">
         <button class="results-toc-chip" onclick="scrollResults('today-actions-section')"><span class="en">Plan</span><span class="zh hide">计划</span><span class="th hide">แผน</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-outfit')"><span class="en">Outfit</span><span class="zh hide">穿搭</span><span class="th hide">ชุด</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-foods')"><span class="en">Foods</span><span class="zh hide">食物</span><span class="th hide">อาหาร</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('res-lucky-nums')"><span class="en">Numbers</span><span class="zh hide">数字</span><span class="th hide">ตัวเลข</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-power-days')"><span class="en">Power Days</span><span class="zh hide">吉日</span><span class="th hide">วันมงคล</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-lucky-nums')"><span class="en">Numbers</span><span class="zh hide">数字</span><span class="th hide">ตัวเลข</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-foods')"><span class="en">Foods</span><span class="zh hide">食物</span><span class="th hide">อาหาร</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-ritual')"><span class="en">Ritual</span><span class="zh hide">仪式</span><span class="th hide">พิธี</span></button>
+        <button class="results-toc-chip" onclick="scrollResults('res-outfit')"><span class="en">Outfit</span><span class="zh hide">穿搭</span><span class="th hide">ชุด</span></button>
       </div>
     </div>
     <div class="results-toc-bar hide" id="toc-you">
@@ -1360,6 +1360,18 @@
         <div id="today-actions-card"></div>
       </section>
 
+      <!-- Auspicious Power Days -->
+      <section class="section" data-tab="actions" id="res-power-days">
+        <div class="section-head" data-tip="power-days">
+          <h3 class="en">Power Days</h3>
+          <h3 class="zh hide">吉日</h3>
+          <h3 class="th hide">วันมงคล</h3>
+          <span class="section-sub"><span class="en">Pick your date · 择日</span><span class="zh hide">择日</span><span class="th hide">เลือกวัน · 择日</span></span>
+        </div>
+        <p class="cal-intro"><span class="en">Tell us what you’re planning and we’ll find the dates that fit <strong>your</strong> chart, and explain why.</span><span class="zh hide">告诉我们你要做什么，我们按<strong>你</strong>的命盘找出合适的日子，并说明原因。</span><span class="th hide">บอกเราว่าคุณวางแผนอะไร เราจะหาวันที่เข้ากับดวง<strong>ของคุณ</strong> พร้อมอธิบายเหตุผล</span></p>
+        <div id="power-days-card"></div>
+      </section>
+
       <!-- Love & Relationships (moved to Relationships tab) -->
       <section class="section" data-tab="relationships" id="res-rel-forecast">
         <div class="section-head" data-tip="love-section">
@@ -1393,17 +1405,6 @@
         <div class="fortune-grid" id="fortune-grid"></div>
       </section>
 
-      <!-- Feng Shui Outfit Guide -->
-      <section class="section" data-tab="actions" id="res-outfit">
-        <div class="section-head" data-tip="outfit">
-          <h3 class="en">Feng Shui Outfit Guide</h3>
-          <h3 class="zh hide">风水穿搭指南</h3>
-          <h3 class="th hide">คู่มือชุดฮวงจุ้ย</h3>
-          <span class="section-sub"><span class="en">2026 · Monthly Colors</span><span class="zh hide">2026 · 月度色彩</span><span class="th hide">2026 · สีประจำเดือน</span></span>
-        </div>
-        <div id="outfit-card"></div>
-      </section>
-
       <!-- Lucky Numbers -->
       <section class="section" data-tab="actions" id="res-lucky-nums">
         <div class="section-head" data-tip="lucky-nums">
@@ -1413,25 +1414,6 @@
           <span class="section-sub">数字运势</span>
         </div>
         <div id="lucky-num-card"></div>
-      </section>
-
-      <!-- Auspicious Power Days -->
-      <section class="section" data-tab="actions" id="res-power-days">
-        <div class="section-head" data-tip="power-days">
-          <h3 class="en">Power Days</h3>
-          <h3 class="zh hide">吉日</h3>
-          <h3 class="th hide">วันมงคล</h3>
-          <span class="section-sub">2026 · 吉日</span>
-        </div>
-        <p class="cal-intro"><span class="en">Power Days are this month’s dates that fit <strong>your</strong> chart: sound in the Chinese almanac, in harmony with your pillars, never clashing your year animal. Pick what you’re planning, then tap any date to see why.</span><span class="zh hide">吉日是本月与<strong>你</strong>命盘相合的日子：黄历吉、与四柱相合、不冲生肖太岁。先选你要做的事，再点任意日期看原因。</span><span class="th hide">วันพลังคือวันในเดือนนี้ที่เข้ากับดวง<strong>ของคุณ</strong>: ดีตามปฏิทินจีน เข้ากับเสา และไม่ชงปีนักษัตร เลือกสิ่งที่วางแผน แล้วแตะวันที่เพื่อดูเหตุผล</span></p>
-        <div class="cal-filters" id="cal-filters" role="group" aria-label="Date filters">
-          <button type="button" class="cal-filter is-on" data-cal-filter="all" onclick="setCalFilter('all')"><span class="en">All</span><span class="zh hide">全部</span><span class="th hide">ทั้งหมด</span></button>
-          <button type="button" class="cal-filter" data-cal-filter="business" onclick="setCalFilter('business')"><span class="en">Open business</span><span class="zh hide">开业</span><span class="th hide">เปิดกิจการ</span></button>
-          <button type="button" class="cal-filter" data-cal-filter="contract" onclick="setCalFilter('contract')"><span class="en">Sign contract</span><span class="zh hide">签约</span><span class="th hide">เซ็นสัญญา</span></button>
-          <button type="button" class="cal-filter" data-cal-filter="travel" onclick="setCalFilter('travel')"><span class="en">Travel</span><span class="zh hide">出行</span><span class="th hide">เดินทาง</span></button>
-          <button type="button" class="cal-filter" data-cal-filter="personal" onclick="setCalFilter('personal')"><span class="en">Personal lucky date</span><span class="zh hide">个人吉日</span><span class="th hide">วันมงคลส่วนตัว</span></button>
-        </div>
-        <div id="power-days-card"></div>
       </section>
 
       <!-- Career Archetype -->
@@ -1526,6 +1508,18 @@
         </div>
         <div id="kua-card"></div>
       </section>
+
+      <!-- Feng Shui Outfit Guide -->
+      <section class="section" data-tab="actions" id="res-outfit">
+        <div class="section-head" data-tip="outfit">
+          <h3 class="en">Feng Shui Outfit Guide</h3>
+          <h3 class="zh hide">风水穿搭指南</h3>
+          <h3 class="th hide">คู่มือชุดฮวงจุ้ย</h3>
+          <span class="section-sub"><span class="en">2026 · Monthly Colors</span><span class="zh hide">2026 · 月度色彩</span><span class="th hide">2026 · สีประจำเดือน</span></span>
+        </div>
+        <div id="outfit-card"></div>
+      </section>
+
 
       <!-- Luck Cycle 大运 -->
 
@@ -1868,10 +1862,10 @@
     </div>
   </div>
 
-  <script src="/bazi-engine.js?v=5"></script>
+  <script src="/bazi-engine.js?v=6"></script>
   <script src="/verdict.js?v=2"></script>
   <script src="/app/portal.js?v=5"></script>
-  <script src="/app/script.js?v=39"></script>
+  <script src="/app/script.js?v=41"></script>
   <script src="/app/share-viral.js?v=5"></script>
 </body>
 </html>

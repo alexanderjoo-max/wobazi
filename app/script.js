@@ -457,9 +457,11 @@ let _appNavigating = false;
 let _currentUser = null;
 let _savedReading = null;
 let _lastPartner = null;
-let _calFilter = 'all';
-let _powerDay = null;     // selected date in the Power Days calendar
-let _powerScored = [];    // last scored month, for the day detail panel
+let _calGroup = 'you';    // Power Days category (engine DATE_OBJECTIVE_GROUPS)
+let _calFilter = 'personal'; // objective within it (engine DATE_OBJECTIVES)
+let _calView = 0;         // month grid offset from the current month
+let _powerSel = null;     // selected date { y, m (0-indexed), d }
+const _powerCache = new Map();
 
 /* GA4 event; a no-op when analytics is blocked. Consent Mode decides what is stored. */
 function track(name, params) {
@@ -4032,80 +4034,189 @@ function renderLuckyNumbers(year, month, day, animal, dominantEl) {
   `;
 }
 
-/* ── Render Auspicious Power Days ── */
+/* ── Render Auspicious Power Days ──
+   Pick a category (Business, Career, Love…) then what you're planning. The engine
+   scores every date against the chart; the top upcoming fits are the answer, the
+   month grid shows the rest, and any date can be explained. */
+const POWER_WINDOW_DAYS = 56;   // "next best dates" look this far ahead
+const POWER_MAX_MONTHS = 12;    // how far the month grid can be paged
+
+function _loc(o) {
+  if (!o) return '';
+  return _t(o.en, o.zh, o.th);
+}
+function _plainLoc(o) {
+  if (!o) return '';
+  const lang = currentLang();
+  return o[lang] || o.en;
+}
+function _powerObjective(key) {
+  const all = (window.BaziEngine && BaziEngine.DATE_OBJECTIVES) || {};
+  return all[key] || all.personal;
+}
+function _powerGroups() {
+  return (window.BaziEngine && BaziEngine.DATE_OBJECTIVE_GROUPS) || [];
+}
+
+function _scoredMonth(pillars, year, month1, purpose) {
+  const key = (pillars || []).map(p => (p && p.known && p.stem) ? p.stem.char + p.branch.char : '-').join('') + `|${year}-${month1}|${purpose}`;
+  if (!_powerCache.has(key)) {
+    if (_powerCache.size > 60) _powerCache.clear();
+    _powerCache.set(key, getPersonalDates(pillars, year, month1, purpose));
+  }
+  return _powerCache.get(key);
+}
+
+function _powerFits(s) {
+  if (!s || s.tier === 'avoid') return false;
+  return _calFilter === 'personal' || s.reasons.some(r => r.code === 'purpose-fit');
+}
+
+/* Best dates from today forward, across month boundaries. */
+function _powerPicks(pillars) {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const end = new Date(start); end.setDate(end.getDate() + POWER_WINDOW_DAYS);
+  const days = [];
+  for (let y = start.getFullYear(), m = start.getMonth(); new Date(y, m, 1) <= end; m === 11 ? (y++, m = 0) : m++) {
+    _scoredMonth(pillars, y, m + 1, _calFilter).forEach(s => {
+      const dt = new Date(s.year, s.month - 1, s.day);
+      if (dt >= start && dt <= end) days.push(s);
+    });
+  }
+  let pool = days.filter(_powerFits);
+  const classic = pool.length > 0 || _calFilter === 'personal';
+  if (!pool.length) pool = days.filter(s => s.tier !== 'avoid');
+  const picks = pool.slice().sort((a, b) => b.score - a.score || (a.month - b.month) || a.day - b.day).slice(0, 3);
+  picks.sort((a, b) => new Date(a.year, a.month - 1, a.day) - new Date(b.year, b.month - 1, b.day));
+  return { picks, classic };
+}
+
+function setCalGroup(key) {
+  const g = _powerGroups().find(x => x.key === key);
+  if (!g) return;
+  _calGroup = key;
+  _calFilter = g.objectives[0];
+  _powerSel = null;
+  if (_shareData && _shareData.animal) renderAuspiciousDates(_shareData.animal, _shareData.dominantEl, { selectBest: true });
+}
+
 function setCalFilter(key) {
-  _calFilter = key || 'all';
-  document.querySelectorAll('.cal-filter').forEach(b => {
-    b.classList.toggle('is-on', b.getAttribute('data-cal-filter') === _calFilter);
-  });
+  _calFilter = (window.BaziEngine && BaziEngine.DATE_OBJECTIVES && BaziEngine.DATE_OBJECTIVES[key]) ? key : 'personal';
+  _powerSel = null;
+  if (_shareData && _shareData.animal) renderAuspiciousDates(_shareData.animal, _shareData.dominantEl, { selectBest: true });
+}
+
+function shiftPowerMonth(delta) {
+  _calView = Math.max(0, Math.min(POWER_MAX_MONTHS - 1, _calView + delta));
   if (_shareData && _shareData.animal) renderAuspiciousDates(_shareData.animal, _shareData.dominantEl);
 }
 
-function renderAuspiciousDates(animal, dominantEl) {
+function renderAuspiciousDates(animal, dominantEl, opts) {
   const card = document.getElementById('power-days-card');
   if (!card) return;
+  opts = opts || {};
   const elColor = EL_COLOR[dominantEl] || '#f0c040';
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth(); // 0-indexed
-  const today = now.getDate();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = new Date(year, month, 1).getDay();
-  const MNAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const purpose = _calFilter === 'all' ? 'personal' : _calFilter;
   const pillars = _shareData && _shareData.pillars;
-  const scored = getPersonalDates(pillars, year, month + 1, purpose);
+  const obj = _powerObjective(_calFilter);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // Picks first: they are the answer to "when should I…?"
+  const { picks, classic } = _powerPicks(pillars);
+  if (opts.selectBest && picks.length) {
+    const best = picks.slice().sort((a, b) => b.score - a.score)[0];
+    _powerSel = { y: best.year, m: best.month - 1, d: best.day };
+  }
+  if (!_powerSel) _powerSel = { y: today.getFullYear(), m: today.getMonth(), d: today.getDate() };
+  if (opts.selectBest || opts.followSel) {
+    _calView = Math.max(0, (_powerSel.y - today.getFullYear()) * 12 + _powerSel.m - today.getMonth());
+  }
+
+  const view = new Date(today.getFullYear(), today.getMonth() + _calView, 1);
+  const year = view.getFullYear();
+  const month = view.getMonth();
+  const scored = _scoredMonth(pillars, year, month + 1, _calFilter);
   const byDay = {};
   scored.forEach(s => { byDay[s.day] = s; });
 
-  const partnerScored = (_lastPartner && _lastPartner.pillars)
-    ? getPersonalDates(_lastPartner.pillars, year, month + 1, purpose)
-    : [];
   const partnerOk = {};
-  partnerScored.forEach(s => { if (s.tier === 'power' || s.tier === 'good') partnerOk[s.day] = true; });
+  if (_lastPartner && _lastPartner.pillars) {
+    _scoredMonth(_lastPartner.pillars, year, month + 1, _calFilter)
+      .forEach(s => { if (s.tier === 'power' || s.tier === 'good') partnerOk[s.day] = true; });
+  }
+  const hasPartner = Object.keys(partnerOk).length > 0;
 
+  /* Category tabs + objective chips */
+  const groups = _powerGroups();
+  const group = groups.find(g => g.key === _calGroup) || groups[0];
+  const groupsHTML = groups.map(g => `
+    <button type="button" class="pd-group${g.key === group.key ? ' is-on' : ''}" aria-pressed="${g.key === group.key}" onclick="haptic(6); setCalGroup('${g.key}')">
+      <span class="pd-group-ico" aria-hidden="true">${g.icon}</span>${_loc(g)}
+    </button>`).join('');
+  const objectivesHTML = group.objectives.length > 1 ? `
+    <div class="pd-objectives" role="group" aria-label="What are you planning?">
+      ${group.objectives.map(k => {
+        const o = _powerObjective(k);
+        return `<button type="button" class="cal-filter${k === _calFilter ? ' is-on' : ''}" aria-pressed="${k === _calFilter}" onclick="haptic(6); setCalFilter('${k}')">${_loc(o.label)}</button>`;
+      }).join('')}
+    </div>` : '';
+
+  /* Next best dates — short content, so columns */
+  const purposeFit = s => s.reasons.some(r => r.code === 'purpose-fit');
+  const picksHTML = picks.map(p => {
+    const dt = new Date(p.year, p.month - 1, p.day);
+    const on = _powerSel && _powerSel.y === p.year && _powerSel.m === p.month - 1 && _powerSel.d === p.day;
+    const why = p.reasons.filter(r => r.good && r.code !== 'purpose-fit').slice(0, 2)
+      .map(r => `<span>${_loc(r.short)}</span>`).join('');
+    return `
+      <button type="button" class="pick-col${on ? ' is-on' : ''}" onclick="haptic(6); selectPowerDate(${p.year}, ${p.month - 1}, ${p.day})">
+        <span class="pick-dow">${dt.toLocaleDateString(dateLocale(), { weekday: 'short' })}</span>
+        <span class="pick-date" style="color:${elColor}">${dt.toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short' })}</span>
+        <span class="pick-gz">${p.pillar}${p.officer ? ' · ' + p.officer.char : ''}</span>
+        <span class="pick-score is-${p.tier}">${p.score}</span>
+        <span class="pick-why">${why || _t('Steady day', '平稳之日', 'วันราบรื่น')}</span>
+      </button>`;
+  }).join('');
+  const personal = _calFilter === 'personal';
+  const picksHead = personal
+    ? _t('Your next best dates', '你近期最好的日子', 'วันที่ดีที่สุดของคุณเร็วๆ นี้')
+    : _t(`Best dates for ${obj.en}`, `最宜${obj.zh}的日子`, `วันที่ดีที่สุดสำหรับ${obj.th}`);
+  const picksSub = classic
+    ? _t('Next 8 weeks · tap a date to see why', '未来 8 周 · 点日期看原因', '8 สัปดาห์ข้างหน้า · แตะวันที่เพื่อดูเหตุผล')
+    : _t(`No classic ${obj.en} date in the next 8 weeks — these are your strongest days instead`, `未来 8 周没有宜${obj.zh}的正日，以下是你最强的日子`, `ไม่มีวันหลักสำหรับ${obj.th}ใน 8 สัปดาห์ — นี่คือวันที่แข็งแรงที่สุดของคุณแทน`);
+
+  /* Month grid */
   const dayHeaders = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-header">${d}</div>`).join('');
-  const blanks = Array(firstDay).fill('<div class="cal-day cal-blank"></div>').join('');
-  const fits = s => _calFilter !== 'all' && s && s.tier !== 'avoid' && s.reasons.some(r => r.code === 'purpose-fit');
-  _powerScored = scored;
-  if (!_powerDay || _powerDay > daysInMonth) _powerDay = today;
+  const blanks = Array(view.getDay()).fill('<div class="cal-day cal-blank"></div>').join('');
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
   const days = Array.from({ length: daysInMonth }, (_, i) => {
     const d = i + 1;
     const s = byDay[d];
+    const dt = new Date(year, month, d);
     let cls = 'cal-day';
     if (s) {
-      if (s.tier === 'power') cls += ' cal-power';
-      else if (s.tier === 'good') cls += ' cal-good';
-      else if (s.tier === 'avoid') cls += ' cal-avoid';
-      else cls += ' cal-plain';
+      cls += s.tier === 'power' ? ' cal-power' : s.tier === 'good' ? ' cal-good' : s.tier === 'avoid' ? ' cal-avoid' : ' cal-plain';
       if (partnerOk[d] && (s.tier === 'power' || s.tier === 'good')) cls += ' cal-both';
+      if (!personal && s.tier !== 'avoid' && purposeFit(s)) cls += ' cal-fit';
     }
-    if (d === today) cls += ' cal-today';
-    if (fits(s)) cls += ' cal-fit';
-    if (d === _powerDay) cls += ' cal-selected';
-    const title = s ? `${s.pillar} · ${s.officer ? s.officer.char + s.officer.en : ''} · ${s.score}/100` : '';
-    return `<button type="button" class="${cls}" data-day="${d}" style="${s && s.tier === 'power' ? `--el-c:${elColor}` : ''}" title="${title}" aria-pressed="${d === _powerDay}" onclick="haptic(6); showPowerDay(${d})">${d}</button>`;
+    if (dt < today) cls += ' cal-past';
+    if (dt.getTime() === today.getTime()) cls += ' cal-today';
+    const on = _powerSel.y === year && _powerSel.m === month && _powerSel.d === d;
+    if (on) cls += ' cal-selected';
+    const title = s ? `${s.pillar} · ${s.officer ? s.officer.char + ' ' + s.officer.en : ''} · ${s.score}/100` : '';
+    return `<button type="button" class="${cls}" data-day="${d}" title="${title}" aria-pressed="${on}" onclick="haptic(6); selectPowerDate(${year}, ${month}, ${d})">${d}</button>`;
   }).join('');
+  const monthLabel = view.toLocaleDateString(dateLocale(), { month: 'long', year: 'numeric' });
 
-  // Top picks: best remaining days this month, else the best of the month.
-  let pool = scored.filter(s => s.tier !== 'avoid');
-  if (_calFilter !== 'all' && pool.some(fits)) pool = pool.filter(fits);
-  let picks = pool.filter(s => s.day >= today);
-  if (picks.length < 3) picks = pool;
-  picks = picks.sort((a, b) => b.score - a.score || a.day - b.day).slice(0, 3).sort((a, b) => a.day - b.day);
-
-  const picksHTML = picks.map(p => {
-    const why = p.reasons.filter(r => r.good).slice(0, 2).map(r => _t(r.en, r.zh, r.th)).join(' · ')
-      || _t('Clear, uncomplicated day', '平稳无碍之日', 'วันราบรื่น ไม่มีอุปสรรค');
-    return `
-      <div class="pick-row" role="button" tabindex="0" onclick="haptic(6); showPowerDay(${p.day})">
-        <div class="pick-when">
-          <span class="pick-date" style="color:${elColor}">${MNAMES[month].slice(0, 3)} ${p.day}</span>
-          <span class="pick-gz">${p.pillar}${p.officer ? ' · ' + p.officer.char : ''}</span>
-        </div>
-        <div class="pick-why">${why}</div>
-      </div>`;
-  }).join('');
+  const legendHTML = `
+    <div class="cal-legend">
+      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power"></div> ${_t('Power Day', '吉日', 'วันพลัง')} 72+</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-good"></div> ${_t('Good Day', '吉', 'วันดี')} 60+</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-avoid"></div> ${_t('Avoid', '忌', 'ควรเลี่ยง')}</div>
+      ${!personal ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-fit"></div> ${_t(`Suits ${obj.en}`, `宜${obj.zh}`, `เหมาะกับ${obj.th}`)}</div>` : ''}
+      ${hasPartner ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-both"></div> ${_t('Works for both charts', '两盘皆宜', 'เหมาะทั้งสองแผน')}</div>` : ''}
+    </div>`;
 
   const clashDays = scored.filter(s => s.clashYear).map(s => s.day);
   const animalName = _t(animal, ANIMAL_ZH[animal] || animal, ANIMAL_TH[animal] || animal);
@@ -4116,89 +4227,117 @@ function renderAuspiciousDates(animal, dominantEl) {
         `เลี่ยงวันที่ ${clashDays.join(', ')} — ชงปี${animalName}ของคุณ (冲太岁)`)}</div>`
     : '';
 
-  const purposeNote = {
-    all:      _t('Dates are read from your own four pillars: sound in the almanac (建除), in harmony with your chart, and never clashing your year animal.', '这些日子由你的四柱推出：黄历建除吉、与你本命相合、且绝不冲你的生肖太岁。', 'วันเหล่านี้อ่านจากสี่เสาของคุณ: ดีตามปฏิทินจีน (建除) เข้ากับดวงคุณ และไม่ชงปีนักษัตรของคุณ'),
-    business: _t('Opening dates favour 开 Open and 成 Complete days that also support your Day Master.', '开业宜取开日、成日，并要生扶你的日主。', 'วันเปิดกิจการเน้นวันเปิด (开) และวันสำเร็จ (成) ที่เสริมวันมาสเตอร์ของคุณ'),
-    contract: _t('Signing dates favour 定 Settle and 执 Hold days in harmony with your pillars.', '签约宜取定日、执日，且与你四柱相合。', 'วันเซ็นสัญญาเน้นวันตกลง (定) และวันยึด (执) ที่เข้ากับเสาของคุณ'),
-    travel:   _t('Travel dates favour 开 Open and 除 Remove days, clear of clashes with your chart.', '出行宜取开日、除日，且不冲你的命盘。', 'วันเดินทางเน้นวันเปิด (开) และวันขจัด (除) ที่ไม่ชงกับดวงคุณ'),
-    personal: _t('Personal dates weigh your favourable element, your 天乙贵人 days, and harmony with your pillars.', '个人吉日看你的喜用神、天乙贵人日，以及与四柱的合。', 'วันมงคลส่วนตัวดูจากธาตุที่คุณต้องการ วันกุ้ยเหริน และความเข้ากันกับเสาของคุณ'),
-  };
-
-  const purposeLabel = {
-    business: _t('opening a business', '开业', 'เปิดกิจการ'),
-    contract: _t('signing a contract', '签约', 'เซ็นสัญญา'),
-    travel:   _t('travel', '出行', 'เดินทาง'),
-    personal: _t('personal plans', '个人事务', 'เรื่องส่วนตัว'),
-  };
-  const picksHead = _calFilter === 'all'
-    ? _t('Best dates for you', '为你择的日子', 'วันที่ดีที่สุดสำหรับคุณ')
-    : _t(`Best dates for ${purposeLabel[_calFilter]}`, `最宜${purposeLabel[_calFilter]}的日子`, `วันที่ดีที่สุดสำหรับ${purposeLabel[_calFilter]}`);
-  const legendHTML = `
-    <div class="cal-legend">
-      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power"></div> ${_t('Power Day', '吉日', 'วันพลัง')}</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-good"></div> ${_t('Good Day', '吉', 'วันดี')}</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-avoid"></div> ${_t('Avoid', '忌', 'ควรเลี่ยง')}</div>
-      ${partnerScored.length ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-both"></div> ${_t('Works for both charts', '两盘皆宜', 'เหมาะทั้งสองแผน')}</div>` : ''}
-      ${_calFilter !== 'all' ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-fit"></div> ${_t(`Suits ${purposeLabel[_calFilter]}`, `宜${purposeLabel[_calFilter]}`, `เหมาะกับ${purposeLabel[_calFilter]}`)}</div>` : ''}
-    </div>
-  `;
+  const officerNames = obj.officers.map(i => {
+    const o = BaziEngine.DAY_OFFICERS[i];
+    return { en: `${o.char} ${o.en}`, zh: o.zh, th: `วัน${o.char}` };
+  });
+  const methodNote = personal
+    ? _t('Each date is read against your own four pillars: its almanac officer (建除), harmony with your year and day animals, your Nobleman days, and the element your chart needs. Days that clash your year animal are always Avoid.',
+         '每一天都按你的四柱来看：建除十二神、与你年支日支的合、天乙贵人日，以及你命盘所需的五行。冲生肖太岁之日一律为忌。',
+         'ทุกวันอ่านจากสี่เสาของคุณ: เจ้าวันตามปฏิทิน (建除) ความเข้ากับนักษัตรปีและวัน วันกุ้ยเหริน และธาตุที่ดวงคุณต้องการ วันที่ชงปีนักษัตรของคุณจะเป็นวันควรเลี่ยงเสมอ')
+    : _t(`For ${obj.en}, the almanac favours ${officerNames.map(o => o.en).join(', ')} days. Wobazi then keeps only the ones that also suit your chart${obj.noble ? ', and gives extra weight to your Nobleman days, when helpful people show up' : ''}.`,
+         `${obj.zh}宜取${officerNames.map(o => o.zh).join('、')}，再只保留与你命盘相合的日子${obj.noble ? '，并加重天乙贵人日' : ''}。`,
+         `สำหรับ${obj.th} ปฏิทินจีนเน้น${officerNames.map(o => o.th).join(' ')} แล้ว Wobazi เก็บเฉพาะวันที่เข้ากับดวงคุณ${obj.noble ? ' และให้น้ำหนักวันกุ้ยเหรินเพิ่ม' : ''}`);
 
   card.innerHTML = `
     <div class="power-days-card">
-      <div class="cal-month-label">${MNAMES[month]} ${year}</div>
-      <div class="cal-grid">
-        ${dayHeaders}
-        ${blanks}
-        ${days}
-      </div>
-      ${legendHTML}
-      <div class="cal-detail" id="power-day-detail" aria-live="polite">${powerDayDetailHTML(byDay[_powerDay], month, year, elColor)}</div>
-      ${clashHTML}
+      <div class="pd-groups" role="group" aria-label="Category">${groupsHTML}</div>
+      ${objectivesHTML}
       ${picksHTML ? `<div class="cal-picks">
-        <div class="cal-picks-head">${picksHead}</div>
-        ${picksHTML}
+        <div class="cal-picks-top">
+          <div class="cal-picks-head">${picksHead}</div>
+          <div class="cal-picks-sub">${picksSub}</div>
+        </div>
+        <div class="pick-cols">${picksHTML}</div>
       </div>` : ''}
-      <div class="cal-note">${purposeNote[_calFilter] || purposeNote.all}</div>
-    </div>
-  `;
+      <div class="pd-split">
+      <div class="cal-detail" id="power-day-detail" aria-live="polite">${powerDayDetailHTML(_powerDetailScore(), elColor)}</div>
+      <div class="cal-month">
+        <div class="cal-month-bar">
+          <button type="button" class="cal-nav" onclick="haptic(6); shiftPowerMonth(-1)" ${_calView === 0 ? 'disabled' : ''} aria-label="Previous month">‹</button>
+          <div class="cal-month-label">${monthLabel}</div>
+          <button type="button" class="cal-nav" onclick="haptic(6); shiftPowerMonth(1)" ${_calView >= POWER_MAX_MONTHS - 1 ? 'disabled' : ''} aria-label="Next month">›</button>
+        </div>
+        <div class="cal-grid">${dayHeaders}${blanks}${days}</div>
+        ${legendHTML}
+      </div>
+      </div>
+      ${clashHTML}
+      <div class="cal-note">${methodNote}</div>
+    </div>`;
+  if (typeof applyI18n === 'function') applyI18n();
 }
 
-/* Tap a date: what that day is for your chart, and why (reasons come straight from the engine). */
-function powerDayDetailHTML(s, month, year, elColor) {
+function _powerDetailScore() {
+  if (!_powerSel || !_shareData) return null;
+  return _scoredMonth(_shareData.pillars, _powerSel.y, _powerSel.m + 1, _calFilter).find(x => x.day === _powerSel.d) || null;
+}
+
+/* Tap a date: a plain verdict, then each reason with what it means. */
+function powerDayDetailHTML(s, elColor) {
   if (!s) return '';
-  const date = new Date(year, month, s.day).toLocaleDateString(dateLocale(), { weekday: 'short', day: 'numeric', month: 'short' });
-  const tier = {
+  const obj = _powerObjective(_calFilter);
+  const personal = _calFilter === 'personal';
+  const dt = new Date(s.year, s.month - 1, s.day);
+  const fit = s.reasons.some(r => r.code === 'purpose-fit');
+  const tierLbl = {
     power: _t('Power Day', '吉日', 'วันพลัง'),
     good:  _t('Good Day', '吉', 'วันดี'),
     avoid: _t('Avoid', '忌', 'ควรเลี่ยง'),
     plain: _t('Ordinary day', '平日', 'วันธรรมดา'),
   }[s.tier] || '';
-  const officer = s.officer ? ` · ${s.officer.char} ${_t(s.officer.en, s.officer.zh, s.officer.th)}` : '';
-  const reasons = (s.reasons || []).map(r =>
-    `<li class="${r.good ? 'is-good' : 'is-bad'}"><span aria-hidden="true">${r.good ? '✓' : '✕'}</span>${_t(r.en, r.zh, r.th)}</li>`).join('');
+  let verdict;
+  if (s.tier === 'avoid') verdict = _t('Avoid for anything important', '重要之事避开', 'เลี่ยงเรื่องสำคัญ');
+  else if (personal) verdict = s.tier === 'plain' ? _t('An ordinary day for you', '于你是平常之日', 'วันธรรมดาสำหรับคุณ') : _t(`${s.tier === 'power' ? 'Power Day' : 'Good Day'} for you`, s.tier === 'power' ? '你的吉日' : '于你吉', `${s.tier === 'power' ? 'วันพลัง' : 'วันดี'}สำหรับคุณ`);
+  else if (fit && s.tier !== 'plain') verdict = _t(`${s.tier === 'power' ? 'Power Day' : 'Good Day'} for ${obj.en}`, `${s.tier === 'power' ? '吉日' : '吉'} · 宜${obj.zh}`, `${s.tier === 'power' ? 'วันพลัง' : 'วันดี'}สำหรับ${obj.th}`);
+  else if (fit) verdict = _t(`Suits ${obj.en}, but little else in your favour`, `宜${obj.zh}，但于你助力不多`, `เหมาะกับ${obj.th} แต่ไม่ค่อยมีอะไรหนุนคุณ`);
+  else if (s.tier !== 'plain') verdict = _t(`Good for you, but not a classic day for ${obj.en}`, `于你吉，但非${obj.zh}正日`, `ดีสำหรับคุณ แต่ไม่ใช่วันหลักสำหรับ${obj.th}`);
+  else verdict = _t(`Not a day for ${obj.en}`, `不宜${obj.zh}`, `ไม่ใช่วันสำหรับ${obj.th}`);
+
+  const officer = s.officer ? ` · ${_t(s.officer.char + ' ' + s.officer.en + ' day', s.officer.zh, 'วัน' + s.officer.char)}` : '';
+  const animalLbl = _t(`${s.element} ${s.animal}`, `${EL_ZH[s.element] || ''}${ANIMAL_ZH[s.animal] || ''}`, `${EL_TH[s.element] || s.element} ${ANIMAL_TH[s.animal] || s.animal}`);
+  const reasons = (s.reasons || []).map(r => `
+    <li class="${r.good ? 'is-good' : 'is-bad'}">
+      <span class="cr-ico" aria-hidden="true">${r.good ? '✓' : '✕'}</span>
+      <div class="cr-body"><strong>${_loc(r.short) || _t(r.en, r.zh, r.th)}</strong>${r.hint ? `<span class="cr-hint">${_loc(r.hint)}</span>` : ''}</div>
+    </li>`).join('');
   return `
     <div class="cal-detail-head">
-      <span class="pick-date" style="color:${elColor}">${date}</span>
-      <span class="pick-gz">${s.pillar}${officer}</span>
-      <span class="cal-detail-tier is-${s.tier}">${tier} · ${s.score}</span>
+      <div class="cd-date" style="--el-c:${elColor}">
+        <span class="cd-dow">${dt.toLocaleDateString(dateLocale(), { weekday: 'short' })}</span>
+        <span class="cd-day">${s.day}</span>
+        <span class="cd-mon">${dt.toLocaleDateString(dateLocale(), { month: 'short' })}</span>
+      </div>
+      <div class="cd-main">
+        <div class="cd-verdict">${verdict}</div>
+        <div class="pick-gz">${s.pillar} ${animalLbl}${officer}</div>
+      </div>
+      <span class="cal-detail-tier is-${s.tier}" title="${s.score}/100">${tierLbl} · ${s.score}</span>
     </div>
-    ${reasons ? `<ul class="cal-reasons">${reasons}</ul>` : `<p class="cal-detail-empty">${_t('Nothing for or against your chart — a neutral day.', '于你命盘无特别吉凶——平常之日。', 'ไม่มีข้อดีข้อเสียต่อดวงคุณ — วันกลางๆ')}</p>`}`;
+    ${reasons ? `<ul class="cal-reasons">${reasons}</ul>` : `<p class="cal-detail-empty">${_t('Nothing for or against your chart — a neutral day.', '于你命盘无特别吉凶——平常之日。', 'ไม่มีข้อดีข้อเสียต่อดวงคุณ — วันกลางๆ')}</p>`}
+    <p class="cd-scale">${_t('Every date starts at 50. Each ✓ adds points and each ✕ takes them away: 72+ is a Power Day, 60+ a Good Day.', '每天从 50 分起算，✓ 加分、✕ 扣分：72 分以上为吉日，60 分以上为吉。', 'ทุกวันเริ่มที่ 50 คะแนน ✓ บวกคะแนน ✕ ลบคะแนน: 72+ คือวันพลัง 60+ คือวันดี')}</p>`;
 }
 
-function showPowerDay(day) {
-  _powerDay = day;
+function selectPowerDate(y, m, d) {
+  _powerSel = { y, m, d };
+  const now = new Date();
+  const offset = (y - now.getFullYear()) * 12 + m - now.getMonth();
+  if (offset !== _calView && _shareData && _shareData.animal) {
+    _calView = Math.max(0, Math.min(POWER_MAX_MONTHS - 1, offset));
+    renderAuspiciousDates(_shareData.animal, _shareData.dominantEl);
+    return;
+  }
   const card = document.getElementById('power-days-card');
   if (!card) return;
   card.querySelectorAll('.cal-day[data-day]').forEach(b => {
-    const on = Number(b.dataset.day) === day;
+    const on = Number(b.dataset.day) === d;
     b.classList.toggle('cal-selected', on);
     b.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
-  const s = _powerScored.find(x => x.day === day);
-  const now = new Date();
+  card.querySelectorAll('.pick-col').forEach(b => b.classList.remove('is-on'));
   const detail = document.getElementById('power-day-detail');
   if (detail) {
-    detail.innerHTML = powerDayDetailHTML(s, now.getMonth(), now.getFullYear(), EL_COLOR[_shareData && _shareData.dominantEl] || '#f0c040');
+    detail.innerHTML = powerDayDetailHTML(_powerDetailScore(), EL_COLOR[_shareData && _shareData.dominantEl] || '#f0c040');
     if (typeof applyI18n === 'function') applyI18n();
   }
 }
@@ -4457,8 +4596,8 @@ const NEW_TIPS = {
     icon: '📅',
     title_en: 'Power Days',
     title_zh: '吉日',
-    body_en: 'Each date this month is scored against your own four pillars: is it sound in the Chinese almanac (建除 day officers), does it harmonise with your year and day branches, is it a Nobleman 天乙贵人 day, and is its element one your chart needs? Days that clash your year animal (冲太岁) are always marked Avoid. Pick what you are planning to highlight the dates that suit it, and tap any date to see its reasons.',
-    body_zh: '本月每一天都按你的四柱打分：黄历建除是否吉、是否与你的年支日支相合、是否天乙贵人日、当日五行是否为你所喜。冲你生肖太岁的日子一律标为忌。选择你要做的事即可标出合适的日子，点任意日期查看原因。',
+    body_en: 'Choose a category and what you are planning — pitching, signing, a first date, a move. Every date is scored against your own four pillars, starting at 50: its Chinese almanac officer (建除), harmony with your year and day animals, your Nobleman 天乙贵人 days, and whether its element is one your chart needs. The almanac lists which officers suit each undertaking. Days that clash your year animal (冲太岁) are always Avoid. Tap any date for its reasons.',
+    body_zh: '先选类别和你要做的事——提案、签约、约会、搬家。每一天从 50 分起，按你的四柱打分：建除十二神、与你年支日支的合、天乙贵人日，以及当日五行是否为你所需。黄历写明各事宜取哪些日神。冲你生肖太岁的日子一律为忌。点任意日期看原因。',
   },
   'foods': {
     icon: '🥗',

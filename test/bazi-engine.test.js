@@ -273,6 +273,43 @@ describe('择日 — personal date selection', () => {
     for (const d of po) assert.equal(d.tier, 'avoid');
   });
 
+  it('every objective belongs to a group and never favours 破 or 闭 days', () => {
+    const inGroups = bazi.DATE_OBJECTIVE_GROUPS.flatMap(g => g.objectives);
+    for (const [key, o] of Object.entries(bazi.DATE_OBJECTIVES)) {
+      assert.ok(inGroups.includes(key), key + ' is not in a group');
+      assert.ok(!o.officers.includes(6) && !o.officers.includes(11), key + ' favours a bad officer');
+    }
+    for (const k of inGroups) assert.ok(bazi.DATE_OBJECTIVES[k], k + ' is not an objective');
+  });
+
+  it('marks only matching officers as fitting an objective, and never for "For you"', () => {
+    const pitch = bazi.bestDatesInMonth({ year: 2026, month: 10, pillars: natal, purpose: 'pitch' });
+    for (const d of pitch) {
+      const fit = d.reasons.some(r => r.code === 'purpose-fit');
+      assert.equal(fit, bazi.DATE_OBJECTIVES.pitch.officers.includes(d.officer.idx) && d.officer.quality !== 'bad');
+    }
+    const personal = bazi.bestDatesInMonth({ year: 2026, month: 10, pillars: natal, purpose: 'personal' });
+    assert.ok(personal.every(d => !d.reasons.some(r => r.code === 'purpose-fit')));
+  });
+
+  it('weights Nobleman days more for people-facing objectives', () => {
+    const opts = { year: 2026, month: 10, pillars: natal };
+    const noble = bazi.bestDatesInMonth(Object.assign({ purpose: 'pitch' }, opts)).find(d => d.noble && !d.clashYear);
+    assert.ok(noble, 'expected a Nobleman day in the month');
+    const renovate = bazi.scoreDayForChart(Object.assign({ day: noble.day, purpose: 'renovate' }, opts));
+    const pitchFit = noble.reasons.some(r => r.code === 'purpose-fit') ? 10 : 0;
+    const renoFit = renovate.reasons.some(r => r.code === 'purpose-fit') ? 10 : 0;
+    assert.ok(noble.score - pitchFit > renovate.score - renoFit || noble.score === 100);
+  });
+
+  it('explains every reason in plain words', () => {
+    const days = bazi.bestDatesInMonth({ year: 2026, month: 10, pillars: natal, purpose: 'contract' });
+    for (const r of days.flatMap(d => d.reasons)) {
+      assert.ok(r.short && r.short.en && r.short.zh && r.short.th, r.code + ' missing short label');
+      assert.ok(r.hint && r.hint.en && r.hint.zh && r.hint.th, r.code + ' missing hint');
+    }
+  });
+
   it('reads favourable elements from the Day Master balance', () => {
     const fav = bazi.favorableElements(natal);
     assert.ok(Array.isArray(fav.favorable) && fav.favorable.length > 0);

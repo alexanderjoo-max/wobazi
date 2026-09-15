@@ -1326,20 +1326,90 @@
     { char: '闭', pinyin: 'Bì',    en: 'Close',     zh: '闭日', th: 'วันปิด',    quality: 'bad'   },
   ];
 
-  /* 宜 — the officers each undertaking favours. */
-  const PURPOSE_OFFICERS = {
-    business: [10, 8, 4, 2],          // 开 成 定 满
-    contract: [4, 5, 8],              // 定 执 成
-    travel:   [10, 1, 8],             // 开 除 成
-    personal: [1, 4, 5, 7, 8, 10],    // 除 定 执 危 成 开
+  /* What each officer means in plain words — shown when a date is explained. */
+  const OFFICER_NOTE = [
+    { en: 'a starting day — good for applying, meeting superiors and setting off; weak for digging or building',
+      zh: '宜求职、谒贵、出行；不宜动土', th: 'วันเริ่มต้น — เหมาะสมัครงาน พบผู้ใหญ่ ออกเดินทาง ไม่เหมาะขุดดินหรือก่อสร้าง' },
+    { en: 'clears out the old — good for cleaning up, treatment, ending bad habits and travel',
+      zh: '宜除旧、求医、扫舍、出行', th: 'ขจัดของเก่า — เหมาะทำความสะอาด รักษาตัว เลิกนิสัยเสีย และเดินทาง' },
+    { en: 'a day of plenty — good for trade, receiving money and celebrations; avoid legal filings',
+      zh: '宜开市、纳财、喜庆；忌诉讼', th: 'วันอุดมสมบูรณ์ — เหมาะค้าขาย รับเงิน งานฉลอง เลี่ยงเรื่องฟ้องร้อง' },
+    { en: 'an even, ordinary day — fine for routine and smoothing things over, flat for big starts',
+      zh: '宜修整、调和；大事平平', th: 'วันธรรมดาสม่ำเสมอ — เหมาะงานประจำและไกล่เกลี่ย ไม่โดดเด่นสำหรับเริ่มเรื่องใหญ่' },
+    { en: 'things set firmly — good for agreements, engagements and commitments; avoid lawsuits',
+      zh: '宜签约、订婚、定事；忌诉讼', th: 'สิ่งต่างๆ ลงตัว — เหมาะทำข้อตกลง หมั้น ให้คำมั่น เลี่ยงการฟ้องร้อง' },
+    { en: 'hold on to what you gain — good for signing, securing deals and commitments; avoid moving house',
+      zh: '宜立契、纳采、守成；忌搬迁', th: 'รักษาสิ่งที่ได้ — เหมาะเซ็นสัญญา ปิดดีล ให้คำมั่น เลี่ยงย้ายบ้าน' },
+    { en: 'things break apart — only for demolition or ending things; avoid every new start',
+      zh: '诸事不宜，只宜拆除、了结', th: 'สิ่งต่างๆ แตกออก — เหมาะแค่รื้อถอนหรือยุติเรื่อง เลี่ยงการเริ่มใหม่ทุกอย่าง' },
+    { en: 'a favourable officer that asks for care — good for well-prepared, steady moves; avoid gambles, heights and boats',
+      zh: '黄道吉日但须谨慎——宜稳妥之事；忌冒险、登高、行船', th: 'วันดีที่ต้องระวัง — เหมาะก้าวที่เตรียมพร้อมและมั่นคง เลี่ยงการเสี่ยง ที่สูง และทางน้ำ' },
+    { en: 'things come together — one of the best all-round days for launches, weddings and moves',
+      zh: '诸事可成，宜开业、结婚、搬迁', th: 'ทุกอย่างสำเร็จ — หนึ่งในวันที่ดีที่สุดสำหรับเปิดตัว แต่งงาน และย้ายบ้าน' },
+    { en: 'a harvest day — good for collecting payment, buying and enrolling; flat for launching',
+      zh: '宜纳财、收账、置业、入学；不宜开张', th: 'วันเก็บเกี่ยว — เหมาะเก็บเงิน ซื้อของ ลงทะเบียนเรียน ไม่เหมาะเปิดตัว' },
+    { en: 'doors open — the classic day for openings, launches, interviews and journeys',
+      zh: '宜开业、开市、求职、出行', th: 'ประตูเปิด — วันคลาสสิกสำหรับเปิดกิจการ เปิดตัว สัมภาษณ์ และเดินทาง' },
+    { en: 'things shut — good for closing accounts and rest; poor for openings',
+      zh: '宜收藏、了结、休养；忌开张', th: 'สิ่งต่างๆ ปิดลง — เหมาะปิดบัญชีและพักผ่อน ไม่เหมาะเปิดกิจการ' },
+  ];
+
+  /* 宜 — what people plan, grouped, and the officers each undertaking favours.
+     officer idx: 建0 除1 满2 平3 定4 执5 破6 危7 成8 收9 开10 闭11.
+     noble: helpful people matter most, so a 天乙贵人 day counts extra. */
+  const DATE_OBJECTIVES = {
+    pitch:     { group: 'business', officers: [10, 8, 0],    noble: true, en: 'pitching',          zh: '提案路演', th: 'นำเสนองาน',
+                 label: { en: 'Present or pitch', zh: '提案路演', th: 'นำเสนอ/พิทช์' } },
+    negotiate: { group: 'business', officers: [4, 5, 8],     noble: true, en: 'negotiating',       zh: '谈判',     th: 'เจรจา',
+                 label: { en: 'Negotiate', zh: '谈判', th: 'เจรจา' } },
+    contract:  { group: 'business', officers: [4, 5, 8],                  en: 'signing',           zh: '签约',     th: 'เซ็นสัญญา',
+                 label: { en: 'Sign a contract', zh: '签约', th: 'เซ็นสัญญา' } },
+    launch:    { group: 'business', officers: [10, 8, 2],                 en: 'a launch',          zh: '发布新品', th: 'เปิดตัวสินค้า',
+                 label: { en: 'Launch a product', zh: '发布新品', th: 'เปิดตัวสินค้า' } },
+    business:  { group: 'business', officers: [10, 8, 4, 2],              en: 'opening a business', zh: '开业',     th: 'เปิดกิจการ',
+                 label: { en: 'Open a business', zh: '开业', th: 'เปิดกิจการ' } },
+    job:       { group: 'career',   officers: [10, 0, 8],    noble: true, en: 'job applications',  zh: '求职面试', th: 'สมัครงาน',
+                 label: { en: 'Apply or interview', zh: '求职面试', th: 'สมัครงาน/สัมภาษณ์' } },
+    startjob:  { group: 'career',   officers: [10, 8, 0, 4],              en: 'starting a job',    zh: '入职上任', th: 'เริ่มงานใหม่',
+                 label: { en: 'Start a new job', zh: '入职上任', th: 'เริ่มงานใหม่' } },
+    raise:     { group: 'career',   officers: [8, 2, 9],     noble: true, en: 'asking for a raise', zh: '谈加薪升职', th: 'ขอขึ้นเงินเดือน',
+                 label: { en: 'Ask for a raise', zh: '谈加薪升职', th: 'ขอขึ้นเงินเดือน' } },
+    study:     { group: 'career',   officers: [10, 8, 4],                 en: 'exams and study',   zh: '考试进修', th: 'สอบ/เรียน',
+                 label: { en: 'Exam or course', zh: '考试进修', th: 'สอบ/เริ่มเรียน' } },
+    date:      { group: 'love',     officers: [8, 10, 2],                 en: 'a first date',      zh: '约会表白', th: 'เดท',
+                 label: { en: 'First date', zh: '约会表白', th: 'เดทแรก/สารภาพรัก' } },
+    propose:   { group: 'love',     officers: [4, 5, 8],                  en: 'a proposal',        zh: '求婚订婚', th: 'ขอแต่งงาน',
+                 label: { en: 'Propose or engage', zh: '求婚订婚', th: 'ขอแต่งงาน/หมั้น' } },
+    wedding:   { group: 'love',     officers: [8, 4, 10],                 en: 'a wedding',         zh: '结婚',     th: 'แต่งงาน',
+                 label: { en: 'Wedding', zh: '结婚', th: 'แต่งงาน' } },
+    reconcile: { group: 'love',     officers: [1, 3, 4],                  en: 'making up',         zh: '和解修好', th: 'คืนดี',
+                 label: { en: 'Make up', zh: '和解修好', th: 'คืนดี' } },
+    travel:    { group: 'home',     officers: [10, 1, 8, 0],              en: 'travel',            zh: '出行',     th: 'เดินทาง',
+                 label: { en: 'Travel', zh: '出行', th: 'เดินทาง' } },
+    move:      { group: 'home',     officers: [8, 10, 4, 2],              en: 'moving house',      zh: '搬家入宅', th: 'ย้ายบ้าน',
+                 label: { en: 'Move house', zh: '搬家入宅', th: 'ย้ายบ้าน' } },
+    renovate:  { group: 'home',     officers: [8, 10, 3],                 en: 'renovation',        zh: '装修动土', th: 'รีโนเวท',
+                 label: { en: 'Renovate', zh: '装修动土', th: 'รีโนเวท' } },
+    purchase:  { group: 'home',     officers: [8, 9, 2, 4],               en: 'a big purchase',    zh: '置业买车', th: 'ซื้อของใหญ่',
+                 label: { en: 'Buy home or car', zh: '置业买车', th: 'ซื้อบ้าน/รถ' } },
+    health:    { group: 'wellbeing', officers: [1, 8, 10],                en: 'a health reset',    zh: '调养身体', th: 'ดูแลสุขภาพ',
+                 label: { en: 'Start a health plan', zh: '调养身体', th: 'เริ่มดูแลสุขภาพ' } },
+    declutter: { group: 'wellbeing', officers: [1, 3],                    en: 'clearing out',      zh: '除旧扫舍', th: 'เคลียร์ของ',
+                 label: { en: 'Clear out', zh: '除旧扫舍', th: 'เคลียร์ของ' } },
+    newlook:   { group: 'wellbeing', officers: [1, 8, 2],                 en: 'a new look',        zh: '理发换造型', th: 'เปลี่ยนลุค',
+                 label: { en: 'Haircut or new look', zh: '理发换造型', th: 'ตัดผม/เปลี่ยนลุค' } },
+    personal:  { group: 'you',      officers: [1, 4, 5, 7, 8, 10],        en: 'personal matters',  zh: '个人之事', th: 'เรื่องส่วนตัว',
+                 label: { en: 'Anything personal', zh: '个人吉日', th: 'วันมงคลส่วนตัว' } },
   };
 
-  const PURPOSE_LABEL = {
-    business: { en: 'opening a business', zh: '开业', th: 'เปิดกิจการ' },
-    contract: { en: 'signing',            zh: '签约', th: 'เซ็นสัญญา' },
-    travel:   { en: 'travel',             zh: '出行', th: 'เดินทาง' },
-    personal: { en: 'personal matters',   zh: '个人之事', th: 'เรื่องส่วนตัว' },
-  };
+  const DATE_OBJECTIVE_GROUPS = [
+    { key: 'you',       icon: '✦',  en: 'For you',       zh: '为你',     th: 'สำหรับคุณ',     objectives: ['personal'] },
+    { key: 'business',  icon: '💼', en: 'Business',      zh: '生意',     th: 'ธุรกิจ',        objectives: ['pitch', 'negotiate', 'contract', 'launch', 'business'] },
+    { key: 'career',    icon: '📈', en: 'Career',        zh: '事业',     th: 'การงาน',       objectives: ['job', 'startjob', 'raise', 'study'] },
+    { key: 'love',      icon: '💞', en: 'Love & family', zh: '感情家庭', th: 'ความรักและครอบครัว', objectives: ['date', 'propose', 'wedding', 'reconcile'] },
+    { key: 'home',      icon: '🧳', en: 'Home & travel', zh: '出行安居', th: 'บ้านและการเดินทาง', objectives: ['travel', 'move', 'renovate', 'purchase'] },
+    { key: 'wellbeing', icon: '🌿', en: 'Wellbeing',     zh: '身心',     th: 'สุขภาพ',        objectives: ['health', 'declutter', 'newlook'] },
+  ];
 
   function dayOfficer(dayBranchIdx, monthBranchIdx) {
     if (dayBranchIdx < 0 || monthBranchIdx < 0) return null;
@@ -1382,7 +1452,8 @@
   function scoreDayForChart(opts) {
     opts = opts || {};
     const natal = opts.pillars || [];
-    const purpose = PURPOSE_OFFICERS[opts.purpose] ? opts.purpose : 'personal';
+    const purpose = DATE_OBJECTIVES[opts.purpose] ? opts.purpose : 'personal';
+    const obj = DATE_OBJECTIVES[purpose];
     const r = calcBaziAccurate({
       year: opts.year, month: opts.month, day: opts.day, hour: 12,
       tzOffsetMinutes: opts.tzOffsetMinutes,
@@ -1404,77 +1475,131 @@
     const clashYear = natalYearIdx >= 0 && CLASH[natalYearIdx] === dIdx;
     const clashDay  = natalDayIdx  >= 0 && CLASH[natalDayIdx]  === dIdx;
 
+    const sideZh = function (side) { return side === 'year' ? '年' : '日'; };
+    const sideTh = function (side) { return side === 'year' ? 'ปี' : 'วัน'; };
+
     if (clashYear) {
       score -= 45;
       reasons.push({ code: 'clash-year', good: false,
-        en: 'Clashes your year animal (冲太岁)', zh: '冲你的生肖太岁', th: 'ชงปีนักษัตรของคุณ (冲太岁)' });
+        en: 'Clashes your year animal (冲太岁)', zh: '冲你的生肖太岁', th: 'ชงปีนักษัตรของคุณ (冲太岁)',
+        short: { en: 'Clashes you', zh: '冲太岁', th: 'ชงคุณ' },
+        hint: { en: 'This day’s animal sits opposite yours on the zodiac wheel. Practitioners never use it for anything important.',
+                zh: '当日生肖与你的生肖正对相冲，择日时凡事避开。',
+                th: 'นักษัตรของวันนี้อยู่ตรงข้ามกับของคุณ ซินแสจะไม่ใช้วันนี้ทำเรื่องสำคัญ' } });
     }
     if (clashDay) {
       score -= 30;
       reasons.push({ code: 'clash-day', good: false,
-        en: 'Clashes your Day pillar', zh: '冲你的日柱', th: 'ชงเสาวันของคุณ' });
+        en: 'Clashes your Day pillar', zh: '冲你的日柱', th: 'ชงเสาวันของคุณ',
+        short: { en: 'Clashes Day pillar', zh: '冲日柱', th: 'ชงเสาวัน' },
+        hint: { en: 'Your Day pillar stands for you and your closest bond; a clash here brings friction and second thoughts.',
+                zh: '日柱代表你自己与伴侣，逢冲易起摩擦、反复。',
+                th: 'เสาวันแทนตัวคุณและคนใกล้ชิด การชงทำให้เกิดแรงเสียดทานและลังเล' } });
     }
+    const note = officer ? OFFICER_NOTE[officer.idx] : null;
     if (officer && officer.quality === 'bad') {
       score -= officer.idx === 6 ? 25 : 12;
       reasons.push({ code: 'officer-bad', good: false,
         en: officer.char + ' ' + officer.en + ' day — poor for starting things',
-        zh: officer.zh + '——不宜起事', th: 'วัน' + officer.char + ' — ไม่เหมาะเริ่มงาน' });
+        zh: officer.zh + '——不宜起事', th: 'วัน' + officer.char + ' — ไม่เหมาะเริ่มงาน',
+        short: { en: officer.char + ' ' + officer.en, zh: officer.zh, th: 'วัน' + officer.char },
+        hint: { en: 'The almanac’s ' + officer.en + ' officer: ' + note.en + '.', zh: '建除十二神之' + officer.zh + '：' + note.zh + '。', th: note.th } });
     } else if (officer && officer.quality === 'good') {
       score += 12;
       reasons.push({ code: 'officer-good', good: true,
-        en: officer.char + ' ' + officer.en + ' day — sound in the almanac',
-        zh: officer.zh + '——黄历吉日', th: 'วัน' + officer.char + ' — เป็นวันดีตามปฏิทิน' });
+        en: officer.char + ' ' + officer.en + ' day — a lucky almanac day',
+        zh: officer.zh + '——黄道吉日', th: 'วัน' + officer.char + ' — วันดีตามปฏิทิน',
+        short: { en: officer.char + ' ' + officer.en + ' day', zh: officer.zh, th: 'วัน' + officer.char },
+        hint: { en: 'One of the six lucky day officers in the Chinese almanac: ' + note.en + '.', zh: '黄道六吉之一：' + note.zh + '。', th: 'หนึ่งในหกวันดีของปฏิทินจีน: ' + note.th } });
     }
-    if (officer && PURPOSE_OFFICERS[purpose].indexOf(officer.idx) >= 0 && officer.quality !== 'bad') {
+    // "For you" has no undertaking to fit, so only real objectives earn this.
+    if (purpose !== 'personal' && officer && obj.officers.indexOf(officer.idx) >= 0 && officer.quality !== 'bad') {
       score += 10;
-      const lbl = PURPOSE_LABEL[purpose] || PURPOSE_LABEL.personal;
       reasons.push({ code: 'purpose-fit', good: true,
-        en: 'Suits ' + lbl.en, zh: '宜' + lbl.zh, th: 'เหมาะกับ' + lbl.th });
+        en: 'Suits ' + obj.en, zh: '宜' + obj.zh, th: 'เหมาะกับ' + obj.th,
+        short: { en: 'Suits ' + obj.en, zh: '宜' + obj.zh, th: 'เหมาะกับ' + obj.th },
+        hint: { en: 'The almanac lists ' + officer.char + ' ' + officer.en + ' days among the classic dates for ' + obj.en + '.',
+                zh: '黄历中' + officer.zh + '正是' + obj.zh + '所宜。',
+                th: 'ปฏิทินจีนถือว่าวัน' + officer.char + 'เป็นวันคลาสสิกสำหรับ' + obj.th } });
     }
 
     [[natalYearIdx, 'year'], [natalDayIdx, 'day']].forEach(function (pair) {
       const idx = pair[0];
+      const side = pair[1];
       if (idx < 0) return;
       if (COMBINE[idx] === dIdx) {
         score += 12;
-        reasons.push({ code: 'combine-' + pair[1], good: true,
-          en: 'Six Harmony with your ' + pair[1] + ' branch (六合)',
-          zh: '与你的' + (pair[1] === 'year' ? '年' : '日') + '支六合',
-          th: 'เข้ากับเสา' + (pair[1] === 'year' ? 'ปี' : 'วัน') + 'ของคุณ (六合)' });
+        reasons.push({ code: 'combine-' + side, good: true,
+          en: 'Six Harmony with your ' + side + ' branch (六合)',
+          zh: '与你的' + sideZh(side) + '支六合',
+          th: 'เข้ากับเสา' + sideTh(side) + 'ของคุณ (六合)',
+          short: { en: 'Pairs with you', zh: '六合', th: 'เข้าคู่กับคุณ' },
+          hint: { en: 'This day’s animal is the natural partner of your ' + side + ' animal — people and plans tend to meet you halfway.',
+                  zh: '当日地支与你的' + sideZh(side) + '支相合，人事易于配合。',
+                  th: 'นักษัตรของวันนี้เป็นคู่ของนักษัตร' + sideTh(side) + 'คุณ ผู้คนและแผนงานมักเป็นใจ' } });
       } else if (inThreeHarmony(idx, dIdx)) {
         score += 9;
-        reasons.push({ code: 'harmony-' + pair[1], good: true,
-          en: 'Three Harmony with your ' + pair[1] + ' branch (三合)',
-          zh: '与你的' + (pair[1] === 'year' ? '年' : '日') + '支三合',
-          th: 'สามประสานกับเสา' + (pair[1] === 'year' ? 'ปี' : 'วัน') + 'ของคุณ (三合)' });
+        reasons.push({ code: 'harmony-' + side, good: true,
+          en: 'Three Harmony with your ' + side + ' branch (三合)',
+          zh: '与你的' + sideZh(side) + '支三合',
+          th: 'สามประสานกับเสา' + sideTh(side) + 'ของคุณ (三合)',
+          short: { en: 'In harmony', zh: '三合', th: 'สามประสาน' },
+          hint: { en: 'This day’s animal is in the same harmony trio as your ' + side + ' animal — a cooperative, easy-going day for you.',
+                  zh: '当日地支与你的' + sideZh(side) + '支同属三合局，气场协调。',
+                  th: 'นักษัตรของวันนี้อยู่กลุ่มสามประสานเดียวกับนักษัตร' + sideTh(side) + 'คุณ เป็นวันที่ร่วมมือกันง่าย' } });
       }
       if (HARM[idx] === dIdx) {
         score -= 8;
-        reasons.push({ code: 'harm-' + pair[1], good: false,
-          en: 'Harm with your ' + pair[1] + ' branch (六害)', zh: '与你的支相害', th: 'เป็นโทษกับเสาของคุณ (六害)' });
+        reasons.push({ code: 'harm-' + side, good: false,
+          en: 'Harm with your ' + side + ' branch (六害)', zh: '与你的' + sideZh(side) + '支相害', th: 'เป็นโทษกับเสา' + sideTh(side) + 'ของคุณ (六害)',
+          short: { en: 'Friction', zh: '六害', th: 'ขัดแย้ง' },
+          hint: { en: 'A quiet friction pairing with your chart — double-check messages and watch for misunderstandings.',
+                  zh: '与命盘暗中相害，留意沟通误会。',
+                  th: 'คู่ที่ขัดกันเงียบๆ กับดวงคุณ ตรวจข้อความให้ดีและระวังการเข้าใจผิด' } });
       }
       if (isPunish(idx, dIdx)) {
         score -= 8;
-        reasons.push({ code: 'punish-' + pair[1], good: false,
-          en: 'Punishment with your ' + pair[1] + ' branch (相刑)', zh: '与你的支相刑', th: 'ต้องโทษกับเสาของคุณ (相刑)' });
+        reasons.push({ code: 'punish-' + side, good: false,
+          en: 'Punishment with your ' + side + ' branch (相刑)', zh: '与你的' + sideZh(side) + '支相刑', th: 'ต้องโทษกับเสา' + sideTh(side) + 'ของคุณ (相刑)',
+          short: { en: 'Punishment', zh: '相刑', th: 'ต้องโทษ' },
+          hint: { en: 'A punishment pairing with your chart — delays and small mistakes are more likely, so leave margin.',
+                  zh: '与命盘相刑，易有延误差错，宜留余地。',
+                  th: 'คู่ต้องโทษกับดวงคุณ มีโอกาสล่าช้าหรือผิดพลาดเล็กๆ ควรเผื่อเวลา' } });
       }
     });
 
-    if (nobleBranches.indexOf(dIdx) >= 0) {
-      score += 14;
+    const isNoble = nobleBranches.indexOf(dIdx) >= 0;
+    if (isNoble) {
+      score += obj.noble ? 20 : 14;
       reasons.push({ code: 'noble', good: true,
-        en: 'Nobleman day (天乙贵人) — helpful people', zh: '天乙贵人日——贵人相助', th: 'วันกุ้ยเหริน (天乙贵人) — มีคนช่วย' });
+        en: 'Nobleman day (天乙贵人) — helpful people', zh: '天乙贵人日——贵人相助', th: 'วันกุ้ยเหริน (天乙贵人) — มีคนช่วย',
+        short: { en: 'Helpful people', zh: '贵人日', th: 'มีคนช่วย' },
+        hint: obj.noble
+          ? { en: 'Your Nobleman star falls on this day. Clients, bosses and decision-makers are more inclined to help — exactly what ' + obj.en + ' needs.',
+              zh: '你的天乙贵人落在这天，客户、上司、决策者更愿相助——正合' + obj.zh + '。',
+              th: 'ดาวกุ้ยเหรินของคุณตกวันนี้ ลูกค้า หัวหน้า และผู้ตัดสินใจมีแนวโน้มช่วย ซึ่งสำคัญมากสำหรับ' + obj.th }
+          : { en: 'Your Nobleman star falls on this day — mentors and people in a position to help are more inclined to.',
+              zh: '你的天乙贵人落在这天，易得长辈、贵人相助。',
+              th: 'ดาวกุ้ยเหรินของคุณตกวันนี้ ผู้ใหญ่และคนที่ช่วยได้มีแนวโน้มช่วยคุณ' } });
     }
 
     const dayEl = dayP.stem ? dayP.stem.element : null;
     if (dayEl && fav.favorable.indexOf(dayEl) >= 0) {
       score += 12;
       reasons.push({ code: 'element-good', good: true,
-        en: dayEl + ' day — your favourable element', zh: (EL_ZH[dayEl] || dayEl) + '日——正是你的喜用', th: 'วันธาตุ' + dayEl + ' — ธาตุที่คุณต้องการ' });
+        en: dayEl + ' day — your favourable element', zh: (EL_ZH[dayEl] || dayEl) + '日——正是你的喜用', th: 'วันธาตุ' + dayEl + ' — ธาตุที่คุณต้องการ',
+        short: { en: dayEl + ' boost', zh: '喜用' + (EL_ZH[dayEl] || dayEl), th: 'เสริมธาตุ' + dayEl },
+        hint: { en: dayEl + ' is one of the elements your chart is short of, so the day’s energy props you up.',
+                zh: (EL_ZH[dayEl] || dayEl) + '正是你命盘所需，当天气场扶你一把。',
+                th: 'ธาตุ' + dayEl + 'เป็นธาตุที่ดวงคุณขาด พลังของวันจึงช่วยหนุนคุณ' } });
     } else if (dayEl && fav.unfavorable.indexOf(dayEl) >= 0) {
       score -= 8;
       reasons.push({ code: 'element-bad', good: false,
-        en: dayEl + ' day — works against your balance', zh: (EL_ZH[dayEl] || dayEl) + '日——于你不宜', th: 'วันธาตุ' + dayEl + ' — ไม่เข้ากับสมดุลของคุณ' });
+        en: dayEl + ' day — works against your balance', zh: (EL_ZH[dayEl] || dayEl) + '日——于你不宜', th: 'วันธาตุ' + dayEl + ' — ไม่เข้ากับสมดุลของคุณ',
+        short: { en: 'Too much ' + dayEl, zh: (EL_ZH[dayEl] || dayEl) + '过旺', th: 'ธาตุ' + dayEl + 'มากไป' },
+        hint: { en: dayEl + ' adds to what your chart already has plenty of — you may tire faster or overreach.',
+                zh: (EL_ZH[dayEl] || dayEl) + '是你命盘已偏多之气，当天易疲或用力过猛。',
+                th: 'ธาตุ' + dayEl + 'มีมากในดวงคุณอยู่แล้ว อาจเหนื่อยง่ายหรือทำเกินตัว' } });
     }
 
     score = Math.max(0, Math.min(100, Math.round(score)));
@@ -1491,7 +1616,8 @@
       tier: tier,
       clashYear: clashYear,
       clashDay: clashDay,
-      noble: nobleBranches.indexOf(dIdx) >= 0,
+      noble: isNoble,
+      note: note,
       reasons: reasons,
     };
   }
@@ -1529,6 +1655,7 @@
     getNatalNobles, getPeachBlossom, analyzeNowOverlay,
     pairBranchRelations, scoreLovePair, branchRelation, elementLink,
     THREE_HARMONY,
-    DAY_OFFICERS, dayOfficer, favorableElements, scoreDayForChart, bestDatesInMonth,
+    DAY_OFFICERS, OFFICER_NOTE, DATE_OBJECTIVES, DATE_OBJECTIVE_GROUPS,
+    dayOfficer, favorableElements, scoreDayForChart, bestDatesInMonth,
   };
 }));

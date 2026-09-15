@@ -160,6 +160,11 @@ The Four Pillars row renders **Hour → Day → Month → Year** (traditional ri
 
 Fixtures: `npm test` (`test/bazi-engine.test.js`) vs lunar-javascript / BaZi Lab 排盘 (no true solar time).
 
+### Power Days 择日 (updated 2026-09-15)
+- Engine: `DATE_OBJECTIVE_GROUPS` (For you · Business · Career · Love & family · Home & travel · Wellbeing) → `DATE_OBJECTIVES` (pitch, negotiate, contract, launch, business, job, startjob, raise, study, date, propose, wedding, reconcile, travel, move, renovate, purchase, health, declutter, newlook, personal). Each lists the 建除 officers it favours; `noble: true` objectives weight 天乙贵人 days +20 instead of +14.
+- `scoreDayForChart` reasons carry `short` and `hint` ({en,zh,th}) so the UI can explain each ✓/✕ in plain words. `personal` never earns `purpose-fit`.
+- UI (Actions tab, right after Today's Action Plan): category tabs → objective chips → "Best dates for X" (top 3 in the next 8 weeks, as columns) → explained date card → pageable month grid (12 months). Outfit guide sits last on the Actions tab.
+
 ### Hash routing (SPA)
 - `/` landing
 - `/#input` birth form (prefilled from `localStorage` `wobazi_chart_v1`)
