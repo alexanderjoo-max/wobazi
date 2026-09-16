@@ -21,8 +21,13 @@ async function main() {
   const startTime = Date.now();
   console.log(`[Worker] Starting batch-worker at ${new Date().toISOString()}`);
 
-  // Connect to the same database
+  // Connect to the same database (production must use the persistent disk; never fall back to ephemeral storage)
+  if (!process.env.DB_PATH && (process.env.RENDER === 'true' || process.env.NODE_ENV === 'production' || (process.env.BASE_URL || '').startsWith('https'))) {
+    console.error('[Worker] FATAL: DB_PATH is not set in production. Refusing to start.');
+    process.exit(1);
+  }
   const db = new Database(process.env.DB_PATH || path.join(__dirname, 'wobazi.db'));
+  console.log(`[Worker] Database: ${db.name}`);
   db.pragma('journal_mode = WAL');
 
   // Ensure table exists

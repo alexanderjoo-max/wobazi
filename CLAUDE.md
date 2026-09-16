@@ -27,7 +27,8 @@ node batch-worker.js  # Run daily reading batch manually
 - `BATCH_SECRET` — Protects the manual batch trigger endpoint
 - `BASE_URL` — Server URL (defaults to http://localhost:3000)
 - `PORT` — Server port (defaults to 3000)
-- `DB_PATH` — SQLite file path (defaults to `./wobazi.db`). On Render, point it at a persistent disk (e.g. `/var/data/wobazi.db`) or every deploy starts with an empty database while cookie sessions survive.
+- `DB_PATH` — SQLite file path. Local dev defaults to `./wobazi.db`. In production (`RENDER=true`, `NODE_ENV=production`, or an https `BASE_URL`) `server.js` and `batch-worker.js` refuse to start without it. On Render it is `/var/data/wobazi.db` (1 GB persistent disk).
+- `R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_BUCKET` — Litestream backup target (Cloudflare R2), read only by `litestream.yml`.
 
 ## Project Structure
 ```
@@ -62,7 +63,16 @@ public/                Static assets for SEO pages
   - Indexed on (user_id, date) for fast lookup
   - One record per user per day
 
-## Batch System (NEW — added 2026-03-18)
+## Backups — Litestream (added 2026-09-16)
+- Render Build Command downloads a pinned, checksum-verified Litestream (v0.5.17, linux x86_64) into `./bin/`. Start Command: `./bin/litestream replicate -config litestream.yml -restore-if-db-not-exists -exec "npm start"` (`npm start` is unchanged).
+- `litestream.yml` expands every value from the environment (no secrets in the file). Replica: `s3://$R2_BUCKET/wobazi.db` on R2. Snapshot every 24h, restore points kept 7 days. Litestream owns WAL checkpoints; the app keeps WAL mode + better-sqlite3's default 5s busy timeout.
+- `-restore-if-db-not-exists`: if the disk file is missing at boot, restore from R2 before the app starts instead of creating an empty database.
+- Two layers: Render disk snapshots + Litestream to R2.
+- Restore (Render Shell): `cd /opt/render/project/src && ./bin/litestream restore -config litestream.yml -o /var/data/restored.db -integrity-check full "$DB_PATH"`, check it, move `wobazi.db*` and `.wobazi.db-litestream` aside, rename `restored.db` → `wobazi.db`, restart the service.
+
+## Batch System (NOT MOUNTED — added 2026-03-18)
+
+> Status 2026-09-16: `server.js` does **not** call `require('./batch').mount(app, db)`, so no cron runs, the batch routes don't exist, and there is no `daily_readings` table in production. The frontend doesn't call `/api/daily-reading`. Mounting it is a separate post-launch decision: node-cron uses server time (UTC on Render, so "midnight" = 07:00 Bangkok) and dates are UTC; a separate Render Cron Job cannot reach this service's disk.
 
 ### What it does
 Generates personalized daily BaZi readings for every active user using DeepSeek V3.2 (Gemini 2.0 Flash fallback). Processes users in batches of 10 with 1-second delays.

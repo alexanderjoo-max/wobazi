@@ -1,0 +1,17 @@
+# Litestream: continuous backup of the production SQLite database to Cloudflare R2.
+# Every value comes from Render's environment at startup; no credentials live in this file.
+# Started by Render's Start Command: ./bin/litestream replicate -config litestream.yml -exec "npm start"
+snapshot:
+  interval: 24h
+  retention: 168h   # keep 7 days of restore points
+
+dbs:
+  - path: ${DB_PATH}
+    replica:
+      type: s3
+      bucket: ${R2_BUCKET}
+      path: wobazi.db
+      endpoint: https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
+      region: auto
+      access-key-id: ${R2_ACCESS_KEY_ID}
+      secret-access-key: ${R2_SECRET_ACCESS_KEY}

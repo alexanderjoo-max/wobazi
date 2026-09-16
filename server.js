@@ -19,6 +19,11 @@ const PORT = process.env.PORT || 3000;
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
 /* ── SQLite Database ── */
+// Production must use the persistent disk: without DB_PATH the file would land on ephemeral storage and be wiped on deploy.
+if (!process.env.DB_PATH && (process.env.RENDER === 'true' || process.env.NODE_ENV === 'production' || BASE_URL.startsWith('https'))) {
+  console.error('[db] FATAL: DB_PATH is not set in production. Set it to the persistent disk path (e.g. /var/data/wobazi.db). Refusing to start.');
+  process.exit(1);
+}
 const db = new Database(process.env.DB_PATH || path.join(__dirname, 'wobazi.db'));
 db.pragma('journal_mode = WAL');
 
@@ -856,9 +861,6 @@ app.listen(PORT, () => {
   try {
     const count = t => db.prepare(`SELECT COUNT(*) AS n FROM ${t}`).get().n;
     console.log(`[db] ${db.name} · ${count('users')} users · ${count('reading_snapshots')} saved readings`);
-    if (isProduction && !process.env.DB_PATH) {
-      console.warn('[db] WARNING: DB_PATH is not set — the database is on temporary storage and is wiped on every deploy.');
-    }
   } catch (err) {
     console.error('[db] Could not read database stats:', err.message);
   }
