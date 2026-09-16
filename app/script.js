@@ -1297,7 +1297,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
 
   // Today / You tab new sections
   renderLifeAreas(fortune, heroIsCompat, heroIsClash);
-  renderInsightCards(_t(heroMsgEn, heroMsgZh), fortune, dominantEl);
+  renderInsightCards(_t(heroMsgEn, heroMsgZh, heroMsgTh), fortune, dominantEl);
   renderActionsPreview({ title: 'Loading…', title_zh: '加载中…' }, 'Loading…', '加载中…', 'Loading…', '加载中…');
 
   // Fetch AI-generated daily guidance
@@ -1497,6 +1497,7 @@ function renderChartBasis() {
   const s = a.solar;
   const dateEn = `${s.day} ${MON[s.month - 1]} ${s.year}`;
   const dateZh = `${s.year}年${s.month}月${s.day}日`;
+  const dateTh = new Date(Date.UTC(s.year, s.month - 1, s.day)).toLocaleDateString('th-TH-u-ca-gregory', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   const time = s.hour == null ? '' : ` · ${pad(s.hour)}:${pad(s.minute || 0)}`;
   const timeUnk = s.hour == null ? _t(' · time unknown', ' · 时辰未知', ' · ไม่ทราบเวลา') : '';
   let cal = _t('Solar', '阳历', 'สุริยคติ');
@@ -1515,7 +1516,7 @@ function renderChartBasis() {
     else if (a.twin.reason === 'needs_time') how = _t(' · add birth time to apply', ' · 需填写出生时间', ' · กรุณาระบุเวลาเกิด');
     twin = ` · ${order}${how}`;
   }
-  el.innerHTML = `${_t('Chart for', '命盘', 'แผนภูมิของ')} <strong>${_t(dateEn, dateZh, dateEn)}${time}</strong>${timeUnk} · ${cal}${twin}`;
+  el.innerHTML = `${_t('Chart for', '命盘', 'แผนภูมิของ')} <strong>${_t(dateEn, dateZh, dateTh)}${time}</strong>${timeUnk} · ${cal}${twin}`;
 }
 
 function renderTenGods(profile, pillars) {
@@ -1531,13 +1532,15 @@ function renderTenGods(profile, pillars) {
   const maxAxis = Math.max(33.3, ...profile.list.map(g => g.percent));
   list.innerHTML = profile.list.map((g, i) => {
     const fam = (g.family === 'peer' || g.family === 'resource') ? 'fam-peer' : 'fam-power';
-    const loc = (g.sources || []).slice(0, 4).map(s => s.pillar + ' ' + s.char).join(', ');
+    const PILLAR_NAME = { Year: ['年', 'ปี'], Month: ['月', 'เดือน'], Day: ['日', 'วัน'], Hour: ['时', 'ชั่วโมง'] };
+    const locIn = li => (g.sources || []).slice(0, 4).map(s => (li < 0 ? s.pillar : (PILLAR_NAME[s.pillar] || [])[li] || s.pillar) + ' ' + s.char);
+    const loc = locIn(-1).join(', ');
     const meaning = g.meaning || {};
     const how = loc
-      ? _t('Shows up in ' + loc + '.', '出现在：' + loc + '。', 'ปรากฏที่ ' + loc)
+      ? _t('Shows up in ' + loc + '.', '出现在：' + locIn(0).join('、') + '。', 'ปรากฏที่ ' + locIn(1).join(', '))
       : '';
     return `<div class="tengods-row${g.percent === 0 ? ' is-zero' : ''}" onclick="toggleTenGod(this)">
-      <div class="tengods-name">${g.en}<span class="tg-zh">${g.zh}</span></div>
+      <div class="tengods-name">${_t(`${g.en}<span class="tg-zh">${g.zh}</span>`, g.zh, `${g.th || g.en}<span class="tg-zh">${g.zh}</span>`)}</div>
       <div class="tengods-bar-track"><div class="tengods-bar-fill ${fam}" style="width:${Math.min(100, (g.percent / maxAxis) * 100)}%"></div></div>
       <div class="tengods-pct">${g.percent}%</div>
       <div class="tengods-detail hide">${_t(meaning.en || '', meaning.zh || '', meaning.th || '')}${how ? ' ' + how : ''}</div>
@@ -1569,9 +1572,12 @@ function renderNowOverlays(pillars, dayMaster) {
   const mLabel = `${mStem.char}${mBr.char}`;
   const kindLine = (line, whenEn, whenZh, whenTh, stem, br) => {
     const who = stem && br ? `${stem.char}${br.char} ${stem.element} ${br.animal}` : '';
-    if (line && line.kind === 'strengthen') return _t(whenEn + ' strengthens ' + line.el + (who ? ' — ' + who : '') + '.', whenZh + '生助' + (EL_ZH[line.el] || line.el) + (who ? '（' + who + '）' : '') + '。', whenTh + 'เสริมพลัง' + line.el + (who ? ' — ' + who : ''));
-    if (line && line.kind === 'drain') return _t(whenEn + ' drains ' + line.el + (who ? ' — ' + who : '') + '.', whenZh + '泄/克' + (EL_ZH[line.el] || line.el) + (who ? '（' + who + '）' : '') + '。', whenTh + 'ถอน' + line.el + (who ? ' — ' + who : ''));
-    return _t(whenEn + ' sits as ' + (who || 'a mixed month') + ' beside your Day Master.', whenZh + '为' + (who || '驳杂') + '，与日主并立。', whenTh + 'คือ ' + (who || 'ผสม') + ' ข้างวันมาสเตอร์');
+    const whoZh = stem && br ? `${stem.char}${br.char} ${EL_ZH[stem.element] || ''}${ANIMAL_ZH[br.animal] || ''}` : '';
+    const whoTh = stem && br ? `${stem.char}${br.char} ${ANIMAL_TH[br.animal] || br.animal}${EL_TH[stem.element] || stem.element}` : '';
+    const elTh = line ? (EL_TH[line.el] || line.el) : '';
+    if (line && line.kind === 'strengthen') return _t(whenEn + ' strengthens ' + line.el + (who ? ' — ' + who : '') + '.', whenZh + '生助' + (EL_ZH[line.el] || line.el) + (whoZh ? '（' + whoZh + '）' : '') + '。', whenTh + 'เสริมพลังธาตุ' + elTh + (whoTh ? ' — ' + whoTh : ''));
+    if (line && line.kind === 'drain') return _t(whenEn + ' drains ' + line.el + (who ? ' — ' + who : '') + '.', whenZh + '泄/克' + (EL_ZH[line.el] || line.el) + (whoZh ? '（' + whoZh + '）' : '') + '。', whenTh + 'ถอนพลังธาตุ' + elTh + (whoTh ? ' — ' + whoTh : ''));
+    return _t(whenEn + ' sits as ' + (who || 'a mixed month') + ' beside your Day Master.', whenZh + '为' + (whoZh || '驳杂') + '，与日主并立。', whenTh + 'คือ ' + (whoTh || 'ผสม') + ' ข้างวันมาสเตอร์');
   };
   const clashNote = o.clashMonth
     ? _t(' This month clashes a natal branch.', ' 本月冲本命地支。', ' เดือนนี้ชงกิ่งกำเนิด')
@@ -1606,7 +1612,7 @@ function renderNobleCard(pillars) {
   const n = BaziEngine.getNatalNobles(pillars);
   const animals = (n.tianyiBranches || []).map(b => _t(b.animal, ANIMAL_ZH[b.animal] || b.animal)).join(' · ');
   const hits = (n.tianyi || []).map(h =>
-    `<span class="noble-chip">${_t(h.pillar, h.pillar)} · ${h.branch}${_t(' ' + h.animal, ANIMAL_ZH[h.animal] || '')}</span>`
+    `<span class="noble-chip">${_t(h.pillar)} · ${h.branch}${_t(' ' + h.animal, ANIMAL_ZH[h.animal] || '')}</span>`
   ).join('');
   const extra = [];
   if (n.yuede) extra.push(`${_t('Moon Virtue 月德', '月德贵人', '月德')} ${n.yuede.stem}${n.yuede.present ? _t(' — in this chart', ' — 入盘', ' — ในแผนนี้') : _t(' — not in the four pillars', ' — 未入四柱', ' — ไม่อยู่ในสี่เสา')}`);
@@ -2311,6 +2317,10 @@ function renderYinYang(pillars) {
     : yangPct > 65 ? '阳气充足，行动力强，外向而积极。'
     : '阴阳均衡，难得的平衡之气，内外兼修。';
 
+  const sumTh = yinPct > 65 ? 'หยินเด่นชัด — มีสัญชาตญาณดี เปิดรับ และให้ความสำคัญกับโลกภายใน'
+    : yangPct > 65 ? 'หยางเด่นชัด — มุ่งลงมือทำ แสดงออก และเปิดรับโลกภายนอก'
+    : 'สมดุลดี — ความสมดุลระหว่างหยินและหยางที่หาได้ยากและทรงพลัง';
+
   document.getElementById('yinyang-card').innerHTML = `
     <div class="yinyang-card">
       <div class="yy-row">
@@ -2333,6 +2343,7 @@ function renderYinYang(pillars) {
       </div>
       <div class="yy-summary en">${summary}</div>
       <div class="yy-summary zh hide">${sumZh}</div>
+      <div class="yy-summary th hide">${sumTh}</div>
     </div>`;
 
   setTimeout(() => {
@@ -2756,6 +2767,7 @@ function renderWorkSection(animal, elements, forecast2026) {
         <div class="love-tier-label" style="color:${tier.color}">${_t(tier.label, tier.zh)}</div>
         <div class="love-sublabel en">Your 2026 career momentum</div>
         <div class="love-sublabel zh hide">${tier.zh} · 2026年事业运</div>
+        <div class="love-sublabel th hide">แรงส่งด้านการงานของคุณในปี 2026</div>
       </div>
       <div class="love-archetype" style="border-color:${elColor}25">
         <div class="love-archetype-emoji">${ca.icon}</div>
@@ -2766,7 +2778,7 @@ function renderWorkSection(animal, elements, forecast2026) {
         </div>
       </div>
       <div class="love-months-wrap">
-        <div class="love-months-label">Monthly Career Forecast · 月份事业运</div>
+        <div class="love-months-label">${_t('Monthly Career Forecast · 月份事业运', '月份事业运', 'พยากรณ์การงานรายเดือน · 月份事业运')}</div>
         <div class="love-months-strip" id="work-months-strip">
           <div class="love-months-row">${monthlyHTML}</div>
         </div>
@@ -2958,8 +2970,8 @@ function renderLoveSection(animal, elements, overall2026) {
     return `<div class="love-soul-card" style="border-left:3px solid ${col}">
       ${makeMedallion(a, col, 'pillar-med')}
       <div class="love-soul-info">
-        <div class="love-soul-name" style="color:${col}">${a}</div>
-        <div class="love-soul-note">"${note}"</div>
+        <div class="love-soul-name" style="color:${col}">${_t(a)}</div>
+        <div class="love-soul-note">"${_t(note)}"</div>
         <div class="love-soul-years">${years.map(y=>`<span class="love-soul-year">${y}</span>`).join('')}</div>
       </div>
     </div>`;
@@ -2968,7 +2980,7 @@ function renderLoveSection(animal, elements, overall2026) {
   /* Clash chips */
   const clashHTML = zData.clash.map(a =>
     `<div class="love-clash-chip">
-      <svg viewBox="0 0 100 100" width="14" height="14" style="color:rgba(255,255,255,0.35)">${ANIMAL_SVGS[a]||''}</svg>${a}
+      <svg viewBox="0 0 100 100" width="14" height="14" style="color:rgba(255,255,255,0.35)">${ANIMAL_SVGS[a]||''}</svg>${_t(a)}
     </div>`
   ).join('');
 
@@ -2998,6 +3010,7 @@ function renderLoveSection(animal, elements, overall2026) {
         <div class="love-tier-label" style="color:${tier.color}">${_t(tier.label, tier.zh)}</div>
         <div class="love-sublabel en">Chance of a meaningful connection in 2026</div>
         <div class="love-sublabel zh hide">${tier.zh} · 2026年情感运势</div>
+        <div class="love-sublabel th hide">โอกาสพบความสัมพันธ์ที่มีความหมายในปี 2026</div>
       </div>
 
       <div class="love-archetype" style="border-color:${elColor}25">
@@ -3019,7 +3032,7 @@ function renderLoveSection(animal, elements, overall2026) {
       </div>
 
       <div class="love-months-wrap">
-        <div class="love-months-label">Monthly Love Forecast · 月份情感运</div>
+        <div class="love-months-label">${_t('Monthly Love Forecast · 月份情感运', '月份情感运', 'พยากรณ์ความรักรายเดือน · 月份情感运')}</div>
         <div class="love-months-strip">
           <div class="love-months-row">${monthlyHTML}</div>
         </div>
@@ -3593,6 +3606,7 @@ function render2026Fortune(animal, elements, preCalc = null) {
 
   const levelEn = overall >= 75 ? 'Auspicious Year ✦' : overall >= 55 ? 'Steady Year' : 'Challenging Year';
   const levelZh = overall >= 75 ? '大吉之年 ✦'        : overall >= 55 ? '平稳之年'    : '多磨之年';
+  const levelTh = overall >= 75 ? 'ปีมงคล ✦'          : overall >= 55 ? 'ปีที่มั่นคง'   : 'ปีที่ท้าทาย';
 
   const insightEn = overall >= 75
     ? `The Fire Horse's blazing momentum aligns strongly with your chart. 2026 rewards your boldest moves — especially mid-year when Fire peaks. Lean in hard.`
@@ -3604,6 +3618,11 @@ function render2026Fortune(animal, elements, preCalc = null) {
     : overall >= 55
     ? `2026年喜忧参半，夏季发力，冬季蓄势，以稳健一致贯穿全年。`
     : `火马年能量对你的命盘有压力，以耐心、谋略为主，避免冒进，以长远视角稳步前行。`;
+  const insightTh = overall >= 75
+    ? `แรงส่งอันร้อนแรงของปีม้าไฟสอดคล้องกับแผนภูมิของคุณอย่างมาก ปี 2026 ให้ผลดีแก่การตัดสินใจที่กล้าหาญที่สุด โดยเฉพาะช่วงกลางปีที่ธาตุไฟมีกำลังสูงสุด ควรทุ่มเทอย่างเต็มที่`
+    : overall >= 55
+    ? `เป็นปีที่มีทั้งแรงผลักและแรงต้านจากพลังม้าไฟ ควรทุ่มเทในฤดูร้อนที่ธาตุไฟมีกำลังสูงสุด ดำเนินการอย่างระมัดระวังในฤดูหนาว และรักษาความสม่ำเสมอ`
+    : `พลังที่รุนแรงของปี 2026 อาจทำให้รู้สึกไม่มั่นคงเมื่อเทียบกับแผนภูมิของคุณ ควรให้ความสำคัญกับความอดทน การวางกลยุทธ์ และการมองระยะยาว มากกว่าการเสี่ยงอย่างหุนหันพลันแล่น ค่อย ๆ สร้าง อย่าเร่งรีบ`;
 
   const ASPECT_META = [
     { key:'career', label:'Career', label_zh:'事业', icon:'💼', color:'#8b5cf6' },
@@ -3633,7 +3652,7 @@ function render2026Fortune(animal, elements, preCalc = null) {
     <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="2.5" fill="#f0c040"/>
   </svg>
   <div class="forecast-spark-labels">
-    ${MLABELS.map(l => `<span>${l}</span>`).join('')}
+    ${MLABELS.map((l, i) => `<span>${_t(l, String(i + 1), String(i + 1))}</span>`).join('')}
   </div>
 </div>`;
 
@@ -3676,14 +3695,17 @@ function render2026Fortune(animal, elements, preCalc = null) {
         </div>
         <div class="forecast-label en">${levelEn}</div>
         <div class="forecast-label zh hide">${levelZh}</div>
+        <div class="forecast-label th hide">${levelTh}</div>
         <div class="forecast-sublabel en">Your 2026 Fortune Score</div>
         <div class="forecast-sublabel zh hide">2026年运势综合评分</div>
+        <div class="forecast-sublabel th hide">คะแนนดวงปี 2026 ของคุณ</div>
       </div>
       <div class="forecast-aspects">${aspectsHTML}</div>
       ${sparklineHTML}
       <div class="forecast-insight">
         <span class="en">${insightEn}</span>
         <div class="forecast-insight-zh zh hide">${insightZh}</div>
+        <span class="th hide">${insightTh}</span>
       </div>
     </div>`;
 
@@ -4024,7 +4046,7 @@ function renderOutfitSection(dominantEl, nowMonth) {
 
   const monthCards = months.map(m => `
     <div class="outfit-month-card${m.isCurrent ? ' outfit-current' : ''}">
-      <div class="outfit-month-label">${m.month}${m.isCurrent ? ` · ${_t('Now','当前')}` : ''}</div>
+      <div class="outfit-month-label">${_t(m.month)}${m.isCurrent ? ` · ${_t('Now','当前')}` : ''}</div>
       <div class="outfit-swatches-row">
         <div class="outfit-swatch" style="background:${m.hex}" title="${m.name}">
           <span class="outfit-swatch-name">${_t(m.name, m.name_zh || m.name)}</span>
@@ -4051,7 +4073,7 @@ function renderOutfitSection(dominantEl, nowMonth) {
     <div class="outfit-card">
       <div class="outfit-months-row">${monthCards}</div>
       <div class="outfit-el-tip" style="border-left-color:${elColor}">
-        <span class="outfit-el-icon">✦ ${_t(dominantEl + ' Element', dominantEl + ' 元素')}</span> — ${_t(elTips[dominantEl][0], elTips[dominantEl][1])}
+        <span class="outfit-el-icon">✦ ${_t(dominantEl + ' Element', (EL_ZH[dominantEl] || dominantEl) + ' 元素', 'ธาตุ' + (EL_TH[dominantEl] || dominantEl))}</span> — ${_t(elTips[dominantEl][0], elTips[dominantEl][1])}
       </div>
     </div>
   `;
@@ -4087,7 +4109,7 @@ function renderLuckyNumbers(year, month, day, animal, dominantEl) {
           ${genLottery().map(n => `<div class="lottery-ball">${n}</div>`).join('')}
         </div>
         <button class="lottery-btn" onclick="haptic(8); const w=document.getElementById('lottery-balls-wrap'); const picks=[]; while(picks.length<6){const n=Math.floor(Math.random()*49)+1;if(!picks.includes(n))picks.push(n);} picks.sort((a,b)=>a-b); w.innerHTML=picks.map(n=>'<div class=\\'lottery-ball\\'>' +n+ '</div>').join('');">
-          🎱 New Pick
+          🎱 ${_t('New Pick', '换一组', 'สุ่มใหม่')}
         </button>
       </div>
     </div>
@@ -4236,7 +4258,7 @@ function renderAuspiciousDates(animal, dominantEl, opts) {
     : _t(`No classic ${obj.en} date in the next 8 weeks — these are your strongest days instead`, `未来 8 周没有宜${obj.zh}的正日，以下是你最强的日子`, `ไม่มีวันหลักสำหรับ${obj.th}ใน 8 สัปดาห์ — นี่คือวันที่แข็งแรงที่สุดของคุณแทน`);
 
   /* Month grid */
-  const dayHeaders = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-header">${d}</div>`).join('');
+  const dayHeaders = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-header">${_t(d)}</div>`).join('');
   const blanks = Array(view.getDay()).fill('<div class="cal-day cal-blank"></div>').join('');
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const days = Array.from({ length: daysInMonth }, (_, i) => {
@@ -4411,7 +4433,7 @@ function renderLuckyFoods(dominantEl) {
       <div class="food-power-card" style="border-left-color:${elColor}">
         <div class="food-power-icon">⚡</div>
         <div>
-          <div class="food-power-label">${_t('Power Food · ' + dominantEl + ' Element', '核心食物 · ' + dominantEl + '元素')}</div>
+          <div class="food-power-label">${_t('Power Food · ' + dominantEl + ' Element', '核心食物 · ' + (EL_ZH[dominantEl] || dominantEl) + '元素', 'อาหารเสริมพลัง · ธาตุ' + (EL_TH[dominantEl] || dominantEl))}</div>
           <div class="food-power-name">${_t(foods.power, foods.power_zh)}</div>
           <div class="food-power-why">${_t(foods.powerWhy, foods.powerWhy_zh)}</div>
         </div>
@@ -4438,7 +4460,7 @@ function renderCrystals(dominantEl) {
     <div class="crystal-card" style="border-left-color:${elColor}">
       <div class="crystal-emoji">${s.emoji}</div>
       <div class="crystal-info">
-        <div class="crystal-name">${s.name}</div>
+        <div class="crystal-name">${_t(s.name)}</div>
         <div class="crystal-effect">${_t(s.effect, s.effect_zh)}</div>
         <div class="crystal-carry-badge">${_t('Carry', '携带')}: ${_t(s.carry, s.carry_zh)}</div>
       </div>
@@ -4509,10 +4531,10 @@ function renderKuaSection(kua, dominantEl) {
         <div class="kua-num-badge" style="color:${dirColor}">Kua ${kua}</div>
       </div>
       <div class="kua-info">
-        <div class="kua-dir-name" style="color:${dirColor}">${kuaData.dir} · ${kuaData.zh}</div>
+        <div class="kua-dir-name" style="color:${dirColor}">${_t(kuaData.dir + ' · ' + kuaData.zh, kuaData.zh, (window.WoBaziI18n && WoBaziI18n.lookup(kuaData.dir, 'th')) || kuaData.dir)}</div>
         <div class="kua-dir-label">${_t('Your optimal sleep direction', '你的最佳睡眠方向')}</div>
         <div class="kua-dir-desc">${_t(kuaData.desc, kuaData.desc_zh)}</div>
-        <div class="kua-tip">${_t('Point the top of your head toward', '睡眠时头顶朝向')} <strong>${_t(kuaData.dir, kuaData.zh)}</strong>${_t(' when sleeping. Even approximate alignment activates this qi.', '。即使大致对齐也能激活此气场。')}</div>
+        <div class="kua-tip">${_t('Point the top of your head toward', '睡眠时头顶朝向')} <strong>${_t(kuaData.dir, kuaData.zh)}</strong>${_t(' when sleeping. Even approximate alignment activates this qi.', '。即使大致对齐也能激活此气场。', ' แม้หันไปใกล้เคียงทิศนี้ก็ช่วยกระตุ้นชี่ได้')}</div>
       </div>
     </div>
   `;
@@ -4556,7 +4578,7 @@ function renderLifeDecades(year, dominantEl, luck, month0, day) {
     <div class="decades-card">
       <div class="decades-bar">${blocks}</div>
       <div class="decade-current-detail">
-        <span style="color:${elColor}">${_t('You are in the', '你正处于')} <strong>${_t(themes[currentDecadeIdx].phase, themes[currentDecadeIdx].phase_zh)}</strong> ${_t('phase', '阶段')}</span> (${_t('age','年龄')} ~${currentDecadeIdx*14}–${currentDecadeIdx*14+13}).
+        <span style="color:${elColor}">${_t('You are in the', '你正处于', 'ตอนนี้คุณอยู่ในช่วง')} <strong>${_t(themes[currentDecadeIdx].phase, themes[currentDecadeIdx].phase_zh)}</strong> ${_t('phase', '阶段', 'ของชีวิต')}</span> (${_t('age','年龄', 'อายุ')} ~${currentDecadeIdx*14}–${currentDecadeIdx*14+13}).
         <span class="decade-note-text">${_t(themes[currentDecadeIdx].note, themes[currentDecadeIdx].note_zh)}</span>
         <span class="decade-note-text">${_t('Add your gender on the birth form to see your real 10-year luck pillars — their direction depends on it.', '在出生信息中填写性别，即可查看真实的十年大运（顺逆排取决于性别）。', 'ระบุเพศในฟอร์มวันเกิดเพื่อดูเสาโชค 10 ปีจริง (ทิศทางขึ้นกับเพศ)')}</span>
       </div>
@@ -4602,7 +4624,7 @@ function renderLuckPillars(host, luck, year, month0, day) {
     const branchGod = current.branchGod ? godLabel(current.branchGod) : '';
     detail = `${_t('You are in', '当前大运', 'ตอนนี้อยู่ในวัยจร')} <strong>${current.stem.char}${current.branch.char}</strong>
       (${_t('age', '年龄', 'อายุ')} ${fmtAge(current.ageFrom)}–${fmtAge(current.ageTo) - 1}, ${current.startYear}–${current.endYear - 1}).
-      <span class="decade-note-text">${_t('Stem', '天干', 'ก้าน')} ${current.stem.char} ${current.stem.element}: ${godLabel(current.stemGod)}${branchGod ? ` · ${_t('Branch', '地支', 'กิ่ง')} ${current.branch.char} ${current.branch.animal}: ${branchGod}` : ''}</span>`;
+      <span class="decade-note-text">${_t('Stem', '天干', 'ก้าน')} ${current.stem.char} ${_t(current.stem.element, EL_ZH[current.stem.element], EL_TH[current.stem.element])}: ${godLabel(current.stemGod)}${branchGod ? ` · ${_t('Branch', '地支', 'กิ่ง')} ${current.branch.char} ${_t(current.branch.animal, ANIMAL_ZH[current.branch.animal], ANIMAL_TH[current.branch.animal])}: ${branchGod}` : ''}</span>`;
   } else {
     detail = _t(`Your first luck pillar starts at ${startLabel}.`, `${startLabel}起运。`, `วัยจรแรกเริ่มที่ ${startLabel}`);
   }
@@ -5463,7 +5485,7 @@ function renderRelProfile(animal, yearPillar, dayPillar, dominantEl) {
         <span class="rel-profile-emoji">${p.emoji}</span>
         <div>
           <div class="rel-profile-title">${_t(p.title, p.title_zh)}</div>
-          <div class="rel-profile-sub">${dayPillar.stem.char} ${dayPillar.stem.polarity} ${dayPillar.stem.element} · ${_t('Day Stem', '日主')}</div>
+          <div class="rel-profile-sub">${dayPillar.stem.char} ${_t(`${dayPillar.stem.polarity} ${dayPillar.stem.element}`, (dayPillar.stem.polarity === 'Yang' ? '阳' : '阴') + (EL_ZH[dayPillar.stem.element] || ''), `${EL_TH[dayPillar.stem.element] || dayPillar.stem.element}${dayPillar.stem.polarity === 'Yang' ? 'หยาง' : 'หยิน'}`)} · ${_t('Day Stem', '日主')}</div>
         </div>
       </div>
       <div class="rel-profile-traits">
@@ -5507,9 +5529,9 @@ function renderSoulAnimals(animal) {
     return `<div class="soul-card">
       <span class="soul-emoji">${emoji}</span>
       <div class="soul-info">
-        <span class="soul-name">${_t(a, ANIMAL_ZH[a])}<span class="soul-tag" style="color:${EL_COLOR[aEl]}">${_t(aEl, EL_ZH[aEl])}</span></span>
+        <span class="soul-name">${_t(a, ANIMAL_ZH[a])}<span class="soul-tag" style="color:${EL_COLOR[aEl]}">${_t(aEl, EL_ZH[aEl], EL_TH[aEl])}</span></span>
         <div class="soul-years">${yrsStr(a)}</div>
-        <div class="soul-note">${_t(`${trioElement} Trio ally — amplifies your ${trioElement.toLowerCase()} energy when together`, `${EL_ZH[trioElement]}三合 — 与你在一起时增强${EL_ZH[trioElement]}能量`)}</div>
+        <div class="soul-note">${_t(`${trioElement} Trio ally — amplifies your ${trioElement.toLowerCase()} energy when together`, `${EL_ZH[trioElement]}三合 — 与你在一起时增强${EL_ZH[trioElement]}能量`, `พันธมิตรกลุ่มสามประสานธาตุ${EL_TH[trioElement]} — ช่วยเสริมพลังธาตุ${EL_TH[trioElement]}ของคุณเมื่ออยู่ด้วยกัน`)}</div>
       </div>
     </div>`;
   }).join('');
@@ -5520,7 +5542,7 @@ function renderSoulAnimals(animal) {
       <div class="soul-info">
         <span class="soul-name">${_t(secretFriend, ANIMAL_ZH[secretFriend])}<span class="soul-tag" style="color:var(--gold)">${_t('SECRET FRIEND', '暗合')}</span></span>
         <div class="soul-years">${yrsStr(secretFriend)}</div>
-        <div class="soul-note">${_t(`Your hidden ally — a deep, intuitive bond. ${animal} and ${secretFriend} form one of the Six Harmonies.`, `你的隐秘盟友 — 深层直觉联系。${ANIMAL_ZH[animal]}与${ANIMAL_ZH[secretFriend]}组成六合之一。`)}</div>
+        <div class="soul-note">${_t(`Your hidden ally — a deep, intuitive bond. ${animal} and ${secretFriend} form one of the Six Harmonies.`, `你的隐秘盟友 — 深层直觉联系。${ANIMAL_ZH[animal]}与${ANIMAL_ZH[secretFriend]}组成六合之一。`, `พันธมิตรที่ซ่อนอยู่ของคุณ — ความผูกพันที่ลึกซึ้งและเข้าใจกันโดยสัญชาตญาณ ${ANIMAL_TH[animal]}และ${ANIMAL_TH[secretFriend]}เป็นหนึ่งในคู่หกประสาน (六合)`)}</div>
       </div>
     </div>
     ${trioCards}
@@ -5537,21 +5559,21 @@ function renderBusinessCompat(animal, dominantEl, elements) {
   const controls = ELEMENT_CONTROLS[dominantEl];
   const controlledBy = ELEMENT_CONTROLLED_BY[dominantEl];
 
-  const bizCard = (elName, relationship, relZh) => {
+  const bizCard = (elName, relationship, relZh, relTh) => {
     const b = BIZ_ADVICE[elName];
     return `<div class="biz-card">
       <div class="biz-el-icon" style="color:${EL_COLOR[elName]}">${b.icon} ${_t(EL_ZH[elName], EL_ZH[elName])}</div>
       <div class="biz-el-name">${_t(b.role, b.role_zh)}</div>
-      <div class="biz-el-note">${_t(relationship, relZh)}</div>
+      <div class="biz-el-note">${_t(relationship, relZh, relTh)}</div>
     </div>`;
   };
 
   const relKey = {
-    combine: { en: 'Combine 合', zh: '合', th: 'Combine · 合' },
-    clash: { en: 'Crash 冲', zh: '冲', th: 'Crash · 冲' },
-    harm: { en: 'Harm 害', zh: '害', th: 'Harm · 害' },
-    punish: { en: 'Punishment 刑', zh: '刑', th: 'Punishment · 刑' },
-    harmony: { en: 'Harmony 三合', zh: '三合', th: 'Harmony · 三合' },
+    combine: { en: 'Combine 合', zh: '合', th: 'ประสาน · 合' },
+    clash: { en: 'Crash 冲', zh: '冲', th: 'ชง · 冲' },
+    harm: { en: 'Harm 害', zh: '害', th: 'ทำร้าย · 害' },
+    punish: { en: 'Punishment 刑', zh: '刑', th: 'ลงโทษ · 刑' },
+    harmony: { en: 'Harmony 三合', zh: '三合', th: 'สามประสาน · 三合' },
     same: { en: 'Same branch', zh: '同支', th: 'กิ่งเดียวกัน' },
     neutral: { en: 'Neutral', zh: '中性', th: 'กลาง' },
   };
@@ -5562,20 +5584,20 @@ function renderBusinessCompat(animal, dominantEl, elements) {
     <div class="biz-section-label">${_t('FOUR-PILLAR ANIMALS', '四柱生肖', 'สัตว์สี่เสา')}</div>
     <div class="biz-branch-list">${pairNote.map(r => {
       const lab = relKey[r.relation] || relKey.neutral;
-      return `<div class="biz-branch-row"><span>${_t(r.pillar, r.pillar)}</span><span>${r.a.emoji} ${_t(r.a.animal, ANIMAL_ZH[r.a.animal])} · ${r.b.emoji} ${_t(r.b.animal, ANIMAL_ZH[r.b.animal])}</span><strong>${_t(lab.en, lab.zh, lab.th)}</strong></div>`;
+      return `<div class="biz-branch-row"><span>${_t(r.pillar)}</span><span>${r.a.emoji} ${_t(r.a.animal, ANIMAL_ZH[r.a.animal])} · ${r.b.emoji} ${_t(r.b.animal, ANIMAL_ZH[r.b.animal])}</span><strong>${_t(lab.en, lab.zh, lab.th)}</strong></div>`;
     }).join('')}</div>
-    <p class="biz-climate">${_t('Read length as climate, not an expiry date. Combine and Harmony thicken the weather; Crash and Punishment are storm cells you plan around.', '合伙长短当气候读，不是保质期。合与三合让天气变厚；冲与刑是你要绕开的风暴。', 'อ่านระยะเป็นภูมิอากาศ ไม่ใช่วันหมดอายุ 合 และ 三合 ทำให้ฟ้าหนา 冲 และ 刑 คือพายุที่ต้องวางแผน')}</p>` : `<p class="biz-hint">${_t('Enter a partner birth date in Compatibility Check to see pillar-by-pillar Combine / Crash / Harmony.', '在合婚中输入对方生日，即可看到逐柱合 / 冲 / 三合。', 'กรอกวันเกิดคู่ใน Compatibility เพื่อดู 合 / 冲 / 三合 รายเสา')}</p>`;
+    <p class="biz-climate">${_t('Read length as climate, not an expiry date. Combine and Harmony thicken the weather; Crash and Punishment are storm cells you plan around.', '合伙长短当气候读，不是保质期。合与三合让天气变厚；冲与刑是你要绕开的风暴。', 'อ่านระยะเป็นภูมิอากาศ ไม่ใช่วันหมดอายุ 合 และ 三合 ทำให้ฟ้าหนา 冲 และ 刑 คือพายุที่ต้องวางแผน')}</p>` : `<p class="biz-hint">${_t('Enter a partner birth date in Compatibility Check to see pillar-by-pillar Combine / Crash / Harmony.', '在合婚中输入对方生日，即可看到逐柱合 / 冲 / 三合。', 'กรอกวันเกิดของคู่ในส่วนตรวจความเข้ากัน เพื่อดู 合 / 冲 / 三合 ทีละเสา')}</p>`;
 
   el.innerHTML = `<div class="biz-compat-wrap">
     <div class="biz-section-label">${_t('PRODUCTIVE PARTNERSHIPS', '生产合作')}</div>
     <div class="biz-grid">
-      ${bizCard(producedBy, `Fuels your ${dominantEl} — they support your growth`, `为你的${EL_ZH[dominantEl]}提供能量`)}
-      ${bizCard(produces, `You inspire their ${produces} — natural mentorship`, `你激发他们的${EL_ZH[produces]} — 天然导师`)}
+      ${bizCard(producedBy, `Fuels your ${dominantEl} — they support your growth`, `为你的${EL_ZH[dominantEl]}提供能量`, `หล่อเลี้ยงธาตุ${EL_TH[dominantEl]}ของคุณ — ช่วยสนับสนุนการเติบโตของคุณ`)}
+      ${bizCard(produces, `You inspire their ${produces} — natural mentorship`, `你激发他们的${EL_ZH[produces]} — 天然导师`, `คุณช่วยเสริมธาตุ${EL_TH[produces]}ของพวกเขา — เป็นพี่เลี้ยงโดยธรรมชาติ`)}
     </div>
     <div class="biz-section-label">${_t('STRESS / CRASH POINTS', '压力 / 冲克')}</div>
     <div class="biz-grid">
-      ${bizCard(controlledBy, `Challenges your ${dominantEl} — pushes you to evolve`, `挑战你的${EL_ZH[dominantEl]} — 推动你进化`)}
-      ${bizCard(controls, `You overpower their ${controls} — be mindful of dominance`, `你压制他们的${EL_ZH[controls]} — 注意平衡`)}
+      ${bizCard(controlledBy, `Challenges your ${dominantEl} — pushes you to evolve`, `挑战你的${EL_ZH[dominantEl]} — 推动你进化`, `ท้าทายธาตุ${EL_TH[dominantEl]}ของคุณ — ผลักดันให้คุณพัฒนา`)}
+      ${bizCard(controls, `You overpower their ${controls} — be mindful of dominance`, `你压制他们的${EL_ZH[controls]} — 注意平衡`, `คุณข่มธาตุ${EL_TH[controls]}ของพวกเขา — ควรระวังการครอบงำ`)}
     </div>
     ${pairHtml}
   </div>`;

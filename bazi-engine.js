@@ -83,6 +83,7 @@
     Water: '#3b82f6',
   };
   const EL_ZH    = { Wood:'木', Fire:'火', Earth:'土', Metal:'金', Water:'水' };
+  const EL_TH    = { Wood:'ไม้', Fire:'ไฟ', Earth:'ดิน', Metal:'โลหะ', Water:'น้ำ' };
   const ANIMAL_ZH = {
     Rat:'鼠', Ox:'牛', Tiger:'虎', Rabbit:'兔', Dragon:'龙', Snake:'蛇',
     Horse:'马', Goat:'羊', Monkey:'猴', Rooster:'鸡', Dog:'狗', Pig:'猪',
@@ -750,10 +751,10 @@
         ? 'This chart leans ' + top.map(g => g.en + ' ' + g.zh + ' (' + g.percent + '%)').join(', ') + '.'
         : 'Ten Gods are unreadable without a Day Master.',
       zh: top.length
-        ? '此盘偏于' + top.map(g => g.zh + g.en + '（' + g.percent + '%）').join('、') + '。'
+        ? '此盘偏于' + top.map(g => g.zh + '（' + g.percent + '%）').join('、') + '。'
         : '缺少日主，十神无法排盘。',
       th: top.length
-        ? 'แผนนี้เอียงไปทาง ' + top.map(g => g.en + ' ' + g.zh + ' (' + g.percent + '%)').join(', ')
+        ? 'แผนนี้เอียงไปทาง ' + top.map(g => g.th + ' ' + g.zh + ' (' + g.percent + '%)').join(', ')
         : 'ไม่มีวันมาสเตอร์ จึงจัดสิบเทพไม่ได้',
     };
 
@@ -1599,19 +1600,19 @@
     if (dayEl && fav.favorable.indexOf(dayEl) >= 0) {
       score += 12;
       reasons.push({ code: 'element-good', good: true,
-        en: dayEl + ' day — your favourable element', zh: (EL_ZH[dayEl] || dayEl) + '日——正是你的喜用', th: 'วันธาตุ' + dayEl + ' — ธาตุที่คุณต้องการ',
-        short: { en: dayEl + ' boost', zh: '喜用' + (EL_ZH[dayEl] || dayEl), th: 'เสริมธาตุ' + dayEl },
+        en: dayEl + ' day — your favourable element', zh: (EL_ZH[dayEl] || dayEl) + '日——正是你的喜用', th: 'วันธาตุ' + (EL_TH[dayEl] || dayEl) + ' — ธาตุที่คุณต้องการ',
+        short: { en: dayEl + ' boost', zh: '喜用' + (EL_ZH[dayEl] || dayEl), th: 'เสริมธาตุ' + (EL_TH[dayEl] || dayEl) },
         hint: { en: dayEl + ' is one of the elements your chart is short of, so the day’s energy props you up.',
                 zh: (EL_ZH[dayEl] || dayEl) + '正是你命盘所需，当天气场扶你一把。',
-                th: 'ธาตุ' + dayEl + 'เป็นธาตุที่ดวงคุณขาด พลังของวันจึงช่วยหนุนคุณ' } });
+                th: 'ธาตุ' + (EL_TH[dayEl] || dayEl) + 'เป็นธาตุที่ดวงคุณขาด พลังของวันจึงช่วยหนุนคุณ' } });
     } else if (dayEl && fav.unfavorable.indexOf(dayEl) >= 0) {
       score -= 8;
       reasons.push({ code: 'element-bad', good: false,
-        en: dayEl + ' day — works against your balance', zh: (EL_ZH[dayEl] || dayEl) + '日——于你不宜', th: 'วันธาตุ' + dayEl + ' — ไม่เข้ากับสมดุลของคุณ',
-        short: { en: 'Too much ' + dayEl, zh: (EL_ZH[dayEl] || dayEl) + '过旺', th: 'ธาตุ' + dayEl + 'มากไป' },
+        en: dayEl + ' day — works against your balance', zh: (EL_ZH[dayEl] || dayEl) + '日——于你不宜', th: 'วันธาตุ' + (EL_TH[dayEl] || dayEl) + ' — ไม่เข้ากับสมดุลของคุณ',
+        short: { en: 'Too much ' + dayEl, zh: (EL_ZH[dayEl] || dayEl) + '过旺', th: 'ธาตุ' + (EL_TH[dayEl] || dayEl) + 'มากไป' },
         hint: { en: dayEl + ' adds to what your chart already has plenty of — you may tire faster or overreach.',
                 zh: (EL_ZH[dayEl] || dayEl) + '是你命盘已偏多之气，当天易疲或用力过猛。',
-                th: 'ธาตุ' + dayEl + 'มีมากในดวงคุณอยู่แล้ว อาจเหนื่อยง่ายหรือทำเกินตัว' } });
+                th: 'ธาตุ' + (EL_TH[dayEl] || dayEl) + 'มีมากในดวงคุณอยู่แล้ว อาจเหนื่อยง่ายหรือทำเกินตัว' } });
     }
 
     score = Math.max(0, Math.min(100, Math.round(score)));
