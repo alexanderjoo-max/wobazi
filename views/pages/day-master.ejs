@@ -86,14 +86,14 @@
           demoPillars.forEach(function(p) {
         %>
           <div class="about-pillar-col">
-            <div class="about-pillar-head"><%= p.label %></div>
+            <div class="about-pillar-head"><span class="en"><%= p.label %></span></div>
             <div class="about-pillar-stem"
               style="background:rgba(255,255,255,0.04);border:1px solid <%= p.highlight ? 'rgba(240,192,64,0.6)' : bazi.EL_COLOR[p.stemEl] + '33' %>;<%= p.highlight ? 'box-shadow:0 0 12px rgba(240,192,64,0.25);' : '' %>">
               <span style="font-family:'Noto Sans SC',sans-serif;font-size:22px;font-weight:700;color:<%= p.highlight ? 'var(--gold,#f0c040)' : bazi.EL_COLOR[p.stemEl] %>;">
                 <%= p.stemChar %>
               </span>
               <br>
-              <span style="font-size:10px;color:var(--muted);"><%= p.stemEl %> (<%= p.stemPol %>)</span>
+              <span class="en" style="font-size:10px;color:var(--muted);"><%= p.stemEl %> (<%= p.stemPol %>)</span>
             </div>
             <div class="about-pillar-branch" style="background:rgba(255,255,255,0.03);">
               <span style="font-family:'Noto Sans SC',sans-serif;font-size:18px;color:var(--text);">
@@ -101,16 +101,16 @@
               </span>
               <span style="font-size:16px;"><%= p.branchEmoji %></span>
               <br>
-              <span style="font-size:10px;color:var(--muted);"><%= p.branchAnimal %></span>
+              <span class="en" style="font-size:10px;color:var(--muted);"><%= p.branchAnimal %></span>
             </div>
-            <div class="about-pillar-foot"><%= p.label.toUpperCase() %></div>
+            <div class="about-pillar-foot"><span class="en"><%= p.label.toUpperCase() %></span></div>
           </div>
         <% }); %>
       </div>
 
-      <div class="about-callout">
+      <div class="about-callout"><span class="en">
         <strong>&#x1F451; Day Master:</strong> In this example, the Day Master is <span style="font-family:'Noto Sans SC',sans-serif;color:var(--gold,#f0c040);">壬</span> (R&eacute;n) — Yang Water. It sits at the Heavenly Stem position of the Day Pillar.
-      </div>
+      </span></div>
     </div>
 
     <!-- ═══════════════════════════════════════
@@ -148,9 +148,7 @@
               </span>
               <div>
                 <div style="font-size:14px;color:var(--text);font-weight:600;"><%= stem.pinyin %></div>
-                <span style="display:inline-block;background:<%= elColor %>18;color:<%= elColor %>;border:1px solid <%= elColor %>33;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:500;margin-top:2px;">
-                  <%= stem.polarity %> <%= stem.element %>
-                </span>
+                <span style="display:inline-block;background:<%= elColor %>18;color:<%= elColor %>;border:1px solid <%= elColor %>33;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:500;margin-top:2px;"><span class="en"><%= stem.polarity %> <%= stem.element %></span></span>
               </div>
             </div>
             <p style="color:var(--muted,#888a9e);font-size:13px;line-height:1.6;margin:0;">

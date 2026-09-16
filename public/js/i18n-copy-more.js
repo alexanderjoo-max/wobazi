@@ -213,7 +213,7 @@
     'dm.faq.a4': {
       en: 'No single Day Master is inherently the strongest. Strength depends on contextual factors: the season of birth, support from other pillars, and overall element balance. A Day Master born in a season that matches its element is naturally stronger. However, in BaZi, strength alone is not always desirable — a weaker Day Master in a well-balanced chart can be more favorable than an overly strong one.',
       th: 'ไม่มีวันมาสเตอร์ใดแข็งที่สุดในตัว ความแข็งขึ้นกับบริบท: ฤดูเกิด การเกื้อจากเสาอื่น และสมดุลธาตุรวม วันมาสเตอร์ที่เกิดในฤดูตรงธาตุย่อมแข็งกว่า แต่ในปาจื้อ ความแข็งอย่างเดียวไม่ใช่สิ่งพึงเสมอ — วันมาสเตอร์อ่อนในแผงสมดุลอาจดีกว่าที่แข็งเกินไป',
-      zh: '没有天生最强的日主。强弱看出生季节、他柱生扶与整体五行。得令 naturally 更旺。但八字里旺不一定好——弱而平衡，往往胜过过旺。'
+      zh: '没有天生最强的日主。强弱看出生季节、他柱生扶与整体五行。得令者自然更旺。但八字里旺不一定好——弱而平衡，往往胜过过旺。'
     },
 
     'page.astrology.sub': {

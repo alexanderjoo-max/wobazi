@@ -136,6 +136,14 @@ Google sign-in only. Mounted in `server.js` via `require('./portal').mount(app, 
 - Every header uses the same 10px vertical padding (safe-area aware) and, ≥768px, the centred content column gutters.
 - Landing auth block is chosen server-side too: `sendApp` keeps `<!-- SPLASH_GUEST -->…` (Plot/Continue CTA + "No account needed" line) for guests or `<!-- SPLASH_MEMBER -->…` (welcome card, name filled at `<!-- SPLASH_WELCOME -->`, HTML-escaped) for members, and strips the other. The client only toggles guest chart state (Plot Your Chart vs Continue Your Reading).
 
+## i18n (EN / TH / ZH) (updated 2026-09-16)
+- Custom system in `public/js/i18n.js`: `.en/.zh/.th` sibling spans, `data-i18n` / `data-i18n-placeholder` / `data-i18n-aria` keys, and a phrase lookup (`WoBaziI18n.lookup(english, lang)`) used when a Thai or Chinese copy is missing. `_t(en, zh, th)` in `script.js` falls back to that lookup.
+- `public/js/i18n-app-th.js` (app only): Thai keyed by English phrase for the content tables in `script.js`, plus a few Thai+Chinese rows and keyed rows (Oracle chips, form placeholders, aria labels). New table text needs a row here or a `_th` value.
+- `public/js/i18n-site.js` (website pages via `head.ejs`): Thai + Chinese for `/chinese-astrology` and `/day-master`, keyed by the English of each `.en` element.
+- All three languages share one font stack (`Outfit, Noto Sans SC, Noto Sans Thai`); no per-language font or size overrides.
+- The ⓘ explanation sheet shows only the selected language (`TIPS[key].title_th/body_th`).
+- Not translated: AI output (daily DO/AVOID/WATCH has no Thai; Oracle replies), share-image text, pinyin/BaZi terms, `/privacy` and `/terms`.
+
 ## API Conventions
 - Routes: kebab-case (`/api/daily-reading`)
 - Auth check: `if (!req.session.user)` → 401
