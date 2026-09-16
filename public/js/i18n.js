@@ -17,6 +17,7 @@
     'nav.about': { en: 'Master Alice', th: 'มาสเตอร์อลิซ', zh: 'Master Alice' },
     'nav.back': { en: 'Back', th: 'กลับ', zh: '返回' },
     'nav.begin': { en: 'Plot Your Chart', th: 'จัดแผนภูมิของคุณ', zh: '排出你的命盘' },
+    'nav.seeChart': { en: 'See Your Chart', th: 'ดูแผนภูมิของคุณ', zh: '查看你的命盘' },
     'nav.beginShort': { en: 'Plot chart', th: 'จัดแผนภูมิ', zh: '排盘' },
     'nav.signin': { en: 'Sign in', th: 'เข้าสู่ระบบ', zh: '登录' },
     'nav.signinGoogle': { en: 'Sign in with Google', th: 'เข้าสู่ระบบด้วย Google', zh: '使用 Google 登录' },

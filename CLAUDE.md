@@ -120,8 +120,8 @@ Google sign-in only. Mounted in `server.js` via `require('./portal').mount(app, 
 ## Shared nav + footer (updated 2026-09-16)
 - `views/partials/footer.ejs` is the one site footer. EJS pages include it; `sendApp` in `server.js` renders it into every `<!-- SITE_FOOTER -->` marker in `app/index.html` (landing + results). Footer CSS lives in `app/style.css` (`.seo-footer*`).
 - `views/partials/nav-menu.ejs` is the right side of every header plus its menu. EJS pages include it with `ctx: 'site'`; `sendApp` renders it into each `<!-- NAV_MENU:<ctx> -->` marker (`landing`, `input`, `results`, `portal`, `oracle`). Signed-in state comes from `res.locals.user` (cookie session), so the header is correct on first paint.
-  - Guest: BaZi Explainer + Master Alice text links (desktop), Google "Sign in", menu button. Members: avatar button only. "Plot Your Chart" CTA on `site`/`landing`.
-  - Menu (icons): member head · My Wobazi · Reading History · Share + Edit birth data (results) · Plot Your Chart (members, site/landing) · BaZi Explainer · Master Alice · Language · Log out. Guests also get Sign in with Google (+ Plot Your Chart CTA).
+  - Guest: BaZi Explainer + Master Alice text links (desktop), Google "Sign in", menu button. Members: avatar button only. CTA on `site`/`landing`: "Plot Your Chart" for guests, "See Your Chart" (`/#you`) for members.
+  - Menu (icons): member head · My Wobazi (star) · Reading History · Share + Edit birth data (results) · See Your Chart (members, site/landing) · BaZi Explainer · Master Alice · Language · Log out. Guests also get Sign in with Google (+ Plot Your Chart CTA).
   - App links keep real hrefs and call `appNav(event, action)` in `script.js`.
 - Every header uses the same 10px vertical padding (safe-area aware) and, ≥768px, the centred content column gutters.
 

@@ -498,6 +498,7 @@ function appNav(e, action) {
   haptic(6);
   switch (action) {
     case 'portal': goHash('portal'); break;
+    case 'chart': goHash('you'); break;
     case 'history': goHash('history'); break;
     case 'share': showShareCard(); break;
     case 'edit':
