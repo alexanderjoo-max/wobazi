@@ -85,8 +85,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=65">
-  <link rel="stylesheet" href="/app/portal.css?v=6">
+  <link rel="stylesheet" href="/app/style.css?v=74">
+  <link rel="stylesheet" href="/app/portal.css?v=7">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
     html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
@@ -1126,9 +1126,9 @@
     </div>
     <div class="results-toc-bar hide" id="toc-you">
       <div class="results-toc-inner">
+        <button class="results-toc-chip" onclick="scrollResults('res-you-hero')"><span class="en">Profile</span><span class="zh hide">档案</span><span class="th hide">โปรไฟล์</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-pillars')"><span class="en">Pillars</span><span class="zh hide">四柱</span><span class="th hide">เสา</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-decades')"><span class="en">Luck Cycle</span><span class="zh hide">大运</span><span class="th hide">รอบโชค</span></button>
-        <button class="results-toc-chip" onclick="scrollResults('you-profile-section')"><span class="en">Profile</span><span class="zh hide">档案</span><span class="th hide">โปรไฟล์</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-elements')"><span class="en">Elements</span><span class="zh hide">五行</span><span class="th hide">ธาตุ</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-tengods')"><span class="en">Ten Gods</span><span class="zh hide">十神</span><span class="th hide">สิบเทพ</span></button>
         <button class="results-toc-chip" onclick="scrollResults('res-noble')"><span class="en">Noble</span><span class="zh hide">贵人</span><span class="th hide">贵人</span></button>
@@ -1238,17 +1238,12 @@
         <div id="decades-card"></div>
       </section>
 
-      <section class="section" data-tab="you" id="you-profile-section">
-        <div id="you-profile-header"></div>
-      </section>
-
       <section class="section" data-tab="you" id="res-elements">
         <div class="section-head" data-tip="element-balance">
           <h3 class="en">Element Balance</h3>
           <h3 class="zh hide">五行平衡</h3>
           <h3 class="th hide">สมดุลธาตุ</h3>
           <span class="section-sub">五行 Wǔxíng</span>
-          <span class="tip-hint">ⓘ <span class="en">What is this?</span><span class="zh hide">这是什么？</span><span class="th hide">นี่คืออะไร?</span></span>
         </div>
         <div class="element-chart-wrap">
           <svg id="radar-svg" viewBox="0 0 200 190" class="radar-svg"></svg>
@@ -1823,10 +1818,10 @@
     </div>
   </div>
 
-  <script src="/bazi-engine.js?v=6"></script>
+  <script src="/bazi-engine.js?v=7"></script>
   <script src="/verdict.js?v=2"></script>
   <script src="/app/portal.js?v=5"></script>
-  <script src="/app/script.js?v=42"></script>
+  <script src="/app/script.js?v=48"></script>
   <script src="/app/share-viral.js?v=5"></script>
 </body>
 </html>

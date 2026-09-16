@@ -1523,50 +1523,62 @@
                 th: 'ปฏิทินจีนถือว่าวัน' + officer.char + 'เป็นวันคลาสสิกสำหรับ' + obj.th } });
     }
 
+    /* Year and day branches are scored separately, but a relation that hits both
+       (e.g. 午午 self-punishment for a Horse year + Horse day) is shown once. */
+    const sideHits = { combine: [], harmony: [], harm: [], punish: [] };
     [[natalYearIdx, 'year'], [natalDayIdx, 'day']].forEach(function (pair) {
       const idx = pair[0];
       const side = pair[1];
       if (idx < 0) return;
-      if (COMBINE[idx] === dIdx) {
-        score += 12;
-        reasons.push({ code: 'combine-' + side, good: true,
-          en: 'Six Harmony with your ' + side + ' branch (六合)',
-          zh: '与你的' + sideZh(side) + '支六合',
-          th: 'เข้ากับเสา' + sideTh(side) + 'ของคุณ (六合)',
-          short: { en: 'Pairs with you', zh: '六合', th: 'เข้าคู่กับคุณ' },
-          hint: { en: 'This day’s animal is the natural partner of your ' + side + ' animal — people and plans tend to meet you halfway.',
-                  zh: '当日地支与你的' + sideZh(side) + '支相合，人事易于配合。',
-                  th: 'นักษัตรของวันนี้เป็นคู่ของนักษัตร' + sideTh(side) + 'คุณ ผู้คนและแผนงานมักเป็นใจ' } });
-      } else if (inThreeHarmony(idx, dIdx)) {
-        score += 9;
-        reasons.push({ code: 'harmony-' + side, good: true,
-          en: 'Three Harmony with your ' + side + ' branch (三合)',
-          zh: '与你的' + sideZh(side) + '支三合',
-          th: 'สามประสานกับเสา' + sideTh(side) + 'ของคุณ (三合)',
-          short: { en: 'In harmony', zh: '三合', th: 'สามประสาน' },
-          hint: { en: 'This day’s animal is in the same harmony trio as your ' + side + ' animal — a cooperative, easy-going day for you.',
-                  zh: '当日地支与你的' + sideZh(side) + '支同属三合局，气场协调。',
-                  th: 'นักษัตรของวันนี้อยู่กลุ่มสามประสานเดียวกับนักษัตร' + sideTh(side) + 'คุณ เป็นวันที่ร่วมมือกันง่าย' } });
-      }
-      if (HARM[idx] === dIdx) {
-        score -= 8;
-        reasons.push({ code: 'harm-' + side, good: false,
-          en: 'Harm with your ' + side + ' branch (六害)', zh: '与你的' + sideZh(side) + '支相害', th: 'เป็นโทษกับเสา' + sideTh(side) + 'ของคุณ (六害)',
-          short: { en: 'Friction', zh: '六害', th: 'ขัดแย้ง' },
-          hint: { en: 'A quiet friction pairing with your chart — double-check messages and watch for misunderstandings.',
-                  zh: '与命盘暗中相害，留意沟通误会。',
-                  th: 'คู่ที่ขัดกันเงียบๆ กับดวงคุณ ตรวจข้อความให้ดีและระวังการเข้าใจผิด' } });
-      }
-      if (isPunish(idx, dIdx)) {
-        score -= 8;
-        reasons.push({ code: 'punish-' + side, good: false,
-          en: 'Punishment with your ' + side + ' branch (相刑)', zh: '与你的' + sideZh(side) + '支相刑', th: 'ต้องโทษกับเสา' + sideTh(side) + 'ของคุณ (相刑)',
-          short: { en: 'Punishment', zh: '相刑', th: 'ต้องโทษ' },
-          hint: { en: 'A punishment pairing with your chart — delays and small mistakes are more likely, so leave margin.',
-                  zh: '与命盘相刑，易有延误差错，宜留余地。',
-                  th: 'คู่ต้องโทษกับดวงคุณ มีโอกาสล่าช้าหรือผิดพลาดเล็กๆ ควรเผื่อเวลา' } });
-      }
+      if (COMBINE[idx] === dIdx) { score += 12; sideHits.combine.push(side); }
+      else if (inThreeHarmony(idx, dIdx)) { score += 9; sideHits.harmony.push(side); }
+      if (HARM[idx] === dIdx) { score -= 8; sideHits.harm.push(side); }
+      if (isPunish(idx, dIdx)) { score -= 8; sideHits.punish.push(side); }
     });
+    const sidesEn = function (sides) { return sides.join(' and '); };
+    const sidesZh = function (sides) { return sides.map(sideZh).join('、'); };
+    const sidesTh = function (sides) { return sides.map(sideTh).join('และ'); };
+    const plural = function (sides, one, many) { return sides.length > 1 ? many : one; };
+    if (sideHits.combine.length) {
+      const sides = sideHits.combine;
+      reasons.push({ code: 'combine-' + sides.join('-'), good: true,
+        en: 'Six Harmony with your ' + sidesEn(sides) + plural(sides, ' branch', ' branches') + ' (六合)',
+        zh: '与你的' + sidesZh(sides) + '支六合',
+        th: 'เข้ากับเสา' + sidesTh(sides) + 'ของคุณ (六合)',
+        short: { en: 'Pairs with you', zh: '六合', th: 'เข้าคู่กับคุณ' },
+        hint: { en: 'This day’s animal is the natural partner of your ' + sidesEn(sides) + plural(sides, ' animal', ' animals') + ' — people and plans tend to meet you halfway.',
+                zh: '当日地支与你的' + sidesZh(sides) + '支相合，人事易于配合。',
+                th: 'นักษัตรของวันนี้เป็นคู่ของนักษัตร' + sidesTh(sides) + 'คุณ ผู้คนและแผนงานมักเป็นใจ' } });
+    }
+    if (sideHits.harmony.length) {
+      const hs = sideHits.harmony;
+      reasons.push({ code: 'harmony-' + hs.join('-'), good: true,
+        en: 'Three Harmony with your ' + sidesEn(hs) + plural(hs, ' branch', ' branches') + ' (三合)',
+        zh: '与你的' + sidesZh(hs) + '支三合',
+        th: 'สามประสานกับเสา' + sidesTh(hs) + 'ของคุณ (三合)',
+        short: { en: 'In harmony', zh: '三合', th: 'สามประสาน' },
+        hint: { en: 'This day’s animal is in the same harmony trio as your ' + sidesEn(hs) + plural(hs, ' animal', ' animals') + ' — a cooperative, easy-going day for you.',
+                zh: '当日地支与你的' + sidesZh(hs) + '支同属三合局，气场协调。',
+                th: 'นักษัตรของวันนี้อยู่กลุ่มสามประสานเดียวกับนักษัตร' + sidesTh(hs) + 'คุณ เป็นวันที่ร่วมมือกันง่าย' } });
+    }
+    if (sideHits.harm.length) {
+      const hs = sideHits.harm;
+      reasons.push({ code: 'harm-' + hs.join('-'), good: false,
+        en: 'Harm with your ' + sidesEn(hs) + plural(hs, ' branch', ' branches') + ' (六害)', zh: '与你的' + sidesZh(hs) + '支相害', th: 'เป็นโทษกับเสา' + sidesTh(hs) + 'ของคุณ (六害)',
+        short: { en: 'Friction', zh: '六害', th: 'ขัดแย้ง' },
+        hint: { en: 'A quiet friction pairing with your ' + sidesEn(hs) + plural(hs, ' animal', ' animals') + ' — double-check messages and watch for misunderstandings.',
+                zh: '与你的' + sidesZh(hs) + '支暗中相害，留意沟通误会。',
+                th: 'คู่ที่ขัดกันเงียบๆ กับนักษัตร' + sidesTh(hs) + 'ของคุณ ตรวจข้อความให้ดีและระวังการเข้าใจผิด' } });
+    }
+    if (sideHits.punish.length) {
+      const ps = sideHits.punish;
+      reasons.push({ code: 'punish-' + ps.join('-'), good: false,
+        en: 'Punishment with your ' + sidesEn(ps) + plural(ps, ' branch', ' branches') + ' (相刑)', zh: '与你的' + sidesZh(ps) + '支相刑', th: 'ต้องโทษกับเสา' + sidesTh(ps) + 'ของคุณ (相刑)',
+        short: { en: 'Punishment', zh: '相刑', th: 'ต้องโทษ' },
+        hint: { en: 'A punishment pairing with your ' + sidesEn(ps) + plural(ps, ' animal', ' animals') + ' — delays and small mistakes are more likely, so leave margin.',
+                zh: '与你的' + sidesZh(ps) + '支相刑，易有延误差错，宜留余地。',
+                th: 'คู่ต้องโทษกับนักษัตร' + sidesTh(ps) + 'ของคุณ มีโอกาสล่าช้าหรือผิดพลาดเล็กๆ ควรเผื่อเวลา' } });
+    }
 
     const isNoble = nobleBranches.indexOf(dIdx) >= 0;
     if (isNoble) {

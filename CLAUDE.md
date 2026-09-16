@@ -119,6 +119,7 @@ Google sign-in only. Mounted in `server.js` via `require('./portal').mount(app, 
 
 ## Shared nav + footer (updated 2026-09-15)
 - `views/partials/footer.ejs` is the one site footer. EJS pages include it; `sendApp` in `server.js` renders it into every `<!-- SITE_FOOTER -->` marker in `app/index.html` (landing + results). Footer CSS lives in `app/style.css` (`.seo-footer*`).
+- Desktop (≥768px): results header, tab bar, chip bars and `.scroll-body` share one centred column (`--app-max: 1000px`, gutter `--app-gutter` 40px / 64px ≥1200px).
 - `res.locals.user` (from the cookie session) drives signed-in state server-side: `nav.ejs` shows "My Wobazi" + avatar menu, the footer's My Wobazi column shows My Wobazi / Reading History / Account / Log out (guests: Sign in / Plot Your Chart). Links go to `/#portal`, `/#history`, `/#account`, `/auth/logout`.
 
 ## API Conventions
@@ -168,6 +169,8 @@ Fixtures: `npm test` (`test/bazi-engine.test.js`) vs lunar-javascript / BaZi Lab
 - Engine: `DATE_OBJECTIVE_GROUPS` (For you · Business · Career · Love & family · Home & travel · Wellbeing) → `DATE_OBJECTIVES` (pitch, negotiate, contract, launch, business, job, startjob, raise, study, date, propose, wedding, reconcile, travel, move, renovate, purchase, health, declutter, newlook, personal). Each lists the 建除 officers it favours; `noble: true` objectives weight 天乙贵人 days +20 instead of +14.
 - `scoreDayForChart` reasons carry `short` and `hint` ({en,zh,th}) so the UI can explain each ✓/✕ in plain words. `personal` never earns `purpose-fit`.
 - UI (Actions tab, right after Today's Action Plan): "Best dates for [grouped dropdown ▾]" → top 3 in the next 8 weeks as compact columns → pageable month grid (12 months) → explained date card (side by side when the card is ≥680px). Outfit guide sits last on the Actions tab.
+- Calendar cells: plain number = Ordinary (<60), green ring = Good (60–71), gold disc = Power (72+), red struck-through = Avoid (clash year/day branch or 破 day, regardless of score). Legend is a score scale plus a separate Avoid line.
+- A branch relation (六合/三合/六害/相刑) hitting both year and day branch is one reason (`punish-year-day` etc.), scored per branch.
 
 ### Hash routing (SPA)
 - `/` landing

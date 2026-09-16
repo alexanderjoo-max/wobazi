@@ -310,6 +310,20 @@ describe('择日 — personal date selection', () => {
     }
   });
 
+  it('shows a relation once when it hits both the year and day branch', () => {
+    // 1978-07-07 is 戊午 year, 午 day: 午 self-punishes on 午 days for both branches.
+    const horse = bazi.calcBaziAccurate({ year: 1978, month: 7, day: 7, hour: 12 }).pillars;
+    assert.strictEqual(horse[0].branch.char + horse[2].branch.char, '午午');
+    const d = bazi.scoreDayForChart({ year: 2026, month: 9, day: 17, pillars: horse });
+    const punish = d.reasons.filter(r => r.short.en === 'Punishment');
+    assert.strictEqual(punish.length, 1);
+    assert.strictEqual(punish[0].code, 'punish-year-day');
+    for (let day = 1; day <= 30; day++) {
+      const labels = bazi.scoreDayForChart({ year: 2026, month: 9, day, pillars: horse }).reasons.map(r => r.short.en);
+      assert.strictEqual(new Set(labels).size, labels.length, 'repeated reason on 2026-09-' + day);
+    }
+  });
+
   it('reads favourable elements from the Day Master balance', () => {
     const fav = bazi.favorableElements(natal);
     assert.ok(Array.isArray(fav.favorable) && fav.favorable.length > 0);

@@ -1336,7 +1336,6 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
     }
     if (window.WobaziPortal) WobaziPortal.captureToday({ dominantEl });
   })();
-  renderYouProfile(animal, yearPillar, elColor);
   renderYouHero(animal, yearPillar, elColor);
   renderTenGods(accurate && accurate.tenGods, pillars);
   renderNowOverlays(pillars, accurate && accurate.dayMaster);
@@ -1854,10 +1853,14 @@ function applyLangSpans(lang) {
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'th' ? 'th' : 'en';
 }
 
+let _langRerender = false;   // renderAuspiciousDates calls applyI18n, which fires wobazi:lang again
 document.addEventListener('wobazi:lang', (e) => {
   applyLangSpans(e.detail && e.detail.lang ? e.detail.lang : 'en');
+  if (_langRerender) return;
   if (_shareData && _shareData.animal && document.querySelector('#power-days-card .pd-select')) {
+    _langRerender = true;
     try { renderAuspiciousDates(_shareData.animal, _shareData.dominantEl); } catch (err) {}
+    _langRerender = false;
   }
 });
 
@@ -4200,23 +4203,22 @@ function renderAuspiciousDates(animal, dominantEl, opts) {
   }).join('');
   const monthLabel = view.toLocaleDateString(dateLocale(), { month: 'long', year: 'numeric' });
 
+  /* Legend: Avoid, then the score scale every other date sits on */
   const legendHTML = `
     <div class="cal-legend">
-      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-power"></div> ${_t('Power Day', '吉日', 'วันพลัง')} 72+</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-good"></div> ${_t('Good Day', '吉', 'วันดี')} 60+</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot cal-legend-avoid"></div> ${_t('Avoid', '忌', 'ควรเลี่ยง')}</div>
-      ${!personal ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-fit"></div> ${_t(`Suits ${obj.en}`, `宜${obj.zh}`, `เหมาะกับ${obj.th}`)}</div>` : ''}
-      ${hasPartner ? `<div class="cal-legend-item"><div class="cal-legend-dot cal-legend-both"></div> ${_t('Works for both charts', '两盘皆宜', 'เหมาะทั้งสองแผน')}</div>` : ''}
+      <div class="cal-scale" role="img" aria-label="${_plainLoc({ en: 'Day types: Avoid on clash days, Ordinary under 60, Good 60 to 71, Power Day 72 and up', zh: '日子分类：冲日为忌，60 以下平日，60–71 吉，72 以上吉日', th: 'ประเภทวัน: วันชงควรเลี่ยง, ต่ำกว่า 60 วันธรรมดา, 60–71 วันดี, 72 ขึ้นไป วันพลัง' })}">
+        <span class="cal-scale-seg is-avoid"></span><span class="cal-scale-seg is-plain"></span><span class="cal-scale-seg is-good"></span><span class="cal-scale-seg is-power"></span>
+        <span class="cal-scale-lbl is-avoid">${_t('Avoid', '忌', 'เลี่ยง')}<small>${_t('Clash', '冲日', 'วันชง')}</small></span>
+        <span class="cal-scale-lbl">${_t('Ordinary', '平日', 'วันธรรมดา')}<small>0–59</small></span>
+        <span class="cal-scale-lbl is-good">${_t('Good', '吉', 'วันดี')}<small>60–71</small></span>
+        <span class="cal-scale-lbl is-power">${_t('Power Day', '吉日', 'วันพลัง')}<small>72–100</small></span>
+      </div>
+      ${!personal || hasPartner ? `<div class="cal-legend-row">
+        ${!personal ? `<div class="cal-legend-item"><span class="cal-legend-dot cal-legend-fit"></span> ${_t(`Suits ${obj.en}`, `宜${obj.zh}`, `เหมาะกับ${obj.th}`)}</div>` : ''}
+        ${hasPartner ? `<div class="cal-legend-item"><span class="cal-legend-dot cal-legend-both"></span> ${_t('Works for both charts', '两盘皆宜', 'เหมาะทั้งสองแผน')}</div>` : ''}
+      </div>` : ''}
     </div>`;
 
-  const clashDays = scored.filter(s => s.clashYear).map(s => s.day);
-  const animalName = _t(animal, ANIMAL_ZH[animal] || animal, ANIMAL_TH[animal] || animal);
-  const clashHTML = clashDays.length
-    ? `<div class="cal-clash-note">${_t(
-        `Avoid ${clashDays.join(', ')} — these days clash your ${animalName} year (冲太岁).`,
-        `避开 ${clashDays.join('、')} 日——冲你的${animalName}年太岁。`,
-        `เลี่ยงวันที่ ${clashDays.join(', ')} — ชงปี${animalName}ของคุณ (冲太岁)`)}</div>`
-    : '';
 
   const officerNames = obj.officers.map(i => {
     const o = BaziEngine.DAY_OFFICERS[i];
@@ -4252,7 +4254,6 @@ function renderAuspiciousDates(animal, dominantEl, opts) {
         </div>
         <div class="cal-detail" id="power-day-detail" aria-live="polite">${powerDayDetailHTML(_powerDetailScore(), elColor)}</div>
       </div>
-      ${clashHTML}
       <div class="cal-note">${methodNote}</div>
     </div>`;
   if (typeof applyI18n === 'function') applyI18n();
@@ -4733,23 +4734,6 @@ function renderYouHero(animal, yearPillar, elColor) {
   );
   document.getElementById('you-hero-traits').innerHTML =
     (zData.traits || []).map(t => `<span class="you-hero-trait">${_t(t, TRAIT_ZH[t] || t)}</span>`).join('');
-}
-
-/* ── You Profile Header (You tab) ── */
-function renderYouProfile(animal, yearPillar, elColor) {
-  const el = document.getElementById('you-profile-header');
-  if (!el) return;
-  const emoji = BRANCHES.find(b => b.animal === animal)?.emoji || '';
-  const stem = yearPillar.stem;
-  el.innerHTML = `
-    <div class="you-profile-card" style="border-color:${elColor}55">
-      <div class="you-profile-label"><span class="en">Wǒ Bāzì Profile</span><span class="zh hide">我的八字命盘</span><span class="th hide">โปรไฟล์ปาจื้อ</span></div>
-      <div class="you-profile-identity">
-        <span class="you-profile-badge" style="background:${elColor}22;color:${elColor}">${emoji} <span class="en">${stem.element} ${animal}</span><span class="zh hide">${EL_ZH[stem.element]}${ANIMAL_ZH[animal]}</span></span>
-        <span class="you-profile-badge"><span class="en">${stem.polarity}</span><span class="zh hide">${stem.polarity === 'Yang' ? '阳' : '阴'}</span></span>
-        <span class="you-profile-badge">${stem.char}${yearPillar.branch.char}</span>
-      </div>
-    </div>`;
 }
 
 /* ═══════════════════════════════════════

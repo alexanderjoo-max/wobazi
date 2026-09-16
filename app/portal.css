@@ -43,7 +43,9 @@
 }
 
 /* ── Portal home, journal, account (existing tokens/values only) ── */
-#portal .scroll-body > div > .section:first-child { margin-top: 16px; }
+/* No phantom status-bar gap: the header sits at the top like the results header */
+#portal .nav-bar { padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: 10px; }
+#portal .scroll-body > div > .section:first-child { margin-top: 0; }
 .portal-card { border-color: var(--border); }
 .portal-keep { margin-top: 16px; }
 .portal-id-row { display: flex; align-items: center; gap: 10px; }
