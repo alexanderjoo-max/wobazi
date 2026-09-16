@@ -189,12 +189,27 @@ function appIndexHtml() {
   if (mtime !== appIndexCache.mtime) appIndexCache = { mtime, html: fs.readFileSync(APP_INDEX, 'utf8') };
   return appIndexCache.html;
 }
-function sendApp(req, res, next) {
-  res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-  res.render('partials/footer', { user: res.locals.user }, (err, footer) => {
-    if (err) return next(err);
-    res.type('html').send(appIndexHtml().split('<!-- SITE_FOOTER -->').join(footer));
-  });
+function renderPartial(view, locals) {
+  return new Promise((resolve, reject) => app.render(view, locals, (err, html) => (err ? reject(err) : resolve(html))));
+}
+/* The app shell gets the same footer and header menu as the site pages, rendered for the signed-in state:
+   <!-- SITE_FOOTER --> and <!-- NAV_MENU:<screen> --> markers are replaced per request. */
+async function sendApp(req, res, next) {
+  try {
+    const user = res.locals.user;
+    let html = appIndexHtml();
+    const footer = await renderPartial('partials/footer', { user });
+    html = html.split('<!-- SITE_FOOTER -->').join(footer);
+    const screens = [...new Set([...html.matchAll(/<!-- NAV_MENU:(\w+) -->/g)].map(m => m[1]))];
+    for (const ctx of screens) {
+      const menu = await renderPartial('partials/nav-menu', { user, ctx });
+      html = html.split(`<!-- NAV_MENU:${ctx} -->`).join(menu);
+    }
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.type('html').send(html);
+  } catch (err) {
+    next(err);
+  }
 }
 app.get(['/', '/index.html', '/index'], sendApp);
 

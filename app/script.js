@@ -490,6 +490,23 @@ function closeAppNav() {
     n.querySelectorAll('[aria-expanded="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
   });
 }
+/* Header menu actions (views/partials/nav-menu.ejs). Links keep real hrefs; modified clicks open them normally. */
+function appNav(e, action) {
+  if (e && (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1)) return true;
+  if (e) e.preventDefault();
+  closeAppNav();
+  haptic(6);
+  switch (action) {
+    case 'portal': goHash('portal'); break;
+    case 'history': goHash('history'); break;
+    case 'share': showShareCard(); break;
+    case 'edit':
+    case 'plot': goToInput(); break;
+    case 'login': loginWithGoogle(); break;
+    case 'logout': logout(); break;
+  }
+  return false;
+}
 function goToLanding() { closeAppNav(); goHash(''); }
 function goToInput() {
   closeAppNav();
@@ -5058,22 +5075,9 @@ async function checkAuth() {
 
 function showAuthState() {
   if (!_currentUser) return;
-  // Switch splash to logged-in state
-  const guest = document.getElementById('splash-guest');
+  // Header and menu are rendered signed-in by the server (nav-menu.ejs); only the splash content switches here.
   const authed = document.getElementById('splash-authed');
-  const navAuthed = document.getElementById('nav-authed');
-  if (guest) guest.classList.add('hide');
   if (authed) authed.classList.remove('hide');
-  if (navAuthed) {
-    navAuthed.classList.remove('hide');
-    const av = document.getElementById('nav-authed-avatar');
-    if (av && _currentUser.avatar) {
-      av.src = _currentUser.avatar;
-      av.alt = _currentUser.name || '';
-    }
-  }
-  document.querySelectorAll('.drawer-guest').forEach(el => el.classList.add('hide'));
-  document.querySelectorAll('.drawer-authed').forEach(el => el.classList.remove('hide'));
 
   // Set welcome message
   const welcomeEl = document.getElementById('splash-welcome');

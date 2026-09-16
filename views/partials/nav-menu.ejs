@@ -1,0 +1,90 @@
+<%#
+  Right side of every header + its menu. One source for the site pages (ctx 'site')
+  and each app screen (ctx 'landing' | 'input' | 'results' | 'portal' | 'oracle').
+  Guests: desktop text links, Sign in, menu button. Members: avatar button opens the menu.
+  Share / language / explainer / My Wobazi live in the menu only.
+%>
+<%
+  const member = typeof user !== 'undefined' && user ? user : null;
+  const app = ctx !== 'site';
+  const act = a => app ? ` onclick="return appNav(event, '${a}')"` : '';
+  const showCta = ctx === 'site' || ctx === 'landing';
+  const ico = {
+    home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+    history: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>',
+    edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>',
+    plot: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+    book: '<path d="M2 4h7a3 3 0 013 3v13a2 2 0 00-2-2H2z"/><path d="M22 4h-7a3 3 0 00-3 3v13a2 2 0 012-2h8z"/>',
+    person: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 3.5 6 3.5 9s-1 6-3.5 9c-2.5-3-3.5-6-3.5-9S9.5 6 12 3z"/>',
+    logout: '<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
+  };
+  const svg = k => `<svg class="drawer-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico[k]}</svg>`;
+  const google = size => `<svg class="google-logo" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>`;
+%>
+<div class="nav-right">
+  <% if (!member) { %>
+  <a href="/what-is-bazi" class="nav-text-link" data-i18n="nav.explainer">BaZi Explainer</a>
+  <a href="/Master-Alice.html" class="nav-text-link" data-i18n="nav.about">Master Alice</a>
+  <a href="/auth/google" class="google-login-btn nav-signin" data-i18n="nav.signin"<%- act('login') %>><%- google(16) %><span data-i18n-label>Sign in</span></a>
+  <% } %>
+  <% if (showCta) { %>
+  <a href="<%= app ? '/#input' : '/?begin=1' %>" class="btn-primary site-nav-cta"<%- act('plot') %>><span data-i18n="nav.begin">Plot Your Chart</span></a>
+  <% } %>
+  <% if (member) { %>
+  <button type="button" class="nav-member-btn" aria-label="Account menu" aria-expanded="false" onclick="toggleSiteNav(this, event)"><%- svg('person') %><% if (member.avatar) { %><img class="nav-authed-avatar" src="<%= member.avatar %>" alt="" referrerpolicy="no-referrer"><% } %></button>
+  <% } else { %>
+  <button type="button" class="site-nav-toggle" aria-label="Menu" aria-expanded="false" onclick="toggleSiteNav(this, event)"><span class="nav-burger" aria-hidden="true"><span></span><span></span><span></span></span></button>
+  <% } %>
+</div>
+
+<div class="site-nav-drawer">
+  <div class="drawer-card">
+    <% if (member) { %>
+    <div class="drawer-member">
+      <div class="drawer-member-head">
+        <% if (member.avatar) { %><img class="nav-authed-avatar drawer-member-avatar" src="<%= member.avatar %>" alt="" referrerpolicy="no-referrer"><% } %>
+        <div class="drawer-member-id">
+          <div class="drawer-member-name"><%= member.name || '' %></div>
+          <div class="drawer-member-email"><%= member.email || '' %></div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+
+    <nav class="drawer-list" aria-label="Menu">
+      <% if (member) { %>
+      <a href="/#portal" class="drawer-link"<%- act('portal') %>><%- svg('home') %><span data-i18n="footer.portal">My Wobazi</span></a>
+      <a href="/#history" class="drawer-link"<%- act('history') %>><%- svg('history') %><span data-i18n="footer.history">Reading History</span></a>
+      <% } %>
+      <% if (ctx === 'results') { %>
+      <a href="/#you" class="drawer-link"<%- act('share') %>><%- svg('share') %><span data-i18n="nav.share">Share</span></a>
+      <a href="/#input" class="drawer-link"<%- act('edit') %>><%- svg('edit') %><span data-i18n="nav.editBirth">Edit birth data</span></a>
+      <% } %>
+      <% if (member && showCta) { %>
+      <a href="<%= app ? '/#input' : '/?begin=1' %>" class="drawer-link"<%- act('plot') %>><%- svg('plot') %><span data-i18n="nav.begin">Plot Your Chart</span></a>
+      <% } %>
+      <a href="/what-is-bazi" class="drawer-link"><%- svg('book') %><span data-i18n="nav.explainer">BaZi Explainer</span></a>
+      <a href="/Master-Alice.html" class="drawer-link"><%- svg('person') %><span data-i18n="nav.about">Master Alice</span></a>
+      <div class="drawer-link drawer-lang-row">
+        <%- svg('globe') %><span data-i18n="nav.language">Language</span>
+        <div class="drawer-lang">
+          <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">EN</button>
+          <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
+          <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+        </div>
+      </div>
+      <% if (member) { %>
+      <a href="/auth/logout" class="drawer-link drawer-logout"<%- act('logout') %>><%- svg('logout') %><span data-i18n="footer.logout">Log out</span></a>
+      <% } %>
+    </nav>
+
+    <% if (!member) { %>
+    <a href="/auth/google" class="google-login-btn drawer-google" data-i18n="nav.signinGoogle"<%- act('login') %>><%- google(18) %><span data-i18n-label>Sign in with Google</span></a>
+    <% if (showCta) { %>
+    <a href="<%= app ? '/#input' : '/?begin=1' %>" class="btn-primary drawer-cta"<%- act('plot') %>><span data-i18n="nav.begin">Plot Your Chart</span></a>
+    <% } %>
+    <% } %>
+  </div>
+</div>

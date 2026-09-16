@@ -117,10 +117,13 @@ Google sign-in only. Mounted in `server.js` via `require('./portal').mount(app, 
 - **Guest conversion**: one dismissible "Keep this chart" card per device (`localStorage wobazi_keep_prompt_v1`). After sign-in, `onAuth()` saves the browser's chart to `readings` only if the account has none.
 - Hooks in `script.js`: `captureToday` at the end of the daily-guidance IIFE, `onAuth` in `checkAuth`, `isRoute/route` in `applyRoute`.
 
-## Shared nav + footer (updated 2026-09-15)
+## Shared nav + footer (updated 2026-09-16)
 - `views/partials/footer.ejs` is the one site footer. EJS pages include it; `sendApp` in `server.js` renders it into every `<!-- SITE_FOOTER -->` marker in `app/index.html` (landing + results). Footer CSS lives in `app/style.css` (`.seo-footer*`).
-- Desktop (≥768px): results header, tab bar, chip bars and `.scroll-body` share one centred column (`--app-max: 1000px`, gutter `--app-gutter` 40px / 64px ≥1200px).
-- `res.locals.user` (from the cookie session) drives signed-in state server-side: `nav.ejs` shows "My Wobazi" + avatar menu, the footer's My Wobazi column shows My Wobazi / Reading History / Account / Log out (guests: Sign in / Plot Your Chart). Links go to `/#portal`, `/#history`, `/#account`, `/auth/logout`.
+- `views/partials/nav-menu.ejs` is the right side of every header plus its menu. EJS pages include it with `ctx: 'site'`; `sendApp` renders it into each `<!-- NAV_MENU:<ctx> -->` marker (`landing`, `input`, `results`, `portal`, `oracle`). Signed-in state comes from `res.locals.user` (cookie session), so the header is correct on first paint.
+  - Guest: BaZi Explainer + Master Alice text links (desktop), Google "Sign in", menu button. Members: avatar button only. "Plot Your Chart" CTA on `site`/`landing`.
+  - Menu (icons): member head · My Wobazi · Reading History · Share + Edit birth data (results) · Plot Your Chart (members, site/landing) · BaZi Explainer · Master Alice · Language · Log out. Guests also get Sign in with Google (+ Plot Your Chart CTA).
+  - App links keep real hrefs and call `appNav(event, action)` in `script.js`.
+- Every header uses the same 10px vertical padding (safe-area aware) and, ≥768px, the centred content column gutters.
 
 ## API Conventions
 - Routes: kebab-case (`/api/daily-reading`)

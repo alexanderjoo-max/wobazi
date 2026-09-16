@@ -43,8 +43,7 @@
 }
 
 /* ── Portal home, journal, account (existing tokens/values only) ── */
-/* No phantom status-bar gap: the header sits at the top like the results header */
-#portal .nav-bar { padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: 10px; }
+/* First section sits right under the header */
 #portal .scroll-body > div > .section:first-child { margin-top: 0; }
 .portal-card { border-color: var(--border); }
 .portal-keep { margin-top: 16px; }
@@ -97,10 +96,8 @@
 .drawer-member-id { min-width: 0; }
 .drawer-member-name { font-size: 14px; font-weight: 600; color: var(--text); }
 .drawer-member-email { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.drawer-member .drawer-logout { color: var(--muted); }
-body.is-authed .drawer-card > .drawer-lang-block { order: 2; }
 
-/* Desktop header (no hamburger above 860px): My Wobazi + avatar button opening the member menu */
+/* Member avatar button: opens the header menu on every page */
 .nav-member-btn {
   position: relative;
   display: flex; align-items: center; justify-content: center;
