@@ -96,11 +96,11 @@
     html[data-lang="zh"] .en:has(~ .zh) { display: none !important; }
     html[data-lang="zh"] .zh { display: revert !important; }
   </style>
-  <script src="/public/js/i18n.js?v=14"></script>
+  <script src="/public/js/i18n.js?v=15"></script>
   <script src="/public/js/i18n-ui.js?v=3"></script>
   <script src="/public/js/i18n-copy.js?v=2"></script>
   <script src="/public/js/i18n-copy-more.js?v=2"></script>
-  <script src="/public/js/i18n-app-th.js?v=3"></script>
+  <script src="/public/js/i18n-app-th.js?v=4"></script>
 </head>
 <body>
 
@@ -784,13 +784,13 @@
           <div class="field-row field-datetime">
             <div class="field-col field-col-date">
               <div class="date-trio">
-                <input type="number" id="birth-day"   class="date-part" placeholder="DD"   min="1"    max="31"   inputmode="numeric" required aria-required="true">
+                <input type="number" id="birth-day"   class="date-part" placeholder="DD" data-i18n-placeholder="form.dd"   min="1"    max="31"   inputmode="numeric" required aria-required="true">
                 <span class="date-sep">/</span>
-                <input type="number" id="birth-month" class="date-part" placeholder="MM"   min="1"    max="12"   inputmode="numeric" required aria-required="true">
+                <input type="number" id="birth-month" class="date-part" placeholder="MM" data-i18n-placeholder="form.mm"   min="1"    max="12"   inputmode="numeric" required aria-required="true">
                 <span class="date-sep">/</span>
-                <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" min="1900" max="2100" inputmode="numeric" required aria-required="true">
+                <input type="number" id="birth-year"  class="date-part year" placeholder="YYYY" data-i18n-placeholder="form.yyyy" min="1900" max="2100" inputmode="numeric" required aria-required="true">
               </div>
-              <div class="cal-seg" role="radiogroup" aria-label="Calendar type">
+              <div class="cal-seg" role="radiogroup" aria-label="Calendar type" data-i18n-aria="aria.calendarType">
                 <button type="button" class="cal-seg-btn active" id="cal-solar" role="radio" aria-checked="true" onclick="setCalendarType('solar')">
                   <span aria-hidden="true">☀️</span>
                   <span class="en">Solar</span><span class="zh hide">阳历</span><span class="th hide">สุริยคติ</span>
@@ -859,15 +859,15 @@
             <span class="label-opt">双胞胎</span>
           </label>
           <div class="twin-options hide" id="twin-options">
-            <div class="gender-row twin-order" role="radiogroup" aria-label="Twin birth order">
+            <div class="gender-row twin-order" role="radiogroup" aria-label="Twin birth order" data-i18n-aria="aria.twinOrder">
               <label class="gender-opt"><input type="radio" name="twin-order" value="elder" checked onchange="updateTwinHint()"> <span class="en">Born first</span><span class="zh hide">先出生</span><span class="th hide">เกิดก่อน</span></label>
               <label class="gender-opt"><input type="radio" name="twin-order" value="younger" onchange="updateTwinHint()"> <span class="en">Born second</span><span class="zh hide">后出生</span><span class="th hide">เกิดทีหลัง</span></label>
             </div>
             <div class="twin-method-wrap hide" id="twin-method-wrap">
               <label for="twin-method"><span class="en">Method</span><span class="zh hide">取法</span><span class="th hide">วิธี</span></label>
               <select id="twin-method" class="select-input">
-                <option value="luck">大运法 — month from first luck pillar</option>
-                <option value="hour">时柱法 — hour moves one 时辰</option>
+                <option value="luck" data-i18n="twin.luck">大运法 — month from first luck pillar</option>
+                <option value="hour" data-i18n="twin.hour">时柱法 — hour moves one 时辰</option>
               </select>
             </div>
             <p class="field-hint">
@@ -1039,7 +1039,7 @@
             <span class="you-hero-gz" id="you-hero-gz"></span>
           </div>
           <div class="you-hero-main">
-            <button type="button" class="you-hero-emoji" id="you-hero-emoji" aria-label="Year animal" onclick="haptic(8); this.classList.remove('is-hop'); void this.offsetWidth; this.classList.add('is-hop')"></button>
+            <button type="button" class="you-hero-emoji" id="you-hero-emoji" aria-label="Year animal" data-i18n-aria="aria.yearAnimal" onclick="haptic(8); this.classList.remove('is-hop'); void this.offsetWidth; this.classList.add('is-hop')"></button>
             <div class="you-hero-names">
               <h2 class="you-hero-title" id="you-hero-title"></h2>
               <div class="you-hero-sub" id="you-hero-sub"></div>
@@ -1382,7 +1382,7 @@
           <form id="partner-form" class="bazi-mini-form" onsubmit="event.preventDefault(); haptic(10); checkCompatibility();">
             <div class="field">
               <label><span class="en">Name <span class="label-opt">optional</span></span><span class="zh hide">姓名 <span class="label-opt">选填</span></span><span class="th hide">ชื่อ <span class="label-opt">ไม่บังคับ</span></span></label>
-              <input type="text" id="partner-name" placeholder="Partner's name" autocomplete="off" spellcheck="false" data-1p-ignore data-lpignore="true">
+              <input type="text" id="partner-name" placeholder="Partner's name" data-i18n-placeholder="form.partnerName" autocomplete="off" spellcheck="false" data-1p-ignore data-lpignore="true">
             </div>
             <div class="field field-date-block">
               <div class="datetime-labels">
@@ -1392,13 +1392,13 @@
               <div class="field-row field-datetime">
                 <div class="field-col field-col-date">
                   <div class="date-trio">
-                    <input type="number" id="partner-day" class="date-part" placeholder="DD" min="1" max="31" inputmode="numeric">
+                    <input type="number" id="partner-day" class="date-part" placeholder="DD" data-i18n-placeholder="form.dd" min="1" max="31" inputmode="numeric">
                     <span class="date-sep">/</span>
-                    <input type="number" id="partner-month" class="date-part" placeholder="MM" min="1" max="12" inputmode="numeric">
+                    <input type="number" id="partner-month" class="date-part" placeholder="MM" data-i18n-placeholder="form.mm" min="1" max="12" inputmode="numeric">
                     <span class="date-sep">/</span>
-                    <input type="number" id="partner-year" class="date-part year" placeholder="YYYY" min="1900" max="2100" inputmode="numeric">
+                    <input type="number" id="partner-year" class="date-part year" placeholder="YYYY" data-i18n-placeholder="form.yyyy" min="1900" max="2100" inputmode="numeric">
                   </div>
-                  <div class="cal-seg" role="radiogroup" aria-label="Partner calendar type">
+                  <div class="cal-seg" role="radiogroup" aria-label="Partner calendar type" data-i18n-aria="aria.partnerCalendar">
                     <button type="button" class="cal-seg-btn active" id="partner-cal-solar" role="radio" aria-checked="true" onclick="setPartnerCalendarType('solar')">
                       <span aria-hidden="true">☀️</span>
                       <span class="en">Solar</span><span class="zh hide">阳历</span><span class="th hide">สุริยคติ</span>
@@ -1433,14 +1433,14 @@
               <div class="field-col">
                 <label><span class="en">Birth City <span class="label-opt">geographic energy</span></span><span class="zh hide">出生城市 <span class="label-opt">地理能量</span></span><span class="th hide">เมืองเกิด <span class="label-opt">พลังงานภูมิศาสตร์</span></span></label>
                 <div class="city-wrap">
-                  <input type="text" id="partner-birthplace" placeholder="Start typing a city..." autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="partner-city-suggest">
+                  <input type="text" id="partner-birthplace" placeholder="Start typing a city..." data-i18n-placeholder="form.city.ph" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="partner-city-suggest">
                   <ul id="partner-city-suggest" class="city-suggest hide" role="listbox"></ul>
                 </div>
               </div>
               <div class="field-col">
                 <label><span class="en">Blood Type <span class="label-opt">personality traits</span></span><span class="zh hide">血型 <span class="label-opt">性格特征</span></span><span class="th hide">หมู่เลือด <span class="label-opt">ลักษณะนิสัย</span></span></label>
                 <select id="partner-blood" class="select-input">
-                  <option value="">Unknown</option>
+                  <option value="" data-i18n="form.unknown">Unknown</option>
                   <option value="A">A</option>
                   <option value="B">B</option>
                   <option value="AB">AB</option>
@@ -1518,11 +1518,11 @@
         </div>
       </div>
       <div class="oracle-chips" id="oracle-drawer-chips">
-        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Should I make a major move today?</button>
-        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">What does my luck pillar say about 2026?</button>
-        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Best timing this week to close a deal?</button>
-        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Read my wealth stars</button>
-        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)">Is this a good week to travel?</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)" data-i18n="oracle.chip1">Should I make a major move today?</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)" data-i18n="oracle.chip2">What does my luck pillar say about 2026?</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)" data-i18n="oracle.chip3">Best timing this week to close a deal?</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)" data-i18n="oracle.chip4">Read my wealth stars</button>
+        <button class="oracle-chip" onclick="sendOracleChipDrawer(this)" data-i18n="oracle.chip5">Is this a good week to travel?</button>
       </div>
     </div>
     <div class="oracle-drawer-input">
@@ -1544,12 +1544,12 @@
       <div class="viral-handle"></div>
       <div class="viral-top">
         <p class="viral-kicker">WOBAZI ✦ <span class="en">Share a verdict</span><span class="zh hide">分享判词</span><span class="th hide">แชร์คำตัดสิน</span></p>
-        <button type="button" class="viral-x" onclick="closeViralShare()" aria-label="Close">×</button>
+        <button type="button" class="viral-x" onclick="closeViralShare()" aria-label="Close" data-i18n-aria="aria.close">×</button>
       </div>
       <div class="viral-tones" role="tablist">
-        <button type="button" class="viral-chip is-on" data-viral-tone="oracle">Oracle</button>
-        <button type="button" class="viral-chip" data-viral-tone="roast">Roast</button>
-        <button type="button" class="viral-chip" data-viral-tone="power">Power</button>
+        <button type="button" class="viral-chip is-on" data-viral-tone="oracle" data-i18n="viral.oracle">Oracle</button>
+        <button type="button" class="viral-chip" data-viral-tone="roast" data-i18n="viral.roast">Roast</button>
+        <button type="button" class="viral-chip" data-viral-tone="power" data-i18n="viral.power">Power</button>
       </div>
       <div id="viral-preview" class="viral-preview"></div>
       <label class="viral-cap-label"><span class="en">Caption</span><span class="zh hide">文案</span><span class="th hide">แคปชัน</span></label>
@@ -1590,7 +1590,7 @@
   <!-- MY WOBAZI (signed-in portal: home, history, journal, account; driven by app/portal.js) -->
   <div id="portal" class="screen">
     <div class="nav-bar app-nav">
-      <button class="btn-back" aria-label="Back" onclick="haptic(8); WobaziPortal.back()">
+      <button class="btn-back" aria-label="Back" data-i18n-aria="nav.back" onclick="haptic(8); WobaziPortal.back()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="nav-title" id="portal-title"><span class="en">My Wobazi</span><span class="zh hide">我的 Wobazi</span><span class="th hide">Wobazi ของฉัน</span></span>
@@ -1636,11 +1636,11 @@
 
       <!-- Suggested chips -->
       <div class="oracle-chips" id="oracle-chips">
-        <button class="oracle-chip" onclick="sendOracleChip(this)">Should I make a major move today?</button>
-        <button class="oracle-chip" onclick="sendOracleChip(this)">What does my luck pillar say about 2026?</button>
-        <button class="oracle-chip" onclick="sendOracleChip(this)">Best timing this week to close a deal?</button>
-        <button class="oracle-chip" onclick="sendOracleChip(this)">Read my wealth stars</button>
-        <button class="oracle-chip" onclick="sendOracleChip(this)">Is this a good week to travel?</button>
+        <button class="oracle-chip" onclick="sendOracleChip(this)" data-i18n="oracle.chip1">Should I make a major move today?</button>
+        <button class="oracle-chip" onclick="sendOracleChip(this)" data-i18n="oracle.chip2">What does my luck pillar say about 2026?</button>
+        <button class="oracle-chip" onclick="sendOracleChip(this)" data-i18n="oracle.chip3">Best timing this week to close a deal?</button>
+        <button class="oracle-chip" onclick="sendOracleChip(this)" data-i18n="oracle.chip4">Read my wealth stars</button>
+        <button class="oracle-chip" onclick="sendOracleChip(this)" data-i18n="oracle.chip5">Is this a good week to travel?</button>
       </div>
     </div>
 
@@ -1656,7 +1656,7 @@
   <script src="/bazi-engine.js?v=9"></script>
   <script src="/verdict.js?v=2"></script>
   <script src="/app/portal.js?v=6"></script>
-  <script src="/app/script.js?v=55"></script>
-  <script src="/app/share-viral.js?v=5"></script>
+  <script src="/app/script.js?v=56"></script>
+  <script src="/app/share-viral.js?v=6"></script>
 </body>
 </html>

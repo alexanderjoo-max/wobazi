@@ -227,6 +227,11 @@
       var pkey = ph[j].getAttribute('data-i18n-placeholder');
       if (STR[pkey]) ph[j].placeholder = t(pkey, lang);
     }
+    var ar = document.querySelectorAll('[data-i18n-aria]');
+    for (var a = 0; a < ar.length; a++) {
+      var akey = ar[a].getAttribute('data-i18n-aria');
+      if (STR[akey]) ar[a].setAttribute('aria-label', t(akey, lang));
+    }
   }
 
   function add(map) {

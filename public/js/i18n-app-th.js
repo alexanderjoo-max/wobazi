@@ -577,8 +577,47 @@
     'Flows into your soul': ['เข้าถึงจิตใจของคุณ', '流入你的心灵'],
     'Understands your silences': ['เข้าใจแม้ในความเงียบของคุณ', '懂你的沉默'],
     'Deep emotional resonance': ['ความรู้สึกที่สอดคล้องกันอย่างลึกซึ้ง', '深层的情感共鸣'],
+    'Clash': ['ชง', '冲'],
+    'Harmony': ['เข้ากัน', '相合'],
+    'Neutral': ['กลาง ๆ', '平'],
+    'The Oracle is temporarily unavailable — try again in a moment.': ['เทพพยากรณ์ไม่พร้อมใช้งานชั่วคราว โปรดลองใหม่อีกครั้งในอีกสักครู่', '神谕暂时无法使用，请稍后再试。'],
+    'Something went wrong generating your reading. Please try again.': ['เกิดข้อผิดพลาดในการสร้างผลการอ่านดวง โปรดลองอีกครั้ง', '生成解读时出错，请重试。'],
+    'Copied to clipboard! ✦': ['คัดลอกไปยังคลิปบอร์ดแล้ว ✦', '已复制到剪贴板！✦'],
+    'Complete your BaZi profile first to unlock the Oracle': ['กรุณากรอกข้อมูลปาจื้อของคุณให้ครบก่อน เพื่อปลดล็อกเทพพยากรณ์', '请先完善你的八字资料，以解锁神谕'],
+    'Posted? Tag a friend.': ['โพสต์แล้วหรือยัง แท็กเพื่อนของคุณได้เลย', '发好了吗？记得@朋友。'],
+    'Caption copied.': ['คัดลอกแคปชันแล้ว', '文案已复制。'],
+    'Could not copy the caption.': ['ไม่สามารถคัดลอกแคปชันได้', '无法复制文案。'],
+    'Image saved.': ['บันทึกรูปแล้ว', '图片已保存。'],
+    'Copy image is not supported here.': ['อุปกรณ์นี้ไม่รองรับการคัดลอกรูป', '此处不支持复制图片。'],
+    'Image copied.': ['คัดลอกรูปแล้ว', '图片已复制。'],
+    'Could not copy image.': ['ไม่สามารถคัดลอกรูปได้', '无法复制图片。'],
+    'Link copied.': ['คัดลอกลิงก์แล้ว', '链接已复制。'],
+    'Could not copy the link.': ['ไม่สามารถคัดลอกลิงก์ได้', '无法复制链接。'],
+    'Card saved. Upload it on Instagram.': ['บันทึกการ์ดแล้ว สามารถอัปโหลดบน Instagram ได้', '卡片已保存，可上传到 Instagram。'],
   };
-  var C = {}, en;
+  /* Keyed rows for data-i18n / data-i18n-placeholder / data-i18n-aria attributes */
+  var C = {
+    'form.dd': { en: 'DD', th: 'วว', zh: '日' },
+    'form.mm': { en: 'MM', th: 'ดด', zh: '月' },
+    'form.yyyy': { en: 'YYYY', th: 'ปปปป', zh: '年' },
+    'form.partnerName': { en: 'Partner\'s name', th: 'ชื่อคู่ของคุณ', zh: '对方姓名' },
+    'aria.calendarType': { en: 'Calendar type', th: 'ประเภทปฏิทิน', zh: '历法类型' },
+    'aria.partnerCalendar': { en: 'Partner calendar type', th: 'ประเภทปฏิทินของคู่', zh: '对方历法类型' },
+    'aria.twinOrder': { en: 'Twin birth order', th: 'ลำดับการเกิดของแฝด', zh: '双胞胎出生顺序' },
+    'aria.yearAnimal': { en: 'Year animal', th: 'นักษัตรประจำปีเกิด', zh: '生肖' },
+    'aria.close': { en: 'Close', th: 'ปิด', zh: '关闭' },
+    'nav.account': { en: 'Account menu', th: 'เมนูบัญชี', zh: '账户菜单' },
+    'twin.luck': { en: '大运法 — month from first luck pillar', th: '大运法 — ใช้เสาโชคแรกเป็นเสาเดือน', zh: '大运法 — 月柱取第一步大运' },
+    'twin.hour': { en: '时柱法 — hour moves one 时辰', th: '时柱法 — เลื่อนเสาชั่วโมงไปหนึ่ง 时辰', zh: '时柱法 — 时柱后移一个时辰' },
+    'oracle.chip1': { en: 'Should I make a major move today?', th: 'วันนี้ควรตัดสินใจเรื่องสำคัญหรือไม่', zh: '今天适合做重大决定吗？' },
+    'oracle.chip2': { en: 'What does my luck pillar say about 2026?', th: 'เสาโชคของฉันบอกอะไรเกี่ยวกับปี 2026', zh: '我的大运对2026年有什么启示？' },
+    'oracle.chip3': { en: 'Best timing this week to close a deal?', th: 'ช่วงเวลาใดในสัปดาห์นี้เหมาะกับการปิดการเจรจามากที่สุด', zh: '本周什么时候最适合谈成交易？' },
+    'oracle.chip4': { en: 'Read my wealth stars', th: 'ช่วยอ่านดาวการเงินของฉัน', zh: '帮我看看财星' },
+    'oracle.chip5': { en: 'Is this a good week to travel?', th: 'สัปดาห์นี้เหมาะกับการเดินทางหรือไม่', zh: '这周适合出行吗？' },
+    'viral.oracle': { en: 'Oracle', th: 'เทพพยากรณ์', zh: '神谕' },
+    'viral.roast': { en: 'Roast', th: 'ตรงไปตรงมา', zh: '吐槽' },
+    'viral.power': { en: 'Power', th: 'พลัง', zh: '力量' },
+  }, en;
   for (en in TH) {
     if (Object.prototype.hasOwnProperty.call(TH, en)) C['th:' + en] = { en: en, th: TH[en] };
   }

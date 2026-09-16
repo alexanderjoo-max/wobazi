@@ -35,9 +35,9 @@
   <a href="<%= app ? '/#input' : '/?begin=1' %>" class="btn-primary site-nav-cta"<%- act('plot') %>><span data-i18n="nav.begin">Plot Your Chart</span></a>
   <% } %>
   <% if (member) { %>
-  <button type="button" class="nav-member-btn" aria-label="Account menu" aria-expanded="false" onclick="toggleSiteNav(this, event)"><%- svg('person') %><% if (member.avatar) { %><img class="nav-authed-avatar" src="<%= member.avatar %>" alt="" referrerpolicy="no-referrer"><% } %></button>
+  <button type="button" class="nav-member-btn" aria-label="Account menu" data-i18n-aria="nav.account" aria-expanded="false" onclick="toggleSiteNav(this, event)"><%- svg('person') %><% if (member.avatar) { %><img class="nav-authed-avatar" src="<%= member.avatar %>" alt="" referrerpolicy="no-referrer"><% } %></button>
   <% } else { %>
-  <button type="button" class="site-nav-toggle" aria-label="Menu" aria-expanded="false" onclick="toggleSiteNav(this, event)"><span class="nav-burger" aria-hidden="true"><span></span><span></span><span></span></span></button>
+  <button type="button" class="site-nav-toggle" aria-label="Menu" data-i18n-aria="nav.menu" aria-expanded="false" onclick="toggleSiteNav(this, event)"><span class="nav-burger" aria-hidden="true"><span></span><span></span><span></span></span></button>
   <% } %>
 </div>
 
@@ -55,7 +55,7 @@
     </div>
     <% } %>
 
-    <nav class="drawer-list" aria-label="Menu">
+    <nav class="drawer-list" aria-label="Menu" data-i18n-aria="nav.menu">
       <% if (member) { %>
       <a href="/#portal" class="drawer-link"<%- act('portal') %>><%- svg('star') %><span data-i18n="footer.portal">My Wobazi</span></a>
       <a href="/#history" class="drawer-link"<%- act('history') %>><%- svg('history') %><span data-i18n="footer.history">Reading History</span></a>

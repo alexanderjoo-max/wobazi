@@ -488,7 +488,8 @@
   function toast(msg) {
     const t = document.getElementById('viral-toast');
     if (!t) return;
-    t.textContent = msg;
+    const lang = window.WoBaziI18n ? WoBaziI18n.get() : 'en';
+    t.textContent = (lang !== 'en' && WoBaziI18n.lookup(msg, lang)) || msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2200);
   }

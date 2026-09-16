@@ -1152,7 +1152,7 @@ function handleSubmit(e) {
       console.error('[renderResults error]', err);
       showScreen('input');
       goHash('input', { replace: true });
-      alert('Something went wrong generating your reading. Please try again.');
+      alert(_plainLoc({ en: 'Something went wrong generating your reading. Please try again.', zh: '生成解读时出错，请重试。', th: 'เกิดข้อผิดพลาดในการสร้างผลการอ่านดวง โปรดลองอีกครั้ง' }));
     }
   });
 }
@@ -2523,7 +2523,7 @@ async function doShare() {
     }
   } else if (navigator.clipboard) {
     await navigator.clipboard.writeText(text + '\nhttps://wobazi.com');
-    alert('Copied to clipboard! ✦');
+    alert(_plainLoc({ en: 'Copied to clipboard! ✦', zh: '已复制到剪贴板！✦', th: 'คัดลอกไปยังคลิปบอร์ดแล้ว ✦' }));
   }
 }
 
@@ -4228,7 +4228,7 @@ function renderAuspiciousDates(animal, dominantEl, opts) {
     return (k === 'personal' ? '✦ ' : '') + _plainLoc(o.label);
   };
   const selectHTML = `
-    <select class="pd-select" aria-label="What are you planning?" onchange="haptic(6); setCalFilter(this.value)">
+    <select class="pd-select" aria-label="${_plainLoc({ en: 'What are you planning?', zh: '你打算做什么？', th: 'คุณกำลังวางแผนทำอะไร' })}" onchange="haptic(6); setCalFilter(this.value)">
       ${groups.map(g => g.objectives.length === 1
         ? `<option value="${g.objectives[0]}"${g.objectives[0] === _calFilter ? ' selected' : ''}>${optionText(g.objectives[0])}</option>`
         : `<optgroup label="${g.icon} ${_plainLoc(g)}">${g.objectives.map(k =>
@@ -4322,9 +4322,9 @@ function renderAuspiciousDates(animal, dominantEl, opts) {
       <div class="pd-split">
         <div class="cal-month">
           <div class="cal-month-bar">
-            <button type="button" class="cal-nav" onclick="haptic(6); shiftPowerMonth(-1)" ${_calView === 0 ? 'disabled' : ''} aria-label="Previous month">‹</button>
+            <button type="button" class="cal-nav" onclick="haptic(6); shiftPowerMonth(-1)" ${_calView === 0 ? 'disabled' : ''} aria-label="${_plainLoc({ en: 'Previous month', zh: '上个月', th: 'เดือนก่อนหน้า' })}">‹</button>
             <div class="cal-month-label">${monthLabel}</div>
-            <button type="button" class="cal-nav" onclick="haptic(6); shiftPowerMonth(1)" ${_calView >= POWER_MAX_MONTHS - 1 ? 'disabled' : ''} aria-label="Next month">›</button>
+            <button type="button" class="cal-nav" onclick="haptic(6); shiftPowerMonth(1)" ${_calView >= POWER_MAX_MONTHS - 1 ? 'disabled' : ''} aria-label="${_plainLoc({ en: 'Next month', zh: '下个月', th: 'เดือนถัดไป' })}">›</button>
           </div>
           <div class="cal-grid">${dayHeaders}${blanks}${days}</div>
           ${legendHTML}
@@ -4875,7 +4875,7 @@ function showOracle() {
   return;
   // Legacy full-screen mode below (kept for reference)
   if (!_shareData || !_shareData.animal) {
-    alert('Complete your BaZi profile first to unlock the Oracle');
+    alert(_plainLoc({ en: 'Complete your BaZi profile first to unlock the Oracle', zh: '请先完善你的八字资料，以解锁神谕', th: 'กรุณากรอกข้อมูลปาจื้อของคุณให้ครบก่อน เพื่อปลดล็อกเทพพยากรณ์' }));
     return;
   }
   showScreen('oracle-chat');
@@ -4897,17 +4897,17 @@ function showOracle() {
   document.getElementById('oracle-ctx-bar').innerHTML = `
     <div class="oracle-ctx-pill">
       <span class="ctx-dot" style="background:${EL_COLOR[today.stem.element]}"></span>
-      ${today.stem.char}${today.branch.char} ${today.animal} Day
+      ${today.stem.char}${today.branch.char} ${_t(today.animal + ' Day', (ANIMAL_ZH[today.animal] || '') + '日', 'วัน' + (ANIMAL_TH[today.animal] || today.animal))}
     </div>
     <div class="oracle-ctx-pill">
       <span class="ctx-dot" style="background:${clashColor}"></span>
-      ${clashLabel}
+      ${_t(clashLabel)}
     </div>
     <div class="oracle-ctx-pill">
-      Force ${score}
+      ${_t('Force', '气势', 'พลัง')} ${score}
     </div>
     <div class="oracle-ctx-pill" style="${nobleman ? 'color:var(--gold);border-color:rgba(240,192,64,0.3)' : ''}">
-      ${nobleman ? '✦ Nobleman' : 'No Nobleman'}
+      ${nobleman ? _t('✦ Nobleman', '✦ 贵人日', '✦ วันกุ้ยเหริน') : _t('No Nobleman', '无贵人', 'ไม่มีกุ้ยเหริน')}
     </div>
   `;
 
@@ -5074,7 +5074,7 @@ async function sendOracleMessage() {
           if (data.error) {
             typingEl.remove();
             messagesEl.insertAdjacentHTML('beforeend',
-              `<div class="oracle-error-msg">${data.error}</div>`);
+              `<div class="oracle-error-msg">${_t(data.error)}</div>`);
             messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
             _oracleSending = false;
             return;
@@ -5228,7 +5228,7 @@ let _drawerOracleTodayData = null;
 
 function openOracleDrawer() {
   if (!_shareData || !_shareData.animal) {
-    alert('Complete your BaZi profile first to unlock the Oracle');
+    alert(_plainLoc({ en: 'Complete your BaZi profile first to unlock the Oracle', zh: '请先完善你的八字资料，以解锁神谕', th: 'กรุณากรอกข้อมูลปาจื้อของคุณให้ครบก่อน เพื่อปลดล็อกเทพพยากรณ์' }));
     return;
   }
 
@@ -5257,15 +5257,15 @@ function openOracleDrawer() {
   document.getElementById('oracle-drawer-ctx').innerHTML = `
     <div class="oracle-ctx-pill">
       <span class="ctx-dot" style="background:${EL_COLOR[today.stem.element]}"></span>
-      ${today.stem.char}${today.branch.char} ${today.animal} Day
+      ${today.stem.char}${today.branch.char} ${_t(today.animal + ' Day', (ANIMAL_ZH[today.animal] || '') + '日', 'วัน' + (ANIMAL_TH[today.animal] || today.animal))}
     </div>
     <div class="oracle-ctx-pill">
       <span class="ctx-dot" style="background:${clashColor}"></span>
-      ${clashLabel}
+      ${_t(clashLabel)}
     </div>
-    <div class="oracle-ctx-pill">Force ${score}</div>
+    <div class="oracle-ctx-pill">${_t('Force', '气势', 'พลัง')} ${score}</div>
     <div class="oracle-ctx-pill" style="${nobleman ? 'color:var(--gold);border-color:rgba(240,192,64,0.3)' : ''}">
-      ${nobleman ? '✦ Nobleman' : 'No Nobleman'}
+      ${nobleman ? _t('✦ Nobleman', '✦ 贵人日', '✦ วันกุ้ยเหริน') : _t('No Nobleman', '无贵人', 'ไม่มีกุ้ยเหริน')}
     </div>
   `;
 
@@ -5384,7 +5384,7 @@ async function sendOracleDrawerMessage() {
           if (data.error) {
             typingEl.remove();
             messagesEl.insertAdjacentHTML('beforeend',
-              `<div class="oracle-error-msg">${data.error}</div>`);
+              `<div class="oracle-error-msg">${_t(data.error)}</div>`);
             messagesEl.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
             _drawerOracleSending = false;
             return;
