@@ -134,6 +134,7 @@ Google sign-in only. Mounted in `server.js` via `require('./portal').mount(app, 
   - Menu (icons): member head · My Wobazi (star) · Reading History · Share + Edit birth data (results) · See Your Chart (members, site/landing) · BaZi Explainer · Master Alice · Language · Log out. Guests also get Sign in with Google (+ Plot Your Chart CTA).
   - App links keep real hrefs and call `appNav(event, action)` in `script.js`.
 - Every header uses the same 10px vertical padding (safe-area aware) and, ≥768px, the centred content column gutters.
+- Landing auth block is chosen server-side too: `sendApp` keeps `<!-- SPLASH_GUEST -->…` (Plot/Continue CTA + "No account needed" line) for guests or `<!-- SPLASH_MEMBER -->…` (welcome card, name filled at `<!-- SPLASH_WELCOME -->`, HTML-escaped) for members, and strips the other. The client only toggles guest chart state (Plot Your Chart vs Continue Your Reading).
 
 ## API Conventions
 - Routes: kebab-case (`/api/daily-reading`)

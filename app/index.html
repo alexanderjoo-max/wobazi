@@ -136,6 +136,7 @@
         <h1 class="hero-wordmark visually-hidden">Wobazi</h1>
         <p class="logo-sub"><span class="en">Chinese Destiny System</span><span class="zh hide">中国命运系统</span><span class="th hide">ระบบโชคชะตาจีน</span></p>
         <p class="splash-tagline"><span class="en">The moment you were born left eight characters in the heavens — a two-thousand-year-old art, still startlingly precise.</span><span class="zh hide">你诞生的那一刻，八个字符写进了天象——两千年的古老技艺，至今精确得令人心惊。</span><span class="th hide">วินาทีที่คุณเกิดได้ฝากรอยแปดตัวอักษรไว้บนฟ้า — ศาสตร์เก่าแก่สองพันปี ที่ยังแม่นยำจนน่าทึ่ง</span></p>
+        <!-- SPLASH_GUEST: server keeps this block for signed-out visitors only (sendApp) -->
         <div class="splash-cta-wrap" id="splash-cta-wrap">
           <button class="btn-primary splash-cta" id="splash-cta-primary" onclick="haptic(12); onLandingPrimary()">
             <span class="cta-begin">
@@ -151,11 +152,12 @@
           </button>
         </div>
         <p class="splash-google-hint"><span class="en">Free · No account needed · Sign in to save your chart &amp; history</span><span class="zh hide">免费 · 无需账号 · 登录即可保存命盘与记录</span><span class="th hide">ฟรี · ไม่ต้องมีบัญชี · เข้าสู่ระบบเพื่อบันทึกดวงและประวัติ</span></p>
+        <!-- /SPLASH_GUEST -->
       </section>
 
-      <!-- Returning user (authed only) -->
-      <div id="splash-authed" class="hide splash-authed">
-        <div class="splash-welcome" id="splash-welcome"></div>
+      <!-- SPLASH_MEMBER: server keeps this block for signed-in users only (sendApp) -->
+      <div id="splash-authed" class="splash-authed">
+        <div class="splash-welcome" id="splash-welcome"><!-- SPLASH_WELCOME --></div>
         <button class="btn-primary splash-cta" id="btn-continue-reading" onclick="haptic(10); continueReading()">
           <span class="en">Continue Your Reading</span><span class="zh hide">继续你的解读</span><span class="th hide">ดูดวงต่อ</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -164,6 +166,7 @@
           <button class="btn-logout" id="btn-logout" onclick="haptic(6); logout()">Logout</button>
         </div>
       </div>
+      <!-- /SPLASH_MEMBER -->
 
       <!-- Why WoBazi -->
       <section class="splash-features">
@@ -1652,7 +1655,7 @@
   <script src="/bazi-engine.js?v=7"></script>
   <script src="/verdict.js?v=2"></script>
   <script src="/app/portal.js?v=5"></script>
-  <script src="/app/script.js?v=50"></script>
+  <script src="/app/script.js?v=51"></script>
   <script src="/app/share-viral.js?v=5"></script>
 </body>
 </html>

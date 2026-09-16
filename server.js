@@ -205,6 +205,17 @@ async function sendApp(req, res, next) {
     let html = appIndexHtml();
     const footer = await renderPartial('partials/footer', { user });
     html = html.split('<!-- SITE_FOOTER -->').join(footer);
+    // Landing: exactly one auth state ships in the HTML — guest CTAs or the member welcome, never both.
+    if (user) {
+      html = html.replace(/<!-- SPLASH_GUEST[\s\S]*?<!-- \/SPLASH_GUEST -->\n?/, '');
+      const esc = v => String(v || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const name = esc(user.name);
+      const avatar = user.avatar ? `<img src="${esc(user.avatar)}" class="splash-welcome-avatar" alt="" referrerpolicy="no-referrer">` : '';
+      html = html.replace('<!-- SPLASH_WELCOME -->', () =>
+        `${avatar}<span class="en">Welcome back, ${name}</span><span class="zh hide">欢迎回来，${name}</span><span class="th hide">ยินดีต้อนรับกลับ, ${name}</span>`);
+    } else {
+      html = html.replace(/<!-- SPLASH_MEMBER[\s\S]*?<!-- \/SPLASH_MEMBER -->\n?/, '');
+    }
     const screens = [...new Set([...html.matchAll(/<!-- NAV_MENU:(\w+) -->/g)].map(m => m[1]))];
     for (const ctx of screens) {
       const menu = await renderPartial('partials/nav-menu', { user, ctx });

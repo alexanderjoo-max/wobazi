@@ -696,11 +696,7 @@ function updateLandingCtas() {
   const has = hasStoredChart() || !!(typeof _savedReading !== 'undefined' && _savedReading);
   const primary = document.getElementById('splash-cta-primary');
   const secondary = document.getElementById('splash-cta-secondary');
-  /* Signed-in users get the #splash-authed block instead of the guest CTAs + sign-in hint. */
-  const authed = !!_currentUser;
-  const wrap = document.getElementById('splash-cta-wrap');
-  if (wrap) wrap.classList.toggle('hide', authed);
-  document.querySelectorAll('.splash-hero .splash-google-hint').forEach(el => el.classList.toggle('hide', authed));
+  /* Guest CTAs vs. the member welcome are chosen server-side in sendApp; only the chart state is decided here. */
   if (primary) {
     primary.querySelectorAll('.cta-begin').forEach(el => el.classList.toggle('hide', has));
     primary.querySelectorAll('.cta-continue').forEach(el => el.classList.toggle('hide', !has));
@@ -5059,7 +5055,6 @@ async function checkAuth() {
     const data = await res.json();
     if (data.user) {
       _currentUser = data.user;
-      showAuthState();
       await loadUserData();
       if (window.WobaziPortal) WobaziPortal.onAuth();
       updateLandingCtas();
@@ -5072,22 +5067,6 @@ async function checkAuth() {
       }
     }
   } catch (e) { /* guest mode — file:// or server down, continue as guest */ }
-}
-
-function showAuthState() {
-  if (!_currentUser) return;
-  // Header and menu are rendered signed-in by the server (nav-menu.ejs); only the splash content switches here.
-  const authed = document.getElementById('splash-authed');
-  if (authed) authed.classList.remove('hide');
-
-  // Set welcome message
-  const welcomeEl = document.getElementById('splash-welcome');
-  if (welcomeEl) {
-    const avatarHtml = _currentUser.avatar
-      ? `<img src="${_currentUser.avatar}" class="splash-welcome-avatar" alt="" referrerpolicy="no-referrer">`
-      : '';
-    welcomeEl.innerHTML = `${avatarHtml}${_t('Welcome back, ' + _currentUser.name, '欢迎回来，' + _currentUser.name, 'ยินดีต้อนรับกลับ, ' + _currentUser.name)}`;
-  }
 }
 
 async function loadUserData() {
