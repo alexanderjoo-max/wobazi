@@ -3330,126 +3330,162 @@ const TIPS = {
     title_en: 'Your Zodiac Animal',
     title_zh: '生肖',
     body_en: 'Your zodiac animal is set by your birth year. In Chinese astrology it forms the Year Pillar — your outer persona, how the world sees you, and the core energy you were born with.',
-    body_zh: '生肖由出生年份决定，构成年柱，代表你的外在个性与生俱来的核心能量。'
+    body_zh: '生肖由出生年份决定，构成年柱，代表你的外在个性与生俱来的核心能量。',
+    title_th: 'นักษัตรประจำปีเกิด',
+    body_th: 'นักษัตรของคุณกำหนดจากปีเกิด ในโหราศาสตร์จีนถือเป็นเสาปี ซึ่งสะท้อนบุคลิกภายนอก ภาพที่ผู้อื่นมองเห็น และพลังพื้นฐานที่ติดตัวมาตั้งแต่เกิด',
   },
   'four-pillars': {
     icon: '柱',
     title_en: 'Four Pillars of Destiny',
     title_zh: '四柱八字',
     body_en: 'The Four Pillars (八字 Bāzì — "Eight Characters") are Year, Month, Day, and Hour. Each pillar has a Heavenly Stem on top and an Earthly Branch below. These 8 characters form the complete map of your destiny.',
-    body_zh: '四柱即年、月、日、时，每柱含天干与地支各一字，合为八字，是命运的完整蓝图。'
+    body_zh: '四柱即年、月、日、时，每柱含天干与地支各一字，合为八字，是命运的完整蓝图。',
+    title_th: 'สี่เสาแห่งโชคชะตา',
+    body_th: 'สี่เสา (八字 Bāzì — “แปดตัวอักษร”) ได้แก่ เสาปี เสาเดือน เสาวัน และเสาชั่วโมง แต่ละเสามีก้านฟ้าอยู่ด้านบนและกิ่งดินอยู่ด้านล่าง ตัวอักษรทั้งแปดนี้รวมกันเป็นแผนที่ชะตาชีวิตที่สมบูรณ์ของคุณ',
   },
   'ten-gods': {
     icon: '十',
     title_en: 'Ten Gods 十神',
     title_zh: '十神',
     body_en: 'Ten Gods are the Day Master read against every stem in the chart — visible stems plus hidden stems in the branches. They describe how you compete, create, earn, answer to authority, and take in support.',
-    body_zh: '十神是日主对照盘中每一干（含地支藏干）的关系：比劫、食伤、财、官杀、印。用来看你如何竞争、创造、取财、面对权威与受助。'
+    body_zh: '十神是日主对照盘中每一干（含地支藏干）的关系：比劫、食伤、财、官杀、印。用来看你如何竞争、创造、取财、面对权威与受助。',
+    title_th: 'สิบเทพ 十神',
+    body_th: 'สิบเทพคือความสัมพันธ์ระหว่างวันมาสเตอร์กับก้านฟ้าทุกตัวในแผนภูมิ ทั้งก้านที่ปรากฏและก้านที่แฝงอยู่ในกิ่งดิน ใช้อธิบายวิธีที่คุณแข่งขัน สร้างสรรค์ หารายได้ รับมือกับผู้มีอำนาจ และรับการสนับสนุนจากผู้อื่น',
   },
   'daily-fortune': {
     icon: '📅',
     title_en: 'Daily Fortune',
     title_zh: '日运势',
     body_en: 'Every day is governed by one of the 12 Earthly Branches. When today\'s ruling animal is compatible with yours, energy flows your way. When they clash, tread carefully and conserve your power.',
-    body_zh: '每天由十二地支之一掌管。当日生肖与你相合则万事顺遂；相冲时宜谨慎行事，保存能量。'
+    body_zh: '每天由十二地支之一掌管。当日生肖与你相合则万事顺遂；相冲时宜谨慎行事，保存能量。',
+    title_th: 'ดวงประจำวัน',
+    body_th: 'แต่ละวันอยู่ภายใต้กิ่งดินหนึ่งในสิบสองกิ่ง หากนักษัตรประจำวันเข้ากันกับนักษัตรของคุณ พลังจะเอื้อต่อคุณ หากชงกัน ควรระมัดระวังและรักษาพลังไว้',
   },
   'element-balance': {
     icon: '⬠',
     title_en: 'Element Balance',
     title_zh: '五行平衡',
     body_en: 'The Five Elements — Wood, Fire, Earth, Metal, Water — are Chinese cosmology\'s foundation. Your eight birth characters each carry an element. The balance (or imbalance) shapes your strengths and blind spots.',
-    body_zh: '五行（木火土金水）是宇宙的基础。八字中每个字都带有五行属性，其平衡或偏颇决定你的优势与盲点。'
+    body_zh: '五行（木火土金水）是宇宙的基础。八字中每个字都带有五行属性，其平衡或偏颇决定你的优势与盲点。',
+    title_th: 'สมดุลธาตุ',
+    body_th: 'ธาตุทั้งห้า ได้แก่ ไม้ ไฟ ดิน โลหะ และน้ำ เป็นรากฐานของจักรวาลวิทยาจีน ตัวอักษรทั้งแปดในดวงของคุณล้วนมีธาตุประจำ ความสมดุลหรือความไม่สมดุลของธาตุเป็นตัวกำหนดจุดแข็งและจุดบอดของคุณ',
   },
   'fortune-cards': {
     icon: '🔮',
     title_en: 'Life Fortune',
     title_zh: '命运分值',
     body_en: 'These four scores reflect the intrinsic energy patterns in your birth chart across Love, Career, Health, and Wealth. They represent your lifetime baseline — not a single year — shaped by your elements and animal.',
-    body_zh: '四项分值反映命盘中爱情、事业、健康与财富的内在能量格局，代表终身基础运势，由五行与生肖共同塑造。'
+    body_zh: '四项分值反映命盘中爱情、事业、健康与财富的内在能量格局，代表终身基础运势，由五行与生肖共同塑造。',
+    title_th: 'ดวงชะตาตลอดชีวิต',
+    body_th: 'คะแนนทั้งสี่สะท้อนรูปแบบพลังที่มีอยู่ในแผนภูมิวันเกิดของคุณ ด้านความรัก การงาน สุขภาพ และการเงิน เป็นพื้นฐานตลอดชีวิต ไม่ใช่เฉพาะปีใดปีหนึ่ง และได้รับอิทธิพลจากธาตุและนักษัตรของคุณ',
   },
   'career-archetype': {
     icon: '🎭',
     title_en: 'Talent',
     title_zh: '天赋',
     body_en: 'Your dominant element determines your natal talent — what you are built for, not this year\'s job luck. It is the work where your energy flows most freely.',
-    body_zh: '主导五行决定你的先天天赋——你被造就去做的事，而非今年的事业运。那是能量最顺的工作方向。'
+    body_zh: '主导五行决定你的先天天赋——你被造就去做的事，而非今年的事业运。那是能量最顺的工作方向。',
+    title_th: 'พรสวรรค์',
+    body_th: 'ธาตุเด่นของคุณบ่งบอกพรสวรรค์ติดตัว คือสิ่งที่คุณถนัดโดยธรรมชาติ ไม่ใช่โชคด้านการงานของปีนี้ เป็นงานที่พลังของคุณไหลเวียนได้อย่างเป็นธรรมชาติที่สุด',
   },
   'power-season': {
     icon: '🌸',
     title_en: 'Power Season',
     title_zh: '旺季',
     body_en: 'Each element rules a season. Your power season is when your dominant element peaks in nature, amplifying your natural qi. Use this window for your biggest decisions and boldest moves.',
-    body_zh: '五行各主一季。你的旺季是主导五行在自然界能量最强的时节，此时气场加持，是做出重大决策的最佳时机。'
+    body_zh: '五行各主一季。你的旺季是主导五行在自然界能量最强的时节，此时气场加持，是做出重大决策的最佳时机。',
+    title_th: 'ฤดูแห่งพลัง',
+    body_th: 'แต่ละธาตุเป็นเจ้าของฤดูหนึ่ง ฤดูแห่งพลังของคุณคือช่วงที่ธาตุเด่นของคุณมีกำลังสูงสุดในธรรมชาติ ซึ่งช่วยเสริมชี่ของคุณ ควรใช้ช่วงนี้สำหรับการตัดสินใจสำคัญและการลงมือครั้งใหญ่',
   },
   'yin-yang': {
     icon: '☯',
     title_en: 'Yin · Yang Balance',
     title_zh: '阴阳平衡',
     body_en: 'Yin (阴) is receptive, inward, reflective energy. Yang (阳) is active, outward, expressive. The balance in your chart reveals whether you naturally move through life more inwardly or outwardly.',
-    body_zh: '阴为内敛接纳之能，阳为主动外放之能。命盘中阴阳的比例，揭示你天生的处世方式。'
+    body_zh: '阴为内敛接纳之能，阳为主动外放之能。命盘中阴阳的比例，揭示你天生的处世方式。',
+    title_th: 'สมดุลหยิน · หยาง',
+    body_th: 'หยิน (阴) คือพลังที่รับ มุ่งเข้าด้านใน และใคร่ครวญ หยาง (阳) คือพลังที่กระตือรือร้น มุ่งออกด้านนอก และแสดงออก สัดส่วนในแผนภูมิของคุณบอกว่าคุณมีแนวโน้มดำเนินชีวิตแบบเก็บตัวหรือแบบเปิดเผยมากกว่า',
   },
   'compatibility': {
     icon: '💫',
     title_en: 'Compatibility',
     title_zh: '生肖相合',
     body_en: 'Based on the ancient San He (三合) and Liu He (六合) harmony systems. Compatible animals create flowing, supportive energy. Challenging pairings create friction — but also the heat that drives growth.',
-    body_zh: '依据三合、六合古法。相合生肖带来流畅相助的能量，相冲生肖虽摩擦，却也是激发成长的动力。'
+    body_zh: '依据三合、六合古法。相合生肖带来流畅相助的能量，相冲生肖虽摩擦，却也是激发成长的动力。',
+    title_th: 'ความเข้ากัน',
+    body_th: 'อ้างอิงระบบความกลมกลืนโบราณ ซานเหอ (三合) และลิ่วเหอ (六合) นักษัตรที่เข้ากันจะสร้างพลังที่ไหลลื่นและเกื้อหนุนกัน ส่วนคู่ที่ท้าทายจะเกิดแรงเสียดทาน แต่ก็เป็นแรงผลักดันให้เติบโต',
   },
   'lucky-vibes': {
     icon: '✨',
     title_en: 'Lucky Vibes',
     title_zh: '吉祥元素',
     body_en: 'Your lucky colors, numbers, and compass direction are derived from your animal\'s elemental essence. Surrounding yourself with these creates resonance between your environment and your innate energy.',
-    body_zh: '吉祥色彩、数字与方位由生肖五行属性决定，以此布置环境，有助于与天生能量共鸣。'
+    body_zh: '吉祥色彩、数字与方位由生肖五行属性决定，以此布置环境，有助于与天生能量共鸣。',
+    title_th: 'สิ่งมงคลประจำตัว',
+    body_th: 'สีมงคล ตัวเลข และทิศทางของคุณมาจากธาตุประจำนักษัตร การอยู่ท่ามกลางสิ่งเหล่านี้ช่วยให้สภาพแวดล้อมสอดคล้องกับพลังที่ติดตัวคุณมา',
   },
   'forecast-2026': {
     icon: '🔮',
     title_en: '2026 Annual Forecast',
     title_zh: '2026年运势',
     body_en: '2026 is 丙午 (Bǐng Wǔ) — the Year of the Fire Horse. This score shows how your birth chart interacts with the Horse\'s blazing, free-spirited energy. Fire Horse years reward boldness and punish hesitation.',
-    body_zh: '2026年为丙午年——火马之年。分数反映命盘与火马奔放能量的互动。火马年奖励大胆者，惩罚犹豫者。'
+    body_zh: '2026年为丙午年——火马之年。分数反映命盘与火马奔放能量的互动。火马年奖励大胆者，惩罚犹豫者。',
+    title_th: 'ดวงประจำปี 2026',
+    body_th: 'ปี 2026 คือปี 丙午 (Bǐng Wǔ) หรือปีม้าไฟ คะแนนนี้แสดงว่าแผนภูมิวันเกิดของคุณมีปฏิสัมพันธ์กับพลังที่ร้อนแรงและอิสระของม้าไฟอย่างไร ปีม้าไฟให้รางวัลแก่ความกล้าตัดสินใจ และไม่เอื้อต่อความลังเล',
   },
   'monthly-energy': {
     icon: '📊',
     title_en: 'Monthly Energy',
     title_zh: '月份运势',
     body_en: 'Each bar shows the relative strength of qi flowing through that month in 2026. Peak bars are when Fire Horse energy aligns best with your chart — ideal for bold moves, launches, and key decisions.',
-    body_zh: '每根柱子代表2026年该月气场强弱。最高峰处为火马能量与你命盘最契合之时，宜大胆行动、启动计划与做出关键决策。'
+    body_zh: '每根柱子代表2026年该月气场强弱。最高峰处为火马能量与你命盘最契合之时，宜大胆行动、启动计划与做出关键决策。',
+    title_th: 'พลังรายเดือน',
+    body_th: 'แต่ละแท่งแสดงความแรงของชี่ในแต่ละเดือนของปี 2026 แท่งที่สูงที่สุดคือช่วงที่พลังม้าไฟสอดคล้องกับแผนภูมิของคุณมากที่สุด เหมาะสำหรับการลงมือครั้งสำคัญ การเริ่มโครงการ และการตัดสินใจที่สำคัญ',
   },
   'work-section': {
     icon: '💼',
     title_en: 'Work',
     title_zh: '事业运势',
     body_en: 'Your career momentum score blends your zodiac\'s natural professional energy with the 2026 Fire Horse year. Fire Horse years reward those who move decisively — the monthly strip shows when to push and when to pace.',
-    body_zh: '事业运势综合了你生肖天然的职业能量与2026火马年的影响。火马年奖励果断行动者，月份运势指引你何时发力、何时蓄势。'
+    body_zh: '事业运势综合了你生肖天然的职业能量与2026火马年的影响。火马年奖励果断行动者，月份运势指引你何时发力、何时蓄势。',
+    title_th: 'การงาน',
+    body_th: 'คะแนนแรงส่งด้านการงานรวมพลังด้านอาชีพตามธรรมชาติของนักษัตรของคุณเข้ากับอิทธิพลของปีม้าไฟ 2026 ปีม้าไฟให้ผลดีแก่ผู้ที่ตัดสินใจอย่างเด็ดขาด แถบรายเดือนแสดงว่าช่วงใดควรเร่งและช่วงใดควรชะลอ',
   },
   'love-section': {
     icon: '❤️',
     title_en: 'Love & Relationships',
     title_zh: '爱情与关系',
     body_en: 'Your love forecast blends your zodiac\'s natural romantic energy with how the 2026 Fire Horse year activates the heart. The archetype reveals how you give and receive love — shaped by your dominant element.',
-    body_zh: '爱情运融合了生肖天然的感情能量与2026年火马年对情感的激活。爱情原型揭示了你基于主导五行的给予与接受爱的方式。'
+    body_zh: '爱情运融合了生肖天然的感情能量与2026年火马年对情感的激活。爱情原型揭示了你基于主导五行的给予与接受爱的方式。',
+    title_th: 'ความรักและความสัมพันธ์',
+    body_th: 'คำพยากรณ์ความรักผสมผสานพลังด้านความรักตามธรรมชาติของนักษัตรของคุณกับอิทธิพลของปีม้าไฟ 2026 ต่อหัวใจ ต้นแบบความรักบอกวิธีที่คุณให้และรับความรัก ซึ่งได้รับอิทธิพลจากธาตุเด่นของคุณ',
   },
   'blood-type': {
     icon: '🩸',
     title_en: 'Blood Type Profile',
     title_zh: '血型个性',
     body_en: 'East Asian tradition associates blood type with personality and fortune. This profile blends your blood type\'s characteristic energy with your dominant element to reveal a unique combination — and shows how it subtly shifts your fortune scores.',
-    body_zh: '东亚传统将血型与性格及运势相联系。此档案将血型特质与主导五行结合，揭示独特的能量组合，并展示其对运势分数的细微影响。'
+    body_zh: '东亚传统将血型与性格及运势相联系。此档案将血型特质与主导五行结合，揭示独特的能量组合，并展示其对运势分数的细微影响。',
+    title_th: 'โปรไฟล์กรุ๊ปเลือด',
+    body_th: 'ความเชื่อในเอเชียตะวันออกเชื่อมโยงกรุ๊ปเลือดกับบุคลิกและโชคชะตา โปรไฟล์นี้ผสมผสานลักษณะพลังของกรุ๊ปเลือดกับธาตุเด่นของคุณ เพื่อแสดงรูปแบบเฉพาะตัว และแสดงว่ามีผลต่อคะแนนดวงของคุณเล็กน้อยอย่างไร',
   },
   'birthplace': {
     icon: '🌍',
     title_en: 'Geographic Energy',
     title_zh: '地理能量',
     body_en: 'Every place on Earth carries elemental energy based on its direction, climate, and geography. Understanding how your birth chart\'s dominant element interacts with your birthplace element reveals the environmental forces that shaped your earliest years.',
-    body_zh: '地球上每个地方都因方位、气候与地理而蕴含特定五行能量。了解命盘主导五行与出生地五行的互动关系，可揭示塑造你早年成长的环境力量。'
+    body_zh: '地球上每个地方都因方位、气候与地理而蕴含特定五行能量。了解命盘主导五行与出生地五行的互动关系，可揭示塑造你早年成长的环境力量。',
+    title_th: 'พลังภูมิศาสตร์',
+    body_th: 'ทุกสถานที่บนโลกมีพลังธาตุตามทิศทาง ภูมิอากาศ และภูมิประเทศ การเข้าใจว่าธาตุเด่นในแผนภูมิของคุณสัมพันธ์กับธาตุของบ้านเกิดอย่างไร ช่วยให้เห็นอิทธิพลของสภาพแวดล้อมที่หล่อหลอมคุณในช่วงแรกของชีวิต',
   },
   'noble-stars': {
     icon: '✦',
     title_en: 'Nobleman · 贵人',
     title_zh: '贵人',
     body_en: '贵人 are helpful people — mentors, "earth angels." In natal BaZi, 天乙贵人, 月德, and 天德 mark where support sits in your chart. Qi Men Dunjia later locates helpful direction in time (值符 and the Three Wonders 乙丙丁); Wobazi shows the natal stars first.',
-    body_zh: '贵人是助你之人——贵人、导师、人间天使。八字本命看天乙、月德、天德。奇门遁甲再在时间里找贵人方位（值符与三奇乙丙丁）；Wobazi 先呈现本命贵人。'
+    body_zh: '贵人是助你之人——贵人、导师、人间天使。八字本命看天乙、月德、天德。奇门遁甲再在时间里找贵人方位（值符与三奇乙丙丁）；Wobazi 先呈现本命贵人。',
+    title_th: 'กุ้ยเหริน · 贵人',
+    body_th: '贵人 (กุ้ยเหริน) คือผู้ที่ให้ความช่วยเหลือ เช่น ผู้ใหญ่ที่เมตตาและพี่เลี้ยง ในดวงปาจื้อพื้นฐาน 天乙贵人 月德 และ 天德 บ่งบอกตำแหน่งของความช่วยเหลือในแผนภูมิของคุณ ส่วนวิชาฉีเหมินตุ้นเจี่ยจะใช้หาทิศทางแห่งความช่วยเหลือตามเวลา (值符 และสามมหัศจรรย์ 乙丙丁) Wobazi แสดงดาวในดวงพื้นฐานก่อน',
   },
 };
 
@@ -3458,11 +3494,14 @@ function showTip(key) {
   const tip = TIPS[key];
   if (!tip) return;
   haptic(8);
+  // One language per sheet: the selected one, English when a field is missing.
+  const lang = currentLang();
+  const pick = f => (lang !== 'en' && tip[f + '_' + lang]) || tip[f + '_en'];
   document.getElementById('tip-icon').textContent     = tip.icon;
-  document.getElementById('tip-title-en').textContent = tip.title_en;
-  document.getElementById('tip-title-zh').textContent = tip.title_zh;
-  document.getElementById('tip-body-en').textContent  = tip.body_en;
-  document.getElementById('tip-body-zh').textContent  = tip.body_zh;
+  document.getElementById('tip-title-en').textContent = pick('title');
+  document.getElementById('tip-body-en').textContent  = pick('body');
+  document.getElementById('tip-title-zh').hidden = true;
+  document.getElementById('tip-body-zh').hidden = true;
   document.getElementById('tip-overlay').classList.add('active');
 }
 
@@ -4596,6 +4635,8 @@ const NEW_TIPS = {
     title_zh: '风水穿搭',
     body_en: 'In feng shui, colors carry elemental qi. Wearing the monthly auspicious color surrounds you with resonant energy before you even say a word. Think of it as portable feng shui — your environment, on your body.',
     body_zh: '在风水学中，颜色承载五行之气。穿着当月吉祥色彩，等于随身携带风水，以共鸣能量环绕自身。',
+    title_th: 'คู่มือการแต่งกายตามหลักฮวงจุ้ย',
+    body_th: 'ในหลักฮวงจุ้ย สีมีชี่ของธาตุ การสวมสีมงคลประจำเดือนช่วยให้คุณอยู่ท่ามกลางพลังที่สอดคล้อง ก่อนที่คุณจะเอ่ยคำใดเสียอีก เปรียบเสมือนฮวงจุ้ยที่พกติดตัวไปได้',
   },
   'lucky-nums': {
     icon: '🔢',
@@ -4603,6 +4644,8 @@ const NEW_TIPS = {
     title_zh: '幸运数字',
     body_en: 'Your personal numbers are derived from your birth date using numerological reduction, combined with your element\'s archetypal numbers from Chinese cosmology. Use them as apartment numbers, PIN patterns, or lottery picks.',
     body_zh: '您的幸运数字由生日数字归纳与五行宇宙论中的原型数字共同推算。可用于选择门牌、密码模式或彩票号码。',
+    title_th: 'เลขมงคล',
+    body_th: 'เลขประจำตัวของคุณคำนวณจากวันเกิดด้วยการทอนตัวเลข ร่วมกับเลขประจำธาตุตามจักรวาลวิทยาจีน สามารถใช้เลือกเลขที่พัก รูปแบบรหัส หรือเลขลอตเตอรี่',
   },
   'power-days': {
     icon: '📅',
@@ -4610,6 +4653,8 @@ const NEW_TIPS = {
     title_zh: '吉日',
     body_en: 'Choose a category and what you are planning — pitching, signing, a first date, a move. Every date is scored against your own four pillars, starting at 50: its Chinese almanac officer (建除), harmony with your year and day animals, your Nobleman 天乙贵人 days, and whether its element is one your chart needs. The almanac lists which officers suit each undertaking. Days that clash your year animal (冲太岁) are always Avoid. Tap any date for its reasons.',
     body_zh: '先选类别和你要做的事——提案、签约、约会、搬家。每一天从 50 分起，按你的四柱打分：建除十二神、与你年支日支的合、天乙贵人日，以及当日五行是否为你所需。黄历写明各事宜取哪些日神。冲你生肖太岁的日子一律为忌。点任意日期看原因。',
+    title_th: 'วันพลัง',
+    body_th: 'เลือกหมวดหมู่และสิ่งที่คุณวางแผนจะทำ เช่น การนำเสนองาน การลงนามสัญญา การนัดพบครั้งแรก หรือการย้ายที่อยู่ ทุกวันเริ่มต้นที่ 50 คะแนนและประเมินจากสี่เสาของคุณ ได้แก่ เจ้าวันตามปฏิทินจีน (建除) ความเข้ากันกับนักษัตรปีและวันของคุณ วันกุ้ยเหริน 天乙贵人 และธาตุของวันที่ดวงของคุณต้องการหรือไม่ ปฏิทินจีนระบุว่าเจ้าวันใดเหมาะกับกิจแต่ละประเภท วันที่ชงนักษัตรปีเกิดของคุณ (冲太岁) ถือเป็นวันควรเลี่ยงเสมอ แตะวันที่ใดก็ได้เพื่อดูเหตุผล',
   },
   'foods': {
     icon: '🥗',
@@ -4617,6 +4662,8 @@ const NEW_TIPS = {
     title_zh: '饮食运势',
     body_en: 'In Traditional Chinese Medicine, food directly nourishes or depletes your elemental energy. Eating in alignment with your dominant element supports the organs that are most vital — and most vulnerable — for your type.',
     body_zh: '中医认为食物直接滋养或耗损五行能量。按照主导五行调整饮食，有助于支持你最重要也最脆弱的脏腑系统。',
+    title_th: 'อาหารมงคล',
+    body_th: 'ตามหลักการแพทย์แผนจีน อาหารช่วยบำรุงหรือบั่นทอนพลังธาตุของคุณโดยตรง การรับประทานอาหารให้สอดคล้องกับธาตุเด่นช่วยสนับสนุนอวัยวะที่สำคัญและเปราะบางที่สุดสำหรับคุณ',
   },
   'crystals': {
     icon: '💎',
@@ -4624,6 +4671,8 @@ const NEW_TIPS = {
     title_zh: '水晶宝石',
     body_en: 'Each crystal carries a natural electromagnetic frequency that interacts with human bioelectricity. These recommendations pair your element\'s energy pattern with stones known to amplify, balance, or protect it — based on both Western crystal tradition and Chinese elemental resonance.',
     body_zh: '每种水晶都带有与人体生物电相互作用的自然电磁频率。这些推荐基于西方水晶传统与中国五行共鸣理论，为你的元素能量配对最佳宝石。',
+    title_th: 'คริสตัลและอัญมณี',
+    body_th: 'คริสตัลแต่ละชนิดเชื่อกันว่ามีความถี่ตามธรรมชาติที่มีปฏิสัมพันธ์กับพลังงานในร่างกาย คำแนะนำนี้จับคู่รูปแบบพลังของธาตุคุณกับหินที่เชื่อว่าช่วยเสริม สร้างสมดุล หรือปกป้องพลังนั้น โดยอ้างอิงทั้งความเชื่อเรื่องคริสตัลของตะวันตกและหลักธาตุของจีน',
   },
   'ritual': {
     icon: '🌅',
@@ -4631,6 +4680,8 @@ const NEW_TIPS = {
     title_zh: '元素晨练',
     body_en: 'The morning is when your qi is most malleable. These three steps are calibrated specifically to your element — they activate the organs, directions, and energy types that give your element maximum momentum for the day ahead.',
     body_zh: '清晨是气场最易塑造的时刻。这三个步骤专为您的五行定制，激活对应的脏腑、方位与能量类型，为新的一天充分蓄力。',
+    title_th: 'กิจวัตรยามเช้า',
+    body_th: 'ยามเช้าคือช่วงที่ชี่ของคุณปรับเปลี่ยนได้ง่ายที่สุด สามขั้นตอนนี้ออกแบบมาเฉพาะสำหรับธาตุของคุณ เพื่อกระตุ้นอวัยวะ ทิศทาง และรูปแบบพลังที่ช่วยให้ธาตุของคุณมีแรงส่งเต็มที่สำหรับวันนั้น',
   },
   'kua': {
     icon: '🧭',
@@ -4638,6 +4689,8 @@ const NEW_TIPS = {
     title_zh: '卦数睡眠方向',
     body_en: 'Your Kua number is a personal feng shui number calculated from your birth year and gender. Aligning your sleeping position so your head points toward your Kua direction is one of the most powerful and effortless feng shui adjustments you can make.',
     body_zh: '卦数是根据出生年份与性别推算的个人风水数字。将头部朝向卦数方位入睡，是最有效且最省力的风水调整之一。',
+    title_th: 'ทิศการนอน (Kua)',
+    body_th: 'เลข Kua คือเลขฮวงจุ้ยประจำตัวที่คำนวณจากปีเกิดและเพศ การนอนโดยหันศีรษะไปทางทิศ Kua ของคุณเป็นการปรับฮวงจุ้ยที่ได้ผลดีและทำได้ง่ายที่สุดวิธีหนึ่ง',
   },
   'decades': {
     icon: '🕰️',
@@ -4645,6 +4698,8 @@ const NEW_TIPS = {
     title_zh: '大运',
     body_en: '大运 (Dà Yùn) means "Major Luck Cycles" — the 10-year phases that color each chapter of life. Work with the climate of the decade, not against it.',
     body_zh: '大运是十年一程的气运周期，为人生各章着色。顺势，而不是硬顶。',
+    title_th: 'รอบโชค 大运',
+    body_th: '大运 (Dà Yùn) หมายถึง “รอบโชคใหญ่” คือช่วงสิบปีที่กำหนดบรรยากาศของแต่ละบทในชีวิต ควรดำเนินชีวิตให้สอดคล้องกับสภาพของทศวรรษนั้น ไม่ใช่ฝืนต้าน',
   },
 };
 
