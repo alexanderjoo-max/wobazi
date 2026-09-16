@@ -837,4 +837,14 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Wobazi server running on ${BASE_URL}`);
+  // Shows on every deploy whether the database survived (it must live on the persistent disk in production).
+  try {
+    const count = t => db.prepare(`SELECT COUNT(*) AS n FROM ${t}`).get().n;
+    console.log(`[db] ${db.name} · ${count('users')} users · ${count('reading_snapshots')} saved readings`);
+    if (isProduction && !process.env.DB_PATH) {
+      console.warn('[db] WARNING: DB_PATH is not set — the database is on temporary storage and is wiped on every deploy.');
+    }
+  } catch (err) {
+    console.error('[db] Could not read database stats:', err.message);
+  }
 });
