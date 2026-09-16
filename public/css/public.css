@@ -135,7 +135,7 @@ body.ma-page::before {
   padding: 36px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 }
-html[data-lang="zh"] .ma-quote, html[data-lang="th"] .ma-quote { font-style: normal; font-size: 19px; }
+html[data-lang="zh"] .ma-quote, html[data-lang="th"] .ma-quote { font-style: normal; }
 
 /* Shared section heading */
 .ma-h2 {
