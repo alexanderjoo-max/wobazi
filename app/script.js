@@ -475,10 +475,12 @@ function goHash(hash, opts) {
   opts = opts || {};
   const h = hash || '';
   const url = location.pathname + (location.search || '').replace(/[?&]begin=1/, '').replace(/^&/, '?') + (h ? '#' + h : '');
-  const state = { wobazi: h || 'landing' };
+  const push = !opts.replace && currentHash() !== h;
+  // inApp: the entry before this one is also a Wobazi screen, so history.back() stays in the app.
+  const state = { wobazi: h || 'landing', inApp: push || !!(history.state && history.state.inApp) };
   _appNavigating = true;
   if (opts.replace) history.replaceState(state, '', url || location.pathname);
-  else if (currentHash() !== h) history.pushState(state, '', url || location.pathname);
+  else if (push) history.pushState(state, '', url || location.pathname);
   else history.replaceState(state, '', url || location.pathname);
   _appNavigating = false;
   applyRoute(h);

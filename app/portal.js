@@ -316,6 +316,8 @@
   }
 
   function back() {
+    // Return to whatever screen opened this one (e.g. the reading, via the menu).
+    if (history.state && history.state.inApp) { history.back(); return; }
     const h = currentHash();
     if (h.indexOf('history/') === 0) goHash('history');
     else if (h === 'history' || h === 'account') goHash('portal');
