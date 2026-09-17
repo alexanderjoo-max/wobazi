@@ -400,6 +400,19 @@ function scrollResults(id) {
   scroll.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
 }
 
+/* Monthly forecast strips open with the current month centred. A strip on a hidden tab has no width,
+   so it is centred the first time it is visible (switchTab calls this again). */
+function centerNowMonths() {
+  document.querySelectorAll('.love-months-strip').forEach(strip => {
+    if (strip.dataset.centered || !strip.clientWidth) return;
+    const tile = strip.querySelector('.now-month');
+    if (!tile) return;
+    const offset = tile.getBoundingClientRect().left - strip.getBoundingClientRect().left;
+    strip.scrollLeft = Math.max(0, strip.scrollLeft + offset - (strip.clientWidth - tile.offsetWidth) / 2);
+    strip.dataset.centered = '1';
+  });
+}
+
 function switchTab(tab, opts) {
   opts = opts || {};
   if (tab === 'luck') tab = 'you';   // Luck Cycle now lives under Your Chart; old #luck links still land.
@@ -418,6 +431,7 @@ function switchTab(tab, opts) {
   if (heroCard) heroCard.classList.toggle('hide', tab !== 'actions');
   if (ctxStrip) ctxStrip.classList.add('hide'); // Today's Fortune card shows the day pillar + score now; strip is kept for history snapshots
   document.querySelector('#results .scroll-body').scrollTop = 0;
+  requestAnimationFrame(centerNowMonths);
   if (!opts.skipHash && typeof currentHash === 'function' && currentHash() !== tab) {
     history.pushState({ wobazi: tab }, '', location.pathname + location.search + '#' + tab);
   }
@@ -2799,12 +2813,7 @@ function renderWorkSection(animal, elements, forecast2026) {
       if (n >= workScore) clearInterval(iv);
     }, 22);
     // Scroll strip horizontally to current month (no vertical page jump)
-    const strip = document.getElementById('work-months-strip');
-    if (strip) {
-      const tileW = 92;
-      const nowMonth = new Date().getMonth();
-      strip.scrollLeft = Math.max(0, nowMonth * tileW - strip.clientWidth / 2 + tileW / 2);
-    }
+    centerNowMonths();
   }, 400);
 }
 
@@ -3073,11 +3082,7 @@ function renderLoveSection(animal, elements, overall2026) {
       if (n >= loveScore) clearInterval(iv);
     }, 22);
     /* Auto-scroll strip to current month */
-    const strip = document.querySelector('.love-months-strip');
-    if (strip) {
-      const tileW  = 92;
-      strip.scrollLeft = Math.max(0, nowMonth * tileW - strip.clientWidth / 2 + tileW / 2);
-    }
+    centerNowMonths();
   }, 700);
 }
 
