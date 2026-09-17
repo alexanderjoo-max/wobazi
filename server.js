@@ -15,7 +15,7 @@ const crypto = require('crypto');
 const bazi = require('./bazi-engine');
 const seo = require('./seo/meta');
 const { buildSystemPrompt: buildOraclePrompt } = require('./oracle/prompt');
-const { buildGuidancePrompt, normalizeGuidance, GUIDANCE_MAX_TOKENS } = require('./guidance/prompt');
+const { buildGuidancePrompt, normalizeGuidance, luckLine, GUIDANCE_MAX_TOKENS } = require('./guidance/prompt');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -568,7 +568,18 @@ async function streamGemini(systemPrompt, messages, res) {
 }
 
 /* ── Daily Guidance (AI-generated DO/AVOID/WATCH) ── */
-const guidanceCache = new Map(); // key: `${dayMasterEl}-${todayStem}-${todayBranch}` → { ts, data }
+const guidanceCache = new Map(); // key: sha1(natal pillars | today's pillar | zodiac | luck pillar) → { date, data }
+
+/* Birth data for the running luck pillar (大运): the saved chart for signed-in users, else
+   what the browser sent. Used by both the Oracle and the daily guidance prompt. */
+function birthForLuck(req, chartData) {
+  const saved = req.session && req.session.user
+    ? db.prepare('SELECT year, month, day, hour, minute, gender, twin, twin_order, twin_method FROM readings WHERE google_id = ?').get(req.session.user.googleId)
+    : null;
+  return saved
+    ? { ...saved, twin: saved.twin ? { enabled: true, order: saved.twin_order, method: saved.twin_method } : null }
+    : (chartData && chartData.birth) || null;
+}
 
 app.post('/api/daily-guidance', async (req, res) => {
   try {
@@ -577,9 +588,15 @@ app.post('/api/daily-guidance', async (req, res) => {
       return res.status(400).json({ error: 'Missing chart data' });
     }
 
-    // Cache key: unique per day master + today's pillar + full chart
-    const dayPillar = chartData.pillars.find(p => p.label === 'Day');
-    const cacheKey = `${dayPillar?.stem?.char}-${chartData.today.stem}-${chartData.today.branch}-${chartData.animal}`;
+    /* Cache key: every natal pillar plus today's pillar and the running luck pillar. The old key
+       was day stem + today + zodiac animal, so two different charts that happened to share those
+       got each other's reading — more visible now the prompt carries the luck pillar. */
+    const birth = birthForLuck(req, chartData);
+    const chartKey = (chartData.pillars || [])
+      .map(p => (p && p.known !== false && p.stem ? p.stem.char + (p.branch ? p.branch.char : '') : '--')).join('');
+    const cacheKey = crypto.createHash('sha1')
+      .update([chartKey, chartData.today.stem, chartData.today.branch, chartData.animal, luckLine(birth)].join('|'))
+      .digest('hex').slice(0, 16);
     const todayStr = new Date().toISOString().slice(0, 10);
     /* GUIDANCE_CACHE=off makes every request hit the model — used by test/guidance.test.js
        to exercise the real parse path; unset in normal runs. */
@@ -594,7 +611,7 @@ app.post('/api/daily-guidance', async (req, res) => {
     chartData.today.stemElement = todayStemObj?.element || 'Wood';
     chartData.today.stemPolarity = todayStemObj?.polarity || 'Yang';
 
-    const prompt = buildGuidancePrompt(chartData);
+    const prompt = buildGuidancePrompt(chartData, { birth });
 
     /* Attempts: DeepSeek in JSON mode, then DeepSeek again (a truncated or malformed reply is
        usually a one-off), then Gemini. Each returns the raw text so a failure can be logged. */
@@ -701,14 +718,7 @@ app.post('/api/oracle', async (req, res) => {
   res.setHeader('X-Remaining', limit.remaining);
   res.flushHeaders();
 
-  // Birth data for the running luck pillar: the saved chart for signed-in users, else what the browser sent.
-  const saved = req.session && req.session.user
-    ? db.prepare('SELECT year, month, day, hour, minute, gender, twin, twin_order, twin_method FROM readings WHERE google_id = ?').get(req.session.user.googleId)
-    : null;
-  const birth = saved
-    ? { ...saved, twin: saved.twin ? { enabled: true, order: saved.twin_order, method: saved.twin_method } : null }
-    : chartData.birth;
-  const systemPrompt = buildOraclePrompt(chartData, { birth });
+  const systemPrompt = buildOraclePrompt(chartData, { birth: birthForLuck(req, chartData) });
   const messages = [
     ...(conversationHistory || []),
     { role: 'user', content: message },

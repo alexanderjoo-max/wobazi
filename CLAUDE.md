@@ -199,9 +199,11 @@ Migration plan:
 - `GUIDANCE_MAX_TOKENS = 900`. Measured replies run 258–342 completion tokens, so the old `max_tokens: 300` truncated many of them mid-JSON — that, plus the shape drift, is why `/api/daily-guidance` returned 500 "Failed to parse guidance" intermittently.
 - Attempts: DeepSeek (JSON mode) → DeepSeek again → Gemini. Every parse failure logs `finish_reason`, `completion_tokens` and the first 1000 chars of the raw reply. All three failing returns **503 `guidance_unavailable`**, and the client shows "Today's personalised note didn't load — showing general guidance for this day." above the static lines (`.hc-bullet-note`) instead of passing generic advice off as personalised.
 - The Gemini fallback had never run: `thinkingBudget` was passed at the top level of `generationConfig`, which the API rejects with 400. It belongs under `thinkingConfig`. Same bug was fixed in `batch/generate.js`.
-- Tests: `node --test test/guidance.test.js` (prompt facts + parsing; no API calls). Not in `npm test`.
+- The prompt also carries the **running 10-year luck pillar (大运)**, from the same resolver the Oracle uses (`currentLuck` in `oracle/prompt.js`). Birth data comes from `birthForLuck(req, chartData)` in `server.js`: the signed-in user's `readings` row, else `chartData.birth` (the client sends `oracleBirth()`). No gender or no birth date → "unknown … don't invent one"; before the first pillar starts → "not started yet".
+- Cache key is `sha1(natal pillars | today's pillar | zodiac | luck pillar)`. The old key was day stem + today + zodiac animal, so two different charts sharing those three got each other's reading.
+- Tests: `node --test test/guidance.test.js` (prompt facts + parsing + luck pillar; no API calls). Not in `npm test`.
 
-## Day Master in prompts (2026-09-17)
+## Day Master and luck pillar in prompts (2026-09-17)
 - The Day Master (日主) is **always** the Day pillar's stem, and every prompt states it explicitly with char, element, polarity and archetype. Never let a model infer it: the Oracle read the year stem's element off a bare `Element:` line and called a 庚 Metal chart a "Wood Day Master".
 - One resolver, `dayMasterOf(pillars)` in `oracle/prompt.js` (label `Day`, index 2 fallback, null when the pillar is unknown). Archetype names come from `relationships/archetypes.js` `DAY_MASTER` (plain data, shared by oracle, guidance, batch and relationships).
 - An unknown day pillar prints "unknown … don't invent one". Daily guidance used to default to `甲`/`Wood`/`Yang`, which silently mislabelled the chart and its Ten God line.

@@ -10,7 +10,7 @@
 'use strict';
 
 const bazi = require('../bazi-engine');
-const { dayMasterOf } = require('../oracle/prompt');
+const { dayMasterOf, currentLuck, bangkokToday } = require('../oracle/prompt');
 const { dayMasterArchetype } = require('../relationships/archetypes');
 
 function calcTenGod(dayMasterEl, dayMasterPolarity, targetEl, targetPolarity) {
@@ -57,7 +57,18 @@ function normalizeGuidance(g) {
   return out;
 }
 
-function buildGuidancePrompt(chartData) {
+/* The running 10-year luck pillar (大运), resolved by the same helper the Oracle uses.
+   It needs a birth date and a gender: with either missing we say so rather than let the
+   model invent a pillar. `opts.birth` is the signed-in user's saved chart, else what the
+   browser sent (server.js birthForLuck). */
+function luckLine(birth, todayIso) {
+  const l = currentLuck(birth, { iso: todayIso || bangkokToday().iso });
+  if (l && l.chars) return `Current 10-year luck pillar (大运): ${l.chars} (${l.element} ${l.animal}), ${l.startYear}–${l.endYear}`;
+  if (l && l.before) return `Current 10-year luck pillar (大运): not started yet${l.startYear ? ` (first one starts ${l.startYear})` : ''} — read today from the natal chart alone`;
+  return "Current 10-year luck pillar (大运): unknown (no gender or birth date on file) — don't invent one, and don't name a luck pillar in the output";
+}
+
+function buildGuidancePrompt(chartData, opts) {
   const { pillars, today, animal, dominantEl, tenGods } = chartData;
 
   /* Day Master details, from the one shared resolver (oracle/prompt.js). The Day Master is the
@@ -100,6 +111,7 @@ Day Pillar: ${dayPillar?.stem?.char || '?'}${dayPillar?.branch?.char || '?'} (${
 Hour Pillar: ${pillars[3]?.known ? pillars[3].stem.char + pillars[3].branch.char + ' (' + pillars[3].stem.element + ' ' + pillars[3].branch.animal + ')' : 'Unknown'}
 Dominant Element: ${dominantEl}
 Zodiac Animal: ${animal}
+${luckLine(opts && opts.birth, opts && opts.todayIso)}
 
 TODAY'S DAY PILLAR: ${today.stem}${today.branch} (${today.stemElement} ${today.animal})
 Ten God of Today's Stem vs Day Master: ${todayTenGod}
@@ -129,4 +141,4 @@ Do not nest objects, do not add keys, do not wrap the object in anything.
 10. Keep each item to 1-2 sentences max.`;
 }
 
-module.exports = { buildGuidancePrompt, normalizeGuidance, calcTenGod, GUIDANCE_MAX_TOKENS };
+module.exports = { buildGuidancePrompt, normalizeGuidance, calcTenGod, luckLine, GUIDANCE_MAX_TOKENS };
