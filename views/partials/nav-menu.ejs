@@ -55,6 +55,7 @@
     </div>
     <% } %>
 
+    <% if (member || ctx === 'results') { %>
     <nav class="drawer-list" aria-label="Menu" data-i18n-aria="nav.menu">
       <% if (member) { %>
       <a href="/#portal" class="drawer-link"<%- act('portal') %>><%- svg('star') %><span data-i18n="footer.portal">My Wobazi</span></a>
@@ -67,20 +68,11 @@
       <% if (member && showCta) { %>
       <a href="/#you" class="drawer-link"<%- act('chart') %>><%- svg('plot') %><span data-i18n="nav.seeChart">See Your Chart</span></a>
       <% } %>
-      <a href="/what-is-bazi" class="drawer-link"><%- svg('book') %><span data-i18n="nav.explainer">BaZi Explainer</span></a>
-      <a href="/Master-Alice.html" class="drawer-link"><%- svg('person') %><span data-i18n="nav.about">Master Alice</span></a>
-      <div class="drawer-link drawer-lang-row">
-        <%- svg('globe') %><span data-i18n="nav.language">Language</span>
-        <div class="drawer-lang">
-          <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">EN</button>
-          <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
-          <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
-        </div>
-      </div>
       <% if (member) { %>
       <a href="/auth/logout" class="drawer-link drawer-logout"<%- act('logout') %>><%- svg('logout') %><span data-i18n="footer.logout">Log out</span></a>
       <% } %>
     </nav>
+    <% } %>
 
     <% if (!member) { %>
     <a href="/auth/google" class="google-login-btn drawer-google" data-i18n="nav.signinGoogle"<%- act('login') %>><%- google(18) %><span data-i18n-label>Sign in with Google</span></a>
@@ -88,5 +80,19 @@
     <a href="<%= app ? '/#input' : '/?begin=1' %>" class="btn-primary drawer-cta"<%- act('plot') %>><span data-i18n="nav.begin">Plot Your Chart</span></a>
     <% } %>
     <% } %>
+
+    <%# Secondary: learn links, then language, in a lighter weight %>
+    <nav class="drawer-minor" aria-label="Learn">
+      <a href="/what-is-bazi" class="drawer-minor-link"><%- svg('book') %><span data-i18n="nav.explainer">BaZi Explainer</span></a>
+      <a href="/Master-Alice.html" class="drawer-minor-link"><%- svg('person') %><span data-i18n="nav.about">Master Alice</span></a>
+    </nav>
+    <div class="drawer-lang-row drawer-lang-mini">
+      <%- svg('globe') %><span data-i18n="nav.language">Language</span>
+      <div class="drawer-lang">
+        <button type="button" data-lang="en" onclick="setWobaziLang('en', event)">EN</button>
+        <button type="button" data-lang="th" onclick="setWobaziLang('th', event)">ไทย</button>
+        <button type="button" data-lang="zh" onclick="setWobaziLang('zh', event)">中文</button>
+      </div>
+    </div>
   </div>
 </div>

@@ -9,7 +9,7 @@
    are read at call time.
 
    Routes (all inside the #portal screen):
-     #portal          home — chart, today, record, luck pillar, recent readings
+     #portal          home — chart, today, people, record, recent readings
      #history         archive, newest first, month + day strips
      #history/DATE    one stored reading + private journal
      #account         sign-in method, export, sign out, delete account
@@ -127,7 +127,7 @@
 
     const s = strip.cloneNode(true);
     const h = hero.cloneNode(true);
-    h.querySelectorAll('[style*="display:none"]').forEach(n => n.remove());
+    h.querySelectorAll('[style*="display:none"], .hc-plan').forEach(n => n.remove());   // history keeps the day's guidance, not the plan
     scrub(s);
     scrub(h);
 
@@ -369,29 +369,6 @@
     return { name: p.name, html: [solar, time, cal].map(t => `<span class="you-profile-badge">${t}</span>`).join('') };
   }
 
-  function luckHtml(luck) {
-    if (!luck || !luck.current) return '';
-    const c = luck.current;
-    const n = luck.next;
-    const nextStart = n && n.years ? n.years.split(/[–-]/)[0] : '';
-    let line;
-    if (c.pre) {
-      line = n
-        ? _t(`Your first 10-year luck pillar, <strong>${esc(n.chars)}</strong>, begins in ${esc(nextStart)}.`,
-          `你的第一步大运 <strong>${esc(n.chars)}</strong> 于 ${esc(nextStart)} 年开始。`,
-          `เสาโชค 10 ปีแรกของคุณ <strong>${esc(n.chars)}</strong> เริ่มปี ${esc(nextStart)}`)
-        : '';
-    } else {
-      line = _t(`You are in <strong>${esc(c.chars)}</strong> (${esc(c.years)}).`, `当前大运 <strong>${esc(c.chars)}</strong>（${esc(c.years)}）。`, `ตอนนี้อยู่ในวัยจร <strong>${esc(c.chars)}</strong> (${esc(c.years)})`)
-        + (n ? ' ' + _t(`Next: <strong>${esc(n.chars)}</strong> from ${esc(nextStart)}.`, `下一步 <strong>${esc(n.chars)}</strong>，自 ${esc(nextStart)} 年起。`, `ถัดไป <strong>${esc(n.chars)}</strong> เริ่มปี ${esc(nextStart)}`) : '');
-    }
-    if (!line) return '';
-    return `<section class="section">
-      <div class="section-head"><h3>${_t('Luck Pillar', '大运', 'เสาโชค')}</h3><span class="section-sub">大运</span></div>
-      <div class="decade-current-detail">${line}</div>
-    </section>`;
-  }
-
   /* ── My People: the first few saved people, linking into the Relationships tab ── */
   const PEOPLE_PREVIEW = 3;
   const REL_TYPE = {
@@ -423,7 +400,7 @@
           : `<p class="portal-copy">${_t('Add a partner, friend, family member or colleague to see where you click and where you clash.', '添加伴侣、朋友、家人或同事，看看你们哪里合拍、哪里容易摩擦。', 'เพิ่มคู่ เพื่อน ครอบครัว หรือเพื่อนร่วมงาน เพื่อดูว่าตรงไหนเข้ากันและตรงไหนขัดกัน')}</p>`}
         <div class="portal-more"><button type="button" class="btn-secondary" onclick="haptic(6); goHash('relationships')${list.length ? '' : "; if (window.WobaziRel) WobaziRel.openAdd()"}">${list.length > PEOPLE_PREVIEW
           ? _t(`All people (${list.length})`, `全部（${list.length}）`, `ทั้งหมด (${list.length})`) + ' →'
-          : list.length ? _t('Open Relationships', '打开关系', 'เปิดความสัมพันธ์') + ' →' : _t('Add someone', '添加一个人', 'เพิ่มคน')}</button></div>
+          : list.length ? _t('See all people', '查看全部', 'ดูทั้งหมด') + ' →' : _t('Add someone', '添加一个人', 'เพิ่มคน')}</button></div>
       </section>`;
   }
 
@@ -446,8 +423,6 @@
       const today = localDate();
       const todayItem = items.find(i => i.date === today);
       const chart = chartBadges();
-      const liveLuck = readLuck();
-      const luck = liveLuck || (items[0] && items[0].summary && items[0].summary.luck) || null;
       const member = a.memberSince ? fmtDate(a.memberSince.slice(0, 10), { month: 'long', year: 'numeric' }) : '';
 
       const avatar = a.avatar ? `<img src="${esc(a.avatar)}" class="nav-authed-avatar" alt="" referrerpolicy="no-referrer">` : '';
@@ -507,7 +482,7 @@
           <button type="button" class="drawer-link portal-link" onclick="haptic(6); goHash('account')">${_t('Account &amp; your data', '账户与数据', 'บัญชีและข้อมูลของคุณ')} →</button>
         </section>`;
 
-      host.innerHTML = idCard + todaySection + peopleHtml(people) + record + luckHtml(luck) + recentSection + links;
+      host.innerHTML = idCard + todaySection + peopleHtml(people) + record + recentSection + links;
       cleanRows(host);
       applyI18n();
     } catch (e) {

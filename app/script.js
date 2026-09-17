@@ -438,9 +438,9 @@ function switchTab(tab, opts) {
 
   // Render prev/next tab navigation
   const TAB_ORDER = ['you', 'today', 'actions', 'relationships'];
-  const TAB_LABELS = { you: 'Your Chart', today: 'Today', actions: 'Actions', relationships: 'Relationships' };
-  const TAB_LABELS_ZH = { you: '你的命盘', today: '今日', actions: '行动', relationships: '关系' };
-  const TAB_LABELS_TH = { you: 'แผนภูมิของคุณ', today: 'วันนี้', actions: 'การกระทำ', relationships: 'ความสัมพันธ์' };
+  const TAB_LABELS = { you: 'Your Chart', today: 'Today', actions: 'Actions', relationships: 'People' };
+  const TAB_LABELS_ZH = { you: '你的命盘', today: '今日', actions: '行动', relationships: '身边的人' };
+  const TAB_LABELS_TH = { you: 'แผนภูมิของคุณ', today: 'วันนี้', actions: 'การกระทำ', relationships: 'ผู้คน' };
   const idx = TAB_ORDER.indexOf(tab);
   const prev = idx > 0 ? TAB_ORDER[idx - 1] : null;
   const next = idx < TAB_ORDER.length - 1 ? TAB_ORDER[idx + 1] : null;
@@ -1359,6 +1359,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
         <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span>${_t(g.watch.en, g.watch.zh)}</span></div>`;
       // Update actions preview card
       renderActionsPreview({ title: g.do.en, title_zh: g.do.zh }, g.avoid.en, g.avoid.zh, g.watch.en, g.watch.zh);
+      dedupeHeroPlan();
     } catch (err) {
       console.warn('Daily guidance fallback:', err.message);
       // Fall back to static guidance
@@ -1367,6 +1368,7 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
         <div class="hc-bullet"><span class="hc-bullet-key">${_t('AVOID','避')}</span><span>${_t(fallbackAvoidEn, fallbackAvoidZh)}</span></div>
         <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span>${_t(fallbackWatchEn, fallbackWatchZh)}</span></div>`;
       renderActionsPreview(fallbackDo, fallbackAvoidEn, fallbackAvoidZh, fallbackWatchEn, fallbackWatchZh);
+      dedupeHeroPlan();
     }
     if (window.WobaziPortal) WobaziPortal.captureToday({ dominantEl });
   })();
@@ -4037,11 +4039,29 @@ function renderTodayActionsCard(dominantEl, nowMonth) {
     </div>
   `).join('');
 
-  document.getElementById('today-actions-card').innerHTML = `
-    <div class="today-actions-card" style="border-left-color:${elColor}">
-      ${itemsHTML}
-    </div>
+  // Lives inside the Actions hero card, under DO / AVOID / WATCH (one card, no repeats).
+  const plan = document.getElementById('hero-plan');
+  if (!plan) return;
+  plan.innerHTML = `
+    <div class="hc-plan-head">${_t('Your plan today', '今日计划', 'แผนวันนี้')}</div>
+    ${itemsHTML}
   `;
+  dedupeHeroPlan();
+}
+
+/* Hide a plan item that repeats the DO line (the static DO often is the first ritual). */
+function dedupeHeroPlan() {
+  const plan = document.getElementById('hero-plan');
+  const doEl = document.querySelector('#hero-bullets .hc-bullet > span:not(.hc-bullet-key)');
+  if (!plan) return;
+  const norm = t => String(t || '').toLowerCase().replace(/[^a-z0-9\u0e00-\u0e7f\u4e00-\u9fff]+/g, ' ').trim();
+  // _t() writes one span per language; compare the English copy of each.
+  const en = el => el ? (el.querySelector('.en') || el).textContent : '';
+  const doText = norm(en(doEl));
+  plan.querySelectorAll('.tap-action-item').forEach(item => {
+    const title = norm(en(item.querySelector('.tap-action-label strong')));
+    item.classList.toggle('hide', !!doText && !!title && (doText === title || doText.includes(title)));
+  });
 }
 
 /* ── Render Outfit Section ── */

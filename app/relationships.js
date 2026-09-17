@@ -138,7 +138,7 @@
   }
 
   function skeletonList() {
-    return head(T('People', '身边的人', 'ผู้คน')) +
+    return head(T('My People', '我的人', 'คนของฉัน')) +
       `<div class="rel-list" aria-busy="true">${[0, 1, 2].map(() => `
         <div class="rel-row rel-skel"><div class="rel-row-main"><span class="skel skel-w40"></span><span class="skel skel-w70"></span></div></div>`).join('')}</div>`;
   }
@@ -169,7 +169,7 @@
       ? T('Compatibility with the people in your life', '你与身边人的相处方式', 'ความเข้ากันกับคนในชีวิตคุณ')
       : T('Saved to your account', '已保存到你的账号', 'บันทึกไว้ในบัญชีของคุณ');
     if (st.guest) {
-      section.innerHTML = head(T('People', '身边的人', 'ผู้คน'), sub) + `
+      section.innerHTML = head(T('My People', '我的人', 'คนของฉัน'), sub) + `
         <div class="rel-card rel-empty">
           <p class="rel-card-title">${T('Save the people in your life', '保存你身边的人', 'บันทึกคนในชีวิตคุณ')}</p>
           <p class="rel-muted">${T('Members can save profiles for partners, friends, family and colleagues, then come back to each compatibility reading anytime.', '会员可以保存伴侣、朋友、家人和同事的资料，随时回来查看每一份合盘解读。', 'สมาชิกบันทึกโปรไฟล์ของคู่ เพื่อน ครอบครัว และเพื่อนร่วมงานได้ แล้วกลับมาดูผลความเข้ากันได้ทุกเมื่อ')}</p>
@@ -184,12 +184,12 @@
       return;
     }
     if (st.error) {
-      section.innerHTML = head(T('People', '身边的人', 'ผู้คน'), sub) + `<div class="rel-card">${errHtml(st.error)}
+      section.innerHTML = head(T('My People', '我的人', 'คนของฉัน'), sub) + `<div class="rel-card">${errHtml(st.error)}
         <button type="button" class="btn-secondary" data-act="reload">${T('Try again', '重试', 'ลองอีกครั้ง')}</button></div>`;
       return;
     }
     if (st.meta && !st.meta.hasChart) {
-      section.innerHTML = head(T('People', '身边的人', 'ผู้คน'), sub) + `
+      section.innerHTML = head(T('My People', '我的人', 'คนของฉัน'), sub) + `
         <div class="rel-card rel-empty">
           <p class="rel-card-title">${T('Save your chart to your account first', '请先把命盘保存到账号', 'บันทึกแผนภูมิของคุณลงบัญชีก่อน')}</p>
           <p class="rel-muted">${T('Pair readings compare your saved chart with theirs.', '合盘解读会用你保存的命盘与对方比较。', 'ผลความเข้ากันจะเทียบแผนภูมิที่บันทึกไว้ของคุณกับของเขา')}</p>
@@ -198,7 +198,7 @@
       return;
     }
     if (!st.people.length) {
-      section.innerHTML = head(T('People', '身边的人', 'ผู้คน'), sub) + `
+      section.innerHTML = head(T('My People', '我的人', 'คนของฉัน'), sub) + `
         <div class="rel-card rel-empty">
           <p class="rel-card-title">${T('No one here yet', '还没有添加任何人', 'ยังไม่มีใครในนี้')}</p>
           <p class="rel-muted">${T('Add a partner, friend, family member or colleague to see where you click and where you clash.', '添加伴侣、朋友、家人或同事，看看你们哪里合拍、哪里容易摩擦。', 'เพิ่มคู่ เพื่อน ครอบครัว หรือเพื่อนร่วมงาน เพื่อดูว่าตรงไหนเข้ากันและตรงไหนขัดกัน')}</p>
@@ -208,7 +208,7 @@
     }
     const q = st.query.trim().toLowerCase();
     const rows = st.people.filter(p => !q || p.name.toLowerCase().includes(q) || p.type.includes(q));
-    section.innerHTML = head(T('People', '身边的人', 'ผู้คน'), sub) + `
+    section.innerHTML = head(T('My People', '我的人', 'คนของฉัน'), sub) + `
       ${st.people.length >= SEARCH_AT ? `<div class="field rel-search"><input type="search" id="rel-search" value="${esc(st.query)}" placeholder="Search people" aria-label="Search people" autocomplete="off"></div>` : ''}
       <div class="rel-list" id="rel-list">${rows.map(rowHtml).join('') || `<p class="rel-muted rel-pad">${T('No matches.', '没有匹配的人。', 'ไม่พบผลลัพธ์')}</p>`}</div>
       <button type="button" class="btn-primary btn-full" data-act="add">${T('Add someone', '添加一个人', 'เพิ่มคน')}</button>`;
@@ -415,7 +415,7 @@
     const url = d.invite.url;
     body.innerHTML = `
       <p class="rel-sheet-title">${T('Invite link ready', '邀请链接已生成', 'ลิงก์คำเชิญพร้อมแล้ว')}</p>
-      <p class="rel-muted">${T('When they add their details and sign in, you\'ll both see each other in Relationships. The link works once and expires in 14 days.', '对方填写资料并登录后，你们会出现在彼此的关系列表中。链接只能使用一次，14 天后失效。', 'เมื่อเขากรอกข้อมูลและเข้าสู่ระบบ คุณทั้งคู่จะเห็นกันในความสัมพันธ์ ลิงก์ใช้ได้ครั้งเดียวและหมดอายุใน 14 วัน')}</p>
+      <p class="rel-muted">${T('When they add their details and sign in, you\'ll both see each other in People. The link works once and expires in 14 days.', '对方填写资料并登录后，你们会出现在彼此的关系列表中。链接只能使用一次，14 天后失效。', 'เมื่อเขากรอกข้อมูลและเข้าสู่ระบบ คุณทั้งคู่จะเห็นกันในแท็บผู้คน ลิงก์ใช้ได้ครั้งเดียวและหมดอายุใน 14 วัน')}</p>
       <div class="rel-link-box"><code>${esc(url)}</code></div>
       ${linkButtons(url, d.shareText)}`;
     bindLinkButtons(body, url, d.shareText);
@@ -535,7 +535,12 @@
         <h3 class="rel-person-name">${esc(name)}</h3>
         <span class="rel-chip">${tl(p.type)}</span>
         ${p.linked ? `<span class="rel-chip rel-chip-linked">${T('Linked account', '已连接账号', 'บัญชีที่เชื่อมแล้ว')}</span>` : ''}
-      </div>`;
+      </div>
+      ${p.linked ? `<p class="rel-linked-note">${T(
+        `${esc(first(name))} is linked through an invite and manages their own birth details. You appear in their list too, and if they update their details, this reading updates.`,
+        `${esc(first(name))} 通过邀请与你连接，出生资料由对方自己管理。你也会出现在对方的列表中；对方更新资料后，这份解读会随之更新。`,
+        `${esc(first(name))} เชื่อมกับคุณผ่านคำเชิญและจัดการข้อมูลเกิดเอง คุณก็อยู่ในรายชื่อของเขาเช่นกัน และเมื่อเขาแก้ข้อมูล ผลนี้จะอัปเดตตาม`
+      )}</p>` : ''}`;
 
     if (st.readingError) {
       const code = st.readingError.code;

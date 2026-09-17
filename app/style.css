@@ -2579,6 +2579,12 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 
 
 /* ── Today's Action Plan (compact Fortune card) ── */
+/* Action plan inside the Actions hero card */
+.hc-plan { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--w1); }
+.hc-plan:empty { display: none; }
+.hc-plan-head { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--m4); }
+.hc-plan .tap-action-label strong { font-weight: 700; }
+
 .today-actions-card {
   background: var(--w03);
   border: 1px solid var(--border);
@@ -5085,6 +5091,22 @@ body.light-mode .splash-authed {
 .drawer-lang-row { cursor: default; flex-wrap: wrap; }
 .drawer-lang-row:hover { background: transparent; }
 .drawer-lang-row .drawer-lang { margin-left: auto; }
+/* Secondary menu items (explainer, Master Alice, language): smaller and quieter than the main list */
+.drawer-minor { display: flex; flex-direction: column; gap: 2px; padding: 2px 4px 0; }
+.drawer-minor-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 10px; border-radius: 10px;
+  font-size: 13px; font-weight: 500; color: var(--m65); text-decoration: none;
+}
+.drawer-minor-link:hover { background: rgba(240, 192, 64, 0.06); color: var(--text); }
+.drawer-minor-link .drawer-ico, .drawer-lang-mini .drawer-ico { width: 15px; height: 15px; color: var(--m45); }
+.drawer-lang-mini {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px 2px; margin: 0 -14px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 12px; font-weight: 500; color: var(--m5);
+}
+.drawer-lang-mini .drawer-lang button { padding: 4px 9px; font-size: 10.5px; }
 .drawer-logout { color: var(--muted); }
 .drawer-logout .drawer-ico { color: var(--muted); }
 a.drawer-link::after {
