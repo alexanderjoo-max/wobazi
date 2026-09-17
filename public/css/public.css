@@ -593,7 +593,7 @@ html[lang="zh-CN"] .sl-hook, html[lang="th"] .sl-hook { font-style: normal; }
 /* ── What is BaZi: readable body copy + folding sections (JS adds .is-collapsible; no JS = all open) ── */
 .wib-page .seo-main .about-section p { color: rgba(255, 248, 255, 0.82); font-weight: 400; }
 .wib-page .seo-main .about-faq-a { color: rgba(255, 248, 255, 0.78); font-weight: 400; }
-.wib-page .seo-main .about-section.is-collapsible h3 { cursor: pointer; }
+.wib-page .seo-main .about-section.is-collapsible h2 { cursor: pointer; }
 .wib-page .seo-main .about-section.is-collapsible:not(.is-open) .wib-more { display: none; }
 .wib-page .seo-main .about-section.is-collapsible:not(.is-open) > p { margin-bottom: 0; }
 .wib-page .wib-toggle {
@@ -616,7 +616,7 @@ html[lang="zh-CN"] .sl-hook, html[lang="th"] .sl-hook { font-style: normal; }
 .wib-page .about-section.is-open .wib-toggle .wib-open-label { display: none; }
 .wib-page .about-section.is-open .wib-toggle .wib-close-label { display: inline; }
 .wib-page .wib-toggle:focus-visible,
-.wib-page .about-section.is-collapsible h3:focus-visible { outline: 2px solid var(--gold, #f0c040); outline-offset: 4px; border-radius: 6px; }
+.wib-page .about-section.is-collapsible h2:focus-visible { outline: 2px solid var(--gold, #f0c040); outline-offset: 4px; border-radius: 6px; }
 .wib-page .wib-expand-all { display: flex; justify-content: flex-end; margin: 0 4px 12px; }
 .wib-page .wib-expand-all .wib-toggle { margin-top: 0; font-size: 13px; }
 .wib-page .wib-expand-all.is-all-open .wib-toggle::after { content: '−'; }

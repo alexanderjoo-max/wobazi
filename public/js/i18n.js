@@ -250,9 +250,9 @@
       var label = root.querySelector('.lang-switch-label');
       if (label) label.textContent = LANGS[lang] || 'EN';
     }
-    var opts = document.querySelectorAll('[data-lang]');
+    var opts = document.querySelectorAll('button[data-lang]');
     for (var k = 0; k < opts.length; k++) {
-      opts[k].setAttribute('aria-selected', opts[k].getAttribute('data-lang') === lang ? 'true' : 'false');
+      opts[k].setAttribute('aria-pressed', opts[k].getAttribute('data-lang') === lang ? 'true' : 'false');
     }
   }
 

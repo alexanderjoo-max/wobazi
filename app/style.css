@@ -345,6 +345,9 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 
 .logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .logo-vert { width: 130px; height: auto; }
+/* <picture> wrapper for WebP logos: lay the <img> out exactly as if unwrapped. */
+picture.logo-pic { display: contents; }
+picture.logo-pic > source { display: none; }
 .nav-logo {
   height: 28px;
   width: auto;
@@ -5088,7 +5091,7 @@ body.light-mode .splash-authed {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
-.drawer-lang button[aria-selected="true"],
+.drawer-lang button[aria-pressed="true"],
 .drawer-lang button:hover {
   color: #1a0a00;
   background: linear-gradient(135deg, #f0c040, #e08020);
@@ -5298,7 +5301,7 @@ a.drawer-link::after {
   gap: 24px;
 }
 
-.seo-footer-col h4 {
+.seo-footer-col h3 {
   color: var(--gold, #f0c040);
   font-size: 11px;
   text-transform: uppercase;
