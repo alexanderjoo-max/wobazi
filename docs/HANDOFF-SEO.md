@@ -62,7 +62,8 @@ Both rounds passed (2026-09-17). Repeat this list after each future deploy:
 6. Oracle: ask "best date next week", confirm the date is on or after today (Bangkok).
 7. Report results to the owner.
 
-### Phase 2 (`seo/phase-2`) — app off the homepage — **READY, NOT MERGED**
+### Phase 2 (`seo/phase-2`) — app off the homepage — **MERGED** `e233e8b`, deployed 2026-09-17 19:47 UTC
+Plus the follow-up `d25dba9` (form guard, see below).
 `/` is a lean server-rendered landing page; the app shell moved to `/chart` (`noindex, follow`).
 
 | Metric (homepage) | Before | After |
@@ -84,7 +85,13 @@ Also in this branch: model ids behind `DEEPSEEK_MODEL` / `GEMINI_MODEL` (default
 
 Verification: all old entry points resolve correctly (including a signed-in user landing on `/chart#today` with an empty browser store — fixed with `_pendingChartRoute`); guest chart, signed-in chart, Oracle, share card and the EN/中文/ไทย toggle all work; 109 tests pass (41 + 25 + 11 + 32); `/` is byte-identical to the old homepage in every language at both widths except the two blend-mode logo images (≤ Δ4/255 in-process, invisible); `/chart` screens are identical or Δ1 except the Actions tab, whose AI copy is regenerated per server.
 
-**Two gates could not be closed by Claude:** the full Google sign-in (entering credentials is out of scope for the assistant) and byte-identical logo pixels. See §7.
+**Production after deploy:** every route, redirect and the `//` fix verified on wobazi.com (see §2); guest chart plotted end to end on the live site; `/chart` serves `noindex, follow`; sitemap still 9 URLs with no `/chart`.
+
+**Production Lighthouse (mobile, median of 3) is inconclusive and needs a re-measure at a quiet time.** The homepage measured Perf 61, FCP 6.0s, LCP 8.1s, against Perf 61 / FCP 4.2s / LCP 6.3s before the phase — but the *unchanged* `/what-is-bazi` moved the same way in the same window (Perf 76 → 70, LCP 4.4s → 5.3s), so the network or the CDN was worse, not the page. What did change objectively on production: **60 → 30 requests, 2276 → 1106 KB total, 31 → 11 KB of HTML**, and the like-for-like local comparison of the two builds under identical conditions was Perf 62 → 74, FCP 4.8s → 3.3s, LCP 10.3s → 5.3s.
+
+**Regression found on production and fixed** (`65fff98`, PR #7): `/chart` is a fresh page load, so the server-rendered birth form is visible before `script.js` (~360 KB) has executed. The inline `onsubmit` called `handleSubmit` directly, so an early submit threw and fell through to a **native GET** — the browser went to `/chart?name=…&gender=F#input` and the birth data was lost. The handler now checks for `handleSubmit` and calls `preventDefault()` until it exists. `test/markup.test.js` guards it and two other Phase 2 invariants.
+
+**One gate could not be closed by Claude:** the full Google sign-in (entering credentials is out of scope for the assistant). Byte-identical logo pixels: accepted by the owner. See §7.
 
 ## 3. Standing decisions and constraints
 
@@ -123,8 +130,8 @@ Verification: all old entry points resolve correctly (including a signed-in user
 - **Non-SEO bug fixes found while verifying Phase 1b** (PR #4, `fix/guidance-prompt`, open): `/api/daily-guidance` intermittent 500s (truncation at `max_tokens: 300` + the model flattening the nested JSON shape; the Gemini fallback had never run because `thinkingBudget` was in the wrong place), and the Day Master being inferred rather than stated in the Oracle/guidance/batch/relationships prompts. Both are launch-blocking. PR #3 (`fix/oracle-day-master`) was closed as superseded.
 
 ## 7. Open gates on Phase 2 (owner action)
-1. **Google OAuth round trip.** Claude verified everything around it: `/auth/google` 302s to Google with the unchanged `redirect_uri`, the callback code is untouched, `/?auth=success` 302s to `/chart?auth=success`, and with a real session cookie the member lands on their chart with the reading restored and the `?auth` query stripped. The credential step itself needs the owner.
-2. **Pixel-identical rendering.** Everything matches except the hero and nav logos (`mix-blend-mode: screen` + drop-shadow), which differ by at most 4/255 per channel with identical geometry, computed styles, page height and footer position. Deterministic run to run. Either accept it or say so and it will be investigated further.
+1. **Google OAuth round trip — still unverified.** Claude verified everything around it: `/auth/google` 302s to Google with the unchanged `redirect_uri`, the callback code is untouched, `/?auth=success` 302s to `/chart?auth=success`, and with a real session cookie the member lands on their chart with the reading restored and the `?auth` query stripped. The credential step itself needs the owner.
+2. **Pixel-identical rendering — accepted.** Everything matches except the hero and nav logos (`mix-blend-mode: screen` + drop-shadow), which differ by at most 4/255 per channel with identical geometry, computed styles, page height and footer position.
 3. **Deviation from the brief:** `/chart` still has one header bar per screen (5 in the DOM). The homepage now renders the nav once. Unifying the app's headers is an app-shell refactor, not additive, and `/chart` is noindex.
 
 ## 5. Phase 2 spec (owner's original brief) — waits for go-ahead
