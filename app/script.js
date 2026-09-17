@@ -4948,6 +4948,12 @@ function showOracle() {
 }
 
 let _oracleTodayData = null;
+/* Solar birth data so the Oracle can place today inside the user's 10-year luck pillar. */
+function oracleBirth() {
+  const p = getStoredChart();
+  if (!p || !p.year) return null;
+  return { year: p.year, month: p.month, day: p.day, hour: p.hour, minute: p.minute, gender: p.gender, twin: p.twin || null };
+}
 
 /* ── Send chip question ── */
 function sendOracleChip(btn) {
@@ -5043,6 +5049,7 @@ async function sendOracleMessage() {
     pillars: _shareData.pillars || null,
     tenGods: _shareData.tenGods || null,
     today: _oracleTodayData,
+    birth: oracleBirth(),
   };
 
   try {
@@ -5354,6 +5361,7 @@ async function sendOracleDrawerMessage() {
     pillars: _shareData.pillars || null,
     tenGods: _shareData.tenGods || null,
     today: _drawerOracleTodayData,
+    birth: oracleBirth(),
   };
 
   try {

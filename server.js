@@ -13,6 +13,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const bazi = require('./bazi-engine');
+const { buildSystemPrompt: buildOraclePrompt } = require('./oracle/prompt');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -538,45 +539,7 @@ const deepseek = new OpenAI({
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-function buildSystemPrompt(chartData) {
-  const { animal, element, polarity, dominantEl, fortune, pillars, today, tenGods } = chartData;
-
-  const pillarStr = (pillars || []).map(p => {
-    if (!p.known) return `${p.label}: unknown`;
-    return `${p.label}: ${p.stem.char} ${p.branch.char} (${p.stem.element} ${p.stem.polarity} / ${p.branch.animal})`;
-  }).join('\n');
-
-  const todayStr = today
-    ? `Today's Day Pillar: ${today.stem} ${today.branch} (${today.animal} day)\nClash with user: ${today.isClash ? 'YES — friction day' : today.isCompat ? 'NO — harmonious day' : 'Neutral day'}\nDay Force Score: ${today.score}/100\nNobleman Status: ${today.nobleman ? 'Active — helpful people energy today' : 'Inactive'}`
-    : '';
-
-  return `You are the Wobazi Oracle — a direct, authoritative BaZi destiny advisor. You interpret Chinese metaphysics (Four Pillars of Destiny) with confidence and clarity.
-
-USER'S BAZI CHART:
-Animal: ${animal}
-Element: ${element} (${polarity})
-Dominant Element: ${dominantEl}
-Fortune Scores — Love: ${fortune?.love}, Career: ${fortune?.career}, Health: ${fortune?.health}, Wealth: ${fortune?.wealth}
-
-FOUR PILLARS:
-${pillarStr}
-
-${todayStr}
-
-TEN GODS (十神 vs Day Master, visible stem 1.0 / main hidden 0.5 / mid 0.3 / residual 0.2):
-${tenGods && tenGods.list ? tenGods.list.map(g => `${g.en} ${g.zh}: ${g.percent}%`).join(', ') : (Array.isArray(tenGods) ? tenGods.map(g => `${g.en} ${g.zh}: ${g.percent}%`).join(', ') : 'n/a')}
-${tenGods && tenGods.sentence ? tenGods.sentence.en : ''}
-
-RULES:
-- Speak as an oracle — direct, confident, no hedging or disclaimers
-- Keep responses concise (3-5 sentences max)
-- Reference the user's specific chart data in your answers
-- When timing matters, include date suggestions as [DATE:YYYY-MM-DD] tags
-- When giving a clear verdict, include exactly one: [VERDICT:favorable], [VERDICT:defer], or [VERDICT:neutral]
-- Use the Five Element relationships (producing/controlling cycles) in your analysis
-- Reference today's day pillar energy when relevant to "should I do X today" questions
-- Never say "I'm just an AI" or add disclaimers — you ARE the Oracle`;
-}
+/* Oracle system prompt (with today's Bangkok date, annual and luck pillars): oracle/prompt.js */
 
 async function streamDeepSeek(systemPrompt, messages, res) {
   const stream = await deepseek.chat.completions.create({
@@ -811,7 +774,14 @@ app.post('/api/oracle', async (req, res) => {
   res.setHeader('X-Remaining', limit.remaining);
   res.flushHeaders();
 
-  const systemPrompt = buildSystemPrompt(chartData);
+  // Birth data for the running luck pillar: the saved chart for signed-in users, else what the browser sent.
+  const saved = req.session && req.session.user
+    ? db.prepare('SELECT year, month, day, hour, minute, gender, twin, twin_order, twin_method FROM readings WHERE google_id = ?').get(req.session.user.googleId)
+    : null;
+  const birth = saved
+    ? { ...saved, twin: saved.twin ? { enabled: true, order: saved.twin_order, method: saved.twin_method } : null }
+    : chartData.birth;
+  const systemPrompt = buildOraclePrompt(chartData, { birth });
   const messages = [
     ...(conversationHistory || []),
     { role: 'user', content: message },
