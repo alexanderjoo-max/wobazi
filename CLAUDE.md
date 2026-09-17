@@ -184,6 +184,11 @@ Migration plan:
 - The ⓘ explanation sheet shows only the selected language (`TIPS[key].title_th/body_th`).
 - Not translated: AI output (daily DO/AVOID/WATCH has no Thai; Oracle replies), share-image text, pinyin/BaZi terms, `/privacy` and `/terms`.
 
+## Oracle date awareness (2026-09-17)
+- `oracle/prompt.js` builds the `/api/oracle` system prompt on every request with today's date in **Asia/Bangkok**, the annual pillar (turns at 立春), today's day pillar, the user's running 10-year luck pillar, explicit "this week / next week" ranges, and a rule that every suggested date is on or after today. Without it the model suggested 2025 dates.
+- Luck pillar birth data: the signed-in user's `readings` row, else `chartData.birth` sent by the browser (`oracleBirth()` in `script.js`, from the stored chart). No gender → luck pillar stated as unknown.
+- Tests: `node --test test/oracle.test.js` (unit tests plus a live DeepSeek "best date next week" check that runs when `DEEPSEEK_API_KEY` is set). Not part of `npm test` because it calls the API.
+
 ## API Conventions
 - Routes: kebab-case (`/api/daily-reading`)
 - Auth check: `if (!req.session.user)` → 401
