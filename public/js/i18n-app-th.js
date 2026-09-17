@@ -606,6 +606,8 @@
     'aria.twinOrder': { en: 'Twin birth order', th: 'ลำดับการเกิดของแฝด', zh: '双胞胎出生顺序' },
     'aria.yearAnimal': { en: 'Year animal', th: 'นักษัตรประจำปีเกิด', zh: '生肖' },
     'aria.close': { en: 'Close', th: 'ปิด', zh: '关闭' },
+    'aria.send': { en: 'Send', th: 'ส่ง', zh: '发送' },
+    'aria.bloodType': { en: 'Blood type', th: 'หมู่เลือด', zh: '血型' },
     'nav.account': { en: 'Account menu', th: 'เมนูบัญชี', zh: '账户菜单' },
     'twin.luck': { en: '大运法 — month from first luck pillar', th: '大运法 — ใช้เสาโชคแรกเป็นเสาเดือน', zh: '大运法 — 月柱取第一步大运' },
     'twin.hour': { en: '时柱法 — hour moves one 时辰', th: '时柱法 — เลื่อนเสาชั่วโมงไปหนึ่ง 时辰', zh: '时柱法 — 时柱后移一个时辰' },

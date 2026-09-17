@@ -15,7 +15,7 @@
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
   </button>
   <a href="/" class="site-nav-logo">
-    <img src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi">
+    <picture class="logo-pic"><source srcset="/app/assets/logo-horiz.webp?v=1" type="image/webp"><img src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi"></picture>
   </a>
 
   <%- include('nav-menu', { user: member, ctx: 'site' }) %>
