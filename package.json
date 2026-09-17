@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "test": "node --test test/bazi-engine.test.js test/url.test.js"
+    "test": "node --test test/bazi-engine.test.js test/url.test.js test/markup.test.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

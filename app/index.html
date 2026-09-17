@@ -96,7 +96,10 @@
         <div class="intro-icon">✦</div>
         <p id="input-intro-copy"><span class="en">Enter your details to unlock your<br><strong>Four Pillars of Destiny</strong></span><span class="zh hide">输入出生信息，解锁<br><strong>四柱命盘</strong></span><span class="th hide">กรอกข้อมูลเพื่อปลดล็อก<br><strong>สี่เสาแห่งโชคชะตา</strong></span></p>
       </div>
-      <form id="bazi-form" onsubmit="handleSubmit(event)" novalidate>
+      <!-- Guarded because /chart is a fresh page load since Phase 2: the form is server-rendered and
+           visible before script.js (~360 KB) has executed. Without this, an early submit fell through
+           to a native GET, navigating to /chart?name=...&gender=... and losing what was typed. -->
+      <form id="bazi-form" onsubmit="return typeof handleSubmit === 'function' ? handleSubmit(event) : (event.preventDefault(), false)" novalidate>
         <div class="field">
           <label><span class="en">Name <span class="label-opt">personalize your reading</span></span><span class="zh hide">姓名 <span class="label-opt">个性化你的命理</span></span><span class="th hide">ชื่อ <span class="label-opt">ปรับการอ่านให้เป็นของคุณ</span></span></label>
           <input type="text" id="name" placeholder="What do we call you?" data-i18n-placeholder="form.name.ph" autocomplete="off" spellcheck="false" data-1p-ignore data-lpignore="true">
