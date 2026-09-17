@@ -1,6 +1,6 @@
 # SEO overhaul — handoff
 
-Last updated: 2026-09-17. Launch: **2026-09-24**. Site: https://wobazi.com (Render, behind Cloudflare).
+Last updated: 2026-09-17 (Phase 1b merged). Launch: **2026-09-24**. Site: https://wobazi.com (Render, behind Cloudflare).
 
 ## 1. Current state
 
@@ -13,40 +13,53 @@ Up to date with `origin/main`. Latest commits:
 | `de1d94b` | Today tab shows the day's Power Day tier; Actions card back to DO / AVOID / WATCH only. |
 | `bc96bfa` | People tab rename, menu reorder, luck pillar removed from My Wobazi. |
 
-### PR #1 — SEO Phase 1 (`seo/phase-1` → `main`)
-https://github.com/alexanderjoo-max/wobazi/pull/1 — **open, mergeable, not merged**. Head `a0406a3` (Phase 1 commit `da2fce9` plus a merge of `main` that resolved a one-line `require` conflict in `server.js`).
+### PR #1 — SEO Phase 1 (`seo/phase-1` → `main`) — **MERGED** `a4508ee`
+Merged and deployed. Contents unchanged from the description below; production verified 2026-09-17.
 
-What it contains:
-- **Homepage:** title "Free BaZi Calculator – Four Pillars of Destiny Chart | Wobazi"; description (147 chars, no diacritics); H1 is the visible hero subheading `h1.logo-sub` "Free BaZi Calculator — Four Pillars of Destiny" (approved, wraps to two lines on mobile, ~17px push); the wordmark is a `<p>`; the app's hidden empty H1 is a `div`; `og:url` = canonical `https://wobazi.com/`; `twitter:site` removed; viewport zoom lock removed.
-- **Content pages:** keyword-first titles/descriptions from `seo/meta.js` `PAGES`; one H1 each; absolute canonical identical to `og:url`; brand spelled "Wobazi".
-- **URLs:** no trailing slash (301); `/Master-Alice.html` and `/about` 301 → `/master-alice`; `/bazi-calculator` 301 → `/`; internal links updated.
-- **robots.txt:** `Disallow: /api/` (share-image endpoints explicitly allowed), `/auth/`, `/wobazi2`. Sitemap referenced.
-- **Share/invite routes** (`/i/`, `/r/`, `/s/`, `/api/share-viral|share-image|share-story`): crawlable, `X-Robots-Tag: noindex` header, meta robots noindex on pages.
-- **sitemap.xml:** 9 public pages from `PAGES`, hand-set `lastmod`.
-- **JSON-LD:** `/` WebApplication + Organization (+ existing FAQPage); guide pages Article + BreadcrumbList (+ FAQPage); `/master-alice` Person + BreadcrumbList; `/privacy`, `/terms` BreadcrumbList. structured-data-testing-tool (Google presets): 0 failures, 0 warnings.
-- **Performance:** Outfit self-hosted (`public/fonts/outfit-latin*.woff2`, variable, `font-weight: 300 700`, preloaded, pixel-identical); Chinese/Thai Google Fonts CSS non-blocking (preload + onload swap, `<noscript>`, `display=swap`, pixel-identical final render in 中文/ไทย); `?v=` static assets cached 1 year immutable, unversioned 1 day; below-fold images lazy; Master Alice photo 113 KB → 65 KB.
-- **Mobile:** `.oracle-input`, `.oracle-drawer-input`, `.viral-caption`, `.pd-select` 16px at ≤768px (iOS focus zoom).
+<details>
+<summary>What it contained</summary>
 
-Pre-merge verification (local server on a DB copy): all required URLs 200/301 as expected; guest chart plot, Oracle, share sheet, EN/ไทย/中文 toggle work; `npm test` 41 pass; relationships tests 25 pass; Oracle tests 6 pass.
+- **Homepage:** title "Free BaZi Calculator – Four Pillars of Destiny Chart | Wobazi"; H1 is the visible hero subheading `h1.logo-sub`; wordmark is a `<p>`; `og:url` = canonical; `twitter:site` removed; viewport zoom lock removed.
+- **Content pages:** keyword-first titles/descriptions from `seo/meta.js` `PAGES`; one H1 each; absolute canonical identical to `og:url`.
+- **URLs:** no trailing slash (301); `/Master-Alice.html` and `/about` 301 → `/master-alice`; `/bazi-calculator` 301 → `/`.
+- **robots.txt**, **sitemap.xml** (9 pages, hand-set `lastmod`), **JSON-LD** (WebApplication + Organization, Article, BreadcrumbList, Person, FAQPage).
+- **Performance:** Outfit self-hosted; Chinese/Thai Google Fonts non-blocking; `?v=` assets cached 1 year immutable; below-fold images lazy.
+- **Mobile:** 16px inputs at ≤768px (iOS focus zoom).
+</details>
 
-Lighthouse mobile, **local** (no Cloudflare compression), before → after:
+### PR #2 — SEO Phase 1b (`seo/phase-1b` → `main`) — **MERGED** `fbaf87e`
+https://github.com/alexanderjoo-max/wobazi/pull/2. No URL changes, no visual changes.
 
-| Page | Perf | A11y | Best practices | SEO | FCP | LCP |
-|---|---|---|---|---|---|---|
-| `/` | 55 → 64 | 78 → 84 | 100 | 100 | 11.7s → 4.4s | 18.9s → 10.4s |
-| `/what-is-bazi` | 58 → 71 | 89 | 100 | 100 | 7.1s → 3.8s | 10.3s → 5.6s |
+- **WebP logos:** `logo-stack` 77 → 49 KB, `logo-horiz` 62 → 35 KB, lossless (decoded RGBA byte-identical to the PNGs). `<picture class="logo-pic">` + WebP `<source>`, PNG kept as fallback, in `app/index.html` (×6), `nav.ejs`, `footer.ejs`. Hero logo has `fetchpriority="high"` and is not lazy. Canvas/Satori share images still read the PNGs.
+  - `picture.logo-pic { display: contents }` **and** `> source { display: none }` — without the second rule Chrome treats `<source>` as a flex item and the nav gains a 10px gap.
+- **Accessibility (attributes only):** `aria-label` + `data-i18n-aria` on 3 back buttons, 2 Oracle send buttons, the blood-type select (new keys `aria.send`, `aria.bloodType`). `updateSwitchers` matched `[data-lang]`, which put `aria-selected` on `<html>` — now `button[data-lang]` with `aria-pressed` (and `.drawer-lang button[aria-pressed="true"]` in CSS). `/what-is-bazi` section headings no longer carry `role="button"`/`tabindex`; the existing "Read more" button remains the keyboard control.
+- **Heading order:** guide-page section headings h3 → h2 (sub-headings h4 → h3 with inline `font-weight:700;letter-spacing:normal`), footer column headings h4 → h3. `public.css` already styled `.seo-main .about-section h2, h3` identically.
+- **Verified:** computed styles + boxes identical to `main` on 9 pages × 2 widths; pixel diff on `/` and `/what-is-bazi` × 3 languages × 2 widths shows only logo pixels, max Δ 2/255 (PNG vs WebP downscaling); tests 41 + 25 + 11 pass.
 
-**Production baseline before Phase 1** (mobile): `/` 56 / 78 / 100 / 100, FCP 11.0s, LCP 14.6s; `/what-is-bazi` 59 / 89 / 100 / 100, LCP 8.6s. TTFB 0.23–0.48s (first `/what-is-bazi` hit 0.83s).
+**Production after Phase 1b (mobile, 3 runs, median):**
 
-## 2. Pending post-deploy checks (after the owner merges PR #1 and Render deploys)
-Do not merge the PR yourself.
+| Page | Perf | A11y | BP | SEO | FCP | LCP | TTFB |
+|---|---|---|---|---|---|---|---|
+| `/` before Phase 1 | 56 | 78 | 100 | 100 | 11.0s | 14.6s | 0.23–0.48s |
+| `/` after Phase 1 | 66 | 84 | 100 | 100 | 4.2s | 6.0s | 0.23–0.40s |
+| **`/` after Phase 1b** | 61 (56–70) | **100** | 100 | 100 | 4.2s | 6.3s (5.2–14.5) | 374ms |
+| `/what-is-bazi` before Phase 1 | 59 | 89 | 100 | 100 | — | 8.6s | — |
+| `/what-is-bazi` after Phase 1 | 77 | 89 | 100 | 100 | 3.8s | 4.2s | 0.22–0.70s |
+| **`/what-is-bazi` after Phase 1b** | 76 (59–79) | **96** | 100 | 100 | 3.9s | 4.4s (3.9–8.3) | 369ms |
 
-1. `curl` status codes on production for: `/`, `/?begin=1`, `/#input`, `/#you`, `/what-is-bazi`, `/four-pillars-of-destiny`, `/chinese-astrology`, `/day-master`, `/bazi-compatibility`, `/Master-Alice.html` (expect 301 → `/master-alice`), `/master-alice`, `/privacy`, `/terms`, `/auth/google` (302 to Google), `/about` (301), `/bazi-calculator` (301), `/what-is-bazi/` (301).
-2. `X-Robots-Tag: noindex` present on `/i/…`, `/r/…`, `/s/…` and `/api/share-viral…`; absent on content pages.
-3. Live `https://wobazi.com/sitemap.xml` (9 URLs, hand-set `lastmod`, no `/Master-Alice.html`) and `https://wobazi.com/robots.txt` (no `/i/` disallow; share-image allows).
-4. Production Lighthouse mobile on `/` and `/what-is-bazi` (`npx -y lighthouse@12 … --form-factor=mobile`, not added to package.json). Report Performance, Accessibility, SEO, Best practices, FCP, LCP, TTFB against the production baseline above.
-5. Spot-check: `Cache-Control: public, max-age=31536000, immutable` on a `?v=` asset; `/public/fonts/outfit-latin.woff2?v=15` serves `font/woff2`.
-6. Oracle on production: ask "best date next week" and confirm the date is after today (Bangkok).
+Performance is unchanged within run-to-run noise (one slow run per page each time; medians shown). The homepage LCP element is now the WebP hero logo. Accessibility: `/` has **no failing audits**; content pages fail only `color-contrast`.
+
+Also verified on production after the deploy: every URL in §2.1 returns its expected 200/301/302; `X-Robots-Tag: noindex` on `/i/`, `/r/`, `/s/`, `/api/share-*` and absent on content pages; sitemap 9 URLs with matching `lastmod`; robots.txt unchanged; `?v=` assets 1-year immutable; WebP served as `image/webp`.
+
+## 2. Post-deploy checks — done for Phase 1 and Phase 1b
+Both rounds passed (2026-09-17). Repeat this list after each future deploy:
+
+1. `curl` status codes for: `/`, `/?begin=1`, `/#input`, `/#you`, the 5 guide pages, `/master-alice`, `/Master-Alice.html` (301), `/privacy`, `/terms`, `/auth/google` (302), `/about` (301), `/bazi-calculator` (301), `/what-is-bazi/` (301).
+2. `X-Robots-Tag: noindex` on `/i/…`, `/r/…`, `/s/…`, `/api/share-viral…`; absent on content pages.
+3. Live `sitemap.xml` (9 URLs, hand-set `lastmod`) and `robots.txt`.
+4. Lighthouse mobile ×3 (median) on `/` and `/what-is-bazi`; compare with the table above.
+5. `Cache-Control: public, max-age=31536000, immutable` on a `?v=` asset.
+6. Oracle: ask "best date next week", confirm the date is on or after today (Bangkok).
 7. Report results to the owner.
 
 ## 3. Standing decisions and constraints
@@ -73,10 +86,15 @@ Do not merge the PR yourself.
 - Oracle: prompt is rebuilt per request with the Bangkok date; keep `test/oracle.test.js` passing before launch.
 
 ## 4. Open items
-- **Logo WebP (post-launch):** serve `logo-stack.png`, `logo-horiz.png`, `udestiny-logo.png` as lossless WebP with PNG fallback (`<picture>`). 256-colour PNG quantization was tried and bands the gold/silver gradients, so it was skipped. Logged in CLAUDE.md.
+- **Logo WebP:** done for `logo-stack` and `logo-horiz` in Phase 1b. `udestiny-logo.png` (footer) is still PNG-only.
 - **Render-blocking translation scripts in `<head>`:** `public/js/i18n.js`, `i18n-ui.js`, `i18n-copy.js`, `i18n-copy-more.js`, `i18n-app-th.js` (~230 KB uncompressed, ~0.9–2.1s each in local Lighthouse) plus `style.css` (176 KB). Phase 3's one-language pages should remove most of this for content pages; no change made yet.
-- **Accessibility audits still failing on `/`:** `aria-allowed-attr`, `button-name`, `heading-order`, `select-name`. Not in scope so far; fixes may touch markup, so ask first.
-- Production Lighthouse "after" numbers are pending deploy (section 2).
+- **Accessibility:** the attribute-level failures were fixed in Phase 1b (`/` is now 100). What remains is **colour contrast only**, deliberately unchanged because it is a visual-design decision:
+  - Footer text (`--muted` #71707d on #090813) **4.08:1**, needs 4.5:1 — tagline, contact, all column links, copyright, uDestiny line, on every content page.
+  - Footer disclaimer (#575663) **2.76:1** — the worst on the site.
+  - Small muted captions (10–13px) inside cards on `/four-pillars-of-destiny`, `/day-master`, `/bazi-compatibility`, `/chinese-astrology`: 4.09–4.15:1.
+  - "Yin 阴" heading span (#6366f1) on `/chinese-astrology`: 4.45:1 — a hair under.
+  Fixing means lifting `--muted` (and the disclaimer colour) a few steps; it changes the look of every page footer, so it needs the owner's sign-off with before/after screenshots.
+- **Non-SEO bug fixes found while verifying Phase 1b** (PR #4, `fix/guidance-prompt`, open): `/api/daily-guidance` intermittent 500s (truncation at `max_tokens: 300` + the model flattening the nested JSON shape; the Gemini fallback had never run because `thinkingBudget` was in the wrong place), and the Day Master being inferred rather than stated in the Oracle/guidance/batch/relationships prompts. Both are launch-blocking. PR #3 (`fix/oracle-day-master`) was closed as superseded.
 
 ## 5. Phase 2 spec (owner's original brief) — waits for go-ahead
 
