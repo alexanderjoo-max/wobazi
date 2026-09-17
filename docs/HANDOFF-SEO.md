@@ -69,8 +69,10 @@ Both rounds passed (2026-09-17). Repeat this list after each future deploy:
 - Don't delete files; deprecate with redirects. Every URL that works today must keep working (200 or 301).
 - Google OAuth, daily readings, the Oracle and share cards must keep working exactly as before.
 - Render: don't change the service plan or infra config without asking.
-- One branch + PR per phase; finish and verify a phase before starting the next. **Phase 2 and Phase 3 wait for the owner's explicit go-ahead.**
-- Owner merges PRs. Separate, non-SEO fixes go to `main` as their own commits, not into an SEO PR.
+- One branch + PR per phase; finish and verify a phase before starting the next. Phase 2 and Phase 3 are approved (2026-09-17), each still gated on the previous PR being merged and production-verified.
+- **Launch freeze:** nothing merges to `main` 2026-09-23 to 2026-09-25 except bug fixes. Any phase not fully verified by end of 2026-09-22 waits until 2026-09-26.
+- Every PR description carries the rollback target (last good commit on `main`) and a redirect map.
+- Owner merges PRs. (Exception, one-off: the owner asked Claude to merge PR #2 on 2026-09-17; that authorization was for that PR only and does not carry to later ones.) Separate, non-SEO fixes go to `main` as their own commits or their own PR, not into an SEO PR.
 - Tools like Lighthouse run via `npx`, never added to `package.json`. `node-html-parser` is approved **for Phase 3 only**, installed on the Phase 3 branch, server/build-side only (must not ship to the client).
 
 **SEO rules now in the code**
