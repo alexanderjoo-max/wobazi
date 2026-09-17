@@ -1623,6 +1623,28 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
   color: var(--w75);
   line-height: 1.7;
 }
+/* Today's Power Day line inside Today's Fortune */
+.daily-power {
+  position: relative;
+  margin: 0 20px 18px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--w05);
+  border: 1px solid var(--border);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
+}
+.daily-power.is-power { border-color: rgba(240,192,64,0.45); background: rgba(240,192,64,0.08); }
+.daily-power.is-avoid { border-color: rgba(239,68,68,0.35); }
+.daily-power-main { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1 1 200px; min-width: 0; }
+.daily-power-main .pick-score { font-size: 12px; padding: 2px 8px; }
+.daily-power-tier { font-size: 14px; font-weight: 700; color: var(--text); }
+.daily-power-why { font-size: 13px; color: var(--m7); }
+.daily-power-next { font-size: 12px; color: var(--m65); flex-basis: 100%; order: 2; }
+.daily-power-main { order: 1; }
+.daily-power-next strong { color: var(--text); font-weight: 600; }
+.daily-power-link { font-size: 13px; font-weight: 700; color: var(--gold); padding: 2px 0; order: 3; }
+.pick-score.is-avoid { background: rgba(239,68,68,0.16); color: #f8a5a5; }
+
 .daily-level-dot {
   width: 8px; height: 8px; border-radius: 50%;
   display: inline-block; margin-right: 6px;
@@ -2579,12 +2601,6 @@ body.light-mode .light-mode-toggle { background: rgba(0,0,0,0.04); }
 
 
 /* ── Today's Action Plan (compact Fortune card) ── */
-/* Action plan inside the Actions hero card */
-.hc-plan { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--w1); }
-.hc-plan:empty { display: none; }
-.hc-plan-head { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--m4); }
-.hc-plan .tap-action-label strong { font-weight: 700; }
-
 .today-actions-card {
   background: var(--w03);
   border: 1px solid var(--border);

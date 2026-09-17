@@ -1359,7 +1359,6 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
         <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span>${_t(g.watch.en, g.watch.zh)}</span></div>`;
       // Update actions preview card
       renderActionsPreview({ title: g.do.en, title_zh: g.do.zh }, g.avoid.en, g.avoid.zh, g.watch.en, g.watch.zh);
-      dedupeHeroPlan();
     } catch (err) {
       console.warn('Daily guidance fallback:', err.message);
       // Fall back to static guidance
@@ -1368,7 +1367,6 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
         <div class="hc-bullet"><span class="hc-bullet-key">${_t('AVOID','避')}</span><span>${_t(fallbackAvoidEn, fallbackAvoidZh)}</span></div>
         <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span>${_t(fallbackWatchEn, fallbackWatchZh)}</span></div>`;
       renderActionsPreview(fallbackDo, fallbackAvoidEn, fallbackAvoidZh, fallbackWatchEn, fallbackWatchZh);
-      dedupeHeroPlan();
     }
     if (window.WobaziPortal) WobaziPortal.captureToday({ dominantEl });
   })();
@@ -1430,7 +1428,6 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
 
   // New feature renders
   const nowMonth = new Date().getMonth(); // 0-indexed
-  renderTodayActionsCard(dominantEl, nowMonth);
   renderOutfitSection(dominantEl, nowMonth);
   renderLuckyNumbers(year, month, day, animal, dominantEl);
   renderAuspiciousDates(animal, dominantEl);
@@ -2193,6 +2190,61 @@ function calcDayBranch(year, month, day) {
   return ((diff % 12) + 12) % 12;
 }
 
+/* Today's Power Days verdict (personal calendar) + a link to the calendar on the Actions tab. */
+function todayPowerDayHTML() {
+  const pillars = _shareData && _shareData.pillars;
+  if (!pillars || !window.BaziEngine || !BaziEngine.scoreDayForChart) return '';
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  let s;
+  try {
+    s = _scoredMonth(pillars, today.getFullYear(), today.getMonth() + 1, 'personal').find(x => x.day === today.getDate());
+  } catch (e) { return ''; }
+  if (!s) return '';
+  const tier = {
+    power: _t('Today is a Power Day', '今天是吉日', 'วันนี้เป็นวันพลัง'),
+    good: _t('Today is a Good Day', '今天是吉', 'วันนี้เป็นวันดี'),
+    avoid: _t('Today is a day to avoid', '今天宜避', 'วันนี้ควรเลี่ยง'),
+    plain: _t('Today is an Ordinary Day', '今天是平日', 'วันนี้เป็นวันธรรมดา'),
+  }[s.tier] || '';
+  const reason = s.tier === 'avoid'
+    ? s.reasons.find(r => !r.good)
+    : s.reasons.find(r => r.good && r.code !== 'purpose-fit');
+  // When today isn't a Power Day, point to the next one.
+  let next = null;
+  if (s.tier !== 'power') {
+    const end = new Date(today); end.setDate(end.getDate() + POWER_WINDOW_DAYS);
+    for (let y = today.getFullYear(), m = today.getMonth(); !next && new Date(y, m, 1) <= end; m === 11 ? (y++, m = 0) : m++) {
+      next = _scoredMonth(pillars, y, m + 1, 'personal').find(x => {
+        const dt = new Date(x.year, x.month - 1, x.day);
+        return x.tier === 'power' && dt > today && dt <= end;
+      }) || null;
+    }
+  }
+  const nextLbl = next
+    ? new Date(next.year, next.month - 1, next.day).toLocaleDateString(dateLocale(), { weekday: 'short', day: 'numeric', month: 'short' })
+    : '';
+  return `<div class="daily-power is-${s.tier}">
+    <div class="daily-power-main">
+      <span class="pick-score is-${s.tier}">${s.score}</span>
+      <span class="daily-power-tier">${tier}</span>
+      ${reason ? `<span class="daily-power-why">· ${_loc(reason.short)}</span>` : ''}
+    </div>
+    ${next ? `<div class="daily-power-next">${_t('Next Power Day', '下一个吉日', 'วันพลังถัดไป')}: <strong>${nextLbl}</strong></div>` : ''}
+    <button type="button" class="daily-power-link" onclick="haptic(6); openPowerDays()">${_t('See Power Days', '查看吉日', 'ดูวันพลัง')} →</button>
+  </div>`;
+}
+
+function openPowerDays() {
+  const now = new Date();
+  switchTab('actions');
+  if (typeof selectPowerDate === 'function' && _shareData && _shareData.animal) {
+    _calView = 0;
+    selectPowerDate(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+  setTimeout(() => scrollResults('res-power-days'), 60);
+}
+
 function renderDailyFortune(userAnimal) {
   const now = new Date();
   const todayBranchIdx = calcDayBranch(now.getFullYear(), now.getMonth(), now.getDate());
@@ -2251,6 +2303,7 @@ function renderDailyFortune(userAnimal) {
       <span class="daily-level-dot" style="background:${color}"></span>
       ${_t(msg_en, msg_zh, msg_th)}
     </div>
+    ${todayPowerDayHTML()}
   </div>`;
 
   setTimeout(() => {
@@ -4004,66 +4057,6 @@ function getPersonalDates(pillars, year, month, purpose) {
 ═══════════════════════════════════════ */
 
 /* ── Render Today's Action Plan (compact card on Fortune tab) ── */
-function renderTodayActionsCard(dominantEl, nowMonth) {
-  const elColor   = EL_COLOR[dominantEl];
-  const outfit    = OUTFIT_COLORS[nowMonth];
-  const ritual    = MORNING_RITUAL[dominantEl];
-  const crystal   = CRYSTALS[dominantEl]?.[0];
-
-  // Derive 3 concise actions
-  const actions = [
-    {
-      icon: '👗',
-      label: `${_t('Wear','穿')} <strong>${_t(outfit.name, outfit.name_zh || outfit.name)}</strong>`,
-      sub: _t(outfit.why.split('—')[1]?.trim() || outfit.why, outfit.why_zh),
-    },
-    {
-      icon: ritual[0].icon,
-      label: `<strong>${_t(ritual[0].title, ritual[0].title_zh)}</strong>`,
-      sub: _t(ritual[0].body.split('.')[0] + '.', (ritual[0].body_zh || '').split('。')[0] + '。'),
-    },
-    {
-      icon: ritual[1].icon,
-      label: `<strong>${_t(ritual[1].title, ritual[1].title_zh)}</strong>`,
-      sub: _t(ritual[1].body.split('.')[0] + '.', (ritual[1].body_zh || '').split('。')[0] + '。'),
-    },
-  ];
-
-  const itemsHTML = actions.map(a => `
-    <div class="tap-action-item">
-      <span class="tap-action-icon">${a.icon}</span>
-      <div class="tap-action-body">
-        <div class="tap-action-label">${a.label}</div>
-        <div class="tap-action-sub">${a.sub}</div>
-      </div>
-    </div>
-  `).join('');
-
-  // Lives inside the Actions hero card, under DO / AVOID / WATCH (one card, no repeats).
-  const plan = document.getElementById('hero-plan');
-  if (!plan) return;
-  plan.innerHTML = `
-    <div class="hc-plan-head">${_t('Your plan today', '今日计划', 'แผนวันนี้')}</div>
-    ${itemsHTML}
-  `;
-  dedupeHeroPlan();
-}
-
-/* Hide a plan item that repeats the DO line (the static DO often is the first ritual). */
-function dedupeHeroPlan() {
-  const plan = document.getElementById('hero-plan');
-  const doEl = document.querySelector('#hero-bullets .hc-bullet > span:not(.hc-bullet-key)');
-  if (!plan) return;
-  const norm = t => String(t || '').toLowerCase().replace(/[^a-z0-9\u0e00-\u0e7f\u4e00-\u9fff]+/g, ' ').trim();
-  // _t() writes one span per language; compare the English copy of each.
-  const en = el => el ? (el.querySelector('.en') || el).textContent : '';
-  const doText = norm(en(doEl));
-  plan.querySelectorAll('.tap-action-item').forEach(item => {
-    const title = norm(en(item.querySelector('.tap-action-label strong')));
-    item.classList.toggle('hide', !!doText && !!title && (doText === title || doText.includes(title)));
-  });
-}
-
 /* ── Render Outfit Section ── */
 function renderOutfitSection(dominantEl, nowMonth) {
   const elColor = EL_COLOR[dominantEl];

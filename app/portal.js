@@ -127,7 +127,7 @@
 
     const s = strip.cloneNode(true);
     const h = hero.cloneNode(true);
-    h.querySelectorAll('[style*="display:none"], .hc-plan').forEach(n => n.remove());   // history keeps the day's guidance, not the plan
+    h.querySelectorAll('[style*="display:none"]').forEach(n => n.remove());
     scrub(s);
     scrub(h);
 
