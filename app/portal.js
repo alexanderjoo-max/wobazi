@@ -392,14 +392,51 @@
     </section>`;
   }
 
+  /* ── My People: the first few saved people, linking into the Relationships tab ── */
+  const PEOPLE_PREVIEW = 3;
+  const REL_TYPE = {
+    romantic: () => _t('Romantic', '恋人', 'คนรัก'),
+    friend: () => _t('Friend', '朋友', 'เพื่อน'),
+    family: () => _t('Family', '家人', 'ครอบครัว'),
+    business: () => _t('Business', '事业', 'ธุรกิจ'),
+  };
+  function peopleHtml(data) {
+    if (!data || !Array.isArray(data.people)) return '';
+    const list = data.people;
+    const rows = list.slice(0, PEOPLE_PREVIEW).map(p => {
+      const a = p.archetype;
+      const initial = esc((p.name || '?').trim().charAt(0).toUpperCase());
+      return `<button type="button" class="rel-row" onclick="haptic(6); goHash('relationships/p/${Number(p.id)}')">
+        <span class="rel-avatar" data-el="${a ? esc(a.element) : ''}" aria-hidden="true">${initial}</span>
+        <span class="rel-row-main">
+          <span class="rel-row-top"><span class="rel-row-name">${esc(p.name)}</span><span class="rel-chip">${(REL_TYPE[p.type] || REL_TYPE.friend)()}</span>${p.linked ? `<span class="rel-chip rel-chip-linked">${_t('Linked', '已连接', 'เชื่อมแล้ว')}</span>` : ''}</span>
+          ${a ? `<span class="rel-row-line">${_t(esc(a.name.en), esc(a.name.zh), esc(a.name.th))}</span>` : ''}
+        </span>
+        <svg class="rel-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>`;
+    }).join('');
+    return `
+      <section class="section">
+        <div class="section-head"><h3>${_t('My People', '我的人', 'คนของฉัน')}</h3>${list.length ? `<span class="section-sub">${list.length}</span>` : ''}</div>
+        ${list.length
+          ? `<div class="rel-list">${rows}</div>`
+          : `<p class="portal-copy">${_t('Add a partner, friend, family member or colleague to see where you click and where you clash.', '添加伴侣、朋友、家人或同事，看看你们哪里合拍、哪里容易摩擦。', 'เพิ่มคู่ เพื่อน ครอบครัว หรือเพื่อนร่วมงาน เพื่อดูว่าตรงไหนเข้ากันและตรงไหนขัดกัน')}</p>`}
+        <div class="portal-more"><button type="button" class="btn-secondary" onclick="haptic(6); goHash('relationships')${list.length ? '' : "; if (window.WobaziRel) WobaziRel.openAdd()"}">${list.length > PEOPLE_PREVIEW
+          ? _t(`All people (${list.length})`, `全部（${list.length}）`, `ทั้งหมด (${list.length})`) + ' →'
+          : list.length ? _t('Open Relationships', '打开关系', 'เปิดความสัมพันธ์') + ' →' : _t('Add someone', '添加一个人', 'เพิ่มคน')}</button></div>
+      </section>`;
+  }
+
   async function openHome() {
     setView('portal-home', _t('My Wobazi', '我的 Wobazi', 'Wobazi ของฉัน'));
     const host = el('portal-home');
     if (!host.innerHTML.trim()) host.innerHTML = `<p class="portal-empty">✦</p>`;
     try {
-      const [sum, recent] = await Promise.all([
+      const [sum, recent, people] = await Promise.all([
         api('/api/portal/summary?today=' + localDate()),
         api('/api/portal/history?limit=5'),
+        // Relationships is optional here: a failure hides the section, never the home screen.
+        fetch('/api/rel/people').then(res => (res.ok ? res.json() : null)).catch(() => null),
       ]);
       if (currentHash() !== 'portal') return;
       const a = sum.account || {};
@@ -470,7 +507,7 @@
           <button type="button" class="drawer-link portal-link" onclick="haptic(6); goHash('account')">${_t('Account &amp; your data', '账户与数据', 'บัญชีและข้อมูลของคุณ')} →</button>
         </section>`;
 
-      host.innerHTML = idCard + todaySection + record + luckHtml(luck) + recentSection + links;
+      host.innerHTML = idCard + todaySection + peopleHtml(people) + record + luckHtml(luck) + recentSection + links;
       cleanRows(host);
       applyI18n();
     } catch (e) {

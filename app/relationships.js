@@ -165,13 +165,21 @@
   }
 
   function renderList() {
-    const sub = T('Compatibility with the people in your life', '你与身边人的相处方式', 'ความเข้ากันกับคนในชีวิตคุณ');
+    const sub = st.guest
+      ? T('Compatibility with the people in your life', '你与身边人的相处方式', 'ความเข้ากันกับคนในชีวิตคุณ')
+      : T('Saved to your account', '已保存到你的账号', 'บันทึกไว้ในบัญชีของคุณ');
     if (st.guest) {
       section.innerHTML = head(T('People', '身边的人', 'ผู้คน'), sub) + `
         <div class="rel-card rel-empty">
           <p class="rel-card-title">${T('Save the people in your life', '保存你身边的人', 'บันทึกคนในชีวิตคุณ')}</p>
-          <p class="rel-muted">${T('Sign in to add partners, friends, family and colleagues and see how you work together.', '登录后可添加伴侣、朋友、家人和同事，看看你们如何相处。', 'เข้าสู่ระบบเพื่อเพิ่มคู่ เพื่อน ครอบครัว และเพื่อนร่วมงาน แล้วดูว่าคุณเข้ากันอย่างไร')}</p>
-          <button type="button" class="btn-primary btn-full" data-act="signin">${T('Sign in with Google', '使用 Google 登录', 'เข้าสู่ระบบด้วย Google')}</button>
+          <p class="rel-muted">${T('Members can save profiles for partners, friends, family and colleagues, then come back to each compatibility reading anytime.', '会员可以保存伴侣、朋友、家人和同事的资料，随时回来查看每一份合盘解读。', 'สมาชิกบันทึกโปรไฟล์ของคู่ เพื่อน ครอบครัว และเพื่อนร่วมงานได้ แล้วกลับมาดูผลความเข้ากันได้ทุกเมื่อ')}</p>
+          <ul class="rel-perks">
+            <li>${T('Keep everyone in one place, on any device', '所有人集中保存，任何设备都能查看', 'เก็บทุกคนไว้ที่เดียว ดูได้ทุกอุปกรณ์')}</li>
+            <li>${T('See where you click, where you clash, and what to try', '看清合拍点、摩擦点和相处建议', 'ดูว่าตรงไหนเข้ากัน ตรงไหนขัดกัน และควรลองทำอะไร')}</li>
+            <li>${T('Invite someone to link charts with you', '邀请对方与你连接命盘', 'ชวนอีกฝ่ายมาเชื่อมแผนภูมิกับคุณ')}</li>
+          </ul>
+          <button type="button" class="btn-primary btn-full" data-act="signin">${T('Sign in free with Google', '使用 Google 免费登录', 'เข้าสู่ระบบฟรีด้วย Google')}</button>
+          <p class="rel-muted rel-center">${T('Their birth details stay private to your account.', '对方的出生资料只保存在你的账号中，不会公开。', 'ข้อมูลเกิดของเขาเป็นส่วนตัวในบัญชีของคุณ')}</p>
         </div>`;
       return;
     }
@@ -550,11 +558,13 @@
     html += `<div class="rel-card rel-headline">
       <p class="rel-kicker">${T('Pair archetype', '组合类型', 'ต้นแบบคู่')}</p>
       <h2 class="rel-archetype-name">${T(esc(a.name.en), esc(a.name.zh), esc(a.name.th))}</h2>
+      ${dynamicHtml(f, name)}
       ${txt && txt.headline ? `<p class="rel-headline-desc">${named(txt.headline.description, name)}</p>`
         : pending ? '<span class="skel skel-w100"></span><span class="skel skel-w80"></span>'
         : `<p class="rel-headline-desc">${esc(a.desc)}</p>`}
       ${txt && txt.headline ? `<p class="rel-watch"><span class="rel-watch-label">${T('Watch out for', '需要留意', 'ระวัง')}</span> ${named(txt.headline.watch_out, name)}</p>`
         : pending ? '<span class="skel skel-w70"></span>' : ''}
+      ${elementMixHtml(f.elements, name)}
     </div>`;
 
     if (f.confidence === 'lower') {
@@ -640,6 +650,73 @@
     html += `<button type="button" class="btn-primary btn-full rel-share-btn" data-act="share">${T('Share this pairing', '分享这个组合', 'แชร์คู่นี้')}</button>`;
     html += manageHtml(p);
     section.innerHTML = html;
+  }
+
+  /* ── Headline visuals ── */
+  const ELEMENTS = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
+  const EL_LABEL = {
+    Wood: ['Wood', '木', 'ไม้'], Fire: ['Fire', '火', 'ไฟ'], Earth: ['Earth', '土', 'ดิน'],
+    Metal: ['Metal', '金', 'โลหะ'], Water: ['Water', '水', 'น้ำ'],
+  };
+  const POL_LABEL = { Yang: ['Yang', '阳', 'หยาง'], Yin: ['Yin', '阴', 'หยิน'] };
+  // Which way the Day Master relationship points: you → them, them → you, both, or level.
+  const LINK_DIR = { produces: 'ltr', controls: 'ltr', produced_by: 'rtl', controlled_by: 'rtl', combine: 'both', same: 'same' };
+
+  function orbHtml(dm, who) {
+    const el = dm.element;
+    return `<div class="rel-orb" style="--orb: var(--el-${el.toLowerCase()})">
+      <span class="rel-orb-disc"><span class="rel-orb-char">${esc(dm.char)}</span></span>
+      <span class="rel-orb-who">${who}</span>
+      <span class="rel-orb-el">${T(`${POL_LABEL[dm.polarity][0]} ${EL_LABEL[el][0]}`, `${POL_LABEL[dm.polarity][1]}${EL_LABEL[el][1]}`, `${EL_LABEL[el][2]}${POL_LABEL[dm.polarity][2]}`)}</span>
+    </div>`;
+  }
+
+  /* Day Master dynamic: two element discs joined by an arrow showing who fuels or shapes whom. */
+  function dynamicHtml(f, name) {
+    if (!f.you || !f.them || !f.you.dayMaster || !f.them.dayMaster) return '';
+    const d = f.scores.dayMaster;
+    const dir = LINK_DIR[d.dynamic] || 'same';
+    const shaping = d.link === 'controls' || d.link === 'controlled_by';
+    const head = side => `<path d="${side === 'r' ? 'M92 4 L100 10 L92 16' : 'M8 4 L0 10 L8 16'}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const line = dir === 'same'
+      ? '<path d="M6 6 H94 M6 14 H94" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+      : `<path d="M${dir === 'rtl' || dir === 'both' ? 4 : 2} 10 H${dir === 'ltr' || dir === 'both' ? 96 : 98}" stroke="currentColor" stroke-width="2" stroke-linecap="round"${shaping ? ' stroke-dasharray="5 5"' : ''}/>`
+        + (dir === 'ltr' || dir === 'both' ? head('r') : '') + (dir === 'rtl' || dir === 'both' ? head('l') : '');
+    const aria = `You, ${f.you.dayMaster.polarity} ${f.you.dayMaster.element}; ${first(name)}, ${f.them.dayMaster.polarity} ${f.them.dayMaster.element}: ${d.label.en}`;
+    return `<div class="rel-dyn" role="img" aria-label="${esc(aria)}">
+      ${orbHtml(f.you.dayMaster, T('You', '你', 'คุณ'))}
+      <div class="rel-dyn-link">
+        <span class="rel-dyn-label">${T(esc(d.label.en), esc(d.label.zh), esc(d.label.th))}</span>
+        <svg class="rel-dyn-arrow" viewBox="0 0 100 20" width="100%" height="20" preserveAspectRatio="none" aria-hidden="true">${line}</svg>
+      </div>
+      ${orbHtml(f.them.dayMaster, `<span class="rel-name">${esc(first(name))}</span>`)}
+    </div>`;
+  }
+
+  /* Element mix: mirrored bars, you on the left, them on the right, % of each chart. */
+  function elementMixHtml(el, name) {
+    if (!el || !el.you || !el.them) return '';
+    const max = Math.max(1, ...ELEMENTS.map(e => Math.max(el.you[e] || 0, el.them[e] || 0)));
+    const w = v => `${Math.max(v ? 3 : 0, Math.round((v / max) * 100))}%`;
+    const rows = ELEMENTS.map(e => {
+      const y = el.you[e] || 0;
+      const t = el.them[e] || 0;
+      const lbl = T(...EL_LABEL[e]);
+      return `<div class="rel-mix-row" style="--bar: var(--el-${e.toLowerCase()})">
+        <span class="rel-mix-side rel-mix-you" title="You · ${e} ${y}%"><span class="rel-mix-val">${y}%</span><span class="rel-mix-bar" style="width:${w(y)}"></span></span>
+        <span class="rel-mix-el">${lbl}</span>
+        <span class="rel-mix-side rel-mix-them" title="${esc(first(name))} · ${e} ${t}%"><span class="rel-mix-bar" style="width:${w(t)}"></span><span class="rel-mix-val">${t}%</span></span>
+      </div>`;
+    }).join('');
+    return `<div class="rel-mix">
+      <p class="rel-mix-title">${T('Element mix', '五行分布', 'สัดส่วนธาตุ')}</p>
+      <div class="rel-mix-head">
+        <span>${T('You', '你', 'คุณ')}</span>
+        <span></span>
+        <span><span class="rel-name">${esc(first(name))}</span></span>
+      </div>
+      <div class="rel-mix-rows" role="table" aria-label="Element mix, percent of each chart">${rows}</div>
+    </div>`;
   }
 
   function lockedCard(title) {
@@ -849,7 +926,7 @@
   }
   finishPendingInvite();
 
-  window.WobaziRel = { isRoute, route, reload: () => { st.loaded = false; if (visible()) loadList(true); } };
+  window.WobaziRel = { isRoute, route, openAdd, reload: () => { st.loaded = false; if (visible()) loadList(true); } };
 
   /* script.js may have routed before this file loaded (refresh on #relationships/p/:id). */
   const initial = typeof currentHash === 'function' ? currentHash() : '';

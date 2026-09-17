@@ -34,6 +34,7 @@ const { dayMasterArchetype } = require('./archetypes');
 const { entitlements } = require('./flags');
 const { cardData } = require('./share-card');
 const { searchPlaces, resolveTimezone } = require('./tz');
+const { elementScore } = require('./scoring');
 
 const INVITE_DAYS = 14;
 const MAX_NAME = 60;
@@ -350,7 +351,12 @@ function createRoutes(db, deps) {
       const row = readings.ensure(person, { retry });
       if (row.error === 'owner_chart_missing') return res.status(409).json({ error: 'Save your own chart first.', code: row.error });
       if (row.error) return res.status(409).json({ error: 'Birth details for this person are unavailable.', code: row.error });
-      res.json({ reading: readingPayload(row, ent, person.rel_type) });
+      const payload = readingPayload(row, ent, person.rel_type);
+      // Element mix (% per element) for the owner's chart view. Computed live, never stored or shared.
+      const a = readings.ownerChart(person.owner_id);
+      const b = readings.personChart(person);
+      if (a && b) payload.facts.elements = elementScore(a.pillars, b.pillars).shares;
+      res.json({ reading: payload });
     };
   }
   router.get('/api/rel/people/:id/reading', readingRoute(false));

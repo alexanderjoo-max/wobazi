@@ -118,14 +118,14 @@
 .rel-person-name { font-size: 22px; font-weight: 700; margin-right: 2px; overflow-wrap: anywhere; }
 .rel-headline { gap: 8px; padding: 22px 18px; }
 .rel-archetype-name {
-  font-family: 'Cinzel', 'Outfit', 'Noto Sans SC', 'Noto Sans Thai', serif;
-  font-size: 26px;
-  line-height: 1.2;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: 0.01em;
+  /* Same type as the Your Chart hero title (.you-hero-title). */
+  font-size: 30px;
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--gold);
+  margin: 0;
 }
-html[data-lang="zh"] .rel-archetype-name, html[data-lang="th"] .rel-archetype-name { font-family: inherit; }
 .rel-headline-desc { font-size: 15px; line-height: 1.6; color: var(--m85); }
 .rel-watch {
   font-size: 14px;
@@ -277,3 +277,57 @@ body.light-mode .rel-danger { color: #b3261e; }
 .rel-invite-title { font-size: 26px; line-height: 1.25; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
 .rel-public .btn-primary { text-decoration: none; }
 html[data-lang="th"] .rel-kicker, html[data-lang="zh"] .rel-kicker { letter-spacing: 0.02em; }
+
+/* ── Headline visuals: Day Master dynamic + element mix ── */
+.rel-dyn {
+  display: grid;
+  grid-template-columns: 1fr minmax(90px, 1.3fr) 1fr;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 4px;
+  padding: 14px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--w03);
+  border: 1px solid var(--border);
+}
+.rel-orb { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; text-align: center; }
+.rel-orb-disc {
+  width: 58px; height: 58px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--orb) 30%, transparent), color-mix(in srgb, var(--orb) 8%, transparent) 70%);
+  box-shadow: inset 0 0 0 2px var(--orb), 0 0 22px color-mix(in srgb, var(--orb) 28%, transparent);
+}
+.rel-orb-char { font-family: 'Noto Sans SC', sans-serif; font-size: 28px; font-weight: 700; line-height: 1; color: var(--orb); }
+.rel-orb-who { font-size: 13px; font-weight: 700; color: var(--text); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rel-orb-el { font-size: 11px; color: var(--muted); }
+.rel-dyn-link { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--gold); min-width: 0; }
+.rel-dyn-label { font-size: 12px; font-weight: 700; color: var(--text); text-align: center; line-height: 1.25; }
+.rel-dyn-arrow { display: block; overflow: visible; }
+.rel-dyn-score { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.rel-mix { margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--border); }
+.rel-mix-head {
+  display: grid; grid-template-columns: 1fr 64px 1fr; align-items: baseline;
+  font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 8px;
+}
+.rel-mix-head > span:first-child { text-align: right; padding-right: 6px; }
+.rel-mix-head > span:last-child { padding-left: 6px; }
+.rel-mix-title { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); text-align: center; margin: 0 0 8px; }
+.rel-mix-rows { display: flex; flex-direction: column; gap: 6px; }
+.rel-mix-row { display: grid; grid-template-columns: 1fr 64px 1fr; align-items: center; border-radius: 6px; }
+.rel-mix-row:hover { background: var(--w04); }
+.rel-mix-side { display: flex; align-items: center; gap: 6px; height: 16px; min-width: 0; }
+.rel-mix-you { justify-content: flex-end; }
+.rel-mix-bar { display: block; height: 10px; background: var(--bar); min-width: 0; }
+.rel-mix-you .rel-mix-bar { border-radius: 4px 0 0 4px; }
+.rel-mix-them .rel-mix-bar { border-radius: 0 4px 4px 0; }
+.rel-mix-val { font-size: 11px; color: var(--m7); font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+.rel-mix-el { font-size: 11px; font-weight: 600; color: var(--m8); text-align: center; }
+
+.rel-perks { list-style: none; margin: 2px 0 4px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.rel-perks li { position: relative; padding-left: 20px; font-size: 13.5px; line-height: 1.45; color: var(--m85); }
+.rel-perks li::before { content: '✦'; position: absolute; left: 0; top: 0; color: var(--gold); font-size: 12px; }
+.rel-center { text-align: center; font-size: 12px; }
+/* Keep the visuals compact on wide screens */
+.rel-dyn { width: 100%; max-width: 480px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
+.rel-mix-title, .rel-mix-head, .rel-mix-rows { max-width: 480px; margin-left: auto; margin-right: auto; width: 100%; }
