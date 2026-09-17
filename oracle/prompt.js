@@ -9,6 +9,9 @@
 
 'use strict';
 
+/* Day Master archetype catalog (plain data, shared with the relationships readings). */
+const { dayMasterArchetype } = require('../relationships/archetypes');
+
 const bazi = require('../bazi-engine');
 
 const TIME_ZONE = 'Asia/Bangkok';
@@ -101,6 +104,16 @@ function dateContextBlock(ctx) {
   return lines.join('\n');
 }
 
+/* The Day Master (日主) is the Day pillar's stem — never the year stem. The client sends
+   pillars in [Year, Month, Day, Hour] order with labels; prefer the label, fall back to index 2. */
+function dayMasterOf(pillars) {
+  const list = Array.isArray(pillars) ? pillars : [];
+  const dayPillar = list.find(p => p && p.label === 'Day') || list[2];
+  if (!dayPillar || dayPillar.known === false || !dayPillar.stem || !dayPillar.stem.char) return null;
+  const s = dayPillar.stem;
+  return { char: s.char, element: s.element || 'unknown', polarity: s.polarity || 'unknown' };
+}
+
 function buildSystemPrompt(chartData, opts) {
   const { animal, element, polarity, dominantEl, fortune, pillars, today, tenGods } = chartData || {};
   const now = opts && opts.now;
@@ -113,8 +126,15 @@ function buildSystemPrompt(chartData, opts) {
 
   const pillarStr = (pillars || []).map(p => {
     if (!p.known) return `${p.label}: unknown`;
-    return `${p.label}: ${p.stem.char} ${p.branch.char} (${p.stem.element} ${p.stem.polarity} / ${p.branch.animal})`;
+    const mark = p.label === 'Day' ? ' ← Day Master (日主) is this stem' : '';
+    return `${p.label}: ${p.stem.char} ${p.branch.char} (${p.stem.element} ${p.stem.polarity} / ${p.branch.animal})${mark}`;
   }).join('\n');
+
+  const dm = dayMasterOf(pillars);
+  const dmArch = dm ? dayMasterArchetype(dm.char) : null;
+  const dmStr = dm
+    ? `Day Master (日主): ${dm.char} ${dm.element} ${dm.polarity}${dmArch ? ` — ${dmArch.name.en}: ${dmArch.line.en}` : ''} — this is the user's Day Master, taken from the Day pillar's stem.`
+    : "Day Master (日主): unknown (no birth day pillar on file) — don't invent one.";
 
   const todayStr = today
     ? `Today's Day Pillar: ${today.stem} ${today.branch} (${today.animal} day)\nClash with user: ${today.isClash ? 'YES — friction day' : today.isCompat ? 'NO — harmonious day' : 'Neutral day'}\nDay Force Score: ${today.score}/100\nNobleman Status: ${today.nobleman ? 'Active — helpful people energy today' : 'Inactive'}`
@@ -125,8 +145,9 @@ function buildSystemPrompt(chartData, opts) {
 ${dateContextBlock(ctx)}
 
 USER'S BAZI CHART:
-Animal: ${animal}
-Element: ${element} (${polarity})
+${dmStr}
+Animal (生肖): ${animal}
+Year element (生肖/zodiac profile, NOT the Day Master): ${element} (${polarity})
 Dominant Element: ${dominantEl}
 Fortune Scores — Love: ${fortune?.love}, Career: ${fortune?.career}, Health: ${fortune?.health}, Wealth: ${fortune?.wealth}
 
@@ -145,9 +166,10 @@ RULES:
 - Reference the user's specific chart data in your answers
 - When timing matters, include date suggestions as [DATE:YYYY-MM-DD] tags, always on or after today (${ctx.today.iso})
 - When giving a clear verdict, include exactly one: [VERDICT:favorable], [VERDICT:defer], or [VERDICT:neutral]
+- The Day Master is the Day pillar's stem; never describe the user's Day Master as any other element (the year/zodiac element above is not the Day Master)
 - Use the Five Element relationships (producing/controlling cycles) in your analysis
 - Reference today's day pillar energy when relevant to "should I do X today" questions
 - Never say "I'm just an AI" or add disclaimers — you ARE the Oracle`;
 }
 
-module.exports = { buildSystemPrompt, bangkokToday, currentPillars, currentLuck, normalizeBirth, addDaysIso, TIME_ZONE };
+module.exports = { buildSystemPrompt, dayMasterOf, bangkokToday, currentPillars, currentLuck, normalizeBirth, addDaysIso, TIME_ZONE };

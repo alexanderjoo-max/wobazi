@@ -11,6 +11,7 @@
 const OpenAI = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const bazi = require('../bazi-engine');
+const { dayMasterArchetype } = require('../relationships/archetypes');
 const helpers = require('./bazi-helpers');
 const { SYSTEM_PROMPT, buildUserPrompt } = require('./prompt');
 
@@ -94,7 +95,8 @@ function buildChartContext(user, today) {
 
   return {
     name: name || 'User',
-    dayMaster: { char: dayPillar.stem.char, element: dmEl, polarity: dmPol },
+    dayMaster: { char: dayPillar.stem.char, element: dmEl, polarity: dmPol,
+      archetype: (dayMasterArchetype(dayPillar.stem.char) || {}).name?.en || null },
     yearStem: `${pillars[0].stem.char} (${pillars[0].stem.element} ${pillars[0].stem.polarity})`,
     yearBranch: `${pillars[0].branch.char} (${pillars[0].branch.animal})`,
     monthStem: `${pillars[1].stem.char} (${pillars[1].stem.element} ${pillars[1].stem.polarity})`,
@@ -152,7 +154,7 @@ async function callGemini(userPrompt) {
   });
   const result = await model.generateContent({
     contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-    generationConfig: { maxOutputTokens: 800, temperature: 0.7, thinkingBudget: 0 },
+    generationConfig: { maxOutputTokens: 800, temperature: 0.7, thinkingConfig: { thinkingBudget: 0 } },
   });
   return result.response.text().trim();
 }

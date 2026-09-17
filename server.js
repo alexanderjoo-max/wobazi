@@ -15,6 +15,7 @@ const crypto = require('crypto');
 const bazi = require('./bazi-engine');
 const seo = require('./seo/meta');
 const { buildSystemPrompt: buildOraclePrompt } = require('./oracle/prompt');
+const { buildGuidancePrompt, normalizeGuidance, GUIDANCE_MAX_TOKENS } = require('./guidance/prompt');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -569,90 +570,6 @@ async function streamGemini(systemPrompt, messages, res) {
 /* ── Daily Guidance (AI-generated DO/AVOID/WATCH) ── */
 const guidanceCache = new Map(); // key: `${dayMasterEl}-${todayStem}-${todayBranch}` → { ts, data }
 
-function calcTenGod(dayMasterEl, dayMasterPolarity, targetEl, targetPolarity) {
-  const same = dayMasterEl === targetEl;
-  const sameP = dayMasterPolarity === targetPolarity;
-  const prod = bazi.PRODUCTION_CYCLE;
-  const ctrl = bazi.CONTROL_CYCLE;
-  const iIdx = prod.indexOf(dayMasterEl);
-  const tIdx = prod.indexOf(targetEl);
-  // What I produce
-  if (prod[(iIdx + 1) % 5] === targetEl) return sameP ? '食神 Eating God' : '傷官 Hurting Officer';
-  // What produces me
-  if (prod[(tIdx + 1) % 5] === dayMasterEl) return sameP ? '偏印 Indirect Resource' : '正印 Direct Resource';
-  // What I control
-  if (ctrl[dayMasterEl] === targetEl) return sameP ? '偏財 Indirect Wealth' : '正財 Direct Wealth';
-  // What controls me
-  if (ctrl[targetEl] === dayMasterEl) return sameP ? '七殺 Seven Killings' : '正官 Direct Officer';
-  // Same element
-  if (same) return sameP ? '比肩 Friend' : '劫財 Rob Wealth';
-  return 'unknown';
-}
-
-function buildGuidancePrompt(chartData) {
-  const { pillars, today, animal, dominantEl, tenGods } = chartData;
-
-  // Day Master details
-  const dayPillar = pillars.find(p => p.label === 'Day');
-  const dmEl = dayPillar?.stem?.element || 'Wood';
-  const dmPol = dayPillar?.stem?.polarity || 'Yang';
-  const dmChar = dayPillar?.stem?.char || '甲';
-
-  // Today's Ten God relationship
-  const todayTenGod = calcTenGod(dmEl, dmPol, today.stemElement, today.stemPolarity);
-
-  // Branch interactions
-  const dayBranch = dayPillar?.branch?.animal || 'Rat';
-  const clashPairs = {Rat:'Horse',Horse:'Rat',Ox:'Goat',Goat:'Ox',Tiger:'Monkey',Monkey:'Tiger',Rabbit:'Rooster',Rooster:'Rabbit',Dragon:'Dog',Dog:'Dragon',Snake:'Pig',Pig:'Snake'};
-  const todayClash = clashPairs[today.animal] || '';
-  const branchClashes = [];
-  for (const p of pillars) {
-    if (p.known && p.branch && clashPairs[p.branch.animal] === today.animal) {
-      branchClashes.push(`${p.label} ${p.branch.animal}`);
-    }
-  }
-
-  // Nobleman (貴人) check — today's branch is in user's compatible animals
-  const nobStr = today.nobleman ? 'ACTIVE today' : 'inactive';
-
-  return `You are a BaZi (Four Pillars of Destiny) master generating today's DO / AVOID / WATCH for one specific person.
-
-USER'S CHART:
-Day Master: ${dmChar} ${dmEl} ${dmPol} (日主)
-Year Pillar: ${pillars[0]?.stem?.char || '?'}${pillars[0]?.branch?.char || '?'} (${pillars[0]?.stem?.element || '?'} ${pillars[0]?.branch?.animal || '?'})
-Month Pillar: ${pillars[1]?.stem?.char || '?'}${pillars[1]?.branch?.char || '?'} (${pillars[1]?.stem?.element || '?'} ${pillars[1]?.branch?.animal || '?'})
-Day Pillar: ${dayPillar?.stem?.char || '?'}${dayPillar?.branch?.char || '?'} (${dmEl} ${dayBranch})
-Hour Pillar: ${pillars[3]?.known ? pillars[3].stem.char + pillars[3].branch.char + ' (' + pillars[3].stem.element + ' ' + pillars[3].branch.animal + ')' : 'Unknown'}
-Dominant Element: ${dominantEl}
-Zodiac Animal: ${animal}
-
-TODAY'S DAY PILLAR: ${today.stem}${today.branch} (${today.stemElement} ${today.animal})
-Ten God of Today's Stem vs Day Master: ${todayTenGod}
-Branch clashes with user's pillars: ${branchClashes.length ? branchClashes.join(', ') : 'None'}
-Nobleman (貴人) star: ${nobStr}
-Day Force Score: ${today.score}/100
-Ten Gods: ${tenGods && tenGods.list ? tenGods.list.map(g => g.en + ' ' + g.percent + '%').join(', ') : (Array.isArray(tenGods) ? tenGods.map(g => g.en + ' ' + g.percent + '%').join(', ') : (tenGods && tenGods.sentence && tenGods.sentence.en) || 'n/a')}
-
-RULES — you MUST follow ALL of these:
-1. Return EXACTLY this JSON format, nothing else:
-{"do":{"en":"...","zh":"..."},"avoid":{"en":"...","zh":"..."},"watch":{"en":"...","zh":"..."}}
-
-2. Each item MUST reference a specific BaZi mechanism by name (e.g. "your ${todayTenGod} star", "the ${today.animal}-${dayBranch} ${branchClashes.length ? 'clash' : 'relationship'}", "your 貴人 Nobleman star", "your Day Master's ${dmEl} energy").
-
-3. Each item MUST include a specific time window where relevant (e.g. "before noon", "during ${today.animal} hour", "this morning", "after 3pm").
-
-4. Each item must be IMPOSSIBLE to apply to a different person's chart. If it could appear on anyone's ${dmEl} day reading, rewrite it.
-
-5. NEVER output generic wellness advice (grounding, hydration, sugar, meditation). NEVER output vague action items ("opportunities aligned with goals").
-
-6. The "do" should be a specific actionable task tied to the Ten God activation or Nobleman star.
-7. The "avoid" should warn about a specific risk created by today's pillar interaction with their chart.
-8. The "watch" should flag a specific energy shift or timing window based on branch interactions.
-
-9. Chinese translations must be natural, not machine-translated.
-10. Keep each item to 1-2 sentences max.`;
-}
-
 app.post('/api/daily-guidance', async (req, res) => {
   try {
     const { chartData } = req.body;
@@ -664,7 +581,10 @@ app.post('/api/daily-guidance', async (req, res) => {
     const dayPillar = chartData.pillars.find(p => p.label === 'Day');
     const cacheKey = `${dayPillar?.stem?.char}-${chartData.today.stem}-${chartData.today.branch}-${chartData.animal}`;
     const todayStr = new Date().toISOString().slice(0, 10);
-    const cached = guidanceCache.get(cacheKey);
+    /* GUIDANCE_CACHE=off makes every request hit the model — used by test/guidance.test.js
+       to exercise the real parse path; unset in normal runs. */
+    const useCache = process.env.GUIDANCE_CACHE !== 'off';
+    const cached = useCache ? guidanceCache.get(cacheKey) : null;
     if (cached && cached.date === todayStr) {
       return res.json(cached.data);
     }
@@ -676,42 +596,79 @@ app.post('/api/daily-guidance', async (req, res) => {
 
     const prompt = buildGuidancePrompt(chartData);
 
-    let result;
-    try {
+    /* Attempts: DeepSeek in JSON mode, then DeepSeek again (a truncated or malformed reply is
+       usually a one-off), then Gemini. Each returns the raw text so a failure can be logged. */
+    const userTurn = 'Generate today\'s DO/AVOID/WATCH for this chart.';
+    const askDeepSeek = async () => {
       const completion = await deepseek.chat.completions.create({
         model: 'deepseek-chat',
         messages: [
           { role: 'system', content: prompt },
-          { role: 'user', content: 'Generate today\'s DO/AVOID/WATCH for this chart.' },
+          { role: 'user', content: userTurn },
         ],
-        max_tokens: 300,
+        response_format: { type: 'json_object' },
+        max_tokens: GUIDANCE_MAX_TOKENS,
         temperature: 0.7,
       });
-      result = completion.choices?.[0]?.message?.content?.trim();
-    } catch (e) {
-      // Fallback to Gemini
-      const model = genAI.getGenerativeModel({
-        model: 'gemini-2.5-flash',
-        systemInstruction: prompt,
-      });
+      return {
+        source: 'deepseek',
+        text: completion.choices?.[0]?.message?.content?.trim(),
+        finish: completion.choices?.[0]?.finish_reason,
+        usage: completion.usage?.completion_tokens,
+      };
+    };
+    const askGemini = async () => {
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash', systemInstruction: prompt });
       const gemResult = await model.generateContent({
-        contents: [{ role: 'user', parts: [{ text: 'Generate today\'s DO/AVOID/WATCH for this chart.' }] }],
-        generationConfig: { maxOutputTokens: 300, temperature: 0.7, thinkingBudget: 0 },
+        contents: [{ role: 'user', parts: [{ text: userTurn }] }],
+        generationConfig: {
+          maxOutputTokens: GUIDANCE_MAX_TOKENS,
+          temperature: 0.7,
+          /* thinkingBudget belongs under thinkingConfig; at the top level the API 400s,
+             which is why this fallback never actually ran. */
+          thinkingConfig: { thinkingBudget: 0 },
+          responseMimeType: 'application/json',
+        },
       });
-      result = gemResult.response.text().trim();
+      const cand = gemResult.response?.candidates?.[0];
+      return {
+        source: 'gemini',
+        text: gemResult.response.text().trim(),
+        finish: cand?.finishReason,
+        usage: gemResult.response?.usageMetadata?.candidatesTokenCount,
+      };
+    };
+
+    let parsed = null;
+    const failures = [];
+    for (const attempt of [askDeepSeek, askDeepSeek, askGemini]) {
+      let out;
+      try {
+        out = await attempt();
+      } catch (e) {
+        failures.push(`${attempt === askGemini ? 'gemini' : 'deepseek'}: request failed — ${e.message}`);
+        continue;
+      }
+      try {
+        const jsonStr = String(out.text || '').replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+        const candidate = normalizeGuidance(JSON.parse(jsonStr));
+        if (!candidate) throw new Error('missing do/avoid/watch text in either language');
+        parsed = candidate;
+        break;
+      } catch (e) {
+        /* Log enough to diagnose: finish_reason 'length' means the reply was truncated. */
+        failures.push(`${out.source}: ${e.message} (finish_reason=${out.finish}, completion_tokens=${out.usage}, chars=${(out.text || '').length})`);
+        console.error(`[daily-guidance] unparseable ${out.source} reply (finish_reason=${out.finish}, completion_tokens=${out.usage}):`, JSON.stringify(String(out.text || '').slice(0, 1000)));
+      }
     }
 
-    // Parse JSON from response (handle markdown code blocks)
-    let parsed;
-    try {
-      const jsonStr = result.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
-      parsed = JSON.parse(jsonStr);
-    } catch (e) {
-      return res.status(500).json({ error: 'Failed to parse guidance' });
+    if (!parsed) {
+      console.error(`[daily-guidance] all attempts failed for ${cacheKey}: ${failures.join(' | ')}`);
+      return res.status(503).json({ error: 'Guidance unavailable', code: 'guidance_unavailable', attempts: failures.length });
     }
 
     // Cache it
-    guidanceCache.set(cacheKey, { date: todayStr, data: parsed });
+    if (useCache) guidanceCache.set(cacheKey, { date: todayStr, data: parsed });
 
     res.json(parsed);
   } catch (err) {
