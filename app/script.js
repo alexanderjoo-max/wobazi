@@ -1344,6 +1344,9 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
           id: g.id, en: g.en, zh: g.zh, percent: g.percent,
         })) : null,
         tenGodsSentence: accurate && accurate.tenGods ? accurate.tenGods.sentence : null,
+        /* Lets the server resolve the running luck pillar (大运) for guests too; signed-in
+           users' saved chart wins server-side. Needs gender, so it may be absent. */
+        birth: oracleBirth(),
       };
       const resp = await fetch('/api/daily-guidance', {
         method: 'POST',

@@ -7,7 +7,7 @@
 const { test, describe } = require('node:test');
 const assert = require('node:assert');
 
-const { buildGuidancePrompt, normalizeGuidance, calcTenGod, GUIDANCE_MAX_TOKENS } = require('../guidance/prompt');
+const { buildGuidancePrompt, normalizeGuidance, calcTenGod, luckLine, GUIDANCE_MAX_TOKENS } = require('../guidance/prompt');
 const { buildSystemPrompt: buildOraclePrompt, dayMasterOf } = require('../oracle/prompt');
 const batchPrompt = require('../batch/prompt');
 
@@ -126,5 +126,71 @@ describe('Guidance reply parsing', () => {
 
   test('the token cap leaves headroom over measured replies (258-342)', () => {
     assert.ok(GUIDANCE_MAX_TOKENS >= 700, `cap ${GUIDANCE_MAX_TOKENS} is too tight`);
+  });
+});
+
+/* Reference chart from CLAUDE.md: 1995-04-29 08:45 female → 辛巳 1997, 壬午 2007, 癸未 2017, 甲申 2027. */
+const REF_BIRTH = { year: 1995, month: 4, day: 29, hour: 8, minute: 45, gender: 'F' };
+const LUCK_PREFIX = 'Current 10-year luck pillar (大运):';
+
+describe('Luck pillar (大运) is stated, never inferred', () => {
+  const lineFor = (birth, iso) => luckLine(birth, iso);
+
+  test('names the running pillar for the reference chart (2026 → 癸未)', () => {
+    const line = lineFor(REF_BIRTH, '2026-09-17');
+    assert.match(line, /^Current 10-year luck pillar \(大运\): 癸未 \(Water Goat\), 2017–2027$/);
+  });
+
+  test('follows the chart into the next pillar (2028 → 甲申)', () => {
+    assert.match(lineFor(REF_BIRTH, '2028-09-17'), /甲申 \(Wood Monkey\), 2027–2037/);
+  });
+
+  test('unknown gender → says unknown, never a pillar', () => {
+    const line = lineFor({ ...REF_BIRTH, gender: null }, '2026-09-17');
+    assert.match(line, /unknown \(no gender or birth date on file\)/);
+    assert.match(line, /don't invent one/);
+    assert.ok(!/[甲乙丙丁戊己庚辛壬癸]/.test(line), `named a stem: ${line}`);
+    // Same for a blank gender and for the male/female values the form can't produce.
+    for (const g of [undefined, '', 'other', 'X']) {
+      assert.match(lineFor({ ...REF_BIRTH, gender: g }, '2026-09-17'), /unknown/);
+    }
+  });
+
+  test('no birth data at all → unknown', () => {
+    for (const b of [null, undefined, {}, { year: 1995 }]) {
+      assert.match(lineFor(b, '2026-09-17'), /unknown/);
+    }
+  });
+
+  test('before the first luck pillar starts → says so, no pillar named', () => {
+    const born = new Date();
+    const birth = { year: born.getUTCFullYear(), month: 1, day: 2, hour: 8, minute: 0, gender: 'M' };
+    const line = lineFor(birth, `${born.getUTCFullYear()}-06-01`);
+    assert.match(line, /not started yet|unknown/);
+    assert.ok(!/\d{4}–\d{4}/.test(line), `named a running pillar: ${line}`);
+  });
+
+  test('the guidance prompt carries the line, under the chart block', () => {
+    const c = CHARTS[0];
+    const withLuck = buildGuidancePrompt(chartData(c), { birth: REF_BIRTH, todayIso: '2026-09-17' });
+    assert.match(withLuck, /Current 10-year luck pillar \(大运\): 癸未/);
+    assert.ok(withLuck.indexOf(LUCK_PREFIX) > withLuck.indexOf('Day Master (日主):'), 'luck line should follow the chart facts');
+
+    const without = buildGuidancePrompt(chartData(c), { birth: { ...REF_BIRTH, gender: null }, todayIso: '2026-09-17' });
+    assert.match(without, /luck pillar \(大运\): unknown/);
+
+    // No opts at all (older callers) must not throw and must not invent a pillar.
+    const bare = buildGuidancePrompt(chartData(c));
+    assert.match(bare, /luck pillar \(大运\): unknown/);
+  });
+
+  test('the oracle and guidance prompts agree on the same chart', () => {
+    const c = CHARTS[0];
+    const g = buildGuidancePrompt(chartData(c), { birth: REF_BIRTH, todayIso: '2026-09-17' });
+    const o = buildOraclePrompt(chartData(c), { birth: REF_BIRTH });
+    const gz = (g.match(/luck pillar \(大运\): ([^\s(]+)/) || [])[1];
+    const oz = (o.match(/luck pillar \(大运\): ([^\s(]+)/) || [])[1];
+    assert.ok(gz, 'no luck pillar in the guidance prompt');
+    assert.strictEqual(gz, oz);
   });
 });
