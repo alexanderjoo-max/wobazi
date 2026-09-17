@@ -28,7 +28,7 @@ function withTimeout(promise, ms, label) {
 
 async function callDeepSeek(deepseek, system, user) {
   const completion = await deepseek.chat.completions.create({
-    model: 'deepseek-chat',
+    model: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
     messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
     response_format: { type: 'json_object' },
     max_tokens: 1800,
@@ -38,7 +38,7 @@ async function callDeepSeek(deepseek, system, user) {
 }
 
 async function callGemini(genAI, system, user) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash', systemInstruction: system });
+  const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.5-flash', systemInstruction: system });
   const result = await withTimeout(model.generateContent({
     contents: [{ role: 'user', parts: [{ text: user }] }],
     generationConfig: { maxOutputTokens: 4096, temperature: 0.6, responseMimeType: 'application/json' },

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <script>
+    /* Old app links were hashes on the homepage (/#input, /#you, ...). Redirect before first
+       paint so they never flash the landing. public/js/landing.js repeats this for late hashes. */
+    (function () {
+      var h = (location.hash || '').replace(/^#/, '');
+      if (h && /^(input|begin|today|you|actions|relationships|portal|history|account|oracle)(\/|$)/.test(h)) {
+        location.replace('/chart' + location.search + '#' + h);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="site-galaxy" aria-hidden="true">
+    <div class="site-galaxy-img"></div>
+  </div>
+
+<%- include('../partials/landing-main', { user: user }) %>
+
+  <script src="/public/js/landing.js?v=1"></script>
+</body>
+</html>

@@ -30,9 +30,9 @@
   <a href="/auth/google" class="google-login-btn nav-signin" data-i18n="nav.signin"<%- act('login') %>><%- google(16) %><span data-i18n-label>Sign in</span></a>
   <% } %>
   <% if (showCta && member) { %>
-  <a href="/#you" class="btn-primary site-nav-cta"<%- act('chart') %>><span data-i18n="nav.seeChart">See Your Chart</span></a>
+  <a href="/chart#you" class="btn-primary site-nav-cta"<%- act('chart') %>><span data-i18n="nav.seeChart">See Your Chart</span></a>
   <% } else if (showCta) { %>
-  <a href="<%= app ? '/#input' : '/?begin=1' %>" class="btn-primary site-nav-cta"<%- act('plot') %>><span data-i18n="nav.begin">Plot Your Chart</span></a>
+  <a href="/chart#input" class="btn-primary site-nav-cta"<%- act('plot') %>><span data-i18n="nav.begin">Plot Your Chart</span></a>
   <% } %>
   <% if (member) { %>
   <button type="button" class="nav-member-btn" aria-label="Account menu" data-i18n-aria="nav.account" aria-expanded="false" onclick="toggleSiteNav(this, event)"><%- svg('person') %><% if (member.avatar) { %><img class="nav-authed-avatar" src="<%= member.avatar %>" alt="" referrerpolicy="no-referrer"><% } %></button>
@@ -58,15 +58,15 @@
     <% if (member || ctx === 'results') { %>
     <nav class="drawer-list" aria-label="Menu" data-i18n-aria="nav.menu">
       <% if (member) { %>
-      <a href="/#portal" class="drawer-link"<%- act('portal') %>><%- svg('star') %><span data-i18n="footer.portal">My Wobazi</span></a>
-      <a href="/#history" class="drawer-link"<%- act('history') %>><%- svg('history') %><span data-i18n="footer.history">Reading History</span></a>
+      <a href="/chart#portal" class="drawer-link"<%- act('portal') %>><%- svg('star') %><span data-i18n="footer.portal">My Wobazi</span></a>
+      <a href="/chart#history" class="drawer-link"<%- act('history') %>><%- svg('history') %><span data-i18n="footer.history">Reading History</span></a>
       <% } %>
       <% if (ctx === 'results') { %>
-      <a href="/#you" class="drawer-link"<%- act('share') %>><%- svg('share') %><span data-i18n="nav.share">Share</span></a>
-      <a href="/#input" class="drawer-link"<%- act('edit') %>><%- svg('edit') %><span data-i18n="nav.editBirth">Edit birth data</span></a>
+      <a href="/chart#you" class="drawer-link"<%- act('share') %>><%- svg('share') %><span data-i18n="nav.share">Share</span></a>
+      <a href="/chart#input" class="drawer-link"<%- act('edit') %>><%- svg('edit') %><span data-i18n="nav.editBirth">Edit birth data</span></a>
       <% } %>
       <% if (member && showCta) { %>
-      <a href="/#you" class="drawer-link"<%- act('chart') %>><%- svg('plot') %><span data-i18n="nav.seeChart">See Your Chart</span></a>
+      <a href="/chart#you" class="drawer-link"<%- act('chart') %>><%- svg('plot') %><span data-i18n="nav.seeChart">See Your Chart</span></a>
       <% } %>
       <% if (member) { %>
       <a href="/auth/logout" class="drawer-link drawer-logout"<%- act('logout') %>><%- svg('logout') %><span data-i18n="footer.logout">Log out</span></a>
@@ -77,7 +77,7 @@
     <% if (!member) { %>
     <a href="/auth/google" class="google-login-btn drawer-google" data-i18n="nav.signinGoogle"<%- act('login') %>><%- google(18) %><span data-i18n-label>Sign in with Google</span></a>
     <% if (showCta) { %>
-    <a href="<%= app ? '/#input' : '/?begin=1' %>" class="btn-primary drawer-cta"<%- act('plot') %>><span data-i18n="nav.begin">Plot Your Chart</span></a>
+    <a href="/chart#input" class="btn-primary drawer-cta"<%- act('plot') %>><span data-i18n="nav.begin">Plot Your Chart</span></a>
     <% } %>
     <% } %>
 

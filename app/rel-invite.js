@@ -116,7 +116,7 @@
         const d = await post(`/api/rel/invites/${encodeURIComponent(token)}/draft`, body);
         if (d.signedIn) {
           const acc = await post('/api/rel/invites/accept', {});
-          location.href = '/#relationships' + (acc.personId ? '/p/' + acc.personId : '');
+          location.href = '/chart#relationships' + (acc.personId ? '/p/' + acc.personId : '');
           return;
         }
         try { localStorage.setItem(PENDING_KEY, String(Date.now())); } catch (e) { /* private mode: link finishes from the Relationships tab */ }

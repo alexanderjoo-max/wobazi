@@ -5,7 +5,7 @@
 <title><%= title %></title>
 <meta name="description" content="<%= description %>">
 <meta name="theme-color" content="#07070f">
-<% if (typeof noindex !== 'undefined' && noindex) { %><meta name="robots" content="noindex"><% } else { %><link rel="canonical" href="<%= baseUrl %><%= canonical %>"><% } %>
+<% if (typeof noindex !== 'undefined' && noindex) { %><meta name="robots" content="<%= typeof robots !== 'undefined' && robots ? robots : 'noindex' %>"><% } else { %><link rel="canonical" href="<%= baseUrl %><%= canonical %>"><% } %>
 <%- include('icons') %>
 
 <!-- Open Graph -->

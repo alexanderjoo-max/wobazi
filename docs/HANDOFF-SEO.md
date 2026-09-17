@@ -62,6 +62,30 @@ Both rounds passed (2026-09-17). Repeat this list after each future deploy:
 6. Oracle: ask "best date next week", confirm the date is on or after today (Bangkok).
 7. Report results to the owner.
 
+### Phase 2 (`seo/phase-2`) — app off the homepage — **READY, NOT MERGED**
+`/` is a lean server-rendered landing page; the app shell moved to `/chart` (`noindex, follow`).
+
+| Metric (homepage) | Before | After |
+|---|---|---|
+| Served HTML | 136,985 B | 34,154 B (−75%) |
+| DOM nodes | 2,247 | 547 (−76%) |
+| Headings in the DOM | 115 | 10 |
+| Header bars / nav menus | 6 / 6 | 1 / 1 |
+| Screens in the DOM | splash, about, input, loading, results, portal, oracle-chat | splash only |
+| Lighthouse mobile (local, median of 3) | Perf 62, FCP 4.8s, LCP 10.3s, TBT 52ms, 3164 KB | Perf 74, FCP 3.3s, LCP 5.3s, TBT 12ms, 1449 KB |
+
+Heading outline after: `h1` Free BaZi Calculator → three `h2` value props → `h2` What is Bāzì? → `h2` Questions → four `h3` footer columns. (Before, the same outline was followed by the in-app explainer's 12 `h3`s and the results screen's 29 `h3`s, all hidden.)
+
+Redirect map: `/?begin=1` → 301 `/chart#input` · `/?auth=…` → 302 `/chart?auth=…` · `/index.html`, `/index` → 301 `/` · `/#input`, `/#you`, `/#relationships/...` → client-side replace to `/chart#…` (inline, before first paint) · `/app`, `/app/` → shell, URL rewritten to `/chart` · `/chart/` → 301 `/chart`.
+
+Also in this branch: **URL normalisation** (`seo/url.js`). The old middleware only stripped trailing slashes, so `https://wobazi.com//?begin=1` 301'd to itself (ERR_TOO_MANY_REDIRECTS) and `//what-is-bazi//` 301'd to `//what-is-bazi`, a **protocol-relative Location that sent visitors off the site** (`http://what-is-bazi/`). Repeated slashes are now collapsed and the trailing slash stripped in one 301, the result always starts with exactly one slash, and normalising twice is a no-op. Covered by `test/url.test.js` (11 tests, now part of `npm test`).
+
+Also in this branch: model ids behind `DEEPSEEK_MODEL` / `GEMINI_MODEL` (defaults unchanged), `batch/generate.js` moved off `gemini-2.0-flash` onto the shared default, and CLAUDE.md corrected (it claimed DeepSeek V3.2 / Gemini 2.0 Flash, and now records that the batch is still not mounted).
+
+Verification: all old entry points resolve correctly (including a signed-in user landing on `/chart#today` with an empty browser store — fixed with `_pendingChartRoute`); guest chart, signed-in chart, Oracle, share card and the EN/中文/ไทย toggle all work; 109 tests pass (41 + 25 + 11 + 32); `/` is byte-identical to the old homepage in every language at both widths except the two blend-mode logo images (≤ Δ4/255 in-process, invisible); `/chart` screens are identical or Δ1 except the Actions tab, whose AI copy is regenerated per server.
+
+**Two gates could not be closed by Claude:** the full Google sign-in (entering credentials is out of scope for the assistant) and byte-identical logo pixels. See §7.
+
 ## 3. Standing decisions and constraints
 
 **Process**
@@ -79,7 +103,7 @@ Both rounds passed (2026-09-17). Repeat this list after each future deploy:
 - **`lastmod` rule:** `published` / `lastmod` in `seo/meta.js` are set by hand (YYYY-MM-DD). Update `lastmod` only when a page's visible content changes. Never derive it from git history or file mtimes (Render deploys don't reliably carry either; moving dates get ignored).
 - New public page → add it to `PAGES` in `seo/meta.js` (title, description, crumb, dates; `article: true` for guide content).
 - **Share/invite routes preview but are never indexed:** keep them crawlable (not in robots.txt `Disallow`) and send `X-Robots-Tag: noindex` + meta robots noindex. Applies to `/i/`, `/r/`, `/s/`, `/api/share-*` and any future share/invite route.
-- URL policy: absolute `https://wobazi.com`, no trailing slash except `/`, canonical = `og:url`.
+- URL policy: absolute `https://wobazi.com`, no trailing slash except `/`, canonical = `og:url`. Repeated slashes collapse to one in a single 301 (`seo/url.js`); never emit a `Location` starting with `//` (protocol-relative = off-site).
 - `twitter:site`: omit until an X handle is confirmed. Instagram is @wo.bazi.
 - Homepage H1 must be visible text — no visually hidden keyword headings.
 - Static assets: bump `?v=` on every change to a CSS/JS/font/image file (versioned URLs are cached for a year).
@@ -97,6 +121,11 @@ Both rounds passed (2026-09-17). Repeat this list after each future deploy:
   - "Yin 阴" heading span (#6366f1) on `/chinese-astrology`: 4.45:1 — a hair under.
   Fixing means lifting `--muted` (and the disclaimer colour) a few steps; it changes the look of every page footer, so it needs the owner's sign-off with before/after screenshots.
 - **Non-SEO bug fixes found while verifying Phase 1b** (PR #4, `fix/guidance-prompt`, open): `/api/daily-guidance` intermittent 500s (truncation at `max_tokens: 300` + the model flattening the nested JSON shape; the Gemini fallback had never run because `thinkingBudget` was in the wrong place), and the Day Master being inferred rather than stated in the Oracle/guidance/batch/relationships prompts. Both are launch-blocking. PR #3 (`fix/oracle-day-master`) was closed as superseded.
+
+## 7. Open gates on Phase 2 (owner action)
+1. **Google OAuth round trip.** Claude verified everything around it: `/auth/google` 302s to Google with the unchanged `redirect_uri`, the callback code is untouched, `/?auth=success` 302s to `/chart?auth=success`, and with a real session cookie the member lands on their chart with the reading restored and the `?auth` query stripped. The credential step itself needs the owner.
+2. **Pixel-identical rendering.** Everything matches except the hero and nav logos (`mix-blend-mode: screen` + drop-shadow), which differ by at most 4/255 per channel with identical geometry, computed styles, page height and footer position. Deterministic run to run. Either accept it or say so and it will be investigated further.
+3. **Deviation from the brief:** `/chart` still has one header bar per screen (5 in the DOM). The homepage now renders the nav once. Unifying the app's headers is an app-shell refactor, not additive, and `/chart` is noindex.
 
 ## 5. Phase 2 spec (owner's original brief) — waits for go-ahead
 

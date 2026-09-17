@@ -2,7 +2,7 @@
   "name": "Wobazi — Your Chinese Destiny",
   "short_name": "Wobazi",
   "description": "Free BaZi (Four Pillars of Destiny) reading from your birth date and time.",
-  "start_url": "/",
+  "start_url": "/chart",
   "scope": "/",
   "display": "standalone",
   "background_color": "#07070f",

@@ -1,0 +1,261 @@
+<%
+/* The landing hero, value props, BaZi teaser, FAQ and CTA. Moved verbatim out of
+   app/index.html in SEO Phase 2 so the homepage no longer ships the whole app:
+   the markup, ids and classes are unchanged, so it renders pixel-identically.
+   The app itself lives at /chart. */
+const member = typeof user !== 'undefined' && user;
+%>
+  <div id="splash" class="screen active">
+    <div class="stars" id="stars"></div>
+    <div class="splash-aurora" aria-hidden="true"></div>
+
+    <!-- Top navigation -->
+    <header class="site-nav app-nav">
+      <a href="/" class="site-nav-logo" onclick="if(!event.metaKey&&!event.ctrlKey){event.preventDefault();haptic(6);closeAppNav();goToLanding();}">
+        <picture class="logo-pic"><source srcset="/app/assets/logo-horiz.webp?v=1" type="image/webp"><img src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi"></picture>
+      </a>
+      <%- include('nav-menu', { user: member, ctx: 'landing' }) %>
+    </header>
+
+    <!-- Home content -->
+    <div class="splash-inner">
+
+      <!-- Hero -->
+      <section class="splash-hero">
+        <div class="hero-sigil" id="hero-sigil">
+          <div class="hero-glow" aria-hidden="true"></div>
+          <span class="hero-mote m1" aria-hidden="true"></span>
+          <span class="hero-mote m2" aria-hidden="true"></span>
+          <span class="hero-mote m3" aria-hidden="true"></span>
+          <picture class="logo-pic"><source srcset="/app/assets/logo-stack.webp?v=1" type="image/webp"><img src="/app/assets/logo-stack.png?v=5" class="hero-logo-bloom" alt="" aria-hidden="true"></picture>
+          <picture class="logo-pic"><source srcset="/app/assets/logo-stack.webp?v=1" type="image/webp"><img fetchpriority="high" src="/app/assets/logo-stack.png?v=5" class="hero-logo" alt="八字 Wobazi"></picture>
+        </div>
+        <p class="hero-wordmark visually-hidden">Wobazi</p>
+        <h1 class="logo-sub"><span class="en">Free BaZi Calculator — Four Pillars of Destiny</span><span class="zh hide">免费八字排盘 — 四柱命理</span><span class="th hide">เครื่องคำนวณปาจื้อฟรี — สี่เสาแห่งโชคชะตา</span></h1>
+        <p class="splash-tagline"><span class="en">The moment you were born left eight characters in the heavens — a two-thousand-year-old art, still startlingly precise.</span><span class="zh hide">你诞生的那一刻，八个字符写进了天象——两千年的古老技艺，至今精确得令人心惊。</span><span class="th hide">วินาทีที่คุณเกิดได้ฝากรอยแปดตัวอักษรไว้บนฟ้า — ศาสตร์เก่าแก่สองพันปี ที่ยังแม่นยำจนน่าทึ่ง</span></p>
+<% if (!member) { %>
+        <div class="splash-cta-wrap" id="splash-cta-wrap">
+          <button class="btn-primary splash-cta" id="splash-cta-primary" onclick="haptic(12); onLandingPrimary()">
+            <span class="cta-begin">
+              <span class="en">Plot Your Chart</span><span class="zh hide">排出你的命盘</span><span class="th hide">จัดแผนภูมิของคุณ</span>
+            </span>
+            <span class="cta-continue hide">
+              <span class="en">Continue Your Reading</span><span class="zh hide">继续你的解读</span><span class="th hide">ดูดวงต่อ</span>
+            </span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <button type="button" class="btn-secondary splash-cta-secondary hide" id="splash-cta-secondary" onclick="haptic(8); goToInput()">
+            <span class="en">New reading</span><span class="zh hide">新的解读</span><span class="th hide">ดูดวงใหม่</span>
+          </button>
+        </div>
+        <p class="splash-google-hint"><span class="en">Free · No account needed · Sign in to save your chart &amp; history</span><span class="zh hide">免费 · 无需账号 · 登录即可保存命盘与记录</span><span class="th hide">ฟรี · ไม่ต้องมีบัญชี · เข้าสู่ระบบเพื่อบันทึกดวงและประวัติ</span></p>
+<% } %>
+      </section>
+
+<% if (member) { %>
+      <div id="splash-authed" class="splash-authed">
+        <div class="splash-welcome" id="splash-welcome"><% if (member.avatar) { %><img src="<%= member.avatar %>" class="splash-welcome-avatar" alt="" referrerpolicy="no-referrer"><% } %><span class="en">Welcome back, <%= member.name %></span><span class="zh hide">欢迎回来，<%= member.name %></span><span class="th hide">ยินดีต้อนรับกลับ, <%= member.name %></span></div>
+        <button class="btn-primary splash-cta" id="btn-continue-reading" onclick="haptic(10); continueReading()">
+          <span class="en">Continue Your Reading</span><span class="zh hide">继续你的解读</span><span class="th hide">ดูดวงต่อ</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <div>
+          <button class="btn-logout" id="btn-logout" onclick="haptic(6); logout()">Logout</button>
+        </div>
+      </div>
+<% } %>
+
+      <!-- Why WoBazi -->
+      <section class="splash-features">
+
+        <article class="feat-card">
+          <div class="sigil" aria-hidden="true">
+            <svg viewBox="0 0 96 96">
+              <defs>
+                <radialGradient id="sg1-bloom" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#fff4d8" stop-opacity="0.5"/>
+                  <stop offset="42%" stop-color="#f0c040" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="#f0c040" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="sg1-soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.6"/></filter>
+              </defs>
+              <circle class="sg-veil" cx="48" cy="48" r="42" fill="url(#sg1-bloom)"/>
+              <g class="sg-halo" filter="url(#sg1-soft)" fill="none" stroke="#f0c040">
+                <circle cx="48" cy="48" r="29" stroke-opacity="0.2" stroke-width="2.4"/>
+                <circle cx="48" cy="48" r="19" stroke-opacity="0.14" stroke-width="3.4"/>
+              </g>
+              <circle cx="48" cy="48" r="32" fill="none" stroke="#e8c26a" stroke-opacity="0.22" stroke-width="0.7"/>
+              <circle class="sg-orbit" cx="48" cy="48" r="39" fill="none" stroke="#e8c26a" stroke-opacity="0.3" stroke-width="0.8" stroke-dasharray="1 7" stroke-linecap="round"/>
+              <g class="sg-motes" fill="#f6ecd8">
+                <circle cx="48" cy="9" r="1.4" fill-opacity="0.45"/>
+                <circle cx="83" cy="60" r="1.1" fill-opacity="0.35"/>
+                <circle cx="16" cy="62" r="0.9" fill-opacity="0.3"/>
+              </g>
+              <text class="sg-char" x="48" y="48" text-anchor="middle" dominant-baseline="central">日</text>
+            </svg>
+          </div>
+          <div class="feat-copy">
+            <h2><span class="en">Know who you truly are.</span><span class="zh hide">真正认识你自己。</span><span class="th hide">รู้จักตัวเองอย่างแท้จริง</span></h2>
+            <p><span class="en">Your nature, your strengths, your blind spots — read from the moment you were born.</span><span class="zh hide">性情、长处与盲点——都写在你诞生的那一刻。</span><span class="th hide">นิสัย จุดแข็ง จุดบอด — อ่านได้จากวินาทีที่คุณเกิด</span></p>
+          </div>
+        </article>
+
+        <article class="feat-card">
+          <div class="sigil" aria-hidden="true">
+            <svg viewBox="0 0 96 96">
+              <defs>
+                <radialGradient id="sg2-bloom" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#ffe9c0" stop-opacity="0.42"/>
+                  <stop offset="45%" stop-color="#f0c040" stop-opacity="0.15"/>
+                  <stop offset="100%" stop-color="#f0c040" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="sg2-soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.2"/></filter>
+              </defs>
+              <circle class="sg-veil" cx="48" cy="48" r="42" fill="url(#sg2-bloom)"/>
+              <g class="sg-halo" filter="url(#sg2-soft)" fill="none" stroke="#f0c040" stroke-width="2.2">
+                <ellipse cx="48" cy="48" rx="33" ry="17" stroke-opacity="0.18" transform="rotate(-18 48 48)"/>
+                <ellipse cx="48" cy="48" rx="17" ry="33" stroke-opacity="0.12" transform="rotate(-18 48 48)"/>
+              </g>
+              <g class="sg-orbit">
+                <ellipse cx="48" cy="48" rx="35" ry="18" fill="none" stroke="#e8c26a" stroke-opacity="0.3" stroke-width="0.8" transform="rotate(-18 48 48)"/>
+              </g>
+              <g class="sg-drift">
+                <circle cx="48" cy="14" r="2.2" fill="#f6ecd8" fill-opacity="0.55"/>
+                <circle cx="48" cy="14" r="5" fill="#f0c040" fill-opacity="0.16" filter="url(#sg2-soft)"/>
+              </g>
+              <circle class="sg-motes" cx="72" cy="26" r="1.6" fill="#c8412c" fill-opacity="0.5"/>
+              <text class="sg-char" x="48" y="48" text-anchor="middle" dominant-baseline="central">时</text>
+            </svg>
+          </div>
+          <div class="feat-copy">
+            <h2><span class="en">Move when the time is right.</span><span class="zh hide">在对的时机行动。</span><span class="th hide">ขยับเมื่อเวลาเหมาะ</span></h2>
+            <p><span class="en">See the years that reward your boldest decisions.</span><span class="zh hide">看见那些奖赏果敢决定的年份。</span><span class="th hide">เห็นปีที่การตัดสินใจกล้าจะได้รับรางวัล</span></p>
+          </div>
+        </article>
+
+        <article class="feat-card">
+          <div class="sigil" aria-hidden="true">
+            <svg viewBox="0 0 96 96">
+              <defs>
+                <radialGradient id="sg3-bloom" cx="50%" cy="50%" r="52%">
+                  <stop offset="0%" stop-color="#ffeccd" stop-opacity="0.34"/>
+                  <stop offset="100%" stop-color="#f0c040" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="sg3-soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
+              </defs>
+              <circle class="sg-veil" cx="48" cy="48" r="42" fill="url(#sg3-bloom)"/>
+              <g filter="url(#sg3-soft)">
+                <circle class="sg-disc a" cx="37" cy="48" r="21" fill="#f0c040" fill-opacity="0.12"/>
+                <circle class="sg-disc b" cx="59" cy="48" r="21" fill="#c8412c" fill-opacity="0.14"/>
+              </g>
+              <circle class="sg-disc a" cx="37" cy="48" r="21" fill="none" stroke="#e8c26a" stroke-opacity="0.38" stroke-width="0.9"/>
+              <circle class="sg-disc b" cx="59" cy="48" r="21" fill="none" stroke="#e8916a" stroke-opacity="0.34" stroke-width="0.9"/>
+              <circle class="sg-orbit" cx="48" cy="48" r="39" fill="none" stroke="#e8c26a" stroke-opacity="0.24" stroke-width="0.8" stroke-dasharray="1 8" stroke-linecap="round"/>
+              <text class="sg-char" x="48" y="48" text-anchor="middle" dominant-baseline="central">合</text>
+            </svg>
+          </div>
+          <div class="feat-copy">
+            <h2><span class="en">Find the people you belong with.</span><span class="zh hide">找到属于你的人。</span><span class="th hide">พบคนที่พลังตรงกับคุณ</span></h2>
+            <p><span class="en">Discover whose energy harmonizes with yours.</span><span class="zh hide">发现谁的能量与你相合。</span><span class="th hide">ค้นพบว่าพลังของใครกลมกลืนกับคุณ</span></p>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- What is Bazi -->
+      <section class="splash-bazi">
+        <div class="splash-divider" aria-hidden="true"><span>✦</span></div>
+        <h2><span class="en">What is Bāzì?</span><span class="zh hide">什么是八字？</span><span class="th hide">ปาจื้อคืออะไร?</span></h2>
+        <p class="bazi-lead">
+          <span class="en">BaZi (八字) literally means <strong>Eight Characters</strong>. It converts your exact birth date and time into a chart of eight Chinese characters — a cosmic blueprint of who you are, refined over a thousand years of Chinese metaphysics.</span>
+          <span class="zh hide">八字字面意思是<strong>八个字</strong>。它把你精确的出生日期与时辰，转成八个汉字组成的命盘——一份关于你是谁的宇宙蓝图，历经千年中国术数打磨。</span>
+          <span class="th hide">ปาจื้อ (八字) แปลตรงตัวว่า <strong>แปดตัวอักษร</strong> ระบบนี้แปลงวันและเวลาเกิดให้เป็นแผนภูมิแปดตัวอักษรจีน — แบบแปลนจักรวาลของตัวคุณ ที่ถูกขัดเกลาในวิชาอภิปรัชญาจีนมานับพันปี</span>
+        </p>
+        <p class="bazi-lead">
+          <span class="en">Those characters sit across four pillars. Each has a Heavenly Stem above and an Earthly Branch below. The Day Stem is your <strong>Day Master</strong> — the essence of your core self.</span>
+          <span class="zh hide">这八个字分列四柱。每柱上为天干、下为地支。日干就是你的<strong>日主</strong>——核心自我的本质。</span>
+          <span class="th hide">ตัวอักษรเหล่านั่งบนสี่เสา แต่ละเสามีก้านฟ้าอยู่บนและกิ่งดินอยู่ล่าง ก้านของวันคือ <strong>วันมาสเตอร์</strong> — แก่นของตัวคุณ</span>
+        </p>
+
+        <div class="bazi-pillar-meanings">
+          <div class="bazi-mean">
+            <span class="hanzi">年</span>
+            <strong><span class="en">Year</span><span class="zh hide">年</span><span class="th hide">ปี</span></strong>
+            <p><span class="en">Ancestry, social identity, the generational energy you carry</span><span class="zh hide">祖荫、社会身份、你所携带的世代之气</span><span class="th hide">บรรพบุรุษ ตัวตนทางสังคม พลังรุ่นที่คุณถืออยู่</span></p>
+          </div>
+          <div class="bazi-mean">
+            <span class="hanzi">月</span>
+            <strong><span class="en">Month</span><span class="zh hide">月</span><span class="th hide">เดือน</span></strong>
+            <p><span class="en">Career climate, parents, the season that shaped you</span><span class="zh hide">事业气候、父母、塑造你的时令</span><span class="th hide">บรรยากาศอาชีพ พ่อแม่ ฤดูที่หล่อหลอมคุณ</span></p>
+          </div>
+          <div class="bazi-mean">
+            <span class="hanzi">日</span>
+            <strong><span class="en">Day</span><span class="zh hide">日</span><span class="th hide">วัน</span></strong>
+            <p><span class="en">Your Day Master — the single character that is you</span><span class="zh hide">你的日主——那个代表你的字</span><span class="th hide">วันมาสเตอร์ — ตัวอักษรเดียวที่เป็นคุณ</span></p>
+          </div>
+          <div class="bazi-mean">
+            <span class="hanzi">时</span>
+            <strong><span class="en">Hour</span><span class="zh hide">时</span><span class="th hide">ชั่วโมง</span></strong>
+            <p><span class="en">Inner world, later years, the life you build after 40</span><span class="zh hide">内在世界、晚年、四十岁之后你所建立的人生</span><span class="th hide">โลกภายใน บั้นปลายชีวิต ชีวิตที่สร้างหลัง 40</span></p>
+          </div>
+        </div>
+
+        <div class="about-elements-row splash-elements">
+          <div class="about-element-chip" style="color:var(--el-wood)"><span class="hanzi">木</span><span class="en">Wood</span><span class="th hide">ไม้</span></div>
+          <div class="about-element-chip" style="color:var(--el-fire)"><span class="hanzi">火</span><span class="en">Fire</span><span class="th hide">ไฟ</span></div>
+          <div class="about-element-chip" style="color:var(--el-earth)"><span class="hanzi">土</span><span class="en">Earth</span><span class="th hide">ดิน</span></div>
+          <div class="about-element-chip" style="color:var(--el-metal)"><span class="hanzi">金</span><span class="en">Metal</span><span class="th hide">โลหะ</span></div>
+          <div class="about-element-chip" style="color:var(--el-water)"><span class="hanzi">水</span><span class="en">Water</span><span class="th hide">น้ำ</span></div>
+        </div>
+
+        <blockquote class="bazi-callout">
+          <span class="en">BaZi is a weather forecast, not a prison sentence. The chart shows the terrain — you still choose how to walk it.</span>
+          <span class="zh hide">八字是天气预报，不是无期徒刑。盘显示地形——怎么走，仍由你选。</span>
+          <span class="th hide">ปาจื้อคือพยากรณ์อากาศ ไม่ใช่คำพิพากษา แผนภูมิชี้ภูมิประเทศ — คุณยังเลือกวิธีเดินเอง</span>
+        </blockquote>
+
+        <p class="splash-learn"><a href="/what-is-bazi" class="btn-about-link"><span class="en">Read the full guide →</span><span class="zh hide">阅读完整指南 →</span><span class="th hide">อ่านคู่มือฉบับเต็ม →</span></a></p>
+      </section>
+
+      <!-- FAQ (mirrors the FAQPage JSON-LD in <head>) -->
+      <section class="splash-faq" aria-labelledby="splash-faq-title">
+        <h2 id="splash-faq-title"><span class="en">Questions</span><span class="zh hide">常见问题</span><span class="th hide">คำถามที่พบบ่อย</span></h2>
+        <details>
+          <summary><span class="en">Is Wobazi free?</span><span class="zh hide">Wobazi 免费吗？</span><span class="th hide">Wobazi ฟรีไหม?</span></summary>
+          <p><span class="en">Yes. Plotting your chart is free and needs no account. Sign in with Google only if you want to save your chart and history.</span><span class="zh hide">是的。排盘免费，无需账号。只有想保存命盘与记录时，才需要用 Google 登录。</span><span class="th hide">ฟรี จัดแผนภูมิได้โดยไม่ต้องมีบัญชี ล็อกอินด้วย Google เฉพาะเมื่ออยากบันทึกดวงและประวัติ</span></p>
+        </details>
+        <details>
+          <summary><span class="en">What if I don’t know my birth time?</span><span class="zh hide">不知道出生时间怎么办？</span><span class="th hide">ไม่รู้เวลาเกิดทำอย่างไร?</span></summary>
+          <p><span class="en">Tick “Time unknown”. You still get your Year, Month and Day pillars, including your Day Master. Only the Hour pillar is left out.</span><span class="zh hide">勾选“时间未知”。你仍会得到年、月、日三柱，包括你的日主；只有时柱会空着。</span><span class="th hide">ติ๊ก “ไม่ทราบเวลา” คุณยังได้เสาปี เดือน และวัน รวมถึงวันมาสเตอร์ มีเพียงเสายามที่เว้นไว้</span></p>
+        </details>
+        <details>
+          <summary><span class="en">Can I enter a lunar (农历) birthday?</span><span class="zh hide">可以用农历生日吗？</span><span class="th hide">ใช้วันเกิดจันทรคติได้ไหม?</span></summary>
+          <p><span class="en">Yes. Choose Lunar on the form, leap months included, and Wobazi converts it to the solar date before plotting.</span><span class="zh hide">可以。在表单选择农历（含闰月），Wobazi 会先换算成公历再排盘。</span><span class="th hide">ได้ เลือกจันทรคติในฟอร์ม (รวมเดือนอธิกมาส) Wobazi จะแปลงเป็นวันสุริยคติก่อนจัดแผนภูมิ</span></p>
+        </details>
+        <details>
+          <summary><span class="en">How accurate is the chart?</span><span class="zh hide">命盘准确吗？</span><span class="th hide">แผนภูมิแม่นแค่ไหน?</span></summary>
+          <p><span class="en">It follows classical 排盘 rules: the year turns at 立春 (Start of Spring), months follow the 12 solar terms, and the day changes at midnight. It uses your local clock time, not true solar time.</span><span class="zh hide">按传统排盘规则：年柱以立春为界，月柱按十二节，日柱以子夜为界。使用当地钟表时间，不做真太阳时校正。</span><span class="th hide">ใช้กฎจัดดวงแบบดั้งเดิม: ปีเปลี่ยนที่ลี่ชุน (立春) เดือนตาม 12 สารท และวันเปลี่ยนตอนเที่ยงคืน ใช้เวลานาฬิกาท้องถิ่น ไม่ใช่เวลาสุริยะจริง</span></p>
+        </details>
+        <details>
+          <summary><span class="en">Who is behind Wobazi?</span><span class="zh hide">Wobazi 背后是谁？</span><span class="th hide">ใครอยู่เบื้องหลัง Wobazi?</span></summary>
+          <p><span class="en"><a href="/master-alice">Master Alice</a>, a Bangkok-based BaZi and Feng Shui master with 15+ years of practice. Wobazi is her reading, from U Destiny.</span><span class="zh hide"><a href="/master-alice">Master Alice</a>，曼谷的八字与风水老师，执业 15 年以上。Wobazi 是她的解读，来自 U Destiny。</span><span class="th hide"><a href="/master-alice">มาสเตอร์อลิซ</a> ซินแสปาจื้อและฮวงจุ้ยในกรุงเทพฯ ประสบการณ์กว่า 15 ปี Wobazi คือการอ่านของเธอ จาก U Destiny</span></p>
+        </details>
+        <details>
+          <summary><span class="en">Is my birth data private?</span><span class="zh hide">我的出生资料安全吗？</span><span class="th hide">ข้อมูลวันเกิดปลอดภัยไหม?</span></summary>
+          <p><span class="en">As a guest, your chart stays in your browser. If you sign in, it’s saved to your account so you can come back to it. Share cards show your Day Master only, never your birth date. See our <a href="/privacy">Privacy Policy</a>.</span><span class="zh hide">未登录时，命盘只保存在你的浏览器里。登录后会存进你的账号，方便下次回来。分享卡只显示日主，绝不显示生日。详见<a href="/privacy">隐私政策</a>。</span><span class="th hide">ถ้าไม่ล็อกอิน แผนภูมิจะอยู่ในเบราว์เซอร์ของคุณเท่านั้น ถ้าล็อกอินจะบันทึกไว้ในบัญชีเพื่อกลับมาดูได้ การ์ดแชร์แสดงแค่วันมาสเตอร์ ไม่เคยแสดงวันเกิด ดู<a href="/privacy">นโยบายความเป็นส่วนตัว</a></span></p>
+        </details>
+      </section>
+
+      <!-- Final CTA -->
+      <div class="about-cta splash-final-cta">
+        <button class="btn-primary splash-cta" onclick="haptic(12); onLandingPrimary()">
+          <span class="en">Plot Your Chart</span><span class="zh hide">排出你的命盘</span><span class="th hide">จัดแผนภูมิของคุณ</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <%- include('footer', { user: member }) %>
+
+    </div>
+  </div>
+

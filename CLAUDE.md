@@ -26,6 +26,7 @@ node batch-worker.js  # Run daily reading batch manually
 - `SESSION_SECRET` — Session signing
 - `BATCH_SECRET` — Protects the manual batch trigger endpoint
 - `GUIDANCE_CACHE` — set to `off` to bypass the daily-guidance per-day cache (local testing only; unset in production)
+- `DEEPSEEK_MODEL` / `GEMINI_MODEL` — model ids, defaults `deepseek-chat` and `gemini-2.5-flash`. Used by `server.js`, `batch/generate.js` and `relationships/llm.js`, so a model can be rolled forward or back without a code change.
 - `BASE_URL` — Server URL (defaults to http://localhost:3000)
 - `PORT` — Server port (defaults to 3000)
 - `DB_PATH` — SQLite file path. Local dev defaults to `./wobazi.db`. In production (`RENDER=true`, `NODE_ENV=production`, or an https `BASE_URL`) `server.js` and `batch-worker.js` refuse to start without it. On Render it is `/var/data/wobazi.db` (1 GB persistent disk).
@@ -52,7 +53,7 @@ share/                 Dynamic share image generation (Satori + Resvg)
   render.js            PNG generation (font loading, Satori → SVG → PNG)
   routes.js            API routes (/api/share-image, /api/share-story)
   fonts/               TTF fonts (Space Grotesk, Noto Sans SC)
-app/                   Frontend SPA
+app/                   Frontend SPA (served at /chart since Phase 2)
 views/                 EJS SEO pages
 public/                Static assets for SEO pages
 ```
@@ -79,7 +80,7 @@ public/                Static assets for SEO pages
 > Status 2026-09-16: `server.js` does **not** call `require('./batch').mount(app, db)`, so no cron runs, the batch routes don't exist, and there is no `daily_readings` table in production. The frontend doesn't call `/api/daily-reading`. Mounting it is a separate post-launch decision: node-cron uses server time (UTC on Render, so "midnight" = 07:00 Bangkok) and dates are UTC; a separate Render Cron Job cannot reach this service's disk.
 
 ### What it does
-Generates personalized daily BaZi readings for every active user using DeepSeek V3.2 (Gemini 2.0 Flash fallback). Processes users in batches of 10 with 1-second delays.
+Generates personalized daily BaZi readings for every active user using DeepSeek (`DEEPSEEK_MODEL`, default `deepseek-chat`) with a Gemini fallback (`GEMINI_MODEL`, default `gemini-2.5-flash` — it was `gemini-2.0-flash` until 2026-09-17). Processes users in batches of 10 with 1-second delays. **The batch is still not mounted** (see the status note above), so none of this runs in production.
 
 ### How to integrate
 Add one line to `server.js` before `app.listen()`:
@@ -158,10 +159,20 @@ Migration plan:
 4. Bump `FACTS_VERSION` in `relationships/scoring.js` so pair readings regenerate on next open.
 5. Consider true solar time (longitude + equation of time) as a separate, later option.
 
+## Landing page vs app: the /chart split (Phase 2, 2026-09-17)
+- **`/`** renders `views/pages/landing.ejs` → `views/partials/landing-main.ejs` (the old `#splash` markup, moved verbatim so it renders identically) + `public/js/landing.js` (star field, hero parallax, scroll reveal, CTA state — copied from `app/script.js`). Guest CTAs vs the member welcome are chosen server-side, as before.
+- **`/chart`** serves `app/index.html` through `sendApp`, with `noindex, follow` and its own title/description from `seo.chartLocals()` (`<!-- APP_HEAD_SEO -->` marker). It is deliberately not in `PAGES` or the sitemap.
+- The app shell no longer contains the splash screen or the in-app explainer (which duplicated `/what-is-bazi`): 110 KB → 56 KB of markup. `showAbout()` now navigates to `/what-is-bazi`.
+- Old entry points: `/?begin=1` → 301 `/chart#input`; `/?auth=…` → 302 `/chart?auth=…` (the OAuth callback URL itself is unchanged); `/#input`, `/#you`, `/#relationships/p/3` … are redirected to `/chart#…` by an inline script in the landing `<head>` (before first paint) and again by `landing.js` on `hashchange`; `/index.html` and `/index` → 301 `/`; `/app` and `/app/` still serve the shell and rewrite the URL to `/chart`.
+- `site.webmanifest` `start_url` is `/chart`.
+- Routing inside `/chart`: no hash → the saved chart (`#today`) or the form (`#input`). A chart route that arrives before the account's reading has loaded is remembered in `_pendingChartRoute` and restored by `checkAuth`, so a signed-in user landing on `/chart#today` with an empty browser store still gets their chart instead of the form.
+- The homepage FAQ JSON-LD moved from `app/index.html` into `seo/meta.js` (`HOME_FAQ`, emitted by `homeJsonLd()`); keep it in step with the visible FAQ in `landing-main.ejs`.
+- Known deviation from the brief: `/chart` still renders one header bar per screen (5 in the DOM). Deduplicating them is an app-shell refactor, not additive, and `/chart` is noindex — left alone deliberately.
+
 ## SEO (Phase 1, 2026-09-17)
 - `seo/meta.js` is the single table of public pages: title, description, canonical, hand-set `published` / `lastmod` dates, and JSON-LD (BreadcrumbList on content pages, Article on the five guide pages, WebApplication + Organization on `/` via the `<!-- HOME_JSONLD -->` marker). Routes spread `seo.pageLocals(path)`; `head.ejs` prints one `<script type="application/ld+json">` per block. New public page → add it to `PAGES`.
 - **`lastmod` rule:** update a page's `lastmod` (YYYY-MM-DD) in `seo/meta.js` whenever its visible content changes, and only then. Never derive it from git or file dates: Render deploys don't reliably carry either, and a date that moves on every deploy teaches Google to ignore it.
-- URL policy: absolute `https://wobazi.com`, no trailing slash (a middleware 301s `/path/` → `/path`; `/app/` excluded). `/Master-Alice.html` and `/about` 301 → `/master-alice`; `/bazi-calculator` 301 → `/`.
+- URL policy: absolute `https://wobazi.com`, no trailing slash. `seo/url.js` normalises in one 301: repeated slashes collapse (`//x//` → `/x`), trailing slashes go (`/app/`, `/api/`, `/auth/` keep theirs), and the result always has exactly one leading slash — a `Location` of `//host` is protocol-relative and would send visitors off the site. `//?begin=1` used to redirect to itself. Tests: `test/url.test.js`. `/Master-Alice.html` and `/about` 301 → `/master-alice`; `/bazi-calculator` 301 → `/`.
 - robots.txt disallows `/api/` (except the share-image endpoints), `/auth/`, `/wobazi2`. Share and invite routes (`/i/`, `/r/`, `/s/`, `/api/share-*`) stay crawlable so links preview on X and others, and send `X-Robots-Tag: noindex` (pages also carry `<meta name="robots" content="noindex">`).
 - Static `/app/*` and `/public/*`: `?v=` URLs are cached for a year (immutable), unversioned for a day. **Bump `?v=` on every change to a CSS/JS/font/image file.**
 - Outfit is self-hosted (`public/fonts/outfit-latin*.woff2`, variable, declared `font-weight: 300 700` to match what Google served) and preloaded. Noto Sans SC / Noto Sans Thai / Noto Serif SC still come from Google Fonts, loaded non-blocking (`rel=preload` + onload swap, `<noscript>` fallback, `display=swap`).
@@ -259,10 +270,10 @@ Fixtures: `npm test` (`test/bazi-engine.test.js`) vs lunar-javascript / BaZi Lab
 - A branch relation (六合/三合/六害/相刑) hitting both year and day branch is one reason (`punish-year-day` etc.), scored per branch.
 
 ### Hash routing (SPA)
-- `/` landing
-- `/#input` birth form (prefilled from `localStorage` `wobazi_chart_v1`)
+- `/` is the server-rendered landing page (not the app) since Phase 2; the app shell is `/chart`
+- `/chart#input` birth form (prefilled from `localStorage` `wobazi_chart_v1`)
 - `/#today` `/#you` `/#actions` `/#relationships` — each tab is a history state
-- Begin → push `#input`. Calculate → push `#today`. Back: tab → tab → input (fields kept) → landing.
+- Begin → push `#input`. Calculate → push `#today`. Back: tab → tab → input (fields kept) → landing (`/`, a real navigation).
 - Refresh on `/#today` restores the last chart. Guest cache is localStorage; signed-in `readings` remain source of truth.
 
 ### Ten Gods + monthly forecasts
