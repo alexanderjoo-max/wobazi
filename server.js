@@ -85,15 +85,9 @@ app.use(cookieSession({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* One URL per page: no trailing slash (except "/"). /app/ is left alone (see the SPA route below). */
-app.use((req, res, next) => {
-  if ((req.method === 'GET' || req.method === 'HEAD') && req.path.length > 1 && req.path.endsWith('/')
-    && req.path !== '/app/' && !req.path.startsWith('/api/') && !req.path.startsWith('/auth/')) {
-    const q = req.originalUrl.slice(req.path.length);
-    return res.redirect(301, req.path.replace(/\/+$/, '') + q);
-  }
-  next();
-});
+/* One URL per page: a single leading slash, no repeated slashes, no trailing slash
+   (except "/" itself, /app/ and the /api/ + /auth/ namespaces). See seo/url.js. */
+app.use(require('./seo/url').normalizeUrl);
 
 /* Static assets: versioned URLs (?v=) are immutable for a year; unversioned ones revalidate daily.
    Bump the ?v= on every file change. */
