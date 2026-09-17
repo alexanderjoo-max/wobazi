@@ -9,6 +9,9 @@
 
 'use strict';
 
+/* Day Master archetype catalog (plain data, shared with the relationships readings). */
+const { dayMasterArchetype } = require('../relationships/archetypes');
+
 const bazi = require('../bazi-engine');
 
 const TIME_ZONE = 'Asia/Bangkok';
@@ -128,8 +131,9 @@ function buildSystemPrompt(chartData, opts) {
   }).join('\n');
 
   const dm = dayMasterOf(pillars);
+  const dmArch = dm ? dayMasterArchetype(dm.char) : null;
   const dmStr = dm
-    ? `Day Master (日主): ${dm.char} ${dm.element} ${dm.polarity} — this is the user's Day Master, taken from the Day pillar's stem.`
+    ? `Day Master (日主): ${dm.char} ${dm.element} ${dm.polarity}${dmArch ? ` — ${dmArch.name.en}: ${dmArch.line.en}` : ''} — this is the user's Day Master, taken from the Day pillar's stem.`
     : "Day Master (日主): unknown (no birth day pillar on file) — don't invent one.";
 
   const todayStr = today

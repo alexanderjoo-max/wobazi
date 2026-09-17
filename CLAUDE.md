@@ -25,6 +25,7 @@ node batch-worker.js  # Run daily reading batch manually
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — OAuth
 - `SESSION_SECRET` — Session signing
 - `BATCH_SECRET` — Protects the manual batch trigger endpoint
+- `GUIDANCE_CACHE` — set to `off` to bypass the daily-guidance per-day cache (local testing only; unset in production)
 - `BASE_URL` — Server URL (defaults to http://localhost:3000)
 - `PORT` — Server port (defaults to 3000)
 - `DB_PATH` — SQLite file path. Local dev defaults to `./wobazi.db`. In production (`RENDER=true`, `NODE_ENV=production`, or an https `BASE_URL`) `server.js` and `batch-worker.js` refuse to start without it. On Render it is `/var/data/wobazi.db` (1 GB persistent disk).
@@ -43,6 +44,8 @@ batch/                 Daily reading batch generation system
   bazi-helpers.js      Advanced BaZi calculations (stars, clashes, etc.)
   routes.js            API routes (batch trigger + read endpoint)
   cron.js              node-cron scheduler (midnight daily)
+guidance/              Daily DO/AVOID/WATCH prompt + reply parsing
+  prompt.js            buildGuidancePrompt, normalizeGuidance, calcTenGod
 share/                 Dynamic share image generation (Satori + Resvg)
   index.js             Entry point — mount(app) wires routes
   layout.js            Satori layout definitions (square + story)
@@ -189,6 +192,19 @@ Migration plan:
 - The prompt states the **Day Master (日主)** explicitly, derived from the Day pillar's stem, and labels the zodiac element as "Year element … NOT the Day Master". `_shareData.element` is the *year* stem's element (the "Wood Pig" profile); printed as a bare `Element:` line the model read it as the Day Master and gave Wood-core readings to a 庚 Metal chart.
 - Luck pillar birth data: the signed-in user's `readings` row, else `chartData.birth` sent by the browser (`oracleBirth()` in `script.js`, from the stored chart). No gender → luck pillar stated as unknown.
 - Tests: `node --test test/oracle.test.js` (unit tests plus a live DeepSeek "best date next week" check that runs when `DEEPSEEK_API_KEY` is set). Not part of `npm test` because it calls the API.
+
+## Daily guidance (DO / AVOID / WATCH) (updated 2026-09-17)
+- `guidance/prompt.js` builds the `/api/daily-guidance` prompt and parses the reply; `server.js` only orchestrates the calls and the per-day in-memory cache.
+- The model is asked for **six flat string keys** (`do_en`, `do_zh`, `avoid_en`, …), not nested `{do:{en,zh}}`: it kept flattening the nested shape into invalid JSON (`{"do":"…","zh":"…"},"avoid":…`). `normalizeGuidance` maps either shape back to the `{do:{en,zh},…}` the client expects, and returns null if anything is missing.
+- `GUIDANCE_MAX_TOKENS = 900`. Measured replies run 258–342 completion tokens, so the old `max_tokens: 300` truncated many of them mid-JSON — that, plus the shape drift, is why `/api/daily-guidance` returned 500 "Failed to parse guidance" intermittently.
+- Attempts: DeepSeek (JSON mode) → DeepSeek again → Gemini. Every parse failure logs `finish_reason`, `completion_tokens` and the first 1000 chars of the raw reply. All three failing returns **503 `guidance_unavailable`**, and the client shows "Today's personalised note didn't load — showing general guidance for this day." above the static lines (`.hc-bullet-note`) instead of passing generic advice off as personalised.
+- The Gemini fallback had never run: `thinkingBudget` was passed at the top level of `generationConfig`, which the API rejects with 400. It belongs under `thinkingConfig`. Same bug was fixed in `batch/generate.js`.
+- Tests: `node --test test/guidance.test.js` (prompt facts + parsing; no API calls). Not in `npm test`.
+
+## Day Master in prompts (2026-09-17)
+- The Day Master (日主) is **always** the Day pillar's stem, and every prompt states it explicitly with char, element, polarity and archetype. Never let a model infer it: the Oracle read the year stem's element off a bare `Element:` line and called a 庚 Metal chart a "Wood Day Master".
+- One resolver, `dayMasterOf(pillars)` in `oracle/prompt.js` (label `Day`, index 2 fallback, null when the pillar is unknown). Archetype names come from `relationships/archetypes.js` `DAY_MASTER` (plain data, shared by oracle, guidance, batch and relationships).
+- An unknown day pillar prints "unknown … don't invent one". Daily guidance used to default to `甲`/`Wood`/`Yang`, which silently mislabelled the chart and its Ten God line.
 
 ## API Conventions
 - Routes: kebab-case (`/api/daily-reading`)

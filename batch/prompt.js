@@ -12,7 +12,7 @@ const SYSTEM_PROMPT = `You are a BaZi analyst generating a personalized daily re
 function buildUserPrompt(data) {
   const {
     name,
-    dayMaster,        // { char, element, polarity }
+    dayMaster,        // { char, element, polarity, archetype }
     yearStem, yearBranch,
     monthStem, monthBranch,
     dayStem, dayBranch,
@@ -37,7 +37,7 @@ function buildUserPrompt(data) {
 
 CHART DATA:
 Name: ${name}
-Day Master: ${dayMaster.char} (${dayMaster.element} ${dayMaster.polarity})
+Day Master (日主): ${dayMaster.char} (${dayMaster.element} ${dayMaster.polarity}${dayMaster.archetype ? ' — ' + dayMaster.archetype : ''}) — the Day pillar's stem; never read the Day Master off the year or any other pillar
 Year Pillar: ${yearStem} ${yearBranch}
 Month Pillar: ${monthStem} ${monthBranch}
 Day Pillar: ${dayStem} ${dayBranch}

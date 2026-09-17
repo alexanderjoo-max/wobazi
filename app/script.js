@@ -1361,8 +1361,13 @@ function renderResults(name, year, month, day, hour, birthplace = '', bloodType 
       renderActionsPreview({ title: g.do.en, title_zh: g.do.zh }, g.avoid.en, g.avoid.zh, g.watch.en, g.watch.zh);
     } catch (err) {
       console.warn('Daily guidance fallback:', err.message);
-      // Fall back to static guidance
-      document.getElementById('hero-bullets').innerHTML = `
+      /* Fall back to static guidance — and say so, so a silent AI outage doesn't read as a
+         personalised note (the static lines are chart-generic). */
+      const gnote = `<div class="hc-bullet hc-bullet-note">${_t(
+        "Today's personalised note didn't load — showing general guidance for this day.",
+        '今日的个性化提示未能加载，以下为当日通用指引。',
+        'โน้ตเฉพาะบุคคลของวันนี้โหลดไม่สำเร็จ — แสดงคำแนะนำทั่วไปของวันนี้แทน')}</div>`;
+      document.getElementById('hero-bullets').innerHTML = gnote + `
         <div class="hc-bullet"><span class="hc-bullet-key">${_t('DO','做')}</span><span>${_t(fallbackDo.title, fallbackDo.title_zh)}</span></div>
         <div class="hc-bullet"><span class="hc-bullet-key">${_t('AVOID','避')}</span><span>${_t(fallbackAvoidEn, fallbackAvoidZh)}</span></div>
         <div class="hc-bullet"><span class="hc-bullet-key">${_t('WATCH','注意')}</span><span>${_t(fallbackWatchEn, fallbackWatchZh)}</span></div>`;

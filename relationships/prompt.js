@@ -67,11 +67,11 @@ function userPrompt(facts) {
     confidence: facts.confidence,
     archetype: { name: facts.archetype.name.en, summary: facts.archetype.desc },
     you: {
-      day_master: `${facts.you.dayMaster.polarity} ${facts.you.dayMaster.element} (${facts.you.dayMaster.archetype})`,
+      day_master: `${facts.you.dayMaster.char} — ${facts.you.dayMaster.polarity} ${facts.you.dayMaster.element} (${facts.you.dayMaster.archetype}), the Day pillar's stem`,
       strongest_role_family: facts.you.family,
     },
     name: {
-      day_master: `${facts.them.dayMaster.polarity} ${facts.them.dayMaster.element} (${facts.them.dayMaster.archetype})`,
+      day_master: `${facts.them.dayMaster.char} — ${facts.them.dayMaster.polarity} ${facts.them.dayMaster.element} (${facts.them.dayMaster.archetype}), the Day pillar's stem`,
       strongest_role_family: facts.them.family,
     },
     scores: {
