@@ -364,11 +364,12 @@ function calcFortune(animal, elements) {
 /* ═══════════════════════════════════════
    UI — Screen Navigation
 ═══════════════════════════════════════ */
-let _prevAboutFrom = 'splash';
 
 function showScreen(id) {
+  const target = document.getElementById(id);
+  if (!target) return;  // screen not in this shell (the landing lives at / since Phase 2)
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  target.classList.add('active');
   if (id === 'results') {
     document.getElementById('results').querySelector('.scroll-body').scrollTop = 0;
   }
@@ -378,11 +379,8 @@ function showScreen(id) {
   if (typeof applyI18n === 'function') applyI18n();
 }
 
-function showAbout() {
-  const active = document.querySelector('.screen.active');
-  _prevAboutFrom = active ? active.id : 'splash';
-  showScreen('about');
-}
+/* The in-app explainer screen was removed in Phase 2 — /what-is-bazi is the canonical one. */
+function showAbout() { location.href = '/what-is-bazi'; }
 
 function scrollAbout(id) {
   const el = document.getElementById(id);
@@ -524,7 +522,8 @@ function appNav(e, action) {
   }
   return false;
 }
-function goToLanding() { closeAppNav(); goHash(''); }
+/* The landing is its own page (/) since Phase 2, so this leaves the app. */
+function goToLanding() { closeAppNav(); location.href = '/'; }
 function goToInput() {
   closeAppNav();
   fillFormFromStore();
@@ -872,6 +871,8 @@ function continueReading() {
   restoreResults(p);
 }
 
+let _pendingChartRoute = null;
+
 function applyRoute(hash) {
   const h = (hash == null ? currentHash() : hash);
   if (h === 'begin') {
@@ -881,8 +882,11 @@ function applyRoute(hash) {
     return;
   }
   if (!h || h === 'landing') {
-    showScreen('splash');
-    updateLandingCtas();
+    /* No hash on /chart: open the saved chart, or the form when there is nothing to show.
+       (Before Phase 2 this showed the in-app splash, which now lives at /.) */
+    const saved = hasStoredChart() || !!(typeof _savedReading !== 'undefined' && _savedReading);
+    if (!saved) _pendingChartRoute = 'today';  // a signed-in user's chart may still be loading
+    goHash(saved ? 'today' : 'input', { replace: true });
     return;
   }
   if (h === 'input') {
@@ -901,6 +905,10 @@ function applyRoute(hash) {
       twin: twinFromRow(_savedReading),
     } : null);
     if (!p || !p.year) {
+      /* The account's chart may still be loading (checkAuth is async, and since Phase 2 a
+         signed-in user arrives at /chart#today on a fresh page load). Remember where they
+         were going; checkAuth restores it once the reading is in. */
+      _pendingChartRoute = h;
       goHash('input', { replace: true });
       return;
     }
@@ -921,7 +929,7 @@ function applyRoute(hash) {
     WobaziPortal.route(h);
     return;
   }
-  showScreen('splash');
+  applyRoute('');  // unknown hash: fall back to the saved chart, or the form
 }
 
 window.addEventListener('popstate', () => {
@@ -929,72 +937,7 @@ window.addEventListener('popstate', () => {
   applyRoute(currentHash());
 });
 
-/* ── Stars (splash background) ── */
-function buildStars() {
-  const container = document.getElementById('stars');
-  if (!container || container.dataset.built) return;
-  container.dataset.built = '1';
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const count = reduce ? 40 : 110;
-  for (let i = 0; i < count; i++) {
-    const s = document.createElement('div');
-    const isDust = !reduce && i < 14;
-    s.className = isDust ? 'star star-dust' : (!reduce && i % 5 === 0 ? 'star star-drift' : 'star');
-    const hues = ['#ff8ad8', '#7ce7ff', '#c4a2ff', '#ffb4a2'];
-    const dust = hues[i % hues.length];
-    const size = isDust ? Math.random() * 2 + 1.2 : Math.random() * 2.5 + 0.5;
-    const dx = ((Math.random() * 18) - 6).toFixed(1);
-    const dy = ((Math.random() * -22) - 4).toFixed(1);
-    s.style.cssText = `
-      left:${Math.random()*100}%;
-      top:${Math.random()*100}%;
-      width:${size}px; height:${size}px;
-      --dur:${2 + Math.random() * 3}s;
-      --drift:${14 + Math.random() * 16}s;
-      --dx:${dx}px; --dy:${dy}px;
-      animation-delay:${Math.random() * 4}s;
-      ${isDust ? `background:${dust}; box-shadow:0 0 7px ${dust};` : ''}
-    `;
-    container.appendChild(s);
-  }
-}
-
-function initSplashExperience() {
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const revealEls = document.querySelectorAll('.feat-card, .splash-bazi');
-  if (reduce) {
-    revealEls.forEach(el => el.classList.add('is-in'));
-  } else if (revealEls.length && 'IntersectionObserver' in window) {
-    const root = document.getElementById('splash');
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-in');
-        io.unobserve(entry.target);
-      });
-    }, { root, threshold: 0.16, rootMargin: '0px 0px -16px 0px' });
-    revealEls.forEach(el => io.observe(el));
-  } else {
-    revealEls.forEach(el => el.classList.add('is-in'));
-  }
-
-  const sigil = document.getElementById('hero-sigil');
-  const splash = document.getElementById('splash');
-  if (!sigil || !splash || reduce) return;
-  if (window.matchMedia('(pointer: coarse)').matches) return;
-  let raf = 0;
-  let tx = 0, ty = 0;
-  splash.addEventListener('pointermove', (e) => {
-    const r = splash.getBoundingClientRect();
-    tx = ((e.clientX - r.left) / r.width - 0.5) * 12;
-    ty = ((e.clientY - r.top) / r.height - 0.5) * 10;
-    if (raf) return;
-    raf = requestAnimationFrame(() => {
-      sigil.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0)`;
-      raf = 0;
-    });
-  });
-}
+/* The landing's star field and hero parallax moved to public/js/landing.js in Phase 2. */
 
 /* ═══════════════════════════════════════
    UI — Loading Sequence
@@ -5175,12 +5118,20 @@ async function checkAuth() {
       if (window.WobaziPortal) WobaziPortal.onAuth();
       updateLandingCtas();
       const h = currentHash();
-      if (RESULT_TABS.indexOf(h) >= 0 || h === 'input') applyRoute(h);
+      // Drop ?auth=... from the URL before routing, so it does not linger in history.
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.has('auth')) {
         const keepHash = location.hash || '';
         window.history.replaceState({ wobazi: currentHash() || 'landing' }, '', window.location.pathname + keepHash);
       }
+      /* A chart route that arrived before the account's reading did: go back to it now. */
+      if (_pendingChartRoute && (hasStoredChart() || _savedReading)) {
+        const target = _pendingChartRoute;
+        _pendingChartRoute = null;
+        goHash(target, { replace: true });
+        return;
+      }
+      if (RESULT_TABS.indexOf(h) >= 0 || h === 'input') applyRoute(h);
     }
   } catch (e) { /* guest mode — file:// or server down, continue as guest */ }
 }
@@ -5982,13 +5933,11 @@ function initLightMode() {
 }
 
 /* ── Init ── */
-buildStars();
-initSplashExperience();
+/* buildStars / initSplashExperience belong to the landing page (public/js/landing.js since Phase 2). */
 initDateInputs();
 initCityAutocomplete();
 initTooltips();
 initLightMode();
-updateLandingCtas();
 if (/[?&]begin=1(?:&|$)/.test(location.search) && !currentHash()) {
   history.replaceState({ wobazi: 'input' }, '', location.pathname + '#input');
 }

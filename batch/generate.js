@@ -11,6 +11,10 @@
 const OpenAI = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const bazi = require('../bazi-engine');
+
+/* Same model ids and env overrides as server.js. */
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const { dayMasterArchetype } = require('../relationships/archetypes');
 const helpers = require('./bazi-helpers');
 const { SYSTEM_PROMPT, buildUserPrompt } = require('./prompt');
@@ -134,7 +138,7 @@ function buildChartContext(user, today) {
 async function callDeepSeek(userPrompt) {
   const ds = getDeepSeek();
   const completion = await ds.chat.completions.create({
-    model: 'deepseek-chat',
+    model: DEEPSEEK_MODEL,
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: userPrompt },
@@ -149,7 +153,7 @@ async function callDeepSeek(userPrompt) {
 async function callGemini(userPrompt) {
   const genAI = getGemini();
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
+    model: GEMINI_MODEL,
     systemInstruction: SYSTEM_PROMPT,
   });
   const result = await model.generateContent({

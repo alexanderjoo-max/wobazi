@@ -117,7 +117,64 @@ function pageLocals(p) {
   };
 }
 
-/* Homepage structured data (WebApplication + Organization). The FAQPage block stays in app/index.html. */
+/* The homepage FAQ, mirrored by the <section class="splash-faq"> markup in
+   views/partials/landing-main.ejs. Keep the two in step: Google drops FAQ rich results when the
+   answers are not visible on the page. */
+const HOME_FAQ = {
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is Wobazi free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Plotting your chart is free and needs no account. Sign in with Google only if you want to save your chart and history."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What if I don't know my birth time?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tick \"Time unknown\". You still get your Year, Month and Day pillars, including your Day Master. Only the Hour pillar is left out."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I enter a lunar (农历) birthday?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Choose Lunar on the form, leap months included, and Wobazi converts it to the solar date before plotting."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How accurate is the chart?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It follows classical 排盘 rules: the year turns at 立春 (Start of Spring), months follow the 12 solar terms, and the day changes at midnight. It uses your local clock time, not true solar time."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Who is behind Wobazi?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Master Alice, a Bangkok-based BaZi and Feng Shui master with 15+ years of practice. Wobazi is her reading, from U Destiny."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my birth data private?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "As a guest, your chart stays in your browser. If you sign in, it is saved to your account so you can come back to it. Share cards show your Day Master only, never your birth date."
+        }
+      }
+    ]
+  };
+
+/* Homepage structured data: WebApplication + Organization + FAQPage. */
 function homeJsonLd() {
   const page = BY_PATH['/'];
   return [
@@ -135,7 +192,20 @@ function homeJsonLd() {
       publisher: { '@id': `${SITE}/#organization` },
     },
     Object.assign({ '@context': 'https://schema.org' }, ORGANIZATION),
+    Object.assign({ '@context': 'https://schema.org' }, HOME_FAQ),
   ];
+}
+
+/* /chart is the app itself: per-user content, so noindex but follow (its links are real pages).
+   It is deliberately absent from PAGES and the sitemap. */
+function chartLocals() {
+  return {
+    title: 'Your BaZi Chart | Wobazi',
+    description: 'Your Four Pillars chart, Day Master, element balance, luck pillars and daily guidance.',
+    canonical: '/chart',
+    noindex: true,
+    robots: 'noindex, follow',
+  };
 }
 
 function sitemapXml() {
@@ -155,4 +225,4 @@ function jsonLdScript(data) {
   return JSON.stringify(data, null, 2).replace(/</g, '\\u003c');
 }
 
-module.exports = { SITE, PAGES, pageLocals, homeJsonLd, sitemapXml, jsonLdScript, absolute };
+module.exports = { SITE, PAGES, pageLocals, homeJsonLd, chartLocals, sitemapXml, jsonLdScript, absolute };

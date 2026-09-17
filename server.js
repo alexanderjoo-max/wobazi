@@ -219,20 +219,23 @@ async function sendApp(req, res, next) {
     const user = res.locals.user;
     let html = appIndexHtml();
     const footer = await renderPartial('partials/footer', { user });
-    html = html.replace('<!-- HOME_JSONLD -->', () => seo.homeJsonLd()
-      .map(block => `<script type="application/ld+json">\n${seo.jsonLdScript(block)}\n  </script>`).join('\n  '));
+    /* The app is per-user: noindex, follow (its links are real pages). The indexable homepage
+       is a separate server-rendered page (views/pages/landing.ejs) since Phase 2. */
+    const meta = seo.chartLocals();
+    const esc = v => String(v || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    html = html.replace('<!-- APP_HEAD_SEO: title, description, robots and social tags are rendered by sendApp -->', () => [
+      `<title>${esc(meta.title)}</title>`,
+      `  <meta name="description" content="${esc(meta.description)}">`,
+      `  <meta name="robots" content="${esc(meta.robots)}">`,
+      `  <meta property="og:url"         content="${seoBase.baseUrl}${meta.canonical}">`,
+      `  <meta property="og:title"       content="${esc(meta.title)}">`,
+      `  <meta property="og:description" content="${esc(meta.description)}">`,
+      `  <meta property="og:image"       content="${seoBase.baseUrl}/og-card.jpg">`,
+      `  <meta name="twitter:title"       content="${esc(meta.title)}">`,
+      `  <meta name="twitter:description" content="${esc(meta.description)}">`,
+      `  <meta name="twitter:image"       content="${seoBase.baseUrl}/og-card.jpg">`,
+    ].join('\n'));
     html = html.split('<!-- SITE_FOOTER -->').join(footer);
-    // Landing: exactly one auth state ships in the HTML — guest CTAs or the member welcome, never both.
-    if (user) {
-      html = html.replace(/<!-- SPLASH_GUEST[\s\S]*?<!-- \/SPLASH_GUEST -->\n?/, '');
-      const esc = v => String(v || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-      const name = esc(user.name);
-      const avatar = user.avatar ? `<img src="${esc(user.avatar)}" class="splash-welcome-avatar" alt="" referrerpolicy="no-referrer">` : '';
-      html = html.replace('<!-- SPLASH_WELCOME -->', () =>
-        `${avatar}<span class="en">Welcome back, ${name}</span><span class="zh hide">欢迎回来，${name}</span><span class="th hide">ยินดีต้อนรับกลับ, ${name}</span>`);
-    } else {
-      html = html.replace(/<!-- SPLASH_MEMBER[\s\S]*?<!-- \/SPLASH_MEMBER -->\n?/, '');
-    }
     const screens = [...new Set([...html.matchAll(/<!-- NAV_MENU:(\w+) -->/g)].map(m => m[1]))];
     for (const ctx of screens) {
       const menu = await renderPartial('partials/nav-menu', { user, ctx });
@@ -244,7 +247,31 @@ async function sendApp(req, res, next) {
     next(err);
   }
 }
-app.get(['/', '/index.html', '/index'], sendApp);
+/* ── Landing (/) and the app (/chart) ──
+   Phase 2 split them: `/` is a lean, indexable, server-rendered page; the app shell (input,
+   results, portal, oracle, relationships) is served at /chart and is noindex, follow. */
+app.get('/', (req, res, next) => {
+  // Old entry points into the app keep working.
+  if (req.query.begin === '1') return res.redirect(301, '/chart#input');
+  if (req.query.auth) {
+    const qs = Object.entries(req.query).filter(([k]) => k !== 'begin')
+      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+    return res.redirect(302, `/chart${qs ? `?${qs}` : ''}`);
+  }
+  try {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); // guest vs member markup
+    res.render('pages/landing', {
+      ...seoBase,
+      ...seo.pageLocals('/'),
+      jsonLd: seo.homeJsonLd(),
+      user: res.locals.user,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+app.get(['/index.html', '/index'], (req, res) => res.redirect(301, '/'));
+app.get('/chart', sendApp);
 
 app.use('/wobazi2-assets', express.static(path.join(__dirname, 'wobazi2-assets')));
 app.get('/wobazi2', (req, res) => {
@@ -503,6 +530,11 @@ app.get('/api/my-data', (req, res) => {
    AI — DeepSeek + Gemini
 ═══════════════════════════════════════ */
 
+/* Model ids in one place. Defaults are the models in use; the env vars exist so a model can be
+   rolled forward or back without a deploy of new code. */
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+
 const deepseek = new OpenAI({
   apiKey: process.env.DEEPSEEK_API_KEY,
   baseURL: 'https://api.deepseek.com',
@@ -514,7 +546,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 async function streamDeepSeek(systemPrompt, messages, res) {
   const stream = await deepseek.chat.completions.create({
-    model: 'deepseek-chat',
+    model: DEEPSEEK_MODEL,
     messages: [
       { role: 'system', content: systemPrompt },
       ...messages,
@@ -536,7 +568,7 @@ async function streamDeepSeek(systemPrompt, messages, res) {
 
 async function streamGemini(systemPrompt, messages, res) {
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: GEMINI_MODEL,
     systemInstruction: systemPrompt,
   });
 
@@ -618,7 +650,7 @@ app.post('/api/daily-guidance', async (req, res) => {
     const userTurn = 'Generate today\'s DO/AVOID/WATCH for this chart.';
     const askDeepSeek = async () => {
       const completion = await deepseek.chat.completions.create({
-        model: 'deepseek-chat',
+        model: DEEPSEEK_MODEL,
         messages: [
           { role: 'system', content: prompt },
           { role: 'user', content: userTurn },
@@ -635,7 +667,7 @@ app.post('/api/daily-guidance', async (req, res) => {
       };
     };
     const askGemini = async () => {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash', systemInstruction: prompt });
+      const model = genAI.getGenerativeModel({ model: GEMINI_MODEL, systemInstruction: prompt });
       const gemResult = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: userTurn }] }],
         generationConfig: {
