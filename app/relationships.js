@@ -444,7 +444,7 @@
   }
 
   function detailSkeleton() {
-    return `<button type="button" class="rel-back" data-act="back">‹ ${T('People', '身边的人', 'ผู้คน')}</button>
+    return `<button type="button" class="rel-back" data-act="back">‹ ${T('Relationships', '关系', 'ความสัมพันธ์')}</button>
       <div class="rel-card rel-headline" aria-busy="true">
         <span class="skel skel-w30"></span><span class="skel skel-h28 skel-w70"></span>
         <span class="skel skel-w100"></span><span class="skel skel-w80"></span>
@@ -474,7 +474,7 @@
     } catch (err) {
       if (st.detailId !== id) return;
       if (err.status === 401) { closeDetailToList(); return; }
-      section.innerHTML = `<button type="button" class="rel-back" data-act="back">‹ ${T('People', '身边的人', 'ผู้คน')}</button>
+      section.innerHTML = `<button type="button" class="rel-back" data-act="back">‹ ${T('Relationships', '关系', 'ความสัมพันธ์')}</button>
         <div class="rel-card">${err.status === 404 ? `<p>${T('This person is no longer in your list.', '此人已不在你的列表中。', 'คนนี้ไม่อยู่ในรายชื่อของคุณแล้ว')}</p>` : errHtml(err)}</div>`;
     }
   }
@@ -530,7 +530,7 @@
     const stalled = pending && st.polls >= POLL_MAX;
     const name = p.name;
 
-    let html = `<button type="button" class="rel-back" data-act="back">‹ ${T('People', '身边的人', 'ผู้คน')}</button>
+    let html = `<button type="button" class="rel-back" data-act="back">‹ ${T('Relationships', '关系', 'ความสัมพันธ์')}</button>
       <div class="rel-person-head">
         <h3 class="rel-person-name">${esc(name)}</h3>
         <span class="rel-chip">${tl(p.type)}</span>

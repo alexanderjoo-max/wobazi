@@ -436,9 +436,9 @@ function switchTab(tab, opts) {
 
   // Render prev/next tab navigation
   const TAB_ORDER = ['you', 'today', 'actions', 'relationships'];
-  const TAB_LABELS = { you: 'Your Chart', today: 'Today', actions: 'Actions', relationships: 'People' };
-  const TAB_LABELS_ZH = { you: '你的命盘', today: '今日', actions: '行动', relationships: '身边的人' };
-  const TAB_LABELS_TH = { you: 'แผนภูมิของคุณ', today: 'วันนี้', actions: 'การกระทำ', relationships: 'ผู้คน' };
+  const TAB_LABELS = { you: 'Your Chart', today: 'Today', actions: 'Actions', relationships: 'Relationships' };
+  const TAB_LABELS_ZH = { you: '你的命盘', today: '今日', actions: '行动', relationships: '关系' };
+  const TAB_LABELS_TH = { you: 'แผนภูมิของคุณ', today: 'วันนี้', actions: 'การกระทำ', relationships: 'ความสัมพันธ์' };
   const idx = TAB_ORDER.indexOf(tab);
   const prev = idx > 0 ? TAB_ORDER[idx - 1] : null;
   const next = idx < TAB_ORDER.length - 1 ? TAB_ORDER[idx + 1] : null;
