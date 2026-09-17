@@ -37,13 +37,13 @@
     })();
   </script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Wobazi ✦ Your Chinese Destiny</title>
+  <title>Free BaZi Calculator – Four Pillars of Destiny Chart | Wobazi</title>
 
   <!-- Primary meta -->
-  <meta name="description" content="Discover your Chinese destiny. Bāzì reading, zodiac fortune, lucky numbers, auspicious dates, and your Chinese destiny name — all from your birth date.">
+  <meta name="description" content="Free BaZi calculator. Enter your birth date to get your Four Pillars chart, Day Master, element balance and 10-year luck cycles. No account needed.">
   <meta name="theme-color" content="#0f0f1c">
   <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" href="/public/favicon.svg?v=1" type="image/svg+xml">
@@ -54,19 +54,19 @@
 
   <!-- Open Graph (Facebook, iMessage, WhatsApp, etc.) -->
   <meta property="og:type"        content="website">
-  <meta property="og:url"         content="https://wobazi.com">
-  <meta property="og:title"       content="Wobazi ✦ Your Chinese Destiny">
-  <meta property="og:description" content="Discover your Bāzì chart, zodiac animal, Chinese destiny name, and fortune reading. What does your birth date reveal?">
+  <meta property="og:url"         content="https://wobazi.com/">
+  <meta property="og:title"       content="Free BaZi Calculator – Four Pillars of Destiny Chart | Wobazi">
+  <meta property="og:description" content="Free BaZi calculator. Enter your birth date to get your Four Pillars chart, Day Master, element balance and 10-year luck cycles. No account needed.">
   <meta property="og:image"       content="https://wobazi.com/og-card.jpg">
   <meta property="og:image:width"  content="1200">
   <meta property="og:image:height" content="630">
 
   <!-- Twitter / X Card -->
   <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:site"        content="@wobazi">
-  <meta name="twitter:title"       content="Wobazi ✦ Your Chinese Destiny">
-  <meta name="twitter:description" content="Discover your Bāzì chart, zodiac animal, Chinese destiny name, and fortune reading. What does your birth date reveal?">
+  <meta name="twitter:title"       content="Free BaZi Calculator – Four Pillars of Destiny Chart | Wobazi">
+  <meta name="twitter:description" content="Free BaZi calculator. Enter your birth date to get your Four Pillars chart, Day Master, element balance and 10-year luck cycles. No account needed.">
   <meta name="twitter:image"       content="https://wobazi.com/og-card.jpg">
+  <!-- HOME_JSONLD -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -84,8 +84,11 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app/style.css?v=79">
+  <link rel="preload" href="/public/fonts/outfit-latin.woff2?v=15" as="font" type="font/woff2" crossorigin>
+  <!-- Chinese/Thai/serif fonts load without blocking first paint (font-display: swap keeps text visible) -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"></noscript>
+  <link rel="stylesheet" href="/app/style.css?v=81">
   <link rel="stylesheet" href="/app/portal.css?v=8">
   <link rel="stylesheet" href="/app/relationships.css?v=3">
   <style id="wobazi-i18n-css">
@@ -135,8 +138,8 @@
           <img src="/app/assets/logo-stack.png?v=5" class="hero-logo-bloom" alt="" aria-hidden="true">
           <img src="/app/assets/logo-stack.png?v=5" class="hero-logo" alt="八字 Wobazi">
         </div>
-        <h1 class="hero-wordmark visually-hidden">Wobazi</h1>
-        <p class="logo-sub"><span class="en">Chinese Destiny System</span><span class="zh hide">中国命运系统</span><span class="th hide">ระบบโชคชะตาจีน</span></p>
+        <p class="hero-wordmark visually-hidden">Wobazi</p>
+        <h1 class="logo-sub"><span class="en">Free BaZi Calculator — Four Pillars of Destiny</span><span class="zh hide">免费八字排盘 — 四柱命理</span><span class="th hide">เครื่องคำนวณปาจื้อฟรี — สี่เสาแห่งโชคชะตา</span></h1>
         <p class="splash-tagline"><span class="en">The moment you were born left eight characters in the heavens — a two-thousand-year-old art, still startlingly precise.</span><span class="zh hide">你诞生的那一刻，八个字符写进了天象——两千年的古老技艺，至今精确得令人心惊。</span><span class="th hide">วินาทีที่คุณเกิดได้ฝากรอยแปดตัวอักษรไว้บนฟ้า — ศาสตร์เก่าแก่สองพันปี ที่ยังแม่นยำจนน่าทึ่ง</span></p>
         <!-- SPLASH_GUEST: server keeps this block for signed-out visitors only (sendApp) -->
         <div class="splash-cta-wrap" id="splash-cta-wrap">
@@ -343,7 +346,7 @@
         </details>
         <details>
           <summary><span class="en">Who is behind Wobazi?</span><span class="zh hide">Wobazi 背后是谁？</span><span class="th hide">ใครอยู่เบื้องหลัง Wobazi?</span></summary>
-          <p><span class="en"><a href="/Master-Alice.html">Master Alice</a>, a Bangkok-based BaZi and Feng Shui master with 15+ years of practice. Wobazi is her reading, from U Destiny.</span><span class="zh hide"><a href="/Master-Alice.html">Master Alice</a>，曼谷的八字与风水老师，执业 15 年以上。Wobazi 是她的解读，来自 U Destiny。</span><span class="th hide"><a href="/Master-Alice.html">มาสเตอร์อลิซ</a> ซินแสปาจื้อและฮวงจุ้ยในกรุงเทพฯ ประสบการณ์กว่า 15 ปี Wobazi คือการอ่านของเธอ จาก U Destiny</span></p>
+          <p><span class="en"><a href="/master-alice">Master Alice</a>, a Bangkok-based BaZi and Feng Shui master with 15+ years of practice. Wobazi is her reading, from U Destiny.</span><span class="zh hide"><a href="/master-alice">Master Alice</a>，曼谷的八字与风水老师，执业 15 年以上。Wobazi 是她的解读，来自 U Destiny。</span><span class="th hide"><a href="/master-alice">มาสเตอร์อลิซ</a> ซินแสปาจื้อและฮวงจุ้ยในกรุงเทพฯ ประสบการณ์กว่า 15 ปี Wobazi คือการอ่านของเธอ จาก U Destiny</span></p>
         </details>
         <details>
           <summary><span class="en">Is my birth data private?</span><span class="zh hide">我的出生资料安全吗？</span><span class="th hide">ข้อมูลวันเกิดปลอดภัยไหม?</span></summary>
@@ -370,7 +373,7 @@
       <button class="btn-back" onclick="haptic(8); showScreen(_prevAboutFrom || 'splash')">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
-      <img src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi">
+      <img loading="lazy" decoding="async" src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi">
       <div style="width:40px"></div>
     </div>
 
@@ -763,7 +766,7 @@
       <button class="btn-back" onclick="haptic(8); closeAppNav(); backFromInput()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
-      <img src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi">
+      <img loading="lazy" decoding="async" src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi">
       <!-- NAV_MENU:input -->
     </div>
     <div class="input-body">
@@ -921,7 +924,7 @@
   <div id="results" class="screen">
     <div class="results-header app-nav">
       <div class="header-left">
-        <img src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi" onclick="haptic(6); closeAppNav(); goToLanding()">
+        <img loading="lazy" decoding="async" src="/app/assets/logo-horiz.png?v=6" class="nav-logo" alt="Wobazi" onclick="haptic(6); closeAppNav(); goToLanding()">
         <div id="greeting" class="greeting"></div>
         <button type="button" class="btn-edit-birth" id="btn-edit-birth" onclick="haptic(6); goToInput()">
           <span class="en">Edit birth data</span><span class="zh hide">修改出生资料</span><span class="th hide">แก้ข้อมูลเกิด</span>
@@ -1022,7 +1025,7 @@
           </div>
         </div>
         <!-- Kept for JS compatibility, not displayed -->
-        <h1 id="hero-name" style="display:none"></h1>
+        <div id="hero-name" style="display:none"></div>
         <div id="hero-chinese" style="display:none"></div>
         <div id="hero-year-tag" style="display:none"></div>
         <div id="hero-badges" style="display:none"></div>

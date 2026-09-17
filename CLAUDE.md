@@ -155,6 +155,18 @@ Migration plan:
 4. Bump `FACTS_VERSION` in `relationships/scoring.js` so pair readings regenerate on next open.
 5. Consider true solar time (longitude + equation of time) as a separate, later option.
 
+## SEO (Phase 1, 2026-09-17)
+- `seo/meta.js` is the single table of public pages: title, description, canonical, hand-set `published` / `lastmod` dates, and JSON-LD (BreadcrumbList on content pages, Article on the five guide pages, WebApplication + Organization on `/` via the `<!-- HOME_JSONLD -->` marker). Routes spread `seo.pageLocals(path)`; `head.ejs` prints one `<script type="application/ld+json">` per block. New public page → add it to `PAGES`.
+- **`lastmod` rule:** update a page's `lastmod` (YYYY-MM-DD) in `seo/meta.js` whenever its visible content changes, and only then. Never derive it from git or file dates: Render deploys don't reliably carry either, and a date that moves on every deploy teaches Google to ignore it.
+- URL policy: absolute `https://wobazi.com`, no trailing slash (a middleware 301s `/path/` → `/path`; `/app/` excluded). `/Master-Alice.html` and `/about` 301 → `/master-alice`; `/bazi-calculator` 301 → `/`.
+- robots.txt disallows `/api/` (except the share-image endpoints), `/auth/`, `/wobazi2`. Share and invite routes (`/i/`, `/r/`, `/s/`, `/api/share-*`) stay crawlable so links preview on X and others, and send `X-Robots-Tag: noindex` (pages also carry `<meta name="robots" content="noindex">`).
+- Static `/app/*` and `/public/*`: `?v=` URLs are cached for a year (immutable), unversioned for a day. **Bump `?v=` on every change to a CSS/JS/font/image file.**
+- Outfit is self-hosted (`public/fonts/outfit-latin*.woff2`, variable, declared `font-weight: 300 700` to match what Google served) and preloaded. Noto Sans SC / Noto Sans Thai / Noto Serif SC still come from Google Fonts, loaded non-blocking (`rel=preload` + onload swap, `<noscript>` fallback, `display=swap`).
+- Phones/tablets (≤768px): `.oracle-input`, `.oracle-drawer-input`, `.viral-caption`, `.pd-select` are 16px so iOS doesn't zoom on focus (the viewport no longer locks zoom).
+- **Post-launch:** serve the logos (`logo-stack.png`, `logo-horiz.png`, `udestiny-logo.png`) as lossless WebP with PNG fallback. 256-colour PNG quantization was tried and bands the gradients, so it was skipped.
+- Homepage H1 is the hero subheading (`h1.logo-sub`, "Free BaZi Calculator — Four Pillars of Destiny"); the logo wordmark is a `p`.
+- No `twitter:site` (no confirmed X handle). Instagram is @wo.bazi.
+
 ## Shared nav + footer (updated 2026-09-16)
 - `views/partials/footer.ejs` is the one site footer. EJS pages include it; `sendApp` in `server.js` renders it into every `<!-- SITE_FOOTER -->` marker in `app/index.html` (landing + results). Footer CSS lives in `app/style.css` (`.seo-footer*`).
 - `views/partials/nav-menu.ejs` is the right side of every header plus its menu. EJS pages include it with `ctx: 'site'`; `sendApp` renders it into each `<!-- NAV_MENU:<ctx> -->` marker (`landing`, `input`, `results`, `portal`, `oracle`). Signed-in state comes from `res.locals.user` (cookie session), so the header is correct on first paint.

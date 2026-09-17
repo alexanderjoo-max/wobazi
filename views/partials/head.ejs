@@ -23,10 +23,17 @@
 <meta name="twitter:description" content="<%= description %>">
 <meta name="twitter:image" content="<%= typeof ogImage !== 'undefined' && ogImage ? ogImage : (baseUrl + '/og-card.jpg') %>">
 <meta property="og:site_name" content="Wobazi">
+<% if (typeof jsonLd !== 'undefined' && Array.isArray(jsonLd)) { jsonLd.forEach(function (block) { %><script type="application/ld+json">
+<%- JSON.stringify(block, null, 2).replace(/</g, '\\u003c') %>
+</script>
+<% }) } %>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/public/fonts/outfit-latin.woff2?v=15" as="font" type="font/woff2" crossorigin>
+<!-- Chinese/Thai/serif fonts load without blocking first paint (font-display: swap keeps text visible) -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"></noscript>
 <script>
 (function () {
   var lang = 'en';
@@ -39,7 +46,7 @@
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
 })();
 </script>
-<link rel="stylesheet" href="/app/style.css?v=79">
+<link rel="stylesheet" href="/app/style.css?v=81">
 <link rel="stylesheet" href="/app/portal.css?v=8">
 <link rel="stylesheet" href="/public/css/public.css?v=23">
 <style id="wobazi-i18n-css">

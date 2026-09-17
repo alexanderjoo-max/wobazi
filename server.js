@@ -13,6 +13,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const bazi = require('./bazi-engine');
+const seo = require('./seo/meta');
 const { buildSystemPrompt: buildOraclePrompt } = require('./oracle/prompt');
 
 const app = express();
@@ -83,6 +84,29 @@ app.use(cookieSession({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+/* One URL per page: no trailing slash (except "/"). /app/ is left alone (see the SPA route below). */
+app.use((req, res, next) => {
+  if ((req.method === 'GET' || req.method === 'HEAD') && req.path.length > 1 && req.path.endsWith('/')
+    && req.path !== '/app/' && !req.path.startsWith('/api/') && !req.path.startsWith('/auth/')) {
+    const q = req.originalUrl.slice(req.path.length);
+    return res.redirect(301, req.path.replace(/\/+$/, '') + q);
+  }
+  next();
+});
+
+/* Static assets: versioned URLs (?v=) are immutable for a year; unversioned ones revalidate daily.
+   Bump the ?v= on every file change. */
+function staticCache(req, res, next) {
+  res.set('Cache-Control', req.query.v ? 'public, max-age=31536000, immutable' : 'public, max-age=86400');
+  next();
+}
+
+/* Share and invite links must preview on social apps (so they stay crawlable) but never be indexed. */
+app.use(['/i', '/r', '/s', '/api/share-viral', '/api/share-image', '/api/share-story'], (req, res, next) => {
+  res.set('X-Robots-Tag', 'noindex');
+  next();
+});
+
 /* Signed-in user for server-rendered pages (nav + footer member links). */
 app.use((req, res, next) => {
   res.locals.user = (req.session && req.session.user) || null;
@@ -95,10 +119,11 @@ app.set('views', path.join(__dirname, 'views'));
 
 /* ── Static Files ── */
 app.get('/app/index.html', (req, res, next) => sendApp(req, res, next));
-app.use('/public', express.static(path.join(__dirname, 'public')));
-app.use('/app', express.static(path.join(__dirname, 'app'), {
+app.use('/public', staticCache, express.static(path.join(__dirname, 'public'), { cacheControl: false }));
+app.use('/app', staticCache, express.static(path.join(__dirname, 'app'), {
   index: false,
   redirect: false,
+  cacheControl: false,
 }));
 // Serve logos and og-card from root for backward compat
 app.use('/Logos', express.static(path.join(__dirname, 'Logos')));
@@ -131,33 +156,21 @@ app.get('/apple-touch-icon.png', (req, res) => {
 
 /* ── SEO: Sitemap & Robots ── */
 app.get('/sitemap.xml', (req, res) => {
-  const pages = [
-    { loc: '/', priority: '1.0', changefreq: 'weekly' },
-    { loc: '/Master-Alice.html', priority: '0.8', changefreq: 'monthly' },
-    { loc: '/what-is-bazi', priority: '0.9', changefreq: 'monthly' },
-    { loc: '/four-pillars-of-destiny', priority: '0.8', changefreq: 'monthly' },
-    { loc: '/chinese-astrology', priority: '0.8', changefreq: 'monthly' },
-    { loc: '/day-master', priority: '0.8', changefreq: 'monthly' },
-    { loc: '/bazi-compatibility', priority: '0.8', changefreq: 'monthly' },
-    { loc: '/privacy', priority: '0.3', changefreq: 'yearly' },
-    { loc: '/terms', priority: '0.3', changefreq: 'yearly' },
-  ];
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${pages.map(p => `  <url>
-    <loc>https://wobazi.com${p.loc}</loc>
-    <changefreq>${p.changefreq}</changefreq>
-    <priority>${p.priority}</priority>
-  </url>`).join('\n')}
-</urlset>`;
-  res.type('application/xml').send(xml);
+  res.set('Cache-Control', 'public, max-age=3600');
+  res.type('application/xml').send(seo.sitemapXml());
 });
 
 app.get('/robots.txt', (req, res) => {
+  // Share-card images live under /api/ but must stay fetchable: X and others obey robots.txt for previews.
+  // /i/, /r/ and /s/ stay crawlable so links preview on X and others; they send X-Robots-Tag: noindex instead.
   res.type('text/plain').send(`User-agent: *
 Allow: /
+Allow: /api/share-viral
+Allow: /api/share-image
+Allow: /api/share-story
 Disallow: /api/
 Disallow: /auth/
+Disallow: /wobazi2
 
 Sitemap: https://wobazi.com/sitemap.xml
 `);
@@ -205,6 +218,8 @@ async function sendApp(req, res, next) {
     const user = res.locals.user;
     let html = appIndexHtml();
     const footer = await renderPartial('partials/footer', { user });
+    html = html.replace('<!-- HOME_JSONLD -->', () => seo.homeJsonLd()
+      .map(block => `<script type="application/ld+json">\n${seo.jsonLdScript(block)}\n  </script>`).join('\n  '));
     html = html.split('<!-- SITE_FOOTER -->').join(footer);
     // Landing: exactly one auth state ships in the HTML — guest CTAs or the member welcome, never both.
     if (user) {
@@ -250,6 +265,7 @@ app.get('/s/:id', (req, res) => {
     title: `${v.hook} · Wobazi`,
     description: v.body || v.dare || v.hook,
     canonical: `/s/${id}`,
+    noindex: true,
     ogImage: img,
     storyImage: story,
     verdict: v,
@@ -257,87 +273,41 @@ app.get('/s/:id', (req, res) => {
   });
 });
 
-app.get('/Master-Alice.html', (req, res) => {
-  res.render('pages/master-alice', {
-    ...seoBase,
-    title: 'Master Alice — BaZi & Destiny Master | Wobazi',
-    description: 'Master Alice (ซินแสมาสเตอร์อลิซ) is the face and engine of Wobazi. Bangkok-based BaZi, Feng Shui, and destiny consulting — a U Destiny product.',
-    canonical: '/Master-Alice.html',
-  });
+app.get('/master-alice', (req, res) => {
+  res.render('pages/master-alice', { ...seoBase, ...seo.pageLocals('/master-alice') });
 });
-app.get('/about', (req, res) => res.redirect(301, '/Master-Alice.html'));
+app.get('/Master-Alice.html', (req, res) => res.redirect(301, '/master-alice'));
+app.get('/about', (req, res) => res.redirect(301, '/master-alice'));
 
 app.get('/what-is-bazi', (req, res) => {
-  res.render('pages/what-is-bazi', {
-    ...seoBase,
-    title: 'What is BaZi? Chinese Astrology & Four Pillars Explained | WoBazi',
-    description: 'Learn about BaZi (八字), the ancient Chinese astrology system based on your birth date and time. Understand the Four Pillars of Destiny, Heavenly Stems, Earthly Branches, and Five Elements.',
-    canonical: '/what-is-bazi',
-    bazi,
-  });
+  res.render('pages/what-is-bazi', { ...seoBase, ...seo.pageLocals('/what-is-bazi'), bazi });
 });
 
-app.get('/bazi-calculator', (req, res) => {
-  res.redirect(302, '/');
-});
+app.get('/bazi-calculator', (req, res) => res.redirect(301, '/'));
 
 app.get('/four-pillars-of-destiny', (req, res) => {
-  res.render('pages/four-pillars', {
-    ...seoBase,
-    title: 'Four Pillars of Destiny | BaZi Chinese Astrology Guide | WoBazi',
-    description: 'Complete guide to the Four Pillars of Destiny (BaZi). Learn about Year, Month, Day, and Hour pillars, Heavenly Stems, Earthly Branches, and 10-Year Luck Pillars.',
-    canonical: '/four-pillars-of-destiny',
-    bazi,
-  });
+  res.render('pages/four-pillars', { ...seoBase, ...seo.pageLocals('/four-pillars-of-destiny'), bazi });
 });
 
 app.get('/chinese-astrology', (req, res) => {
-  res.render('pages/chinese-astrology', {
-    ...seoBase,
-    title: 'Chinese Astrology | BaZi, Four Pillars & Chinese Zodiac | WoBazi',
-    description: 'Explore Chinese astrology systems: BaZi (Four Pillars), Chinese Zodiac, Zi Wei Dou Shu, and Five Elements. Compare Chinese vs Western astrology.',
-    canonical: '/chinese-astrology',
-    bazi,
-  });
+  res.render('pages/chinese-astrology', { ...seoBase, ...seo.pageLocals('/chinese-astrology'), bazi });
 });
 
 app.get('/day-master', (req, res) => {
-  res.render('pages/day-master', {
-    ...seoBase,
-    title: 'BaZi Day Master | What is Your Day Master? | WoBazi',
-    description: 'Discover your BaZi Day Master. Learn about all 10 Day Masters from Jia Wood to Gui Water, and how your Day Master shapes your personality and destiny.',
-    canonical: '/day-master',
-    bazi,
-  });
+  res.render('pages/day-master', { ...seoBase, ...seo.pageLocals('/day-master'), bazi });
 });
 
 app.get('/bazi-compatibility', (req, res) => {
-  res.render('pages/compatibility', {
-    ...seoBase,
-    title: 'BaZi Compatibility | Chinese Astrology Relationship Guide | WoBazi',
-    description: 'Explore BaZi compatibility and Chinese astrology relationship analysis. Learn about zodiac clashes, combinations, and how to assess romantic and business compatibility.',
-    canonical: '/bazi-compatibility',
-    bazi,
-  });
+  res.render('pages/compatibility', { ...seoBase, ...seo.pageLocals('/bazi-compatibility'), bazi });
 });
 
 app.get('/privacy', (req, res) => {
-  res.render('pages/privacy', {
-    ...seoBase,
-    title: 'Privacy Policy | WoBazi',
-    description: 'How WoBazi collects, uses, and protects your information, including Google sign-in, birth data, and AI-generated readings.',
-    canonical: '/privacy',
-  });
+  res.render('pages/privacy', { ...seoBase, ...seo.pageLocals('/privacy') });
 });
 app.get('/privacy-policy', (req, res) => res.redirect(301, '/privacy'));
 
 app.get('/terms', (req, res) => {
-  res.render('pages/terms', {
-    ...seoBase,
-    title: 'Terms of Service | WoBazi',
-    description: 'Terms of Service for WoBazi, the free BaZi (Four Pillars of Destiny) reading app.',
-    canonical: '/terms',
-  });
+  res.render('pages/terms', { ...seoBase, ...seo.pageLocals('/terms') });
 });
 app.get('/terms-of-service', (req, res) => res.redirect(301, '/terms'));
 app.get('/tos', (req, res) => res.redirect(301, '/terms'));
