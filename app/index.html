@@ -87,6 +87,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/app/style.css?v=76">
   <link rel="stylesheet" href="/app/portal.css?v=8">
+  <link rel="stylesheet" href="/app/relationships.css?v=1">
   <style id="wobazi-i18n-css">
     html[data-lang="en"] .zh, html[data-lang="en"] .th { display: none !important; }
     html[data-lang="th"] .zh:has(~ .th), html[data-lang="th"] .zh.hide { display: none !important; }
@@ -1188,6 +1189,9 @@
         <div id="power-days-card"></div>
       </section>
 
+      <!-- Relationships: People (list + person pages; driven by app/relationships.js) -->
+      <section class="section" data-tab="relationships" id="res-rel-people"></section>
+
       <!-- Love & Relationships (moved to Relationships tab) -->
       <section class="section" data-tab="relationships" id="res-rel-forecast">
         <div class="section-head" data-tip="love-section">
@@ -1656,7 +1660,9 @@
   <script src="/bazi-engine.js?v=9"></script>
   <script src="/verdict.js?v=2"></script>
   <script src="/app/portal.js?v=6"></script>
-  <script src="/app/script.js?v=56"></script>
+  <script src="/app/script.js?v=57"></script>
   <script src="/app/share-viral.js?v=6"></script>
+  <script src="/app/rel-form.js?v=1"></script>
+  <script src="/app/relationships.js?v=1"></script>
 </body>
 </html>

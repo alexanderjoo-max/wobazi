@@ -59,6 +59,7 @@ public/                Static assets for SEO pages
 - `readings` — User birth data (PK: google_id)
 - `oracle_chats` — Chat history (PK: google_id)
 - `sessions` — Express sessions
+- `people`, `relationship_readings`, `relationship_invites`, `relationship_share_links`, `user_birth_places` — Relationships (see below)
 - `daily_readings` — AI-generated daily BaZi readings (added by batch system)
   - Indexed on (user_id, date) for fast lookup
   - One record per user per day
@@ -126,6 +127,33 @@ Google sign-in only. Mounted in `server.js` via `require('./portal').mount(app, 
 - **Account**: export `/api/portal/export?format=json|md`; `POST /api/portal/delete-account {confirm:"DELETE"}` wipes users, readings, oracle_chats, snapshots, journal, daily_readings, legacy sessions.
 - **Guest conversion**: one dismissible "Keep this chart" card per device (`localStorage wobazi_keep_prompt_v1`). After sign-in, `onAuth()` saves the browser's chart to `readings` only if the account has none.
 - Hooks in `script.js`: `captureToday` at the end of the daily-guidance IIFE, `onAuth` in `checkAuth`, `isRoute/route` in `applyRoute`.
+
+## Relationships: people, pair readings, invites, sharing (added 2026-09-17)
+
+Mounted in `server.js` via `require('./relationships').mount(app, db, { deepseek, genAI })` (reuses the existing AI clients). Everything lives inside the existing Relationships tab: `#res-rel-people` is the first section; the older sections (Love forecast, Compatibility, Profile, Compatibility Check, Soul Animals, Business) are unchanged below it. Client: `app/rel-form.js` (shared birth form) + `app/relationships.js` + `app/relationships.css`, loaded after `script.js`. No new env vars except the optional paywall flag.
+
+- **Routes (hash)**: `#relationships` list · `#relationships/p/:id` person page. Hook: `WobaziRel.isRoute/route` in `applyRoute` (before the portal hook). While a person page is open, `#results.rel-detail-open` hides the other Relationships sections and chip bar.
+- **Tables** (`relationships/schema.js`, `up`/`down`): `people` (manual rows hold the birth data the owner typed; invite-linked rows hold none and read the other account's `readings` live), `relationship_readings` (one per person row, keyed by `input_hash` of both charts + type), `relationship_invites` (14 days, single use), `relationship_share_links` (`revoked_at`), `user_birth_places`. Drop all: `node relationships/migrate.js down --confirm` (note a Litestream restore point first).
+- **Calculation vs wording**: `relationships/scoring.js` computes everything deterministically (Element Complementarity, Day Master Dynamic, Branch Harmony vs Clash across all known branch pairs, 3–5 friction candidates, Spouse Palace needs/offers for romantic, work style for business). Pair archetype names come from the fixed catalog in `archetypes.js`, never from the LLM. The LLM (`prompt.js`) gets facts only, no names or dates, and writes `{name}` for the other person; the client substitutes the first name.
+- **Generation** (`readings.js` + `llm.js`): once per person on add, cached; regenerated only when `input_hash` changes (either chart or the type). Rename does not regenerate. DeepSeek (`response_format: json_object`) → `validate.js` → Gemini 2.5 Flash (`responseMimeType: application/json`) → validate. Both fail → `status: 'error'`, scores/archetype still show, Retry button. Facts are stored at `pending`, so archetype + scores render immediately; `pending` older than 2 min after a restart is restarted.
+- **Validation rules**: required keys and lengths, friction ids must come from the candidates, only the type's section, banned wording (fatalism, mysticism, gendered pronouns/roles, years).
+- **Invites**: `/i/:token` (public) shows a Day Master teaser; birth data is kept in the cookie session (`relInvite`) during Google sign-in; `relationships.js` finishes `POST /api/rel/invites/accept` on return (`localStorage wobazi_rel_invite_pending` or `?auth=success`). Accept saves the recipient's chart to `readings` if they have none and creates a linked `people` row on both accounts. LINE in-app browser is bounced out with `openExternalBrowser=1`; Instagram/Facebook webviews show an "Open in browser" note (Google blocks sign-in there).
+- **Sharing**: `/r/:token` public page + `/r/:token/story.png` (1080×1920) and `/og.png` (1200×630), rendered with the share fonts + `relationships/fonts/NotoSansThai-Bold.ttf`, cached as PNGs in `rel-share-cache/` next to `DB_PATH` (temp dir locally; disposable). Content: first names, archetype, catalog description, three scores. The other person's first name is off by default for every person (manual and linked); fallback is "their partner / a friend / a family member / a business partner". Revoked or unknown tokens render `rel-gone.ejs` with 404.
+- **Paywall**: `RELATIONSHIPS_PAYWALL=on` enables free = 1 person + headline + scorecard; paid = unlimited + friction map + type sections. Unset = off (default). `flags.isPaidUser` is the billing hook (always false). Invite and share pages ignore it.
+- **Account delete / export**: `portal/routes.js` calls `relationships/account.js` `wipeUser` inside the same transaction as the rest of the delete. It removes the user's people, rows in other users' lists linked to them (deleted outright, not left as placeholders), their pair readings and share links, invites they sent or accepted, and `user_birth_places`; cached share PNGs are purged after commit. Export lists people with birth data only for rows the user typed.
+- Tests: `node --test test/relationships.test.js` (not in `npm test`).
+
+### Known accuracy issue: every chart uses +08:00 (first post-launch task)
+Every chart, including the user's own chart and all people, is calculated in the engine default `tzOffsetMinutes: +480`, whatever the birth place. Births outside UTC+8 (e.g. Bangkok +7, Sydney +10, US) can land in the wrong hour pillar, and near midnight or a 节 boundary the wrong day or month pillar. It was kept deliberately so existing readings don't change.
+
+Data is being collected now: `people.birth_lat/lon/country/birth_tz/birth_tz_source` for new people, and `user_birth_places` for account holders (from invite drafts, or geocoded in the background from `readings.birthplace` when the People list loads). `tz_source` is `country` (exact, single-zone country) or `longitude` (nearest standard offset among the country's zones; approximate).
+
+Migration plan:
+1. Resolve IANA zones precisely from stored lat/lon (a coordinate→tz lookup) and backfill `user_birth_places` for users whose birthplace label never geocoded; ask users with no birthplace to confirm one.
+2. Compute the historical UTC offset for the birth instant from the IANA zone (DST and pre-1970 rules), and pass it as `tzOffsetMinutes` in `calcBaziAccurate` from the app, portal, batch and relationships (`relationships/chart.js`) at the same time, so every side of a pair uses the same convention.
+3. Show a one-time "Your chart was updated for your birth time zone" notice where a pillar changes; don't rewrite stored `reading_snapshots` history.
+4. Bump `FACTS_VERSION` in `relationships/scoring.js` so pair readings regenerate on next open.
+5. Consider true solar time (longitude + equation of time) as a separate, later option.
 
 ## Shared nav + footer (updated 2026-09-16)
 - `views/partials/footer.ejs` is the one site footer. EJS pages include it; `sendApp` in `server.js` renders it into every `<!-- SITE_FOOTER -->` marker in `app/index.html` (landing + results). Footer CSS lives in `app/style.css` (`.seo-footer*`).

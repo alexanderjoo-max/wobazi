@@ -899,6 +899,10 @@ function applyRoute(hash) {
     }
     return;
   }
+  if (window.WobaziRel && WobaziRel.isRoute(h)) {
+    WobaziRel.route(h);
+    return;
+  }
   if (window.WobaziPortal && WobaziPortal.isRoute(h)) {
     WobaziPortal.route(h);
     return;

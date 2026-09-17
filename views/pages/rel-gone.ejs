@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <link rel="stylesheet" href="/app/relationships.css?v=1">
+</head>
+<body class="seo-page notfound-page">
+  <%- include('../partials/nav') %>
+
+  <main class="seo-main notfound-main">
+    <p class="notfound-han" aria-hidden="true">空亡</p>
+    <p class="legal-kicker">404</p>
+    <% if (kind === 'invite') { %>
+    <h1>
+      <span class="en">This invite has expired or was already used</span><span class="zh hide">此邀请已过期或已被使用</span><span class="th hide">คำเชิญนี้หมดอายุหรือถูกใช้ไปแล้ว</span>
+    </h1>
+    <p class="notfound-lead">
+      <span class="en">Ask for a new link, or start with your own chart.</span>
+      <span class="zh hide">请对方重新发送链接，或先排出你自己的命盘。</span>
+      <span class="th hide">ขอลิงก์ใหม่ หรือเริ่มจากแผนภูมิของคุณเอง</span>
+    </p>
+    <% } else { %>
+    <h1>
+      <span class="en">This reading is no longer shared</span><span class="zh hide">这份解读已不再公开</span><span class="th hide">ผลการอ่านนี้ไม่ได้แชร์แล้ว</span>
+    </h1>
+    <p class="notfound-lead">
+      <span class="en">The link was turned off by the person who shared it. You can still get your own.</span>
+      <span class="zh hide">分享者已关闭此链接。你仍然可以获取自己的解读。</span>
+      <span class="th hide">ผู้แชร์ปิดลิงก์นี้แล้ว คุณยังรับผลการอ่านของตัวเองได้</span>
+    </p>
+    <% } %>
+    <div class="notfound-cta">
+      <a href="/?begin=1" class="btn-primary"><span class="en">Get your own compatibility reading</span><span class="zh hide">获取你的合盘解读</span><span class="th hide">รับผลความเข้ากันของคุณเอง</span></a>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

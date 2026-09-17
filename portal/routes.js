@@ -15,6 +15,7 @@
 'use strict';
 
 const express = require('express');
+const relationshipsAccount = require('../relationships/account');
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const MONTH_RE = /^\d{4}-\d{2}$/;
@@ -91,6 +92,7 @@ function toMarkdown(data) {
       if (r.journal.note) lines.push('**Your note:**', '', r.journal.note.split('\n').map(l => `> ${l}`).join('\n'), '');
     }
   });
+  lines.push(...relationshipsAccount.exportMarkdown(data.relationships));
   return lines.join('\n');
 }
 
@@ -300,6 +302,7 @@ function createRoutes(db) {
       birthChart: birth,
       readings: rows.map(r => ({ date: r.date, savedAt: r.created_at, summary: parseSummary(r), journal: journalOf(r) })),
       oracleChat,
+      relationships: relationshipsAccount.exportUser(db, gid),
     };
     const stamp = new Date().toISOString().slice(0, 10);
     if (req.query.format === 'md') {
@@ -318,7 +321,10 @@ function createRoutes(db) {
     if (!req.body || req.body.confirm !== 'DELETE') {
       return res.status(400).json({ error: 'Type DELETE to confirm' });
     }
+    let removedPeople = [];
     const wipe = db.transaction(id => {
+      // Relationships first (people rows reference users). Same transaction: all or nothing.
+      removedPeople = relationshipsAccount.wipeUser(db, id);
       db.prepare('DELETE FROM journal_entries WHERE google_id = ?').run(id);
       db.prepare('DELETE FROM reading_snapshots WHERE google_id = ?').run(id);
       if (tableExists(db, 'daily_readings')) db.prepare('DELETE FROM daily_readings WHERE user_id = ?').run(id);
@@ -337,6 +343,7 @@ function createRoutes(db) {
       console.error('[Portal] delete-account failed:', err.message);
       return res.status(500).json({ error: 'Could not delete account' });
     }
+    relationshipsAccount.purgeCards(removedPeople);
     req.session = null;
     res.json({ ok: true });
   });

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/app/relationships.css?v=1">
+</head>
+<body class="seo-page rel-public">
+  <%- include('../partials/nav') %>
+  <% const member = typeof user !== 'undefined' && user; %>
+  <% const typeLabel = { romantic: ['a partner', '伴侣', 'คู่รัก'], friend: ['a friend', '朋友', 'เพื่อน'], family: ['family', '家人', 'ครอบครัว'], business: ['a business partner', '合作伙伴', 'คู่ธุรกิจ'] }[relType]; %>
+
+  <main class="rel-public-main rel-invite" id="rel-invite"
+    data-token="<%= inviteToken %>"
+    data-signed-in="<%= member ? '1' : '' %>"
+    data-has-chart="<%= userHasChart ? '1' : '' %>">
+
+    <section class="rel-public-copy">
+      <p class="rel-kicker"><span class="en">Compatibility invite</span><span class="zh hide">合盘邀请</span><span class="th hide">คำเชิญดูความเข้ากัน</span></p>
+      <h1 class="rel-invite-title">
+        <span class="en"><%= inviterFirst %> wants to compare charts with you</span>
+        <span class="zh hide"><%= inviterFirst %> 想和你合盘</span>
+        <span class="th hide"><%= inviterFirst %> อยากเทียบแผนภูมิกับคุณ</span>
+      </h1>
+      <p class="rel-public-desc">
+        <span class="en">Added as <%= typeLabel[0] %>. Enter your birth details to see your Day Master now, then link up to get your pair reading.</span>
+        <span class="zh hide">关系：<%= typeLabel[1] %>。输入你的出生资料，马上看到你的日主，然后连接账号获取合盘解读。</span>
+        <span class="th hide">ในฐานะ<%= typeLabel[2] %> กรอกข้อมูลเกิดเพื่อดูเจ้าวันของคุณทันที แล้วเชื่อมบัญชีเพื่อรับผลความเข้ากัน</span>
+      </p>
+    </section>
+
+    <% if (ownInvite) { %>
+    <div class="rel-card">
+      <p><span class="en">This is your own invite link. Send it to the person you want to compare with.</span><span class="zh hide">这是你自己的邀请链接，请发给想合盘的人。</span><span class="th hide">นี่คือลิงก์คำเชิญของคุณเอง ส่งให้คนที่คุณอยากเทียบด้วย</span></p>
+      <a href="/#relationships" class="btn-secondary"><span class="en">Back to Relationships</span><span class="zh hide">返回关系</span><span class="th hide">กลับไปที่ความสัมพันธ์</span></a>
+    </div>
+    <% } else { %>
+
+    <div class="rel-card hide" id="inv-inapp" role="note">
+      <p class="rel-card-title"><span class="en">Open this page in your browser to sign in</span><span class="zh hide">请在浏览器中打开此页面以登录</span><span class="th hide">เปิดหน้านี้ในเบราว์เซอร์เพื่อเข้าสู่ระบบ</span></p>
+      <p class="rel-muted"><span class="en">Google sign-in doesn't work inside this app. Tap ⋯ and choose "Open in browser", or copy the link. You can still preview your Day Master here.</span><span class="zh hide">此应用内无法使用 Google 登录。点 ⋯ 选择「在浏览器中打开」，或复制链接。你仍可在此预览日主。</span><span class="th hide">เข้าสู่ระบบด้วย Google ในแอปนี้ไม่ได้ แตะ ⋯ แล้วเลือก "เปิดในเบราว์เซอร์" หรือคัดลอกลิงก์ คุณยังดูตัวอย่างเจ้าวันได้ที่นี่</span></p>
+      <button type="button" class="btn-secondary" id="inv-copy"><span class="en">Copy link</span><span class="zh hide">复制链接</span><span class="th hide">คัดลอกลิงก์</span></button>
+    </div>
+
+    <% if (member && userHasChart) { %>
+    <div class="rel-card" id="inv-saved">
+      <p><span class="en">Signed in as <%= member.name %>. We'll use the chart saved on your account.</span><span class="zh hide">已登录：<%= member.name %>。将使用你账号中保存的命盘。</span><span class="th hide">เข้าสู่ระบบในชื่อ <%= member.name %> เราจะใช้แผนภูมิที่บันทึกในบัญชีของคุณ</span></p>
+    </div>
+    <% } else { %>
+    <form class="rel-card bazi-mini-form" id="inv-form" novalidate>
+      <%- include('../partials/rel-birth-fields', { prefix: 'inv', withName: true }) %>
+      <p class="field-error hide" id="inv-error" role="alert"></p>
+      <button type="submit" class="btn-primary btn-full" id="inv-preview">
+        <span class="en">See my Day Master</span><span class="zh hide">查看我的日主</span><span class="th hide">ดูเจ้าวันของฉัน</span>
+      </button>
+    </form>
+    <% } %>
+
+    <div class="rel-card rel-teaser hide" id="inv-teaser" aria-live="polite">
+      <p class="rel-kicker"><span class="en">Your Day Master</span><span class="zh hide">你的日主</span><span class="th hide">เจ้าวันของคุณ</span></p>
+      <div class="rel-teaser-row">
+        <span class="rel-teaser-char" id="inv-dm-char"></span>
+        <div>
+          <p class="rel-teaser-name" id="inv-dm-name"></p>
+          <p class="rel-muted" id="inv-dm-el"></p>
+        </div>
+      </div>
+      <p class="rel-teaser-line" id="inv-dm-line"></p>
+    </div>
+
+    <div class="rel-card hide" id="inv-link">
+      <p class="field-error hide" id="inv-link-error" role="alert"></p>
+      <button type="button" class="btn-primary btn-full" id="inv-connect">
+        <% if (member) { %>
+        <span class="en">Link with <%= inviterFirst %></span><span class="zh hide">与 <%= inviterFirst %> 连接</span><span class="th hide">เชื่อมกับ <%= inviterFirst %></span>
+        <% } else { %>
+        <span class="en">Sign in with Google to link</span><span class="zh hide">使用 Google 登录并连接</span><span class="th hide">เข้าสู่ระบบด้วย Google เพื่อเชื่อม</span>
+        <% } %>
+      </button>
+      <p class="rel-muted">
+        <span class="en"><%= inviterFirst %> won't see your birth date, time or place. You'll each see a compatibility reading, and you can remove the link anytime.</span>
+        <span class="zh hide"><%= inviterFirst %> 看不到你的出生日期、时间或地点。你们各自会看到合盘解读，并可随时解除连接。</span>
+        <span class="th hide"><%= inviterFirst %> จะไม่เห็นวันเวลาหรือสถานที่เกิดของคุณ ต่างคนต่างเห็นผลความเข้ากัน และยกเลิกการเชื่อมได้ทุกเมื่อ</span>
+      </p>
+    </div>
+    <% } %>
+  </main>
+
+  <%- include('../partials/footer') %>
+  <script src="/app/rel-form.js?v=1"></script>
+  <script src="/app/rel-invite.js?v=1"></script>
+</body>
+</html>

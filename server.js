@@ -838,6 +838,9 @@ require('./share').mount(app);
 // ── Registered user portal ──
 require('./portal').mount(app, db);
 
+// ── Relationships (people, pair readings, invites, public share pages) ──
+require('./relationships').mount(app, db, { deepseek, genAI });
+
 /* ── 404 + error pages (must stay after every route) ── */
 function wantsJson(req) {
   return req.path.startsWith('/api/') || req.path.startsWith('/auth/') || (req.get('accept') || '').indexOf('text/html') === -1;

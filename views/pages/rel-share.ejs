@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <meta property="og:image:alt" content="<%= card.archetype %> · <%= card.names %>">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/app/relationships.css?v=1">
+</head>
+<body class="seo-page rel-public">
+  <%- include('../partials/nav') %>
+
+  <main class="rel-public-main">
+    <figure class="rel-public-card">
+      <img src="/r/<%= token %>/og.png" alt="<%= card.archetype %> · <%= card.names %>" width="1200" height="630">
+    </figure>
+
+    <section class="rel-public-copy">
+      <p class="rel-kicker"><span class="en">Compatibility</span><span class="zh hide">合盘</span><span class="th hide">ความเข้ากัน</span></p>
+      <p class="rel-public-names"><%= card.names %></p>
+      <h1 class="rel-archetype-name"><%= card.archetype %></h1>
+      <p class="rel-public-desc"><%= card.description %></p>
+
+      <div class="rel-scorecard">
+        <% card.scores.forEach(function (s) { %>
+        <div class="rel-score">
+          <div class="rel-score-top"><span class="rel-score-label"><%= s.label %></span><span class="rel-score-val"><%= s.value %></span></div>
+          <div class="rel-bar"><div class="rel-bar-fill" style="width: <%= Math.max(4, s.value) %>%"></div></div>
+        </div>
+        <% }) %>
+      </div>
+
+      <div class="rel-public-cta">
+        <a href="/?begin=1" class="btn-primary btn-full">
+          <span class="en">Get your own compatibility reading</span><span class="zh hide">获取你的合盘解读</span><span class="th hide">รับผลความเข้ากันของคุณเอง</span>
+        </a>
+        <p class="rel-muted">
+          <span class="en">Free. Plot your chart in under a minute, then add the people in your life.</span>
+          <span class="zh hide">免费。一分钟内排出命盘，再添加你身边的人。</span>
+          <span class="th hide">ฟรี จัดแผนภูมิในไม่ถึงนาที แล้วเพิ่มคนในชีวิตของคุณ</span>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

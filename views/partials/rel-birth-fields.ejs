@@ -1,0 +1,40 @@
+<%# Birth fields for relationships forms (invite page). Same classes as the app's birth form. %>
+<% if (withName) { %>
+<div class="field">
+  <label for="<%= prefix %>-name"><span class="en">Your first name</span><span class="zh hide">你的名字</span><span class="th hide">ชื่อของคุณ</span></label>
+  <input type="text" id="<%= prefix %>-name" maxlength="60" autocomplete="given-name" spellcheck="false">
+</div>
+<% } %>
+<div class="field field-date-block">
+  <label for="<%= prefix %>-day"><span class="en">Date of birth <span class="label-req">*Required</span></span><span class="zh hide">出生日期 <span class="label-req">*必填</span></span><span class="th hide">วันเกิด <span class="label-req">*จำเป็น</span></span></label>
+  <div class="date-trio">
+    <input type="number" id="<%= prefix %>-day" class="date-part" placeholder="DD" min="1" max="31" inputmode="numeric" aria-label="Day">
+    <span class="date-sep">/</span>
+    <input type="number" id="<%= prefix %>-month" class="date-part" placeholder="MM" min="1" max="12" inputmode="numeric" aria-label="Month">
+    <span class="date-sep">/</span>
+    <input type="number" id="<%= prefix %>-year" class="date-part year" placeholder="YYYY" min="1900" max="2100" inputmode="numeric" aria-label="Year">
+  </div>
+  <div class="cal-seg" role="radiogroup" aria-label="Calendar type">
+    <button type="button" class="cal-seg-btn active" data-cal="solar" role="radio" aria-checked="true"><span aria-hidden="true">☀️</span> <span class="en">Solar</span><span class="zh hide">阳历</span><span class="th hide">สุริยคติ</span></button>
+    <button type="button" class="cal-seg-btn" data-cal="lunar" role="radio" aria-checked="false"><span aria-hidden="true">🌙</span> <span class="en">Lunar</span><span class="zh hide">农历</span><span class="th hide">จันทรคติ</span></button>
+  </div>
+  <label class="leap-opt hide" data-leap-wrap>
+    <input type="checkbox" id="<%= prefix %>-leap">
+    <span class="en">Leap month</span><span class="zh hide">闰月</span><span class="th hide">เดือนอธิกมาส</span>
+  </label>
+</div>
+<div class="field">
+  <label for="<%= prefix %>-time"><span class="en">Birth time <span class="label-opt">local clock</span></span><span class="zh hide">出生时间 <span class="label-opt">当地钟点</span></span><span class="th hide">เวลาเกิด <span class="label-opt">นาฬิกาท้องถิ่น</span></span></label>
+  <input type="time" id="<%= prefix %>-time" class="time-input">
+  <label class="time-unknown-opt">
+    <input type="checkbox" id="<%= prefix %>-time-unknown">
+    <span class="en">I don't know the hour</span><span class="zh hide">我不知道出生时辰</span><span class="th hide">ฉันไม่ทราบเวลาเกิด</span>
+  </label>
+</div>
+<div class="field">
+  <label for="<%= prefix %>-place"><span class="en">Birth city <span class="label-opt">for time zone</span></span><span class="zh hide">出生城市 <span class="label-opt">用于时区</span></span><span class="th hide">เมืองเกิด <span class="label-opt">สำหรับเขตเวลา</span></span></label>
+  <div class="city-wrap">
+    <input type="text" id="<%= prefix %>-place" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="<%= prefix %>-place-list" placeholder="Start typing a city...">
+    <ul id="<%= prefix %>-place-list" class="city-suggest hide" role="listbox"></ul>
+  </div>
+</div>
